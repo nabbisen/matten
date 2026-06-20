@@ -74,11 +74,13 @@
 //   ops/        element-wise + scalar operators and broadcasting (M3)
 //   reshape     reshape, flatten, transpose, swap_axes helpers (M4)
 //   slice       SliceSpec, SliceBuilder, execute_slice, slice_str (M4)
+//   math        sum/mean/min/max, axis reductions, dot, matmul (M7, here)
 //   ser         Serialize/Deserialize for Tensor (M5, here)
 //   parse/      JSON/CSV boundary parsers (M5, here)
 //   dynamic/    feature-gated `Element` engine (Phase 2)
 mod convert;
 mod error;
+mod math;
 mod ops;
 mod parse;
 mod reshape;

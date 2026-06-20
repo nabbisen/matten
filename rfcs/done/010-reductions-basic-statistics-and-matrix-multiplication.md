@@ -1,6 +1,6 @@
 # RFC-010: Reductions, Basic Statistics, and Matrix Multiplication
 
-> RFC status: Proposed (reconciled v2 — 2026-06-20)  
+> RFC status: Implemented (0.7.0)
 > Project: `matten`  
 > Target audience: library implementers, maintainers, reviewers  
 > Design level: external design first; internal design where needed  

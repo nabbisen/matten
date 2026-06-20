@@ -15,6 +15,7 @@
 - [Shape operations](./reference/shape-ops.md)
 - [Slicing](./reference/slicing.md)
 - [Boundary integration](./reference/boundary.md)
+- [Reductions and matrix multiplication](./reference/math.md)
 
 # Contributors
 

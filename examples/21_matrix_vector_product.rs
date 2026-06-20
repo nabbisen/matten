@@ -1,15 +1,28 @@
-//! **DEFERRED** — matrix × vector multiplication.
+//! Matrix × vector multiplication using `Tensor::matmul`.
 //!
 //! Run: cargo run --example 21_matrix_vector_product
 //!
-//! This example requires `matmul` which is defined in RFC-010 reductions/matmul and not yet
-//! implemented. It will be completed when RFC-010 lands in a future milestone.
-//!
-//! Tracking: https://github.com/nabbisen/matten/issues (RFC-010)
+//! Shape rule: [m, n] × [n] -> [m]
+
+use matten::Tensor;
 
 fn main() {
-    println!(
-        "Example '21_matrix_vector_product' is deferred pending RFC-010 (reductions / matmul)."
-    );
-    println!("Check back after the next milestone — or open a GitHub issue to prioritise it.");
+    // [[1,2,3],[4,5,6]] × [1,0,1] = [4, 10]
+    let m = Tensor::new(vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0], &[2, 3]);
+    let v = Tensor::from_vec(vec![1.0, 0.0, 1.0]);
+
+    let r = m.matmul(&v);
+    println!("m    = {m:?}");
+    println!("v    = {v:?}");
+    println!("m·v  = {r:?}"); // [4.0, 10.0]
+
+    assert_eq!(r.shape(), &[2]);
+    assert_eq!(r.as_slice(), &[4.0, 10.0]);
+
+    // Vector × matrix: [n] × [n, p] -> [p]
+    let w = Tensor::from_vec(vec![1.0, 2.0]);
+    let r2 = w.matmul(&m.transpose());
+    println!("w·mᵀ = {r2:?}");
+
+    println!("Shapes and values verified: OK");
 }

@@ -5,6 +5,30 @@ All notable changes to `matten` are documented here. The format is based on
 follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html) once it reaches
 a public API (`0.1.0`).
 
+## [0.7.0] - 2026-06-20
+
+Milestone **M7 — Reductions and Matrix Multiplication** (RFC-010).
+
+### Added
+
+- Whole-tensor reductions: `sum`, `mean`, `min`, `max` — all returning `f64`.
+  `NaN` propagates through `sum`/`mean`; `min`/`max` return `NaN` if any
+  element is `NaN` (explicit short-circuit, not `f64::min`/`max` which would
+  silently ignore it).
+- Axis reductions: `sum_axis(axis)`, `mean_axis(axis)` — both returning a new
+  `Tensor` with the reduced axis removed.
+- `dot(&rhs)` / `matmul(&rhs)` — four supported shapes:
+  `[n]×[n]→[]`, `[m,n]×[n]→[m]`, `[n]×[n,p]→[p]`, `[m,n]×[n,p]→[m,p]`.
+  `*` remains element-wise.
+- New `src/math.rs` module with all of the above.
+- `src/tests/math.rs` — 28 tests covering reductions, NaN policy, axis ops,
+  all four matmul cases, dimension-mismatch panics, and `*`-vs-`matmul`
+  regression.
+- Examples 20–24 and 26 completed (were deferred stubs):
+  `20_dot_product`, `21_matrix_vector_product`, `22_matrix_multiplication`,
+  `23_sum_mean`, `24_min_max`, `26_cosine_similarity`.
+- `docs/src/reference/math.md` — reference page for all new operations.
+
 ## [0.6.0] - 2026-06-20
 
 Milestone **M6 — Example Suite and CI Hardening** (RFC-013 + RFC-014).

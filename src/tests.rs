@@ -6,6 +6,7 @@
 
 mod convert;
 mod error;
+mod math;
 mod ops;
 mod parse;
 mod reshape;
