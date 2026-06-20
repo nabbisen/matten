@@ -180,7 +180,7 @@ fn nan_axis_reduce(
 ) -> Tensor {
     if axis >= t.ndim() {
         panic!(
-            "matten shape error in {operation}: axis {axis} is out of range              for rank-{} tensor",
+            "matten shape error in {operation}: axis {axis} is out of range for rank-{} tensor",
             t.ndim()
         );
     }

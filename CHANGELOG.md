@@ -5,6 +5,51 @@ All notable changes to `matten` are documented here. The format is based on
 follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html) once it reaches
 a public API (`0.1.0`).
 
+## [0.10.0] - 2026-06-20
+
+**Release Candidate — stabilisation milestone.**
+
+### Added
+
+- **Migration guide** (`docs/src/reference/migration.md`) — how and when to
+  move data from `matten` to `ndarray`, `nalgebra`, or `candle`; code snippets
+  for all three.
+- **Compatibility and stability policy** (`docs/src/reference/compatibility.md`)
+  — v0.x change policy, feature-flag stability, MSRV, deferred items table.
+- **Public API snapshot** (`docs/src/reference/public-api-snapshot.md`) — full
+  enumeration of every public item at v0.10.0, serving as the v1.0.0 baseline.
+
+### Fixed
+
+- Malformed whitespace in `axis_reduce` panic message (`"out of range
+  for rank-{}"` had extra spaces; corrected to single space).
+
+### Release Decision Checklist (roadmap §12)
+
+1. **Family-car identity preserved?** Yes — no `Tensor<T>`, no BLAS, no GPU,
+   no proc-macros. One primary type, two error zones.
+2. **Beginner quick-start without lifetime annotations?** Yes — `00_quickstart`
+   compiles with only `use matten::Tensor`.
+3. **Panics actionable?** Yes — all start with `"matten <category> error in
+   <operation>: …"` and include shape/axis context.
+4. **I/O boundaries return `Result`?** Yes — `from_json`, `from_csv`,
+   `load_json`, `load_csv`, `from_json_dynamic`, `from_csv_dynamic`,
+   `try_new`, `try_reshape`, `try_arange`, `slice_str`, `build()`.
+5. **Limitations stated honestly?** Yes — README, philosophy.md, migration.md,
+   and every example that touches performance warns explicitly.
+6. **Public APIs narrow enough?** Yes — 4 root exports, sealed slice traits,
+   `SliceSpecRepr` is `#[doc(hidden)]`.
+7. **Default compilation lightweight?** Yes — `cargo build --no-default-features`
+   pulls in zero optional deps; default profile adds only `serde`/`serde_json`/`csv`.
+8. **Examples realistic and runnable?** Yes — 35 examples, all `cargo run`-able,
+   all smoke-tested in CI.
+9. **Examples demonstrate accepted APIs?** Yes — no example creates new implicit
+   scope; RFC-014 review complete.
+10. **Feature flags understandable?** Yes — `default = ["serde","json","csv"]`;
+    `dynamic` off by default; each feature is documented.
+11. **Version appropriate?** `0.10.0` is the release candidate on the v0 line.
+    v1.0.0 requires explicit maintainer confirmation.
+
 ## [0.9.0] - 2026-06-20
 
 Milestones **M9, M10, M11** — Dynamic hardening, messy-data workflows, and
