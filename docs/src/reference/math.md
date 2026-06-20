@@ -95,6 +95,27 @@ assert_eq!(c.as_slice(), &[19.0, 22.0, 43.0, 50.0]);
 Incompatible shapes panic with an actionable message including both shapes.
 Batched matmul (rank > 2) is out of scope for Phase 1.
 
+
+## Axis reductions (min and max)
+
+`min_axis` and `max_axis` reduce along an axis, removing it from the output
+shape, and propagate `NaN` the same way `min` and `max` do.
+
+```rust
+use matten::Tensor;
+
+// [[3,1,4],[1,5,9]]
+let m = Tensor::new(vec![3.0,1.0,4.0,1.0,5.0,9.0], &[2,3]);
+
+m.min_axis(0)  // column minimums -> shape [3] -> [1.0, 1.0, 4.0]
+m.max_axis(0)  // column maximums -> shape [3] -> [3.0, 5.0, 9.0]
+m.min_axis(1)  // row minimums   -> shape [2] -> [1.0, 1.0]
+m.max_axis(1)  // row maximums   -> shape [2] -> [4.0, 9.0]
+```
+
+NaN propagation: if any element along the reduced axis is `NaN`, the output
+for that position is `NaN`.
+
 ## `*` is always element-wise
 
 ```rust

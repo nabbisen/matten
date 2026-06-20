@@ -215,3 +215,28 @@ fn try_arange_empty_range_is_err() {
 fn arange_panics_on_zero_step() {
     let _ = Tensor::arange(0.0, 5.0, 0.0);
 }
+
+// ---- get_flat (RFC-007 §10) --------------------------------------------
+
+#[test]
+fn get_flat_in_bounds() {
+    let t = Tensor::new(vec![1.0, 2.0, 3.0, 4.0], &[2, 2]);
+    assert_eq!(t.get_flat(0), Some(1.0));
+    assert_eq!(t.get_flat(1), Some(2.0));
+    assert_eq!(t.get_flat(3), Some(4.0));
+}
+
+#[test]
+fn get_flat_out_of_bounds_is_none() {
+    let t = Tensor::new(vec![1.0, 2.0, 3.0, 4.0], &[2, 2]);
+    assert_eq!(t.get_flat(4), None);
+    assert_eq!(t.get_flat(100), None);
+}
+
+#[test]
+fn get_flat_matches_as_slice_order() {
+    let t = Tensor::new(vec![10.0, 20.0, 30.0], &[3]);
+    for (i, &v) in t.as_slice().iter().enumerate() {
+        assert_eq!(t.get_flat(i), Some(v));
+    }
+}

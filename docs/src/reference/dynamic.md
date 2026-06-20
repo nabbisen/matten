@@ -87,6 +87,40 @@ let filled = t.fill_none(Element::text("unknown"));
 let numeric = t.try_numeric()?;  // MattenError::Unsupported on non-numeric
 ```
 
+
+## Missing-value utilities
+
+```rust
+use matten::{Element, Tensor};
+
+let t = Tensor::from_elements(
+    vec![Element::Float(1.0), Element::None, Element::Float(3.0), Element::None],
+    &[4],
+);
+
+// Count None values
+t.count_none()          // 2
+
+// Boolean-like mask: 1.0 where None, 0.0 elsewhere (Phase 1 f64 tensor)
+let mask = t.none_mask();   // [0.0, 1.0, 0.0, 1.0]
+// RFC-011 named alias:
+let mask = t.is_none_mask(); // identical result
+
+// Constant fill
+let filled = t.fill_none(Element::Float(0.0)); // [1.0, 0.0, 3.0, 0.0]
+
+// Forward-fill: carry last non-None value forward (fallback for leading None)
+let t2 = Tensor::from_elements(
+    vec![Element::None, Element::Float(1.0), Element::None, Element::Float(4.0)],
+    &[4],
+);
+let fwd = t2.forward_fill_none(Element::Float(-1.0));
+// [-1.0, 1.0, 1.0, 4.0]  (leading None takes fallback)
+
+// Sum skipping None (panics on non-numeric non-None elements)
+t.sum_skip_none()  // 4.0  (1.0 + 3.0, None values skipped)
+```
+
 ## Parsing mixed data
 
 ```rust

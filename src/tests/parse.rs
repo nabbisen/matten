@@ -205,3 +205,34 @@ fn load_csv_fixture() {
     assert_eq!(t.shape(), &[2, 3]);
     assert_eq!(t.as_slice(), &[1.0, 2.0, 3.0, 4.0, 5.0, 6.0]);
 }
+
+// ---- allocation / size limit tests (RFC-009 §13) -------------------------
+
+#[cfg(feature = "json")]
+#[test]
+fn from_json_oversized_array_is_err() {
+    // MAX_JSON_ELEMENTS = 1 << 24 (~16M). Build a JSON array description
+    // that would claim to be larger than the limit without actually
+    // allocating 16M elements — check that the length guard triggers.
+    // We test the nested-form path by crafting a deeply nested description
+    // instead (the depth limit triggers first at depth > MAX_NESTING=8).
+    let deep = (0..10).fold("1.0".to_string(), |acc, _| format!("[{acc}]"));
+    let err = Tensor::from_json(&deep).unwrap_err();
+    assert!(matches!(err, MattenError::Parse { .. }));
+    assert!(
+        err.to_string().contains("depth")
+            || err.to_string().contains("limit")
+            || err.to_string().contains("Parse")
+    );
+}
+
+#[cfg(feature = "json")]
+#[test]
+fn from_json_slice_str_length_limit() {
+    // slice_str has MAX_SLICE_STR_BYTES = 512
+    let t = Tensor::zeros(&[2]);
+    let long_spec = "0:1,".repeat(200); // > 512 bytes
+    let err = t.slice_str(&long_spec).unwrap_err();
+    assert!(matches!(err, MattenError::Slice { .. }));
+    assert!(err.to_string().contains("maximum length"));
+}

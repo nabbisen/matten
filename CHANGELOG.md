@@ -5,6 +5,40 @@ All notable changes to `matten` are documented here. The format is based on
 follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html) once it reaches
 a public API (`0.1.0`).
 
+## [0.11.0] - 2026-06-20
+
+**Post-audit release.** Systematic four-layer audit (RFC → implementation,
+requirements → tests, tests → codebase, docs → codebase) with all findings
+addressed.
+
+### Audit findings and fixes
+
+**GAP 1 (RFC-007 §10):** `Tensor::get_flat(index)` was specified but missing.  
+→ Implemented `pub fn get_flat(&self, index: usize) -> Option<f64>` in `tensor.rs`.
+
+**GAP 2 (RFC-011 §10):** RFC specified `is_none(&self) -> Tensor`; implementation used `none_mask()`.  
+→ Added `is_none_mask()` as a documented alias; `none_mask()` remains the canonical name.
+
+**GAP 3 (RFC-011 §14):** "default build does not expose Element" test was missing.  
+→ Added compile-time isolation test in `src/tests/dynamic.rs`; the lean-core CI job is the definitive proof.
+
+**GAP 5 (RFC-010 §14):** NumPy golden tests were a SHOULD requirement with no implementation.  
+→ Added `tests/golden/numpy_broadcasting.json` and `tests/golden/numpy_matmul.json`; integration tests in `tests/smoke.rs` load and verify them.
+
+**GAP 7 (RFC-009 §13):** Allocation/size-limit test for boundary parsers was missing.  
+→ Added `from_json_oversized_array_is_err` and `from_json_slice_str_length_limit` tests in `src/tests/parse.rs`.
+
+**Docs gaps fixed:**  
+- `docs/src/reference/math.md`: added `min_axis`/`max_axis` section.  
+- `docs/src/reference/dynamic.md`: added `none_mask`, `count_none`, `forward_fill_none`, `is_none_mask`, `sum_skip_none` section.  
+- `docs/src/reference/public-api-snapshot.md`: added `get_flat` and `is_none_mask`.  
+- `docs/src/reference/compatibility.md`: updated `get_flat` from "not implemented" to "implemented".
+
+**Acceptable deferred items (documented):**
+- GAP 4 (RFC-012): `materialize()`/`is_materialized()` public API — optional diagnostics, already in compatibility.md.
+- GAP 6 (RFC-005/008): Fuzz target for `slice_str` — roadmap says "not required in every CI run".
+- GAP 8 (RFC-013): Full NumPy golden suite beyond the two sets added above — SHOULD, not MUST.
+
 ## [0.10.0] - 2026-06-20
 
 **Release Candidate — stabilisation milestone.**

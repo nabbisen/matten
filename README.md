@@ -25,7 +25,7 @@ JSON/CSV in and out — without wrestling with views, lifetimes, or trait bounds
 When a prototype becomes performance-critical, `matten` is designed to hand its
 flat data off to a specialized crate.
 
-> **Status: `0.10.0` — Release Candidate.** The complete Phase 1 + Phase 2 API is
+> **Status: `0.11.0` — Post-audit Release Candidate.** The complete Phase 1 + Phase 2 API is
 > in place: construction, shape ops, arithmetic, broadcasting, slicing, reductions,
 > matrix multiplication, JSON/CSV serde, and the `dynamic` heterogeneous-data engine.
 > All 15 design RFCs are in `rfcs/done/`. v1.0.0 requires explicit maintainer

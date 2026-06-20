@@ -188,6 +188,19 @@ impl Tensor {
         Tensor::new(data, &dyn_t.shape)
     }
 
+    /// Alias for [`none_mask`](Tensor::none_mask) — returns a Phase 1 `f64` tensor
+    /// where `1.0` marks `Element::None` positions and `0.0` marks all others.
+    ///
+    /// This name matches the RFC-011 §10 specified API `is_none(&self) -> Tensor`.
+    ///
+    /// # Panics
+    ///
+    /// Panics if called on a non-dynamic tensor.
+    #[cfg(feature = "dynamic")]
+    pub fn is_none_mask(&self) -> Tensor {
+        self.none_mask()
+    }
+
     /// Counts the number of `Element::None` values in the tensor.
     ///
     /// # Panics

@@ -562,6 +562,21 @@ impl Tensor {
         self.data.get(flat).copied()
     }
 
+    /// Returns the element at flat row-major `index`, or `None` if out of bounds.
+    ///
+    /// This is the flat-index companion to [`get`](Tensor::get). The index
+    /// follows the same row-major layout as [`as_slice`](Tensor::as_slice).
+    ///
+    /// ```
+    /// use matten::Tensor;
+    /// let t = Tensor::new(vec![1.0, 2.0, 3.0, 4.0], &[2, 2]);
+    /// assert_eq!(t.get_flat(1), Some(2.0));
+    /// assert_eq!(t.get_flat(10), None);
+    /// ```
+    pub fn get_flat(&self, index: usize) -> Option<f64> {
+        self.data.get(index).copied()
+    }
+
     // ---- Slicing (M4 / RFC-008) ---------------------------------------------
 
     /// Starts a slice builder for this tensor. The builder is the canonical

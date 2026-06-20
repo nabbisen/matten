@@ -51,6 +51,7 @@ pub use matten::SliceConvert;   // sealed supertrait; not for external impl
 | `to_vec()` | `Vec<f64>` |
 | `into_vec(self)` | `Vec<f64>` |
 | `get(coord)` | `Option<f64>` |
+| `get_flat(index)` | `Option<f64>` | flat row-major index |
 
 ## `Tensor` — shape operations
 
@@ -121,6 +122,7 @@ pub use matten::SliceConvert;   // sealed supertrait; not for external impl
 | `is_dynamic()` | `bool` |
 | `fill_none(value)` | — |
 | `none_mask()` | Phase 1 `Tensor` |
+| `is_none_mask()` | Phase 1 `Tensor` | RFC-011 alias for `none_mask` |
 | `count_none()` | `usize` |
 | `forward_fill_none(fallback)` | — |
 | `sum_skip_none()` | `f64` |

@@ -1,0 +1,31 @@
+{
+  "cases": [
+    {
+      "description": "scalar [] + matrix [2,3]",
+      "left_shape": [],
+      "left_data": [2.0],
+      "right_shape": [2, 3],
+      "right_data": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
+      "result_shape": [2, 3],
+      "result_data": [3.0, 4.0, 5.0, 6.0, 7.0, 8.0]
+    },
+    {
+      "description": "vector [4] + matrix [3,4]",
+      "left_shape": [4],
+      "left_data": [1.0, 2.0, 3.0, 4.0],
+      "right_shape": [3, 4],
+      "right_data": [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0, 110.0, 120.0],
+      "result_shape": [3, 4],
+      "result_data": [11.0, 22.0, 33.0, 44.0, 51.0, 62.0, 73.0, 84.0, 91.0, 102.0, 113.0, 124.0]
+    },
+    {
+      "description": "column [3,1] + row [1,4] outer-product pattern",
+      "left_shape": [3, 1],
+      "left_data": [1.0, 2.0, 3.0],
+      "right_shape": [1, 4],
+      "right_data": [10.0, 20.0, 30.0, 40.0],
+      "result_shape": [3, 4],
+      "result_data": [11.0, 21.0, 31.0, 41.0, 12.0, 22.0, 32.0, 42.0, 13.0, 23.0, 33.0, 43.0]
+    }
+  ]
+}

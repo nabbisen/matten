@@ -75,7 +75,8 @@ The following items were considered and explicitly deferred:
 | Item | Status | Reason |
 |---|---|---|
 | `is_empty()` | Deferred | Zero-sized dims rejected; always false. Future RFC. |
-| `get_flat` / `set_flat` | Not implemented | Covered by `get()` + `as_slice()`. |
+| `set_flat` | Not implemented | Mutation deferred to Phase 2. |
+| `get_flat` | **Implemented** | `Tensor::get_flat(index) -> Option<f64>` added in v0.11.0. |
 | Negative slice indices | Deferred | Not in RFC-008 grammar for `0.1.0`. |
 | Step slicing `::2` | Supported | `slice_str("0:10:2")` grammar works. |
 | Mutable element API | Deferred | Phase 2 CoW not yet exposed publicly. |

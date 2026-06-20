@@ -105,3 +105,90 @@ fn from_csv_smoke() {
     let t = Tensor::from_csv("1.0,2.0,3.0\n4.0,5.0,6.0\n").unwrap();
     assert_eq!(t.shape(), &[2, 3]);
 }
+
+// ---- NumPy golden tests (RFC-013 §11.2, RFC-010 §14) -------------------
+
+#[cfg(feature = "json")]
+#[test]
+fn golden_broadcasting_matches_numpy() {
+    use std::fs;
+    let raw =
+        fs::read_to_string("tests/golden/numpy_broadcasting.json").expect("golden fixture missing");
+    let doc: serde_json::Value = serde_json::from_str(&raw).unwrap();
+    for case in doc["cases"].as_array().unwrap() {
+        let desc = case["description"].as_str().unwrap();
+        let mk = |key: &str| {
+            let shape: Vec<usize> = case[&format!("{key}_shape")]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|v| v.as_u64().unwrap() as usize)
+                .collect();
+            let data: Vec<f64> = case[&format!("{key}_data")]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|v| v.as_f64().unwrap())
+                .collect();
+            Tensor::new(data, &shape)
+        };
+        let left = mk("left");
+        let right = mk("right");
+        let result = mk("result");
+        let computed = &left + &right;
+        assert_eq!(computed.shape(), result.shape(), "shape mismatch: {desc}");
+        for (i, (&got, &want)) in computed
+            .as_slice()
+            .iter()
+            .zip(result.as_slice())
+            .enumerate()
+        {
+            assert!(
+                (got - want).abs() < 1e-10,
+                "value mismatch at [{i}] in {desc}: got {got}, want {want}"
+            );
+        }
+    }
+}
+
+#[cfg(feature = "json")]
+#[test]
+fn golden_matmul_matches_numpy() {
+    use std::fs;
+    let raw = fs::read_to_string("tests/golden/numpy_matmul.json").expect("golden fixture missing");
+    let doc: serde_json::Value = serde_json::from_str(&raw).unwrap();
+    for case in doc["cases"].as_array().unwrap() {
+        let desc = case["description"].as_str().unwrap();
+        let mk = |key: &str| {
+            let shape: Vec<usize> = case[&format!("{key}_shape")]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|v| v.as_u64().unwrap() as usize)
+                .collect();
+            let data: Vec<f64> = case[&format!("{key}_data")]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|v| v.as_f64().unwrap())
+                .collect();
+            Tensor::new(data, &shape)
+        };
+        let left = mk("left");
+        let right = mk("right");
+        let result = mk("result");
+        let computed = left.matmul(&right);
+        assert_eq!(computed.shape(), result.shape(), "shape mismatch: {desc}");
+        for (i, (&got, &want)) in computed
+            .as_slice()
+            .iter()
+            .zip(result.as_slice())
+            .enumerate()
+        {
+            assert!(
+                (got - want).abs() < 1e-10,
+                "value mismatch at [{i}] in {desc}: got {got}, want {want}"
+            );
+        }
+    }
+}
