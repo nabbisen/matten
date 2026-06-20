@@ -266,3 +266,77 @@ mod storage_tests {
         assert_eq!(s.get_flat(0), Some(&Element::Int(1)));
     }
 }
+
+#[cfg(feature = "dynamic")]
+mod utility_tests {
+    use crate::Tensor;
+    use crate::dynamic::Element;
+
+    #[test]
+    fn none_mask_basic() {
+        let t = Tensor::from_elements(
+            vec![Element::Float(1.0), Element::None, Element::Float(3.0)],
+            &[3],
+        );
+        let mask = t.none_mask();
+        assert_eq!(mask.as_slice(), &[0.0, 1.0, 0.0]);
+    }
+
+    #[test]
+    fn count_none_basic() {
+        let t = Tensor::from_elements(
+            vec![
+                Element::None,
+                Element::Int(1),
+                Element::None,
+                Element::Float(2.0),
+            ],
+            &[4],
+        );
+        assert_eq!(t.count_none(), 2);
+    }
+
+    #[test]
+    fn forward_fill_none_basic() {
+        let t = Tensor::from_elements(
+            vec![
+                Element::Float(1.0),
+                Element::None,
+                Element::None,
+                Element::Float(4.0),
+            ],
+            &[4],
+        );
+        let filled = t.forward_fill_none(Element::Float(0.0));
+        assert_eq!(filled.get_element(&[1]), Some(Element::Float(1.0)));
+        assert_eq!(filled.get_element(&[2]), Some(Element::Float(1.0)));
+        assert_eq!(filled.get_element(&[3]), Some(Element::Float(4.0)));
+    }
+
+    #[test]
+    fn forward_fill_none_leading_uses_fallback() {
+        let t = Tensor::from_elements(
+            vec![Element::None, Element::None, Element::Float(5.0)],
+            &[3],
+        );
+        let filled = t.forward_fill_none(Element::Float(-1.0));
+        assert_eq!(filled.get_element(&[0]), Some(Element::Float(-1.0)));
+        assert_eq!(filled.get_element(&[1]), Some(Element::Float(-1.0)));
+        assert_eq!(filled.get_element(&[2]), Some(Element::Float(5.0)));
+    }
+
+    #[test]
+    fn sum_skip_none_basic() {
+        let t = Tensor::from_elements(
+            vec![Element::Float(1.0), Element::None, Element::Int(3)],
+            &[3],
+        );
+        assert_eq!(t.sum_skip_none(), 4.0);
+    }
+
+    #[test]
+    fn sum_skip_none_all_none_is_zero() {
+        let t = Tensor::from_elements(vec![Element::None; 3], &[3]);
+        assert_eq!(t.sum_skip_none(), 0.0);
+    }
+}

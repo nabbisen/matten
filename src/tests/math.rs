@@ -229,3 +229,45 @@ fn star_is_still_element_wise_not_matmul() {
     assert_eq!((&a * &b).as_slice(), &[5.0, 12.0, 21.0, 32.0]); // element-wise
     assert_eq!(a.matmul(&b).as_slice(), &[19.0, 22.0, 43.0, 50.0]); // matrix product
 }
+
+// ── min_axis / max_axis ---------------------------------------------------
+
+#[test]
+fn min_axis_0_on_matrix() {
+    let m = Tensor::new(vec![3.0, 1.0, 4.0, 1.0, 5.0, 9.0], &[2, 3]);
+    let r = m.min_axis(0);
+    assert_eq!(r.shape(), &[3]);
+    assert_eq!(r.as_slice(), &[1.0, 1.0, 4.0]);
+}
+
+#[test]
+fn max_axis_0_on_matrix() {
+    let m = Tensor::new(vec![3.0, 1.0, 4.0, 1.0, 5.0, 9.0], &[2, 3]);
+    let r = m.max_axis(0);
+    assert_eq!(r.shape(), &[3]);
+    assert_eq!(r.as_slice(), &[3.0, 5.0, 9.0]);
+}
+
+#[test]
+fn min_axis_nan_propagates() {
+    let m = Tensor::new(vec![1.0, f64::NAN, 3.0, 4.0, 5.0, 6.0], &[2, 3]);
+    let r = m.min_axis(0);
+    assert!(r.as_slice()[1].is_nan()); // NaN in column 1
+    assert_eq!(r.as_slice()[0], 1.0);
+    assert_eq!(r.as_slice()[2], 3.0);
+}
+
+#[test]
+fn max_axis_on_vector_gives_scalar() {
+    let v = Tensor::from_vec(vec![2.0, 7.0, 4.0]);
+    let r = v.max_axis(0);
+    assert!(r.is_scalar());
+    assert_eq!(r.as_slice(), &[7.0]);
+}
+
+#[test]
+#[should_panic(expected = "out of range")]
+fn min_axis_out_of_range_panics() {
+    let t = Tensor::ones(&[3]);
+    let _ = t.min_axis(5);
+}

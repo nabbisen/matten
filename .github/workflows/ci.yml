@@ -73,3 +73,6 @@ jobs:
       - run: cargo run --example 25_normalize_vector
       - run: cargo run --example 26_cosine_similarity
       - run: cargo run --example dynamic_00_quickstart --features dynamic,json,csv
+      - run: cargo run --example dynamic_05_dirty_csv_cleanup --features dynamic,json,csv
+      - run: cargo run --example standardize_columns
+      - run: cargo run --example gram_matrix

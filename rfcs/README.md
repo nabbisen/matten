@@ -9,6 +9,7 @@ for RFC state; the Status field inside each file mirrors the folder.
 | ID | Title | Shipped in |
 |---:|---|---|
 | 000 | [RFC lifecycle policy](./done/000-rfc-lifecycle-policy.md) | — |
+| 001 | [Threat Model and Boundary Safety Policy](./done/001-threat-model-and-boundary-safety-policy.md) | 0.9.0 |
 | 002 | [Public API Minimalism and `Tensor` Contract](./done/002-public-api-minimalism-and-tensor-contract.md) | 0.1.0 |
 | 003 | [Shape Model, Scalar Semantics, and Validation](./done/003-shape-model-scalar-semantics-and-validation.md) | 0.1.0 |
 | 004 | [Construction and Conversion APIs](./done/004-construction-and-conversion-apis.md) | 0.2.0 |
@@ -19,7 +20,6 @@ for RFC state; the Status field inside each file mirrors the folder.
 
 ## Proposed
 
-| ID | Title |
-|---:|---|
+*(none — all RFCs implemented)*
 | 001 | [Threat Model and Boundary Safety Policy](./proposed/001-threat-model-and-boundary-safety-policy.md) |
 | 009 | [Serde, JSON, CSV, and Boundary Integration](./done/009-serde-json-csv-and-boundary-integration.md) | 0.5.0 |

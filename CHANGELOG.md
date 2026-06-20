@@ -5,6 +5,63 @@ All notable changes to `matten` are documented here. The format is based on
 follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html) once it reaches
 a public API (`0.1.0`).
 
+## [0.9.0] - 2026-06-20
+
+Milestones **M9, M10, M11** — Dynamic hardening, messy-data workflows, and
+pattern examples. Closes all remaining open RFCs.
+
+### Added
+
+- **`min_axis(axis)` and `max_axis(axis)`** (`src/math.rs`) — axis reductions
+  returning `NaN` when any element along the axis is `NaN` (explicit
+  short-circuit, consistent with `min`/`max`).
+
+- **Dynamic utility methods** (`src/dynamic/tensor_ext.rs`, RFC-011 §10):
+  - `none_mask()` → Phase 1 tensor of `1.0`/`0.0` indicating `None` positions.
+  - `count_none() → usize` — count of `None` elements.
+  - `forward_fill_none(fallback)` — carry last non-None value forward in
+    row-major order; leading `None` values take `fallback`.
+  - `sum_skip_none()` — sum skipping `None`, panicking on non-numeric elements.
+
+- **Dynamic examples** (RFC-014 §6.5, now complete):
+  - `dynamic_01_mixed_elements.rs` — building and inspecting mixed tensors.
+  - `dynamic_02_missing_values.rs` — detecting and counting `None` values.
+  - `dynamic_03_fill_none.rs` — constant fill and forward-fill demonstration.
+  - `dynamic_04_numeric_coercion.rs` — coercion policy demonstration.
+  - `dynamic_05_dirty_csv_cleanup.rs` — end-to-end messy CSV workflow.
+
+- **Recommended `0.1.x` pattern examples** (RFC-014 §6.4, now complete):
+  - `standardize_columns.rs` — z-score normalisation per column.
+  - `minmax_scaling.rs` — 0–1 scaling per column.
+  - `rowwise_scoring.rs` — weighted row scoring.
+  - `column_summary.rs` — per-column mean/min/max/std.
+  - `moving_average.rs` — sliding-window mean.
+  - `rolling_windows_basic.rs` — rolling sum and max.
+  - `pairwise_distance.rs` — Euclidean distance matrix via matmul.
+  - `gram_matrix.rs` — Gram matrix (X·Xᵀ).
+
+- **Tests** — 5 new `min_axis`/`max_axis` tests in `src/tests/math.rs`;
+  6 new dynamic utility tests in `src/tests/dynamic.rs` (`utility_tests`).
+
+### Changed
+
+- CI `.github/workflows/ci.yml`: added `dynamic_00_quickstart` and all
+  pattern examples to the smoke job; added `dynamic+json+csv` feature profile.
+
+### Closed
+
+- **RFC-001 (Threat Model and Boundary Safety Policy)** moved to `rfcs/done/`.
+  All controls in RFC-001 are now in place in the codebase:
+  - `#![forbid(unsafe_code)]` throughout.
+  - Checked arithmetic on all shape/product paths.
+  - Parser size limits (`MAX_SLICE_STR_BYTES`, `MAX_JSON_ELEMENTS`, `MAX_DEPTH`).
+  - Result-zone at all external boundaries (`try_new`, `from_json`, `from_csv`,
+    `load_json`, `load_csv`, `slice_str`, `build()`).
+  - Panic-zone clearly labelled and documented.
+  - `MattenError::Allocation` for overflow before allocation.
+
+  All 15 RFCs are now in `rfcs/done/`. No open RFCs remain.
+
 ## [0.8.0] - 2026-06-20
 
 Milestone **M8 — Dynamic Feature, Phase 2** (RFC-011 + RFC-012).

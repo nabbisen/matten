@@ -163,3 +163,106 @@ impl Tensor {
         Tensor::try_new(floats, &dyn_t.shape)
     }
 }
+
+#[cfg(feature = "dynamic")]
+impl Tensor {
+    // ── Additional missing-value and numeric utilities (M9/M10) ──────────
+
+    /// Returns a Phase 1 boolean-like tensor (`1.0` = None, `0.0` = not None)
+    /// indicating which elements are `Element::None`.
+    ///
+    /// # Panics
+    ///
+    /// Panics if called on a non-dynamic tensor.
+    #[cfg(feature = "dynamic")]
+    pub fn none_mask(&self) -> Tensor {
+        let dyn_t = self
+            .dynamic
+            .as_ref()
+            .expect("none_mask called on a non-dynamic tensor");
+        let data: Vec<f64> = dyn_t
+            .to_vec()
+            .iter()
+            .map(|e| if e.is_none() { 1.0 } else { 0.0 })
+            .collect();
+        Tensor::new(data, &dyn_t.shape)
+    }
+
+    /// Counts the number of `Element::None` values in the tensor.
+    ///
+    /// # Panics
+    ///
+    /// Panics if called on a non-dynamic tensor.
+    #[cfg(feature = "dynamic")]
+    pub fn count_none(&self) -> usize {
+        let dyn_t = self
+            .dynamic
+            .as_ref()
+            .expect("count_none called on a non-dynamic tensor");
+        dyn_t.to_vec().iter().filter(|e| e.is_none()).count()
+    }
+
+    /// Replaces `Element::None` values by carrying the last non-None value
+    /// forward along the flat (row-major) order. Leading None values that
+    /// have no predecessor are replaced with `fallback`.
+    ///
+    /// # Panics
+    ///
+    /// Panics if called on a non-dynamic tensor.
+    #[cfg(feature = "dynamic")]
+    pub fn forward_fill_none(&self, fallback: impl Into<crate::dynamic::Element>) -> Tensor {
+        use crate::dynamic::Element;
+        let fallback = fallback.into();
+        let dyn_t = self
+            .dynamic
+            .as_ref()
+            .expect("forward_fill_none called on a non-dynamic tensor");
+        let mut last: Element = fallback;
+        let new_data: Vec<Element> = dyn_t
+            .to_vec()
+            .into_iter()
+            .map(|e| {
+                if e == Element::None {
+                    last.clone()
+                } else {
+                    last = e.clone();
+                    e
+                }
+            })
+            .collect();
+        let shape = dyn_t.shape.clone();
+        let new_dyn = crate::dynamic::storage::DynamicTensor::from_vec(new_data, shape.clone());
+        Tensor {
+            data: Vec::new(),
+            shape,
+            dynamic: Some(Box::new(new_dyn)),
+        }
+    }
+
+    /// Sums the numeric elements, skipping `None` values.
+    ///
+    /// Returns `0.0` if all elements are `None`. Panics on non-numeric,
+    /// non-None elements (call `fill_none` or `try_numeric` first).
+    ///
+    /// # Panics
+    ///
+    /// Panics if called on a non-dynamic tensor or if any element is
+    /// non-numeric and non-None.
+    #[cfg(feature = "dynamic")]
+    pub fn sum_skip_none(&self) -> f64 {
+        let dyn_t = self
+            .dynamic
+            .as_ref()
+            .expect("sum_skip_none called on a non-dynamic tensor");
+        let mut acc = 0.0f64;
+        for e in dyn_t.to_vec() {
+            if e.is_none() {
+                continue;
+            }
+            acc += e.try_as_f64().unwrap_or_else(|| {
+                panic!("sum_skip_none: non-numeric element {e:?}; use fill_none first")
+            });
+        }
+        acc
+    }
+}

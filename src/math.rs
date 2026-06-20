@@ -132,6 +132,106 @@ impl Tensor {
     }
 }
 
+// ── Min/max axis reductions ───────────────────────────────────────────────
+
+impl Tensor {
+    /// Reduces along `axis` by taking the minimum, removing that axis from the
+    /// output shape. Returns `NaN` if any element along the axis is `NaN`.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `axis >= self.ndim()`.
+    ///
+    /// ```
+    /// use matten::Tensor;
+    /// let m = Tensor::new(vec![3.0,1.0,4.0,1.0,5.0,9.0], &[2,3]);
+    /// assert_eq!(m.min_axis(0).as_slice(), &[1.0, 1.0, 4.0]);
+    /// ```
+    #[must_use]
+    pub fn min_axis(&self, axis: usize) -> Tensor {
+        nan_axis_reduce(self, axis, "min_axis", f64::INFINITY, |a, b| a.min(b))
+    }
+
+    /// Reduces along `axis` by taking the maximum, removing that axis from the
+    /// output shape. Returns `NaN` if any element along the axis is `NaN`.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `axis >= self.ndim()`.
+    ///
+    /// ```
+    /// use matten::Tensor;
+    /// let m = Tensor::new(vec![3.0,1.0,4.0,1.0,5.0,9.0], &[2,3]);
+    /// assert_eq!(m.max_axis(0).as_slice(), &[3.0, 5.0, 9.0]);
+    /// ```
+    #[must_use]
+    pub fn max_axis(&self, axis: usize) -> Tensor {
+        nan_axis_reduce(self, axis, "max_axis", f64::NEG_INFINITY, |a, b| a.max(b))
+    }
+}
+
+/// Axis reduction with explicit NaN propagation (for min/max).
+fn nan_axis_reduce(
+    t: &Tensor,
+    axis: usize,
+    operation: &'static str,
+    identity: f64,
+    f: impl Fn(f64, f64) -> f64,
+) -> Tensor {
+    if axis >= t.ndim() {
+        panic!(
+            "matten shape error in {operation}: axis {axis} is out of range              for rank-{} tensor",
+            t.ndim()
+        );
+    }
+    let src_shape = t.shape();
+    let out_shape: Vec<usize> = src_shape
+        .iter()
+        .enumerate()
+        .filter(|&(i, _)| i != axis)
+        .map(|(_, &d)| d)
+        .collect();
+    let out_len: usize = if out_shape.is_empty() {
+        1
+    } else {
+        out_shape.iter().product()
+    };
+    let mut out_data = vec![identity; out_len];
+    let mut has_nan = vec![false; out_len];
+
+    for (src_flat, &val) in t.data.iter().enumerate() {
+        let src_coord = flat_to_coord(src_flat, src_shape);
+        let out_coord: Vec<usize> = src_coord
+            .iter()
+            .enumerate()
+            .filter(|&(i, _)| i != axis)
+            .map(|(_, &c)| c)
+            .collect();
+        let dst_flat = if out_shape.is_empty() {
+            0
+        } else {
+            coord_to_flat(&out_coord, &out_shape).expect("valid by construction")
+        };
+        if val.is_nan() {
+            has_nan[dst_flat] = true;
+        } else {
+            out_data[dst_flat] = f(out_data[dst_flat], val);
+        }
+    }
+    // Propagate NaN
+    for (i, &nan) in has_nan.iter().enumerate() {
+        if nan {
+            out_data[i] = f64::NAN;
+        }
+    }
+    Tensor {
+        data: out_data,
+        shape: out_shape,
+        #[cfg(feature = "dynamic")]
+        dynamic: None,
+    }
+}
+
 /// Generic axis reduction.
 fn axis_reduce(
     t: &Tensor,

@@ -1,6 +1,6 @@
 # RFC-001: Threat Model and Boundary Safety Policy
 
-> RFC status: Proposed  
+> RFC status: Implemented (0.9.0)
 > Project: `matten`  
 > Target audience: library implementers, maintainers, reviewers  
 > Design level: external design first; internal design where needed  
