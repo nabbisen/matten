@@ -5,6 +5,39 @@ All notable changes to `matten` are documented here. The format is based on
 follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html) once it reaches
 a public API (`0.1.0`).
 
+## [0.4.0] - 2026-06-20
+
+Milestone **M4 — Shape Operations and Slicing** (RFC-007 + RFC-008).
+
+### Added
+
+- **RFC-007 — Reshape, axis operations, and indexing:**
+  - `reshape(&self, shape)` / `try_reshape` — element-count-preserving owned
+    copy; panics / returns `Err` on mismatch.
+  - `flatten(&self)` — collapses any shape to `[len]`; scalar becomes `[1]`.
+  - `transpose(&self)` / `t(&self)` — reverses axis order (swap rows/cols for
+    rank-2; reverses all axes for higher rank).
+  - `swap_axes(&self, a, b)` — swaps two axes; both forms share an internal
+    `permute_axes` helper that writes a fresh row-major result.
+  - `get(&self, coord)` → `Option<f64>` — safe non-panicking element access.
+  - New `src/reshape.rs` module for the above helpers.
+
+- **RFC-008 — Slicing API:**
+  - `tensor.slice()` returns a `SliceBuilder`; methods are `.all()`, `.index(n)`,
+    and `.range(R)` (accepts `Range`, `RangeFrom`, `RangeTo`, `RangeFull`,
+    `RangeInclusive`); `.build()` returns `Result<Tensor, MattenError>`.
+  - `tensor.slice_str(spec)` — bounded NumPy-like convenience (max 512 bytes),
+    always returns `Result`, never panics on malformed input. Grammar: `:`,
+    `n`, `start:end`, `start:`, `:end`, `start:end:step`.
+  - `IntoSliceRange` / `SliceConvert` — public sealed-trait pair (only std range
+    types satisfy the bound; no external implementation possible).
+  - New `src/slice.rs` module.
+
+- **Test reorganisation (module-style fix):**
+  - All `mod.rs` files replaced with the 2018+ `foo.rs` + `foo/` layout:
+    `src/tests.rs`, `src/ops.rs`, `src/ops/broadcast.rs`.
+  - `src/tests/reshape.rs` and `src/tests/slice.rs` added.
+
 ## [0.3.0] - 2026-06-20
 
 Milestone **M3 — Broadcasting and Element-wise Operators** (RFC-006).

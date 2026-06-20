@@ -1,17 +1,8 @@
-# Project layout and process
+# Contributing
 
-- **Design before code.** Requirements → external design → RFCs → implementation.
-  The `rfcs/` pack and roadmap are the source of truth for design decisions.
-- **Milestones.** Development proceeds in small, shippable milestones (M0, M1, …),
-  each preserving a working crate with passing tests and a coherent public API.
-- **Safety.** The crate is `#![forbid(unsafe_code)]`; any future exception
-  requires a dedicated RFC.
+The contributing documentation has moved:
 
-## Local development
-
-```bash
-cargo fmt --all --check
-cargo clippy --all-targets --all-features -- -D warnings
-cargo test --all-targets
-cargo test --doc
-```
+- [Development process](./contributing/development-process.md) — QA commands,
+  reviewer checklist, definition of done, file-size guidelines.
+- [Architecture](./contributing/architecture.md) — module layout, design
+  invariants, feature matrix, milestone sequence.

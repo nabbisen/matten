@@ -7,5 +7,7 @@
 mod convert;
 mod error;
 mod ops;
+mod reshape;
 mod shape;
+mod slice;
 mod tensor;

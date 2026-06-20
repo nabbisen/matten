@@ -25,7 +25,7 @@ JSON/CSV in and out — without wrestling with views, lifetimes, or trait bounds
 When a prototype becomes performance-critical, `matten` is designed to hand its
 flat data off to a specialized crate.
 
-> **Status: `0.3.0` (M3, Broadcasting and Element-wise Operators).** The validated `Tensor`
+> **Status: `0.4.0` (M4, Shape Operations and Slicing).** The validated `Tensor`
 > shape model is in place — scalar/vector/matrix semantics and the observational
 > API. Arithmetic, reshaping, slicing, broadcasting, and the JSON/CSV boundaries
 > land in later milestones — see the roadmap and RFC pack in the repository.

@@ -399,3 +399,159 @@ fn arange_impl(
         shape: vec![len],
     })
 }
+
+impl Tensor {
+    // ---- Shape operations (M4 / RFC-007) ------------------------------------
+
+    /// Reshapes the tensor to `new_shape`, returning a new owned tensor.
+    ///
+    /// The total element count must be unchanged. Data order is preserved
+    /// (row-major flat order).
+    ///
+    /// # Panics
+    ///
+    /// Panics on element-count mismatch or invalid shape. Use
+    /// [`try_reshape`](Tensor::try_reshape) for recoverable construction.
+    ///
+    /// ```
+    /// use matten::Tensor;
+    /// let t = Tensor::new(vec![1.0, 2.0, 3.0, 4.0], &[2, 2]);
+    /// let flat = t.reshape(&[4]);
+    /// assert_eq!(flat.shape(), &[4]);
+    /// assert_eq!(flat.as_slice(), &[1.0, 2.0, 3.0, 4.0]);
+    /// ```
+    #[must_use]
+    pub fn reshape(&self, new_shape: &[usize]) -> Tensor {
+        crate::reshape::try_reshape_impl(self, new_shape).unwrap_or_else(|e| panic!("{e}"))
+    }
+
+    /// Reshapes the tensor, returning an error instead of panicking.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`MattenError::Shape`] on element-count mismatch or invalid shape.
+    pub fn try_reshape(&self, new_shape: &[usize]) -> Result<Tensor, MattenError> {
+        crate::reshape::try_reshape_impl(self, new_shape)
+    }
+
+    /// Flattens the tensor to a 1-D tensor, preserving row-major order.
+    ///
+    /// A scalar (shape `[]`) is returned as shape `[1]`.
+    ///
+    /// ```
+    /// use matten::Tensor;
+    /// let t = Tensor::new(vec![1.0, 2.0, 3.0, 4.0], &[2, 2]);
+    /// let flat = t.flatten();
+    /// assert_eq!(flat.shape(), &[4]);
+    /// ```
+    #[must_use]
+    pub fn flatten(&self) -> Tensor {
+        let len = self.data.len();
+        Tensor {
+            data: self.data.clone(),
+            shape: vec![len],
+        }
+    }
+
+    /// Transposes the tensor by reversing the axis order.
+    ///
+    /// For a rank-2 tensor this swaps rows and columns. For rank > 2 the axis
+    /// order is reversed: `[d0, d1, d2] → [d2, d1, d0]`.
+    ///
+    /// # Panics
+    ///
+    /// Panics for a rank-0 scalar (no axes to transpose).
+    ///
+    /// ```
+    /// use matten::Tensor;
+    /// let m = Tensor::new(vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0], &[2, 3]);
+    /// let mt = m.transpose();
+    /// assert_eq!(mt.shape(), &[3, 2]);
+    /// assert_eq!(mt.as_slice(), &[1.0, 4.0, 2.0, 5.0, 3.0, 6.0]);
+    /// ```
+    #[must_use]
+    pub fn transpose(&self) -> Tensor {
+        let ndim = self.ndim();
+        if ndim == 0 {
+            panic!("matten shape error in transpose: cannot transpose a scalar (rank 0)");
+        }
+        let perm: Vec<usize> = (0..ndim).rev().collect();
+        crate::reshape::permute_axes(self, &perm)
+    }
+
+    /// Alias for [`transpose`](Tensor::transpose).
+    #[must_use]
+    pub fn t(&self) -> Tensor {
+        self.transpose()
+    }
+
+    /// Returns a new tensor with `axis1` and `axis2` swapped.
+    ///
+    /// # Panics
+    ///
+    /// Panics if either axis is out of range.
+    ///
+    /// ```
+    /// use matten::Tensor;
+    /// let t = Tensor::new((1..=24).map(|x| x as f64).collect(), &[2, 3, 4]);
+    /// let s = t.swap_axes(0, 2);
+    /// assert_eq!(s.shape(), &[4, 3, 2]);
+    /// ```
+    #[must_use]
+    pub fn swap_axes(&self, axis1: usize, axis2: usize) -> Tensor {
+        crate::reshape::validate_axes(axis1, axis2, self.ndim(), "swap_axes")
+            .unwrap_or_else(|e| panic!("{e}"));
+        let mut perm: Vec<usize> = (0..self.ndim()).collect();
+        perm.swap(axis1, axis2);
+        crate::reshape::permute_axes(self, &perm)
+    }
+
+    /// Returns the element at the multidimensional `coord`, or `None` if the
+    /// coordinate rank doesn't match or any component is out of bounds.
+    ///
+    /// ```
+    /// use matten::Tensor;
+    /// let t = Tensor::new(vec![1.0, 2.0, 3.0, 4.0], &[2, 2]);
+    /// assert_eq!(t.get(&[0, 1]), Some(2.0));
+    /// assert_eq!(t.get(&[5, 0]), None);
+    /// ```
+    pub fn get(&self, coord: &[usize]) -> Option<f64> {
+        let flat = crate::shape::coord_to_flat(coord, &self.shape)?;
+        self.data.get(flat).copied()
+    }
+
+    // ---- Slicing (M4 / RFC-008) ---------------------------------------------
+
+    /// Starts a slice builder for this tensor. The builder is the canonical
+    /// slicing API; [`slice_str`](Tensor::slice_str) is a convenience wrapper.
+    ///
+    /// ```
+    /// use matten::Tensor;
+    /// let t = Tensor::new(vec![1.0,2.0,3.0,4.0,5.0,6.0], &[2, 3]);
+    /// let row = t.slice().index(0).all().build().unwrap();
+    /// assert_eq!(row.as_slice(), &[1.0, 2.0, 3.0]);
+    /// ```
+    pub fn slice(&self) -> crate::slice::SliceBuilder<'_> {
+        crate::slice::SliceBuilder::new(self)
+    }
+
+    /// Slices this tensor using a NumPy-like string specification.
+    ///
+    /// This is a convenience wrapper over the builder API. It always returns
+    /// `Result` and never panics on malformed input.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`MattenError::Slice`] for any parse or bounds error.
+    ///
+    /// ```
+    /// use matten::Tensor;
+    /// let t = Tensor::new(vec![1.0,2.0,3.0,4.0,5.0,6.0], &[2, 3]);
+    /// let top = t.slice_str("0, :").unwrap();
+    /// assert_eq!(top.as_slice(), &[1.0, 2.0, 3.0]);
+    /// ```
+    pub fn slice_str(&self, spec: &str) -> Result<Tensor, MattenError> {
+        let specs = crate::slice::parse_slice_str(spec)?;
+        crate::slice::execute_slice(self, &specs, "slice_str")
+    }
+}

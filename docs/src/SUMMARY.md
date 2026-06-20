@@ -9,8 +9,13 @@
 
 # Reference
 
-- [Panic vs Result](./panic-vs-result.md)
+- [Error model](./reference/error-model.md)
+- [Construction and conversion](./reference/construction.md)
+- [Operators and broadcasting](./reference/operators.md)
+- [Shape operations](./reference/shape-ops.md)
+- [Slicing](./reference/slicing.md)
 
 # Contributors
 
-- [Project layout and process](./contributing.md)
+- [Development process](./contributing/development-process.md)
+- [Architecture](./contributing/architecture.md)
