@@ -182,6 +182,8 @@ fn axis_reduce(
     Tensor {
         data: out_data,
         shape: out_shape,
+        #[cfg(feature = "dynamic")]
+        dynamic: None,
     }
 }
 
@@ -287,6 +289,8 @@ fn mv_mul(a: &Tensor, b: &Tensor, op: &'static str) -> Tensor {
     Tensor {
         data: out,
         shape: vec![m],
+        #[cfg(feature = "dynamic")]
+        dynamic: None,
     }
 }
 
@@ -303,6 +307,8 @@ fn vm_mul(a: &Tensor, b: &Tensor, op: &'static str) -> Tensor {
     Tensor {
         data: out,
         shape: vec![p],
+        #[cfg(feature = "dynamic")]
+        dynamic: None,
     }
 }
 
@@ -324,6 +330,8 @@ fn mm_mul(a: &Tensor, b: &Tensor, op: &'static str) -> Tensor {
     Tensor {
         data: out,
         shape: vec![m, p],
+        #[cfg(feature = "dynamic")]
+        dynamic: None,
     }
 }
 

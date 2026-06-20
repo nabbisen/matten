@@ -1,6 +1,6 @@
 # RFC-011: Dynamic `Element` Model and Coercion
 
-> RFC status: Proposed  
+> RFC status: Implemented (0.8.0)
 > Project: `matten`  
 > Target audience: library implementers, maintainers, reviewers  
 > Design level: external design first; internal design where needed  

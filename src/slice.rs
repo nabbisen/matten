@@ -138,6 +138,8 @@ pub(crate) fn execute_slice(
     Ok(Tensor {
         data: out_data,
         shape: out_shape,
+        #[cfg(feature = "dynamic")]
+        dynamic: None,
     })
 }
 

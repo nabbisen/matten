@@ -24,6 +24,8 @@ impl Add<f64> for &Tensor {
         Tensor {
             data: self.data.iter().map(|&v| v + rhs).collect(),
             shape: self.shape.clone(),
+            #[cfg(feature = "dynamic")]
+            dynamic: None,
         }
     }
 }
@@ -42,6 +44,8 @@ impl Sub<f64> for &Tensor {
         Tensor {
             data: self.data.iter().map(|&v| v - rhs).collect(),
             shape: self.shape.clone(),
+            #[cfg(feature = "dynamic")]
+            dynamic: None,
         }
     }
 }
@@ -60,6 +64,8 @@ impl Mul<f64> for &Tensor {
         Tensor {
             data: self.data.iter().map(|&v| v * rhs).collect(),
             shape: self.shape.clone(),
+            #[cfg(feature = "dynamic")]
+            dynamic: None,
         }
     }
 }
@@ -78,6 +84,8 @@ impl Div<f64> for &Tensor {
         Tensor {
             data: self.data.iter().map(|&v| v / rhs).collect(),
             shape: self.shape.clone(),
+            #[cfg(feature = "dynamic")]
+            dynamic: None,
         }
     }
 }
@@ -98,6 +106,8 @@ impl Add<&Tensor> for f64 {
         Tensor {
             data: rhs.data.iter().map(|&v| self + v).collect(),
             shape: rhs.shape.clone(),
+            #[cfg(feature = "dynamic")]
+            dynamic: None,
         }
     }
 }
@@ -116,6 +126,8 @@ impl Sub<&Tensor> for f64 {
         Tensor {
             data: rhs.data.iter().map(|&v| self - v).collect(),
             shape: rhs.shape.clone(),
+            #[cfg(feature = "dynamic")]
+            dynamic: None,
         }
     }
 }
@@ -134,6 +146,8 @@ impl Mul<&Tensor> for f64 {
         Tensor {
             data: rhs.data.iter().map(|&v| self * v).collect(),
             shape: rhs.shape.clone(),
+            #[cfg(feature = "dynamic")]
+            dynamic: None,
         }
     }
 }
@@ -153,6 +167,8 @@ impl Div<&Tensor> for f64 {
         Tensor {
             data: rhs.data.iter().map(|&v| self / v).collect(),
             shape: rhs.shape.clone(),
+            #[cfg(feature = "dynamic")]
+            dynamic: None,
         }
     }
 }

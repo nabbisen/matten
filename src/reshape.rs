@@ -36,6 +36,8 @@ pub(crate) fn try_reshape_impl(t: &Tensor, new_shape: &[usize]) -> Result<Tensor
     Ok(Tensor {
         data: t.data.clone(),
         shape: new_shape.to_vec(),
+        #[cfg(feature = "dynamic")]
+        dynamic: None,
     })
 }
 
@@ -64,6 +66,8 @@ pub(crate) fn permute_axes(t: &Tensor, permutation: &[usize]) -> Tensor {
     Tensor {
         data: result_data,
         shape: result_shape,
+        #[cfg(feature = "dynamic")]
+        dynamic: None,
     }
 }
 

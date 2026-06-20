@@ -79,6 +79,8 @@
 //   parse/      JSON/CSV boundary parsers (M5, here)
 //   dynamic/    feature-gated `Element` engine (Phase 2)
 mod convert;
+#[cfg(feature = "dynamic")]
+mod dynamic;
 mod error;
 mod math;
 mod ops;
@@ -89,12 +91,13 @@ mod shape;
 mod slice;
 mod tensor;
 
+#[cfg(feature = "dynamic")]
+pub use crate::dynamic::Element;
 pub use crate::error::{DataFormat, MattenError};
+pub use crate::slice::SliceBuilder;
 pub use crate::tensor::Tensor;
 
-// `Element` (the Phase 2 dynamic value type) becomes a public export under the
-// `dynamic` feature once that engine lands. It is intentionally not exported in
-// M0; enabling `dynamic` today simply compiles the Phase 1 surface unchanged.
+// `Element` is the Phase 2 dynamic value type, exported under `dynamic`.
 
 #[cfg(test)]
 mod tests;

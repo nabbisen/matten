@@ -46,6 +46,8 @@ jobs:
         run: cargo test --no-default-features --features csv
       - name: dynamic isolated
         run: cargo test --no-default-features --features dynamic
+      - name: dynamic+json+csv
+        run: cargo test --no-default-features --features dynamic,json,csv
       - name: All features
         run: cargo test --all-features
 
@@ -70,3 +72,4 @@ jobs:
       - run: cargo run --example 12_boundary_error_handling
       - run: cargo run --example 25_normalize_vector
       - run: cargo run --example 26_cosine_similarity
+      - run: cargo run --example dynamic_00_quickstart --features dynamic,json,csv

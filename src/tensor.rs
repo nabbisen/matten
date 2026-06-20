@@ -35,10 +35,33 @@ const ARANGE_MAX_ELEMENTS: usize = 1 << 28; // ~268 million
 /// let r = Tensor::arange(0.0, 5.0, 1.0);
 /// assert_eq!(r.len(), 5);
 /// ```
-#[derive(Clone, PartialEq)]
+#[derive(Clone)]
 pub struct Tensor {
     pub(crate) data: Vec<f64>,
     pub(crate) shape: Vec<usize>,
+    /// Phase 2 dynamic storage; `None` for Phase 1 numeric tensors.
+    #[cfg(feature = "dynamic")]
+    pub(crate) dynamic: Option<Box<crate::dynamic::storage::DynamicTensor>>,
+}
+
+impl PartialEq for Tensor {
+    fn eq(&self, other: &Self) -> bool {
+        // Compare Phase 1 fields. Dynamic tensors with same shape and logical
+        // data are equal; both dynamic fields must be None or produce the same
+        // element sequence.
+        if self.shape != other.shape {
+            return false;
+        }
+        #[cfg(feature = "dynamic")]
+        {
+            match (&self.dynamic, &other.dynamic) {
+                (Some(a), Some(b)) => return a.to_vec() == b.to_vec(),
+                (None, None) => {}
+                _ => return false,
+            }
+        }
+        self.data == other.data
+    }
 }
 
 // `is_empty` is absent for 0.1.0: zero-sized dims are rejected and a scalar
@@ -85,6 +108,8 @@ impl Tensor {
         Ok(Tensor {
             data,
             shape: shape.to_vec(),
+            #[cfg(feature = "dynamic")]
+            dynamic: None,
         })
     }
 
@@ -102,6 +127,8 @@ impl Tensor {
         Tensor {
             data: vec![value],
             shape: Vec::new(),
+            #[cfg(feature = "dynamic")]
+            dynamic: None,
         }
     }
 
@@ -128,6 +155,8 @@ impl Tensor {
         Tensor {
             data: vec![0.0; len],
             shape: shape.to_vec(),
+            #[cfg(feature = "dynamic")]
+            dynamic: None,
         }
     }
 
@@ -148,6 +177,8 @@ impl Tensor {
         Tensor {
             data: vec![1.0; len],
             shape: shape.to_vec(),
+            #[cfg(feature = "dynamic")]
+            dynamic: None,
         }
     }
 
@@ -168,6 +199,8 @@ impl Tensor {
         Tensor {
             data: vec![value; len],
             shape: shape.to_vec(),
+            #[cfg(feature = "dynamic")]
+            dynamic: None,
         }
     }
 
@@ -242,7 +275,12 @@ impl Tensor {
     /// row, or ragged rows.
     pub fn try_from_rows(rows: Vec<Vec<f64>>) -> Result<Tensor, MattenError> {
         let (data, shape) = flatten_rectangular(rows, "try_from_rows")?;
-        Ok(Tensor { data, shape })
+        Ok(Tensor {
+            data,
+            shape,
+            #[cfg(feature = "dynamic")]
+            dynamic: None,
+        })
     }
 
     // ------------------------------------------------------------------ //
@@ -397,6 +435,8 @@ fn arange_impl(
     Ok(Tensor {
         data,
         shape: vec![len],
+        #[cfg(feature = "dynamic")]
+        dynamic: None,
     })
 }
 
@@ -450,6 +490,8 @@ impl Tensor {
         Tensor {
             data: self.data.clone(),
             shape: vec![len],
+            #[cfg(feature = "dynamic")]
+            dynamic: None,
         }
     }
 

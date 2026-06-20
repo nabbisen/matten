@@ -16,6 +16,7 @@
 - [Slicing](./reference/slicing.md)
 - [Boundary integration](./reference/boundary.md)
 - [Reductions and matrix multiplication](./reference/math.md)
+- [Dynamic feature (Element model)](./reference/dynamic.md)
 
 # Contributors
 

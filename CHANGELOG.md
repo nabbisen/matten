@@ -5,6 +5,63 @@ All notable changes to `matten` are documented here. The format is based on
 follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html) once it reaches
 a public API (`0.1.0`).
 
+## [0.8.0] - 2026-06-20
+
+Milestone **M8 — Dynamic Feature, Phase 2** (RFC-011 + RFC-012).
+
+### Added
+
+- **`dynamic` Cargo feature** — enables Phase 2 heterogeneous tensor support.
+
+- **`Element` enum** (`src/dynamic/element.rs`, RFC-011):
+  - Variants: `Float(f64)`, `Int(i64)`, `Text(Arc<str>)`, `Bool(bool)`, `None`.
+  - Text representation selected as `Arc<str>` after memory measurement:
+    all candidates give `size_of::<Element>() == 24` bytes on 64-bit targets;
+    `Arc<str>` chosen for cheap clone in CoW slices.
+  - Coercion policy: `Float`/`Int` → `f64` allowed; `Bool`/`Text`/`None` → f64
+    explicitly blocked (no silent coercion).
+  - `From` conversions for `f64`, `i64`, `i32`, `bool`, `String`, `&str`, `Arc<str>`.
+  - Exported as `matten::Element` under `#[cfg(feature = "dynamic")]`.
+
+- **CoW storage** (`src/dynamic/storage.rs`, RFC-012):
+  - `DynamicTensor` with `Arc<Vec<Element>>` shared backing storage.
+  - `ViewKind::Contiguous` for construction/reshape; `ViewKind::Indexed` for
+    non-contiguous slices (shared storage, no element copy).
+  - `materialize()` produces fresh contiguous copy; `is_unique()` for CoW check.
+  - No reference cycles; drops cleanly.
+
+- **Dynamic `impl Tensor`** (`src/dynamic/tensor_ext.rs`):
+  - `from_elements` / `try_from_elements` — construction from `Vec<Element>`.
+  - `get_element(&[usize]) → Option<Element>` — safe element access.
+  - `to_elements() → Vec<Element>` — extract in row-major order.
+  - `is_dynamic() → bool`.
+  - `fill_none(value) → Tensor` — replace all `None` values.
+  - `try_numeric() → Result<Tensor, MattenError>` — convert to Phase 1 f64
+    tensor; fails with `MattenError::Unsupported` on any non-numeric element.
+  - `from_json_dynamic(input)` (requires `json` feature) — mixed JSON parser.
+  - `from_csv_dynamic(input)` (requires `csv` feature) — mixed CSV parser.
+
+- **Dynamic parsers** (`src/dynamic/parse/`):
+  - JSON: null→`None`, bool→`Bool`, string→`Text`, integer→`Int`, float→`Float`.
+  - CSV: empty field→`None`, `true`/`false`→`Bool`, integer→`Int`, float→`Float`,
+    other→`Text`.
+
+- **Tests** (`src/tests/dynamic.rs`) — 26 new tests across 5 submodules:
+  element model, tensor construction, CoW storage, JSON parser, CSV parser.
+
+- **Example** `examples/dynamic_00_quickstart.rs` — runs with
+  `--features dynamic,json,csv`.
+
+- **Doc page** `docs/src/reference/dynamic.md`.
+
+### Notes
+
+- Default `f64` Phase 1 API is completely unaffected; the `dynamic` field in
+  `Tensor` is `#[cfg(feature = "dynamic")]` and zero-cost when the feature is
+  off.
+- RFC-011 and RFC-012 moved to `rfcs/done/`.
+- Only RFC-001 (threat model) remains in `rfcs/proposed/`.
+
 ## [0.7.0] - 2026-06-20
 
 Milestone **M7 — Reductions and Matrix Multiplication** (RFC-010).

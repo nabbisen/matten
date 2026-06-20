@@ -144,6 +144,8 @@ where
     crate::Tensor {
         data,
         shape: result_shape,
+        #[cfg(feature = "dynamic")]
+        dynamic: None,
     }
 }
 

@@ -17,6 +17,8 @@ impl Neg for &Tensor {
         Tensor {
             data: self.data.iter().map(|&v| -v).collect(),
             shape: self.shape.clone(),
+            #[cfg(feature = "dynamic")]
+            dynamic: None,
         }
     }
 }
