@@ -26,5 +26,3 @@ for RFC state; the Status field inside each file mirrors the folder.
 | 010 | [Reductions, Basic Statistics, and Matrix Multiplication](./proposed/010-reductions-basic-statistics-and-matrix-multiplication.md) |
 | 011 | [Dynamic `Element` Model and Coercion](./proposed/011-dynamic-element-model-and-coercion.md) |
 | 012 | [Dynamic Storage, View Metadata, and Copy-on-Write](./proposed/012-dynamic-storage-view-metadata-and-cow.md) |
-| 013 | [Testing, Compatibility, and Release Gates](./proposed/013-testing-compatibility-and-release-gates.md) |
-| 014 | [Example Suite and Executable Documentation](./proposed/014-example-suite-and-executable-documentation.md) |

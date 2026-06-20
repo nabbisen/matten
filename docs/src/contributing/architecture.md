@@ -83,7 +83,7 @@ is off by default.
 | 0.3.0 | M3 | Broadcasting & Operators: `Add`/`Sub`/`Mul`/`Div`/`Neg`, scalar forms |
 | 0.4.0 | M4 | Shape Operations & Slicing: reshape, transpose, `SliceBuilder`, `slice_str` |
 | 0.5.0 | M5 | Boundary Integration: serde, `from_json`/`load_json`, `from_csv`/`load_csv` |
-| 0.6.0 | M6 | Release hardening: examples suite, docs complete, public API audit |
+| 0.6.0 | M6 | Example suite (RFC-014), CI gates, `cargo check --examples` in CI |
 
 Phase 2 (dynamic `Element` engine, CoW storage) follows as a separate feature
 track gated behind `--features dynamic`.

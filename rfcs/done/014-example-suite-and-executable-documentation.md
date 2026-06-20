@@ -1,6 +1,6 @@
 # RFC-014: Example Suite and Executable Documentation
 
-> RFC status: Proposed (reconciled v2 — 2026-06-20)  
+> RFC status: Implemented (0.6.0)
 > Project: `matten`  
 > Target audience: library implementers, maintainers, reviewers, documentation owners  
 > Design level: external design first; internal design where needed  

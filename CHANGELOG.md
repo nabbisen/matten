@@ -5,6 +5,35 @@ All notable changes to `matten` are documented here. The format is based on
 follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html) once it reaches
 a public API (`0.1.0`).
 
+## [0.6.0] - 2026-06-20
+
+Milestone **M6 — Example Suite and CI Hardening** (RFC-013 + RFC-014).
+
+### Added
+
+- **Example suite** — 21 runnable examples covering every implemented API
+  surface (RFC-014 §6.3 required set):
+  - `00_quickstart` through `12_boundary_error_handling` — creation, shape,
+    reshape, operators, scalar ops, broadcasting, transpose, slicing (builder
+    and `slice_str`), JSON round-trip, CSV loading, boundary error handling.
+  - `20`–`24` — deferred placeholders pending RFC-010 (reductions / matmul).
+  - `25_normalize_vector`, `26_cosine_similarity` — L2 normalisation and
+    cosine similarity implemented using existing element-wise ops.
+- **Fixture files** added: `examples/data/numeric_3x3.csv`,
+  `examples/data/malformed_numeric.csv`.
+- **CI gates** (`.github/workflows/ci.yml`) extended with:
+  - `cargo check --examples` and `cargo test --examples` in every PR job.
+  - Full feature-profile test matrix (lean, serde, json, csv, dynamic,
+    all-features).
+  - MSRV 1.85.0 full test run (was build-only).
+  - Separate `smoke` job running the six RFC-014 required smoke examples.
+
+### Notes
+
+- RFC-013 and RFC-014 moved to `rfcs/done/`.
+- Examples 20–24 are placeholder stubs clearly marked as deferred pending
+  RFC-010 (reductions / matmul).
+
 ## [0.5.0] - 2026-06-20
 
 Milestone **M5 — Boundary Integration** (RFC-009).

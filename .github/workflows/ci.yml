@@ -25,6 +25,10 @@ jobs:
         run: cargo test --all-targets
       - name: Doctests
         run: cargo test --doc
+      - name: Check examples compile
+        run: cargo check --examples
+      - name: Test examples
+        run: cargo test --examples
 
   features:
     name: feature profiles
@@ -33,15 +37,17 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - name: Lean core
-        run: cargo build --no-default-features
-      - name: Isolated features
-        run: |
-          cargo build --no-default-features --features serde
-          cargo build --no-default-features --features json
-          cargo build --no-default-features --features csv
-          cargo build --no-default-features --features dynamic
+        run: cargo test --no-default-features
+      - name: serde isolated
+        run: cargo test --no-default-features --features serde
+      - name: json isolated
+        run: cargo test --no-default-features --features json
+      - name: csv isolated
+        run: cargo test --no-default-features --features csv
+      - name: dynamic isolated
+        run: cargo test --no-default-features --features dynamic
       - name: All features
-        run: cargo build --all-features
+        run: cargo test --all-features
 
   msrv:
     name: MSRV 1.85
@@ -50,3 +56,17 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@1.85.0
       - run: cargo build
+      - run: cargo test
+
+  smoke:
+    name: example smoke runs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo run --example 00_quickstart
+      - run: cargo run --example 06_broadcasting
+      - run: cargo run --example 08_slicing_builder
+      - run: cargo run --example 12_boundary_error_handling
+      - run: cargo run --example 25_normalize_vector
+      - run: cargo run --example 26_cosine_similarity
