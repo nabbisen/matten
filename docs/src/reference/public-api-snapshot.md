@@ -12,9 +12,10 @@ pub use matten::DataFormat;
 #[cfg(feature = "dynamic")]
 pub use matten::Element;
 pub use matten::SliceBuilder; // returned by Tensor::slice(); blessed public export
-// IntoSliceRange and SliceConvert are pub in their module but NOT root-exported.
-// They are visible only as trait bounds on SliceBuilder::range<R: IntoSliceRange>.
-// Users never name them in imports; they are sealed internal plumbing.
+// IntoSliceRange and SliceConvert are root-exported #[doc(hidden)] for
+// compiler visibility. SliceConvert extends a private sealed::Sealed supertrait;
+// downstream crates cannot meaningfully implement either trait.
+// Users never need to name them in imports.
 // SliceSpecRepr: #[doc(hidden)], internal visibility artefact
 ```
 

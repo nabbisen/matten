@@ -19,7 +19,7 @@
 - [Dynamic feature (Element model)](./reference/dynamic.md)
 - [Migration to specialised libraries](./reference/migration.md)
 - [Compatibility and stability](./reference/compatibility.md)
-- [Public API snapshot (v0.10.0)](./reference/public-api-snapshot.md)
+- [Public API snapshot](./reference/public-api-snapshot.md)
 
 # Contributors
 

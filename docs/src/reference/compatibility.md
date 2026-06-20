@@ -13,9 +13,10 @@ use matten::Element;                 // #[cfg(feature = "dynamic")]
 `SliceBuilder` is returned by `Tensor::slice()` and is held by value; users
 do not need to import it by name.
 
-`IntoSliceRange` and `SliceConvert` are public sealed traits accepted by
-`SliceBuilder::range`. They cannot be implemented outside `matten`; users
-never name them in imports.
+`IntoSliceRange` and `SliceConvert` are hidden implementation plumbing for
+`SliceBuilder::range`. They are exported `#[doc(hidden)]` and use a private
+`sealed::Sealed` supertrait so downstream crates cannot meaningfully implement
+them. Users never need to name them in imports.
 
 `SliceSpecRepr` is `#[doc(hidden)]`; it is a visibility-chain artefact and
 not part of the stable API.

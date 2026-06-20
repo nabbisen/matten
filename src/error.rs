@@ -5,7 +5,7 @@
 //! - **Panic zone**: local, developer-authored convenience APIs may panic with
 //!   an actionable `matten <category> error in <operation>: ...` message.
 //! - **Result zone**: every external boundary (parsing, file I/O, user-driven
-//!   construction) returns [`Result`](crate::Result) carrying a [`MattenError`].
+//!   construction) returns [`Result`](std::result::Result) carrying a [`MattenError`].
 //!
 //! [`MattenError`] is the single public error type. It derives **only `Debug`**,
 //! because [`MattenError::Io`] embeds [`std::io::Error`], which is neither `Clone`

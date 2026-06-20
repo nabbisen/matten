@@ -46,7 +46,7 @@ pub(crate) fn checked_shape_len(
             return Err(MattenError::Shape {
                 operation,
                 message: format!(
-                    "zero-sized dimensions are not supported in matten 0.1 (shape {shape:?})"
+                    "zero-sized dimensions are not supported in the current matten shape model (shape {shape:?})"
                 ),
             });
         }

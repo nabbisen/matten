@@ -119,14 +119,14 @@ pub(crate) fn flatten_rectangular(
     if row_count == 0 {
         return Err(MattenError::Shape {
             operation,
-            message: "cannot create a tensor from an empty row list (zero-sized dimensions are not supported in matten 0.1)".into(),
+            message: "cannot create a tensor from an empty row list (zero-sized dimensions are not supported in the current matten shape model)".into(),
         });
     }
     let col_count = rows[0].len();
     if col_count == 0 {
         return Err(MattenError::Shape {
             operation,
-            message: "rows must have at least one column (zero-sized dimensions are not supported in matten 0.1)".into(),
+            message: "rows must have at least one column (zero-sized dimensions are not supported in the current matten shape model)".into(),
         });
     }
     let mut flat = Vec::with_capacity(row_count * col_count);

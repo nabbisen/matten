@@ -31,7 +31,9 @@ impl Serialize for Tensor {
         #[cfg(feature = "dynamic")]
         if self.is_dynamic() {
             return Err(serde::ser::Error::custom(
-                "matten: dynamic tensors cannot be serialized with the default serde                  implementation; call try_numeric() first to convert to a numeric tensor, or use to_elements() to handle Element values manually",
+                "matten: dynamic tensors cannot be serialized with the default serde \
+                 implementation; call try_numeric() first to convert to a numeric \
+                 tensor, or use to_elements() to handle Element values manually",
             ));
         }
         TensorSerde {

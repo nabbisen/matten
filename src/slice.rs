@@ -163,16 +163,29 @@ pub(crate) fn execute_slice(
 #[doc(hidden)]
 pub struct SliceSpecRepr(pub(crate) SliceSpec);
 
-/// Supertrait that does the actual range-to-spec conversion. Public so it can
-/// appear in a public supertrait bound; sealed because no external type can
-/// satisfy it.
-pub trait SliceConvert {
-    #[doc(hidden)]
+/// Private sealing module — only types with an impl here can satisfy
+/// [`IntoSliceRange`].
+mod sealed {
+    pub trait Sealed {}
+    impl Sealed for std::ops::Range<usize> {}
+    impl Sealed for std::ops::RangeFrom<usize> {}
+    impl Sealed for std::ops::RangeTo<usize> {}
+    impl Sealed for std::ops::RangeFull {}
+    impl Sealed for std::ops::RangeInclusive<usize> {}
+}
+
+/// Supertrait that does the actual range-to-spec conversion. Hidden plumbing
+/// for [`IntoSliceRange`]; not intended for downstream implementation.
+#[doc(hidden)]
+pub trait SliceConvert: sealed::Sealed {
     fn into_repr(self) -> SliceSpecRepr;
 }
 
-/// Sealed marker: only types with an explicit `SliceConvert` impl in this
-/// module can implement `IntoSliceRange`.
+/// Accepts any standard Rust range type as a slice axis specification.
+///
+/// This trait is **sealed**: it can only be satisfied by the five standard
+/// library range types (`Range`, `RangeFrom`, `RangeTo`, `RangeFull`,
+/// `RangeInclusive`). It is not intended for external implementation.
 pub trait IntoSliceRange: SliceConvert {}
 
 impl IntoSliceRange for std::ops::Range<usize> {}

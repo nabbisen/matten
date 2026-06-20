@@ -1,9 +1,9 @@
-//! L2 normalisation of a vector using existing element-wise ops.
+//! L2 normalisation of a vector using simple tensor operations.
 //!
 //! Run: cargo run --example 25_normalize_vector
 //!
-//! matten 0.5 has no built-in sqrt/dot; those arrive with RFC-010 reductions.
-//! This example shows how to compose the existing API to get there today.
+//! This example intentionally computes the norm via as_slice() so you can
+//! see how ordinary Rust and Tensor arithmetic compose for small PoC math.
 
 use matten::Tensor;
 

@@ -80,17 +80,6 @@ t.to_elements()         // Vec<Element> in row-major order
 ## Missing-value utilities
 
 ```rust
-// Replace all None with a fallback value:
-let filled = t.fill_none(Element::text("unknown"));
-
-// Convert to a Phase 1 f64 tensor (fails if any non-numeric element):
-let numeric = t.try_numeric()?;  // MattenError::Unsupported on non-numeric
-```
-
-
-## Missing-value utilities
-
-```rust
 use matten::{Element, Tensor};
 
 let t = Tensor::from_elements(

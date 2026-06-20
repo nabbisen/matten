@@ -5,6 +5,49 @@ All notable changes to `matten` are documented here. The format is based on
 follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html) once it reaches
 a public API (`0.1.0`).
 
+## [0.13.2] - 2026-06-20
+
+**Final cleanup release.** Addresses all remaining P1 and P2 findings from the
+v0.13.1 review.
+
+### Fixed — P1
+
+- **P1-1.** `README.md` status updated from version-stamped text to
+  `"active pre-1.0 development (0.13.x)"`, preventing future stale-version drift.
+
+- **P1-2.** `docs/src/SUMMARY.md` entry changed from
+  `"Public API snapshot (v0.10.0)"` to `"Public API snapshot"` — version removed
+  to avoid needing updates on every patch release.
+
+- **P1-3.** `examples/25_normalize_vector.rs` header updated: stale
+  `"matten 0.5 has no built-in sqrt/dot; those arrive with RFC-010 reductions"`
+  removed and replaced with a version-neutral description.
+
+- **P1-4.** True sealed-trait pattern implemented for `IntoSliceRange` /
+  `SliceConvert`. A private `mod sealed` with `pub trait Sealed` now acts as the
+  sealing supertrait. `SliceConvert` extends `sealed::Sealed`, so downstream
+  crates cannot implement it without access to the private module. The
+  `#[doc(hidden)]` root-exports remain for compiler visibility.
+  `docs/src/reference/compatibility.md` and `public-api-snapshot.md` updated to
+  accurately describe the implementation.
+
+- **P1-5.** `src/ser.rs` multi-space error message fixed: the embedded spaces from
+  backslash-continuation indentation are now correct.
+
+- **P1-6.** `src/error.rs` broken intra-doc link `[Result](crate::Result)` changed
+  to `[Result](std::result::Result)`.
+
+### Fixed — P2
+
+- **P2-1.** Duplicate `## Missing-value utilities` heading in
+  `docs/src/reference/dynamic.md` removed — the shorter first occurrence was
+  eliminated, keeping the fuller second section.
+
+- **P2-3.** Runtime error messages containing `"zero-sized dimensions are not
+  supported in matten 0.1"` in `src/shape.rs` and `src/convert.rs` updated to
+  `"zero-sized dimensions are not supported in the current matten shape model"`,
+  avoiding version-stamped wording in runtime output.
+
 ## [0.13.1] - 2026-06-20
 
 **Cleanup release.** Addresses all remaining findings from the v0.13.0 review.

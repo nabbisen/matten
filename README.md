@@ -25,7 +25,7 @@ JSON/CSV in and out — without wrestling with views, lifetimes, or trait bounds
 When a prototype becomes performance-critical, `matten` is designed to hand its
 flat data off to a specialized crate.
 
-> **Status: `0.13.0`** — Phase 1 numeric core is implemented and close to release quality.
+> **Status: active pre-1.0 development (`0.13.x`).** Phase 1 numeric core is close to release quality.
 > The `dynamic` feature supports heterogeneous ingestion (`from_json_dynamic`, `from_csv_dynamic`),
 > missing-value cleanup (`fill_none`, `none_mask`, `forward_fill_none`), and explicit conversion to
 > numeric tensors (`try_numeric`). Dynamic reshape, slicing, arithmetic, reductions, and serde are
