@@ -25,11 +25,12 @@ JSON/CSV in and out — without wrestling with views, lifetimes, or trait bounds
 When a prototype becomes performance-critical, `matten` is designed to hand its
 flat data off to a specialized crate.
 
-> **Status: `0.11.0` — Post-audit Release Candidate.** The complete Phase 1 + Phase 2 API is
+> **Status: `0.12.0` — Dynamic lifecycle hardened; all architect review items addressed.** The complete Phase 1 + Phase 2 API is
 > in place: construction, shape ops, arithmetic, broadcasting, slicing, reductions,
 > matrix multiplication, JSON/CSV serde, and the `dynamic` heterogeneous-data engine.
 > All 15 design RFCs are in `rfcs/done/`. v1.0.0 requires explicit maintainer
-> confirmation. See [CHANGELOG.md](./CHANGELOG.md) and [`docs/`](./docs/) for details.
+> confirmation. See [CHANGELOG.md](./CHANGELOG.md) and [docs.rs](https://docs.rs/matten) for details.
+> The full mdBook lives in `docs/` in the repository (not included in the crate package).
 
 ## Quick start
 
@@ -67,6 +68,6 @@ matten = { version = "0.1", default-features = false }
 
 ## More detail
 
-- Full documentation: `docs/` (mdBook) and [docs.rs](https://docs.rs/matten).
+- Full documentation: [docs.rs](https://docs.rs/matten) (API reference) and the `docs/` mdBook in the repository.
 - Design and governance: the `rfcs/` pack and roadmap in the repository.
 - License: Apache-2.0 (see `LICENSE` and `NOTICE`).

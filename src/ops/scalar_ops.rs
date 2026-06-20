@@ -8,6 +8,16 @@
 use crate::Tensor;
 use std::ops::{Add, Div, Mul, Sub};
 
+#[cfg(feature = "dynamic")]
+#[inline(always)]
+fn require_numeric(t: &crate::Tensor, operation: &'static str) {
+    if t.is_dynamic() {
+        panic!(
+            "matten unsupported error in {operation}: scalar arithmetic is not supported              on dynamic tensors; call try_numeric() first"
+        );
+    }
+}
+
 // ---- &Tensor op f64 ---------------------------------------------------
 
 impl Add<f64> for &Tensor {
@@ -21,6 +31,8 @@ impl Add<f64> for &Tensor {
     /// assert_eq!(r.as_slice(), &[11.0, 12.0, 13.0]);
     /// ```
     fn add(self, rhs: f64) -> Tensor {
+        #[cfg(feature = "dynamic")]
+        require_numeric(self, "add");
         Tensor {
             data: self.data.iter().map(|&v| v + rhs).collect(),
             shape: self.shape.clone(),
@@ -41,6 +53,8 @@ impl Sub<f64> for &Tensor {
     /// assert_eq!(r.as_slice(), &[4.0, 2.0, 0.0]);
     /// ```
     fn sub(self, rhs: f64) -> Tensor {
+        #[cfg(feature = "dynamic")]
+        require_numeric(self, "sub");
         Tensor {
             data: self.data.iter().map(|&v| v - rhs).collect(),
             shape: self.shape.clone(),
@@ -61,6 +75,8 @@ impl Mul<f64> for &Tensor {
     /// assert_eq!(r.as_slice(), &[3.0, 6.0, 9.0]);
     /// ```
     fn mul(self, rhs: f64) -> Tensor {
+        #[cfg(feature = "dynamic")]
+        require_numeric(self, "mul");
         Tensor {
             data: self.data.iter().map(|&v| v * rhs).collect(),
             shape: self.shape.clone(),
@@ -81,6 +97,8 @@ impl Div<f64> for &Tensor {
     /// assert_eq!(r.as_slice(), &[3.0, 2.0, 1.0]);
     /// ```
     fn div(self, rhs: f64) -> Tensor {
+        #[cfg(feature = "dynamic")]
+        require_numeric(self, "div");
         Tensor {
             data: self.data.iter().map(|&v| v / rhs).collect(),
             shape: self.shape.clone(),
@@ -103,6 +121,8 @@ impl Add<&Tensor> for f64 {
     /// assert_eq!(r.as_slice(), &[11.0, 12.0, 13.0]);
     /// ```
     fn add(self, rhs: &Tensor) -> Tensor {
+        #[cfg(feature = "dynamic")]
+        require_numeric(rhs, "add (scalar-left)");
         Tensor {
             data: rhs.data.iter().map(|&v| self + v).collect(),
             shape: rhs.shape.clone(),
@@ -123,6 +143,8 @@ impl Sub<&Tensor> for f64 {
     /// assert_eq!(r.as_slice(), &[9.0, 8.0, 7.0]);
     /// ```
     fn sub(self, rhs: &Tensor) -> Tensor {
+        #[cfg(feature = "dynamic")]
+        require_numeric(rhs, "sub (scalar-left)");
         Tensor {
             data: rhs.data.iter().map(|&v| self - v).collect(),
             shape: rhs.shape.clone(),
@@ -143,6 +165,8 @@ impl Mul<&Tensor> for f64 {
     /// assert_eq!(r.as_slice(), &[3.0, 6.0, 9.0]);
     /// ```
     fn mul(self, rhs: &Tensor) -> Tensor {
+        #[cfg(feature = "dynamic")]
+        require_numeric(rhs, "mul (scalar-left)");
         Tensor {
             data: rhs.data.iter().map(|&v| self * v).collect(),
             shape: rhs.shape.clone(),
@@ -164,6 +188,8 @@ impl Div<&Tensor> for f64 {
     /// assert_eq!(r.as_slice(), &[8.0, 4.0, 2.0]);
     /// ```
     fn div(self, rhs: &Tensor) -> Tensor {
+        #[cfg(feature = "dynamic")]
+        require_numeric(rhs, "div (scalar-left)");
         Tensor {
             data: rhs.data.iter().map(|&v| self / v).collect(),
             shape: rhs.shape.clone(),

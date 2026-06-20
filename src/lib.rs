@@ -9,7 +9,7 @@
 //!
 //! # Status
 //!
-//! This is **`0.5.0`** (milestone M5, Boundary Integration). Serde,
+//! This is **`0.11.0`** — post-audit release. Phase 1 numeric core and
 //! `from_json`/`load_json`, and `from_csv`/`load_csv` are now in place.
 //! Reductions, matmul, and the examples suite arrive in later milestones.
 //!
@@ -75,8 +75,8 @@
 //   reshape     reshape, flatten, transpose, swap_axes helpers (M4)
 //   slice       SliceSpec, SliceBuilder, execute_slice, slice_str (M4)
 //   math        sum/mean/min/max, axis reductions, dot, matmul (M7, here)
-//   ser         Serialize/Deserialize for Tensor (M5, here)
-//   parse/      JSON/CSV boundary parsers (M5, here)
+//   ser         Serialize/Deserialize for Tensor
+//   parse/      JSON/CSV boundary parsers
 //   dynamic/    feature-gated `Element` engine (Phase 2)
 mod convert;
 #[cfg(feature = "dynamic")]

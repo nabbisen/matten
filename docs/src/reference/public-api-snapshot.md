@@ -1,4 +1,4 @@
-# Public API snapshot — v0.10.0
+# Public API snapshot — v0.12.0
 
 This page lists every public item in `matten` at v0.10.0. It serves as the
 baseline for tracking breaking changes toward v1.0.0.
@@ -11,7 +11,7 @@ pub use matten::MattenError;
 pub use matten::DataFormat;
 #[cfg(feature = "dynamic")]
 pub use matten::Element;
-pub use matten::SliceBuilder; // returned by Tensor::slice(); rarely named
+pub use matten::SliceBuilder; // returned by Tensor::slice(); blessed public export
 pub use matten::IntoSliceRange; // sealed trait; not for external impl
 pub use matten::SliceConvert;   // sealed supertrait; not for external impl
 // SliceSpecRepr: #[doc(hidden)], internal visibility artefact
@@ -52,6 +52,19 @@ pub use matten::SliceConvert;   // sealed supertrait; not for external impl
 | `into_vec(self)` | `Vec<f64>` |
 | `get(coord)` | `Option<f64>` |
 | `get_flat(index)` | `Option<f64>` | flat row-major index |
+
+## Dynamic tensor behaviour
+
+Methods marked as Phase 1 only **panic** with a clear `matten unsupported error` message when called on a dynamic tensor. Use `try_numeric()` to convert first.
+
+| Phase 1 method group | Dynamic behaviour |
+|---|---|
+| `reshape`, `flatten`, `transpose`, `swap_axes` | panic |
+| `slice()` builder, `slice_str()` | returns `MattenError::Unsupported` |
+| arithmetic operators | panic |
+| reductions (`sum`, `mean`, etc.) | panic |
+| `dot` / `matmul` | panic |
+| `Serialize` | returns serde error |
 
 ## `Tensor` — shape operations
 
@@ -98,8 +111,8 @@ pub use matten::SliceConvert;   // sealed supertrait; not for external impl
 | `mean_axis(axis)` | `Tensor` | |
 | `min_axis(axis)` | `Tensor` | NaN if any NaN in axis |
 | `max_axis(axis)` | `Tensor` | NaN if any NaN in axis |
-| `dot(rhs)` | `Tensor` | 4 shape cases |
-| `matmul(rhs)` | `Tensor` | alias for `dot` |
+| `dot(rhs)` | `Tensor` | 4 shape cases; panics on dynamic tensors |
+| `matmul(rhs)` | `Tensor` | alias for `dot`; panics on dynamic tensors |
 
 ## `Tensor` — boundary I/O
 

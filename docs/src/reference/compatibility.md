@@ -76,6 +76,7 @@ The following items were considered and explicitly deferred:
 |---|---|---|
 | `is_empty()` | Deferred | Zero-sized dims rejected; always false. Future RFC. |
 | `set_flat` | Not implemented | Mutation deferred to Phase 2. |
+| `arange` max elements | `1<<20` (~1 M) | Lowered from `1<<28` in v0.12.0 for OOM safety. |
 | `get_flat` | **Implemented** | `Tensor::get_flat(index) -> Option<f64>` added in v0.11.0. |
 | Negative slice indices | Deferred | Not in RFC-008 grammar for `0.1.0`. |
 | Step slicing `::2` | Supported | `slice_str("0:10:2")` grammar works. |

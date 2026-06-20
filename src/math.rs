@@ -11,12 +11,24 @@
 //! **Do not** use `fold(f64::INFINITY, f64::min)` — that silently ignores
 //! `NaN`. The implementation short-circuits on the first `NaN` detected.
 
+use crate::Tensor;
 use crate::shape::{coord_to_flat, flat_to_coord};
-use crate::{MattenError, Tensor};
 
 // ── Whole-tensor reductions ───────────────────────────────────────────────
 
 impl Tensor {
+    /// Asserts this tensor uses numeric (Phase 1) storage and panics with a
+    /// clear message if it is a dynamic tensor.
+    #[cfg(feature = "dynamic")]
+    #[inline(always)]
+    fn require_numeric(&self, operation: &'static str) {
+        if self.is_dynamic() {
+            panic!(
+                "matten unsupported error in {operation}: this reduction is not supported                  on dynamic tensors; call try_numeric() first to convert"
+            );
+        }
+    }
+
     /// Returns the sum of all elements.
     ///
     /// `NaN` propagates naturally (IEEE 754).
@@ -28,6 +40,8 @@ impl Tensor {
     /// ```
     #[must_use]
     pub fn sum(&self) -> f64 {
+        #[cfg(feature = "dynamic")]
+        self.require_numeric("sum");
         self.data.iter().sum()
     }
 
@@ -42,6 +56,8 @@ impl Tensor {
     /// ```
     #[must_use]
     pub fn mean(&self) -> f64 {
+        #[cfg(feature = "dynamic")]
+        self.require_numeric("mean");
         self.sum() / self.data.len() as f64
     }
 
@@ -57,6 +73,8 @@ impl Tensor {
     /// ```
     #[must_use]
     pub fn min(&self) -> f64 {
+        #[cfg(feature = "dynamic")]
+        self.require_numeric("min");
         nan_reduce(&self.data, f64::INFINITY, |acc, v| acc.min(v))
     }
 
@@ -71,6 +89,8 @@ impl Tensor {
     /// ```
     #[must_use]
     pub fn max(&self) -> f64 {
+        #[cfg(feature = "dynamic")]
+        self.require_numeric("max");
         nan_reduce(&self.data, f64::NEG_INFINITY, |acc, v| acc.max(v))
     }
 }
@@ -108,6 +128,8 @@ impl Tensor {
     /// ```
     #[must_use]
     pub fn sum_axis(&self, axis: usize) -> Tensor {
+        #[cfg(feature = "dynamic")]
+        self.require_numeric("sum_axis");
         axis_reduce(self, axis, "sum_axis", |acc, v| acc + v, 0.0)
     }
 
@@ -126,6 +148,14 @@ impl Tensor {
     /// ```
     #[must_use]
     pub fn mean_axis(&self, axis: usize) -> Tensor {
+        #[cfg(feature = "dynamic")]
+        self.require_numeric("mean_axis");
+        if axis >= self.ndim() {
+            panic!(
+                "matten shape error in mean_axis: axis {axis} is out of range                  for rank-{} tensor",
+                self.ndim()
+            );
+        }
         let n = self.shape()[axis] as f64;
         let sums = axis_reduce(self, axis, "mean_axis", |acc, v| acc + v, 0.0);
         &sums / n
@@ -149,6 +179,8 @@ impl Tensor {
     /// ```
     #[must_use]
     pub fn min_axis(&self, axis: usize) -> Tensor {
+        #[cfg(feature = "dynamic")]
+        self.require_numeric("min_axis");
         nan_axis_reduce(self, axis, "min_axis", f64::INFINITY, |a, b| a.min(b))
     }
 
@@ -166,6 +198,8 @@ impl Tensor {
     /// ```
     #[must_use]
     pub fn max_axis(&self, axis: usize) -> Tensor {
+        #[cfg(feature = "dynamic")]
+        self.require_numeric("max_axis");
         nan_axis_reduce(self, axis, "max_axis", f64::NEG_INFINITY, |a, b| a.max(b))
     }
 }
@@ -324,6 +358,13 @@ impl Tensor {
     /// ```
     #[must_use]
     pub fn dot(&self, rhs: &Tensor) -> Tensor {
+        #[cfg(feature = "dynamic")]
+        if self.is_dynamic() || rhs.is_dynamic() {
+            panic!(
+                "matten unsupported error in dot/matmul: not supported on dynamic \
+                 tensors; call try_numeric() on each operand first"
+            );
+        }
         matmul_dispatch(self, rhs, "dot")
     }
 
@@ -450,28 +491,5 @@ fn dim_check(left: usize, right: usize, left_name: &str, right_name: &str, op: &
             "matten shape error in {op}: {left_name} ({left}) \
              must equal {right_name} ({right})"
         );
-    }
-}
-
-/// Public Result-zone wrapper for matmul used by future boundary APIs.
-#[allow(dead_code)]
-pub(crate) fn try_matmul(
-    lhs: &Tensor,
-    rhs: &Tensor,
-    op: &'static str,
-) -> Result<Tensor, MattenError> {
-    // Catch panics from matmul_dispatch via a thin closure so callers that want
-    // Result (e.g. future RFC-009 extensions) can use it without catch_unwind.
-    // For now this just validates the common rank cases and delegates.
-    match (lhs.ndim(), rhs.ndim()) {
-        (1, 1) | (2, 1) | (1, 2) | (2, 2) => Ok(matmul_dispatch(lhs, rhs, op)),
-        _ => Err(MattenError::Shape {
-            operation: op,
-            message: format!(
-                "unsupported rank combination (left rank {}, right rank {})",
-                lhs.ndim(),
-                rhs.ndim()
-            ),
-        }),
     }
 }

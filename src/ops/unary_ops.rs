@@ -14,6 +14,12 @@ impl Neg for &Tensor {
     /// assert_eq!(r.as_slice(), &[-1.0, 2.0, -3.0]);
     /// ```
     fn neg(self) -> Tensor {
+        #[cfg(feature = "dynamic")]
+        if self.is_dynamic() {
+            panic!(
+                "matten unsupported error in neg: unary negation is not supported                  on dynamic tensors; call try_numeric() first"
+            );
+        }
         Tensor {
             data: self.data.iter().map(|&v| -v).collect(),
             shape: self.shape.clone(),

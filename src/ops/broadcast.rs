@@ -126,6 +126,12 @@ pub(crate) fn apply_binary<F>(
 where
     F: Fn(f64, f64) -> f64,
 {
+    #[cfg(feature = "dynamic")]
+    if lhs.is_dynamic() || rhs.is_dynamic() {
+        panic!(
+            "matten unsupported error in {operation}: element-wise arithmetic is not supported              on dynamic tensors; call try_numeric() on each operand first"
+        );
+    }
     let result_shape = broadcast_shape(lhs.shape(), rhs.shape()).unwrap_or_else(|_| {
         panic!(
             "matten broadcast error in {operation}: shapes {:?} and {:?} are not compatible",

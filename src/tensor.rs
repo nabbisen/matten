@@ -11,7 +11,7 @@ use std::fmt;
 
 /// Maximum element count accepted by `arange` / `try_arange` before the
 /// allocation limit fires. Set conservatively for Phase 1.
-const ARANGE_MAX_ELEMENTS: usize = 1 << 28; // ~268 million
+const ARANGE_MAX_ELEMENTS: usize = 1 << 20; // ~1 million (family-car budget: ~8 MiB)
 
 /// A dense, row-major, owned multidimensional array of `f64`.
 ///
@@ -302,6 +302,10 @@ impl Tensor {
     /// The logical element count: the product of the shape.
     #[must_use]
     pub fn len(&self) -> usize {
+        #[cfg(feature = "dynamic")]
+        if let Some(dyn_t) = &self.dynamic {
+            return dyn_t.len;
+        }
         self.data.len()
     }
 
@@ -345,6 +349,22 @@ impl Tensor {
 impl fmt::Debug for Tensor {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         const MAX: usize = 8;
+        #[cfg(feature = "dynamic")]
+        if let Some(dyn_t) = &self.dynamic {
+            write!(f, "Tensor(shape={:?}, dynamic=[", self.shape)?;
+            for i in 0..dyn_t.len.min(MAX) {
+                if i > 0 {
+                    f.write_str(", ")?;
+                }
+                if let Some(e) = dyn_t.get_flat(i) {
+                    write!(f, "{e:?}")?;
+                }
+            }
+            if dyn_t.len > MAX {
+                write!(f, ", ... ({} more)", dyn_t.len - MAX)?;
+            }
+            return f.write_str("])");
+        }
         write!(f, "Tensor(shape={:?}, data=[", self.shape)?;
         for (i, v) in self.data.iter().take(MAX).enumerate() {
             if i > 0 {
@@ -486,6 +506,12 @@ impl Tensor {
     /// ```
     #[must_use]
     pub fn flatten(&self) -> Tensor {
+        #[cfg(feature = "dynamic")]
+        if self.is_dynamic() {
+            panic!(
+                "matten unsupported error in flatten: dynamic tensors do not support flatten;                  call try_numeric() first to convert to a numeric tensor"
+            );
+        }
         let len = self.data.len();
         Tensor {
             data: self.data.clone(),

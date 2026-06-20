@@ -70,7 +70,10 @@ fn parse_object_form(value: &Value) -> Result<Tensor, MattenError> {
         .map(|(i, v)| {
             v.as_u64()
                 .ok_or_else(|| parse_err(format!("\"shape\"[{i}] must be a non-negative integer")))
-                .map(|n| n as usize)
+                .and_then(|n| {
+                    usize::try_from(n)
+                        .map_err(|_| parse_err("shape dimension overflows usize".to_string()))
+                })
         })
         .collect::<Result<_, _>>()?;
 

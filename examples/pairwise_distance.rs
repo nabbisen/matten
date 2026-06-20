@@ -10,13 +10,11 @@ fn pairwise_euclidean(points: &Tensor) -> Tensor {
     let n = points.shape()[0];
 
     // Row-wise squared norms: shape [n]
-    let sq = points * points; // wait — need &ref; fix below
-    let _ = sq;
-    let sq = &(points.clone()) * points;
+    let sq = points * points;
     let row_sq_norms = sq.sum_axis(1); // [n]
 
     // Gram matrix: G[i,j] = points[i] · points[j], shape [n,n]
-    let gram = points.matmul(&points.transpose()); // [n,n]
+    let gram = points.matmul(&points.transpose());
 
     // dist²[i,j] = sq_norm[i] + sq_norm[j] - 2·G[i,j]
     // Broadcast [n] as column [n,1] + row [1,n]
@@ -24,16 +22,12 @@ fn pairwise_euclidean(points: &Tensor) -> Tensor {
     let row = row_sq_norms.reshape(&[1, n]);
     let dist_sq = &(&col + &row) - &(&gram * 2.0);
 
-    // Clamp small negatives from floating-point and take sqrt element-wise
-    let clamped: Vec<f64> = dist_sq
+    // Clamp small negatives from floating-point rounding, then sqrt
+    let dists: Vec<f64> = dist_sq
         .as_slice()
         .iter()
-        .map(|&v| if v < 0.0 { 0.0 } else { v })
+        .map(|&v| if v < 0.0 { 0.0 } else { v.sqrt() })
         .collect();
-    let clamped_t = Tensor::new(clamped, &[n, n]);
-
-    // sqrt element-wise using scalar-on-left trick: each element via map
-    let dists: Vec<f64> = clamped_t.as_slice().iter().map(|v| v.sqrt()).collect();
     Tensor::new(dists, &[n, n])
 }
 
@@ -47,9 +41,9 @@ fn main() {
         println!("  row {i}: {:?}", row.as_slice());
     }
 
-    // distance from (0,0) to (3,4) should be 5
+    // (0,0)→(3,4) = 5, (3,4)→(6,0) = 5, (0,0)→(6,0) = 6
     assert!((dists.get(&[0, 1]).unwrap() - 5.0).abs() < 1e-9);
-    // distance from (3,4) to (6,0) should be 5
     assert!((dists.get(&[1, 2]).unwrap() - 5.0).abs() < 1e-9);
+    assert!((dists.get(&[0, 2]).unwrap() - 6.0).abs() < 1e-9);
     println!("Pairwise distances: OK");
 }

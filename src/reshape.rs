@@ -32,6 +32,13 @@ fn validate_reshape(
 
 /// Reshape implementation shared by the panic and Result forms.
 pub(crate) fn try_reshape_impl(t: &Tensor, new_shape: &[usize]) -> Result<Tensor, MattenError> {
+    #[cfg(feature = "dynamic")]
+    if t.is_dynamic() {
+        return Err(MattenError::Unsupported {
+            operation: "reshape",
+            message: "dynamic tensors do not support reshape;                       call try_numeric() first to convert to a numeric tensor".to_string(),
+        });
+    }
     validate_reshape(t.len(), new_shape, "reshape")?;
     Ok(Tensor {
         data: t.data.clone(),
@@ -49,6 +56,12 @@ pub(crate) fn try_reshape_impl(t: &Tensor, new_shape: &[usize]) -> Result<Tensor
 /// must be a valid bijection over `0..ndim`; the caller is responsible for
 /// validation.
 pub(crate) fn permute_axes(t: &Tensor, permutation: &[usize]) -> Tensor {
+    #[cfg(feature = "dynamic")]
+    if t.is_dynamic() {
+        panic!(
+            "matten unsupported error in transpose/swap_axes:              dynamic tensors do not support axis permutation;              call try_numeric() first"
+        );
+    }
     let src_shape = t.shape();
     // Build result shape: result_shape[i] = src_shape[permutation[i]]
     let result_shape: Vec<usize> = permutation.iter().map(|&p| src_shape[p]).collect();

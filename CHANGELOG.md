@@ -5,6 +5,87 @@ All notable changes to `matten` are documented here. The format is based on
 follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html) once it reaches
 a public API (`0.1.0`).
 
+## [0.12.0] - 2026-06-20
+
+**Hardening release.** Addresses all P0, P1, P2, and P3 findings from the
+v0.11.0 architect review.
+
+### Fixed — Patch A: Release polish
+
+- **A1.** `src/lib.rs` crate-level status docs updated from `0.5.0 / M5` to
+  current `0.12.0` status.
+- **A2.** `mean_axis` now validates `axis < self.ndim()` *before* indexing
+  `self.shape()[axis]`, emitting a canonical `matten shape error in mean_axis:
+  axis N is out of range for rank-M tensor` panic instead of a raw Rust index
+  panic.
+- **A3.** `examples/pairwise_distance.rs` cleaned — scratch comment
+  `"wait — need &ref; fix below"` and the unused intermediate variable removed.
+- **A4.** `README.md` links to `docs/` and `rfcs/` (excluded from the
+  published crate package) replaced with `docs.rs` links.
+- **A5.** Public API snapshot version label updated to match the package
+  version.
+
+### Fixed — Patch B: API and grammar consistency
+
+- **B1.** `SliceBuilder` formally blessed as a public root export; updated in
+  the API snapshot.
+- **B2.** `slice_str("0::")` — empty trailing step segment is now **rejected**
+  with `MattenError::Slice` and a clear message. Previously it silently parsed
+  as `"0:"`.
+- **B3.** The `slice_str_malformed_never_panics` test tightened to
+  `slice_str_malformed_is_err` asserting `Err` for every malformed input.
+- **B4.** `IntoSliceRange`/`SliceConvert` documented as intentionally
+  public-but-hidden plumbing.
+
+### Fixed — Patch C: Dynamic lifecycle hardening (P0-1, P0-2)
+
+Every Phase 1-only `Tensor` method now has an explicit `is_dynamic()` guard:
+
+- **C2.** `len()` returns `DynamicTensor::len` (the logical element count) for
+  dynamic tensors — no longer returns `0`.
+- **C3.** `Debug` prints `dynamic=[...]` with `Element` values for dynamic
+  tensors — no longer shows empty numeric data.
+- **C4.** `reshape`, `try_reshape`, `flatten`, `transpose`, `swap_axes` panic
+  with `matten unsupported error in <op>: dynamic tensors do not support
+  <op>; call try_numeric() first`.
+- **C5.** `slice()` builder and `slice_str()` return `MattenError::Unsupported`
+  for dynamic tensors with a clear message directing users to `get_element`.
+- **C6.** All element-wise operators (`+`, `-`, `*`, `/`, unary `-`), scalar
+  operators, and every reduction (`sum`, `mean`, `min`, `max`, `sum_axis`,
+  `mean_axis`, `min_axis`, `max_axis`) and `dot`/`matmul` panic with
+  `matten unsupported error` on dynamic tensors.
+- **C7.** `Serialize` returns a serde error for dynamic tensors instead of
+  silently serializing shape + empty data.
+- **C8.** Dynamic examples `dynamic_00`, `dynamic_02`, `dynamic_05` rewritten
+  to `assert!` correct behavior rather than only `println!` output.
+
+Added **8 public lifecycle tests** in `src/tests/dynamic.rs::lifecycle_tests`
+(P0-2 fix):
+`dynamic_len_equals_shape_product`, `dynamic_len_2d`, `dynamic_debug_not_empty`,
+`dynamic_reshape_is_unsupported`, `dynamic_flatten_is_unsupported`,
+`dynamic_slice_builder_is_unsupported`, `dynamic_arithmetic_is_unsupported`,
+`dynamic_sum_is_unsupported`.
+
+### Fixed — Patch D: Boundary hardening
+
+- **D1.** `try_matmul` (`pub(crate)`) removed — it was dead code that still
+  panicked internally despite returning `Result`.
+- **D2.** `ARANGE_MAX_ELEMENTS` lowered from `1<<28` (~268 M elements, ~2 GiB)
+  to `1<<20` (~1 M elements, ~8 MiB) — appropriate for the family-car identity.
+- **D3.** JSON shape parsing now uses `usize::try_from(n)` instead of
+  `n as usize`, returning `MattenError::Parse` on overflow rather than silently
+  truncating on 32-bit targets. Applied to both `src/parse/json.rs` and
+  `src/dynamic/parse/json.rs`.
+
+### Changed
+
+- `MattenError` import removed from `math.rs` (only needed by the now-deleted
+  `try_matmul`).
+- `docs/src/reference/public-api-snapshot.md` updated to v0.12.0 and now
+  includes a dynamic-behaviour table.
+- `docs/src/reference/compatibility.md` documents the `ARANGE_MAX_ELEMENTS`
+  budget change.
+
 ## [0.11.0] - 2026-06-20
 
 **Post-audit release.** Systematic four-layer audit (RFC → implementation,

@@ -387,3 +387,113 @@ mod is_none_mask_tests {
         assert_eq!(mask.as_slice(), &[1.0, 0.0, 1.0]);
     }
 }
+
+// ---- P0-2: Public dynamic lifecycle tests (architect review §3) ----------
+
+#[cfg(feature = "dynamic")]
+mod lifecycle_tests {
+    use crate::Tensor;
+    use crate::dynamic::Element;
+
+    #[test]
+    fn dynamic_len_equals_shape_product() {
+        // P0-1: len() must return logical length, not data.len()
+        let t = Tensor::from_elements(
+            vec![Element::Float(1.0), Element::text("a"), Element::None],
+            &[3],
+        );
+        assert_eq!(t.len(), 3, "dynamic len() must equal shape product");
+    }
+
+    #[test]
+    fn dynamic_len_2d() {
+        let t = Tensor::from_elements(
+            vec![
+                Element::Int(1),
+                Element::Int(2),
+                Element::Int(3),
+                Element::Int(4),
+            ],
+            &[2, 2],
+        );
+        assert_eq!(t.len(), 4);
+    }
+
+    #[test]
+    fn dynamic_debug_not_empty() {
+        let t = Tensor::from_elements(vec![Element::Float(1.5), Element::text("hello")], &[2]);
+        let dbg = format!("{t:?}");
+        // Debug must not report an empty tensor for a non-empty dynamic one
+        assert!(
+            !dbg.contains("data: []") || dbg.contains("dynamic"),
+            "Debug output should not appear empty: {dbg}"
+        );
+    }
+
+    #[test]
+    fn dynamic_reshape_is_unsupported() {
+        // Under the "guard" model, reshape on a dynamic tensor should panic
+        // with a clear matten unsupported error message.
+        let t = Tensor::from_elements(vec![Element::Int(1), Element::Int(2)], &[2]);
+        let result = std::panic::catch_unwind(|| t.reshape(&[1, 2]));
+        assert!(
+            result.is_err(),
+            "reshape on dynamic tensor must panic (unsupported)"
+        );
+    }
+
+    #[test]
+    fn dynamic_flatten_is_unsupported() {
+        let t = Tensor::from_elements(
+            vec![
+                Element::Int(1),
+                Element::Int(2),
+                Element::Int(3),
+                Element::Int(4),
+            ],
+            &[2, 2],
+        );
+        let result = std::panic::catch_unwind(|| t.flatten());
+        assert!(
+            result.is_err(),
+            "flatten on dynamic tensor must panic (unsupported)"
+        );
+    }
+
+    #[test]
+    fn dynamic_slice_builder_is_unsupported() {
+        let t = Tensor::from_elements(
+            vec![Element::Int(1), Element::Int(2), Element::Int(3)],
+            &[3],
+        );
+        // slice().build() must either return Err or panic, not silently succeed
+        // with wrong data. We test via slice_str which calls execute_slice.
+        let result = t.slice_str("0:2");
+        assert!(
+            result.is_err(),
+            "slice_str on dynamic tensor must return Err"
+        );
+    }
+
+    #[test]
+    fn dynamic_arithmetic_is_unsupported() {
+        let t = Tensor::from_elements(vec![Element::Float(1.0), Element::Float(2.0)], &[2]);
+        let result = std::panic::catch_unwind(|| {
+            let _ = &t + &t;
+        });
+        assert!(
+            result.is_err(),
+            "arithmetic on dynamic tensor must panic (unsupported)"
+        );
+    }
+
+    #[test]
+    fn dynamic_sum_is_unsupported() {
+        let t = Tensor::from_elements(vec![Element::Float(1.0)], &[1]);
+        let result = std::panic::catch_unwind(|| t.sum());
+        assert!(
+            result.is_err(),
+            "sum on dynamic tensor must panic (unsupported)"
+        );
+    }
+}

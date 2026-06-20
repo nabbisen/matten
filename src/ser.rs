@@ -30,6 +30,12 @@ struct TensorSerde {
 #[cfg(feature = "serde")]
 impl Serialize for Tensor {
     fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        #[cfg(feature = "dynamic")]
+        if self.is_dynamic() {
+            return Err(serde::ser::Error::custom(
+                "matten: dynamic tensors cannot be serialized with the default serde                  implementation; call try_numeric() first to convert to a numeric tensor,                  or use to_elements() to handle Element values manually",
+            ));
+        }
         TensorSerde {
             shape: self.shape().to_vec(),
             data: self.to_vec(),

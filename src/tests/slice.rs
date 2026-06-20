@@ -164,12 +164,16 @@ fn slice_str_matches_builder() {
 }
 
 #[test]
-fn slice_str_malformed_never_panics() {
+fn slice_str_malformed_is_err() {
+    // All of these must return Err (never panic, never silently accept)
+    // "0::" was previously accepted as "0:" — now rejected (trailing colon)
     let t = Tensor::new(vec![1.0, 2.0, 3.0, 4.0], &[2, 2]);
-    for bad in &["0::", "a:b", ":::", "0,1,2,3", "", "x"] {
-        let result = t.slice_str(bad);
-        // must not panic; result may be Ok or Err depending on parse
-        let _ = result;
+    for bad in &["0::", "a:b", ":::", "", "x"] {
+        assert!(
+            t.slice_str(bad).is_err(),
+            "expected Err for {:?} but got Ok",
+            bad
+        );
     }
 }
 

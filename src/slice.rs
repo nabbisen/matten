@@ -78,6 +78,13 @@ pub(crate) fn execute_slice(
     specs: &[SliceSpec],
     operation: &'static str,
 ) -> Result<Tensor, MattenError> {
+    #[cfg(feature = "dynamic")]
+    if tensor.is_dynamic() {
+        return Err(MattenError::Unsupported {
+            operation,
+            message: "dynamic tensors do not support the slice builder or slice_str;                       use get_element(&[row, col]) for element access, or call                       try_numeric() first".to_string(),
+        });
+    }
     let ndim = tensor.ndim();
     if specs.len() != ndim {
         return Err(MattenError::Slice {
@@ -342,7 +349,9 @@ fn parse_axis_spec(part: &str, full: &str) -> Result<SliceSpec, MattenError> {
     let step = if segments.len() == 3 {
         let s = segments[2].trim();
         if s.is_empty() {
-            1
+            return Err(err(format!(
+                "trailing colon in {part:?} is not valid; write {part:?} without the trailing colon,                  or supply a step value (e.g. \"0:10:2\")"
+            )));
         } else {
             s.parse::<usize>()
                 .map_err(|_| err(format!("step must be a positive integer, got {s:?}")))?
