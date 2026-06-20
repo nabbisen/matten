@@ -5,6 +5,28 @@ All notable changes to `matten` are documented here. The format is based on
 follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html) once it reaches
 a public API (`0.1.0`).
 
+## [0.2.0] - 2026-06-20
+
+Milestone **M2 — Creation and Conversion APIs** (RFC-004): the full Phase 1
+constructor and conversion surface.
+
+### Added
+
+- Fill constructors: `zeros`, `ones`, `full`, `from_vec`.
+- `arange(start, end, step)` / `try_arange` — half-open range, checked
+  allocation limit, rejection of zero/non-finite step and non-finite bounds.
+- `into_vec(self)` — consuming flat extraction without a copy.
+- `try_from_rows(rows)` — recoverable rectangular row construction.
+- `From<Vec<f64>>` → 1-D tensor; `From<Vec<Vec<f64>>>` → 2-D (panic on ragged).
+- `From<Tensor> for Vec<f64>` (consuming) and `From<&Tensor>` (borrowing copy).
+- `TryFrom<Tensor> for Vec<Vec<f64>>` — fails for non-rank-2 tensors.
+- New `convert.rs` module holding all trait impls and the `flatten_rectangular`
+  helper.
+
+### Notes
+
+- Arithmetic, broadcasting, and reshape are M3 (v0.3.0); JSON/CSV I/O is M5.
+
 ## [0.1.0] - 2026-06-20
 
 Milestone **M1 — Core Tensor Contract** (RFC-003): the validated shape model and

@@ -10,10 +10,9 @@
 //! # Status
 //!
 //! This is **`0.1.0-alpha.3`** (milestone M3, Broadcasting and Element-wise
-//! Operators). The validated [`Tensor`] shape model — scalar/vector/matrix
-//! semantics, the observational API, and `Clone`/`PartialEq`. Math, reshaping,
-//! slicing, broadcasting, and the JSON/CSV boundaries arrive in later
-//! milestones; see the roadmap and RFC pack.
+//! Operators). The full construction surface is in place: fill constructors, `from_vec`,
+//! `arange`/`try_arange`, `into_vec`, `try_from_rows`, and `From`/`TryFrom`
+//! impls. Arithmetic, reshape, slicing, and I/O arrive in later milestones.
 //!
 //! # Quick start
 //!
@@ -71,11 +70,12 @@
 // stay internal.
 //
 // Internal module map (each added with its owning milestone):
-//   shape       shape validation, strides, row-major index helpers (M1, here)
+//   shape       shape validation, strides, row-major index helpers (M1)
 //   convert     From/TryFrom impls and nested-row helpers (M2)
 //   ops/        element-wise + scalar operators and broadcasting (M3)
 //   parse/      JSON/CSV boundary parsers (M5)
 //   dynamic/    feature-gated `Element` engine (Phase 2)
+mod convert;
 mod error;
 mod shape;
 mod tensor;
