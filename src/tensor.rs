@@ -82,6 +82,19 @@ impl Tensor {
     ///
     /// Panics if the shape is invalid or `data.len()` does not equal the shape
     /// product.
+    /// Panics with a clear `matten unsupported error` message if this tensor
+    /// uses dynamic (`Element`) storage. Used to guard all Phase 1 numeric
+    /// accessors and conversions.
+    #[cfg(feature = "dynamic")]
+    #[inline(always)]
+    pub(crate) fn panic_if_dynamic(&self, operation: &'static str) {
+        if self.is_dynamic() {
+            panic!(
+                "matten unsupported error in {operation}: this numeric API is not                  supported on dynamic tensors; use to_elements() or try_numeric() first"
+            );
+        }
+    }
+
     #[must_use]
     pub fn new(data: Vec<f64>, shape: &[usize]) -> Tensor {
         Self::try_new(data, shape).unwrap_or_else(|e| panic!("{e}"))
@@ -330,18 +343,24 @@ impl Tensor {
     /// The flat, row-major data as a slice.
     #[must_use]
     pub fn as_slice(&self) -> &[f64] {
+        #[cfg(feature = "dynamic")]
+        self.panic_if_dynamic("as_slice");
         &self.data
     }
 
     /// Returns an owned copy of the flat, row-major data.
     #[must_use]
     pub fn to_vec(&self) -> Vec<f64> {
+        #[cfg(feature = "dynamic")]
+        self.panic_if_dynamic("to_vec");
         self.data.clone()
     }
 
     /// Consumes the tensor and returns the flat, row-major data. No copy.
     #[must_use]
     pub fn into_vec(self) -> Vec<f64> {
+        #[cfg(feature = "dynamic")]
+        self.panic_if_dynamic("into_vec");
         self.data
     }
 }
@@ -509,7 +528,7 @@ impl Tensor {
         #[cfg(feature = "dynamic")]
         if self.is_dynamic() {
             panic!(
-                "matten unsupported error in flatten: dynamic tensors do not support flatten;                  call try_numeric() first to convert to a numeric tensor"
+                "matten unsupported error in flatten: dynamic tensors do not support flatten; call try_numeric() first to convert to a numeric tensor"
             );
         }
         let len = self.data.len();
@@ -584,6 +603,8 @@ impl Tensor {
     /// assert_eq!(t.get(&[5, 0]), None);
     /// ```
     pub fn get(&self, coord: &[usize]) -> Option<f64> {
+        #[cfg(feature = "dynamic")]
+        self.panic_if_dynamic("get");
         let flat = crate::shape::coord_to_flat(coord, &self.shape)?;
         self.data.get(flat).copied()
     }
@@ -600,6 +621,8 @@ impl Tensor {
     /// assert_eq!(t.get_flat(10), None);
     /// ```
     pub fn get_flat(&self, index: usize) -> Option<f64> {
+        #[cfg(feature = "dynamic")]
+        self.panic_if_dynamic("get_flat");
         self.data.get(index).copied()
     }
 

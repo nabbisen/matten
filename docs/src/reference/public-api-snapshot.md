@@ -1,4 +1,4 @@
-# Public API snapshot — v0.12.0
+# Public API snapshot — v0.13.0
 
 This page lists every public item in `matten` at v0.10.0. It serves as the
 baseline for tracking breaking changes toward v1.0.0.
@@ -12,8 +12,9 @@ pub use matten::DataFormat;
 #[cfg(feature = "dynamic")]
 pub use matten::Element;
 pub use matten::SliceBuilder; // returned by Tensor::slice(); blessed public export
-pub use matten::IntoSliceRange; // sealed trait; not for external impl
-pub use matten::SliceConvert;   // sealed supertrait; not for external impl
+// IntoSliceRange and SliceConvert are pub in their module but NOT root-exported.
+// They are visible only as trait bounds on SliceBuilder::range<R: IntoSliceRange>.
+// Users never name them in imports; they are sealed internal plumbing.
 // SliceSpecRepr: #[doc(hidden)], internal visibility artefact
 ```
 

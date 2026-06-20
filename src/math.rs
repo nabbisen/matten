@@ -24,7 +24,7 @@ impl Tensor {
     fn require_numeric(&self, operation: &'static str) {
         if self.is_dynamic() {
             panic!(
-                "matten unsupported error in {operation}: this reduction is not supported                  on dynamic tensors; call try_numeric() first to convert"
+                "matten unsupported error in {operation}: this reduction is not supported on dynamic tensors; call try_numeric() first to convert"
             );
         }
     }
@@ -152,7 +152,7 @@ impl Tensor {
         self.require_numeric("mean_axis");
         if axis >= self.ndim() {
             panic!(
-                "matten shape error in mean_axis: axis {axis} is out of range                  for rank-{} tensor",
+                "matten shape error in mean_axis: axis {axis} is out of range for rank-{} tensor",
                 self.ndim()
             );
         }
@@ -276,8 +276,7 @@ fn axis_reduce(
 ) -> Tensor {
     if axis >= t.ndim() {
         panic!(
-            "matten shape error in {operation}: axis {axis} is out of range \
-             for rank-{} tensor",
+            "matten shape error in {operation}: axis {axis} is out of range for rank-{} tensor",
             t.ndim()
         );
     }
@@ -361,8 +360,7 @@ impl Tensor {
         #[cfg(feature = "dynamic")]
         if self.is_dynamic() || rhs.is_dynamic() {
             panic!(
-                "matten unsupported error in dot/matmul: not supported on dynamic \
-                 tensors; call try_numeric() on each operand first"
+                "matten unsupported error in dot/matmul: not supported on dynamic tensors; call try_numeric() on each operand first"
             );
         }
         matmul_dispatch(self, rhs, "dot")
@@ -383,7 +381,8 @@ impl Tensor {
     /// ```
     #[must_use]
     pub fn matmul(&self, rhs: &Tensor) -> Tensor {
-        matmul_dispatch(self, rhs, "matmul")
+        // Delegates to dot() which contains the dynamic guard.
+        self.dot(rhs)
     }
 }
 
@@ -395,8 +394,7 @@ fn matmul_dispatch(lhs: &Tensor, rhs: &Tensor, op: &'static str) -> Tensor {
         (2, 2) => mm_mul(lhs, rhs, op),
         _ => panic!(
             "matten shape error in {op}: unsupported rank combination \
-             (left rank {}, right rank {}); supported: [n]×[n], [m,n]×[n], \
-             [n]×[n,p], [m,n]×[n,p]",
+             (left rank {}, right rank {}); supported: [n]×[n], [m,n]×[n], [n]×[n,p], [m,n]×[n,p]",
             lhs.ndim(),
             rhs.ndim()
         ),
@@ -408,8 +406,7 @@ fn vv_dot(a: &Tensor, b: &Tensor, op: &'static str) -> Tensor {
     let n = a.len();
     if b.len() != n {
         panic!(
-            "matten shape error in {op}: vector lengths must match \
-             (left {n}, right {})",
+            "matten shape error in {op}: vector lengths must match (left {n}, right {})",
             b.len()
         );
     }
@@ -488,8 +485,7 @@ fn shape2(t: &Tensor, op: &'static str) -> [usize; 2] {
 fn dim_check(left: usize, right: usize, left_name: &str, right_name: &str, op: &'static str) {
     if left != right {
         panic!(
-            "matten shape error in {op}: {left_name} ({left}) \
-             must equal {right_name} ({right})"
+            "matten shape error in {op}: {left_name} ({left}) must equal {right_name} ({right})"
         );
     }
 }

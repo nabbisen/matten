@@ -36,7 +36,9 @@ pub(crate) fn try_reshape_impl(t: &Tensor, new_shape: &[usize]) -> Result<Tensor
     if t.is_dynamic() {
         return Err(MattenError::Unsupported {
             operation: "reshape",
-            message: "dynamic tensors do not support reshape;                       call try_numeric() first to convert to a numeric tensor".to_string(),
+            message: "dynamic tensors do not support reshape; \
+                      call try_numeric() first to convert to a numeric tensor"
+                .to_string(),
         });
     }
     validate_reshape(t.len(), new_shape, "reshape")?;
@@ -59,7 +61,8 @@ pub(crate) fn permute_axes(t: &Tensor, permutation: &[usize]) -> Tensor {
     #[cfg(feature = "dynamic")]
     if t.is_dynamic() {
         panic!(
-            "matten unsupported error in transpose/swap_axes:              dynamic tensors do not support axis permutation;              call try_numeric() first"
+            "matten unsupported error in transpose/swap_axes: \
+             dynamic tensors do not support axis permutation; call try_numeric() first"
         );
     }
     let src_shape = t.shape();

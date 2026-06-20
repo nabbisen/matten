@@ -5,6 +5,78 @@ All notable changes to `matten` are documented here. The format is based on
 follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html) once it reaches
 a public API (`0.1.0`).
 
+## [0.13.0] - 2026-06-20
+
+**Post-review hardening.** Addresses all P0, P1, and P2 findings from the
+v0.12.0 careful review.
+
+### Fixed — P0 blockers
+
+- **P0-1.** `dynamic + json` and `dynamic + csv` isolated builds now compile
+  correctly. `src/dynamic/parse.rs` now gates each submodule on its own
+  feature (`#[cfg(feature = "json")]` / `#[cfg(feature = "csv")]`). Added
+  `dynamic,json` and `dynamic,csv` CI profiles to prevent regression.
+
+- **P0-2.** Dynamic tensors no longer silently expose empty numeric data.
+  Added `panic_if_dynamic(operation)` helper to `Tensor` and applied it to:
+  `as_slice`, `to_vec`, `into_vec`, `get`, `get_flat`,
+  `From<Tensor> for Vec<f64>`, `From<&Tensor> for Vec<f64>`,
+  `TryFrom<Tensor> for Vec<Vec<f64>>`.
+  All now panic with `matten unsupported error in <op>: use to_elements() or
+  try_numeric() first`.
+
+- **P0-3.** `Tensor::matmul` now delegates to `Tensor::dot`, which already
+  has the dynamic guard. Previously `matmul` called `matmul_dispatch` directly,
+  silently computing `0.0` for dynamic vectors.
+
+- **P0-4.** `docs/src/reference/dynamic.md` no longer shows a `reshape`
+  CoW example that implied public dynamic reshape is implemented. Replaced with
+  an honest "Current limitations (guard model)" section.
+
+### Fixed — P1 issues
+
+- **P1-1.** `IntoSliceRange` and `SliceConvert` removed from the
+  `pub use` root-export block in `public-api-snapshot.md` — they are module-
+  level `pub` items but not root-exported. Only `SliceBuilder` is root-exported.
+
+- **P1-2.** Stale `version = "0.1"` / `version = "0.8"` Cargo snippets in
+  `docs/src/quick-start.md`, `docs/src/reference/dynamic.md`, and `README.md`
+  updated to `"0.12"` (the last published release at time of writing).
+
+- **P1-3.** `src/lib.rs` crate-level docs no longer mention `"0.11.0"`.
+  Replaced with a version-neutral description of the current scope.
+
+- **P1-4.** `rfcs/README.md` regenerated from the actual `rfcs/done/`
+  directory. All 15 RFCs (000–014) now appear in the Done table; no stale
+  Proposed rows remain.
+
+- **P1-5.** `README.md` status section softened to accurately describe the
+  guard model rather than claiming "complete Phase 2".
+
+### Fixed — P2 polish
+
+- **P2-1.** Error messages with backslash string-continuation whitespace
+  cleaned. `reshape.rs` and `slice.rs` rewritten in full to eliminate the
+  problem at the source. Individual messages in `math.rs`, `tensor.rs`, and
+  `ops/unary_ops.rs` corrected.
+
+- **P2-2.** `RangeInclusive<usize>` in `SliceConvert` now uses
+  `saturating_add(1)` instead of `end() + 1`, preventing overflow panic on
+  `usize::MAX..=usize::MAX` in debug builds.
+
+- **P2-3.** Added `small_int_coercion_exact` and
+  `large_int_coercion_may_lose_precision` tests in
+  `src/tests/dynamic.rs::precision_tests` to document `Int(i64) → f64`
+  behavior explicitly.
+
+### Added
+
+- 10 new tests in `src/tests/dynamic.rs`:
+  - `accessor_guard_tests`: `as_slice`, `to_vec`, `into_vec`, `get`,
+    `get_flat`, `From<&Tensor>` all panic on dynamic tensors.
+  - `matmul_guard_tests`: `matmul` and `dot` panic on dynamic tensors.
+  - `precision_tests`: small-int exact coercion, large-int precision loss.
+
 ## [0.12.0] - 2026-06-20
 
 **Hardening release.** Addresses all P0, P1, P2, and P3 findings from the

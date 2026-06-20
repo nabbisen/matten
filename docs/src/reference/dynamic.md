@@ -4,7 +4,7 @@ The `dynamic` feature enables Phase 2 heterogeneous tensors. Enable it in
 `Cargo.toml`:
 
 ```toml
-matten = { version = "0.8", features = ["dynamic"] }
+matten = { version = "0.12", features = ["dynamic"] }
 ```
 
 `matten` is **not** a dataframe library. The `dynamic` feature is for ingesting
@@ -133,20 +133,30 @@ let t = Tensor::from_json_dynamic(r#"[[1, "active", true], [2, null, false]]"#)?
 let t = Tensor::from_csv_dynamic("1,active,true\n2,,false\n")?;
 ```
 
-## Storage and CoW (RFC-012)
+## Current limitations (guard model)
 
-Dynamic tensors share underlying storage via `Arc`. Slicing and reshape create
-new tensors that share the same `Arc` — no element copies. Mutation (future)
-uses copy-on-write: only materialises a private copy when storage is actually
-shared.
+In the current release, many Phase 1 numeric operations **reject** dynamic
+tensors with a clear `matten unsupported error` message. You must convert
+to a numeric tensor first using `try_numeric()`.
+
+Guarded (will panic or return `Err`):
+- `reshape`, `flatten`, `transpose`, `swap_axes`
+- `slice()` builder and `slice_str()` → `MattenError::Unsupported`
+- all arithmetic operators and reductions
+- `dot` / `matmul`
+- `as_slice`, `to_vec`, `into_vec`, `get`, `get_flat`
+- `Serialize` / serde
+
+The underlying `Arc`-based CoW storage (`DynamicTensor`) is implemented
+internally and will back future public dynamic slicing and reshape in a later
+release.
 
 ```rust
-// Reshape shares Arc — no copy
-let view = t.reshape(&[6]);    // same Arc, different shape
-
-// After processing, convert to Phase 1 for arithmetic:
-let numeric: Tensor = dyn_t.try_numeric()?;
-let result = &numeric * 2.0;
+// Correct pattern: ingest → clean → convert → arithmetic
+let raw = Tensor::from_csv_dynamic("1.0,2.0\n3.0,4.0\n")?;
+let filled  = raw.fill_none(Element::Float(0.0));
+let numeric: Tensor = filled.try_numeric()?; // convert to Phase 1
+let result = &numeric * 2.0;                 // Phase 1 arithmetic
 ```
 
 ## Workflow pattern

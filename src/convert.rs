@@ -51,6 +51,8 @@ impl From<Vec<Vec<f64>>> for Tensor {
 impl From<Tensor> for Vec<f64> {
     /// Consumes the tensor and returns the flat, row-major data. No copy.
     fn from(t: Tensor) -> Vec<f64> {
+        #[cfg(feature = "dynamic")]
+        t.panic_if_dynamic("From<Tensor> for Vec<f64>");
         t.data
     }
 }
@@ -60,6 +62,8 @@ impl From<Tensor> for Vec<f64> {
 impl From<&Tensor> for Vec<f64> {
     /// Returns an owned copy of the tensor's flat, row-major data.
     fn from(t: &Tensor) -> Vec<f64> {
+        #[cfg(feature = "dynamic")]
+        t.panic_if_dynamic("From<&Tensor> for Vec<f64>");
         t.data.clone()
     }
 }
@@ -75,6 +79,14 @@ impl TryFrom<Tensor> for Vec<Vec<f64>> {
     ///
     /// Returns [`MattenError::Shape`] if the tensor is not rank 2.
     fn try_from(t: Tensor) -> Result<Vec<Vec<f64>>, MattenError> {
+        #[cfg(feature = "dynamic")]
+        if t.is_dynamic() {
+            return Err(MattenError::Unsupported {
+                operation: "TryFrom<Tensor> for Vec<Vec<f64>>",
+                message: "dynamic tensors cannot be converted to Vec<Vec<f64>>; ".to_string()
+                    + "call try_numeric() first",
+            });
+        }
         if t.ndim() != 2 {
             return Err(MattenError::Shape {
                 operation: "TryFrom<Tensor> for Vec<Vec<f64>>",

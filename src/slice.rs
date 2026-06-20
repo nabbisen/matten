@@ -82,7 +82,10 @@ pub(crate) fn execute_slice(
     if tensor.is_dynamic() {
         return Err(MattenError::Unsupported {
             operation,
-            message: "dynamic tensors do not support the slice builder or slice_str;                       use get_element(&[row, col]) for element access, or call                       try_numeric() first".to_string(),
+            message: "dynamic tensors do not support the slice builder or slice_str; \
+                      use get_element(&[row, col]) for element access, or call \
+                      try_numeric() first"
+                .to_string(),
         });
     }
     let ndim = tensor.ndim();
@@ -151,16 +154,6 @@ pub(crate) fn execute_slice(
 }
 
 // ---- IntoSliceRange sealed trait ----------------------------------------
-//
-// Both the trait and its supertrait are `pub` so they can appear as a bound on
-// the `pub fn range` method. The supertrait's conversion method returns a type
-// alias (`SliceSpecOut`) that is `pub` here but maps 1:1 to the private
-// `SliceSpec` — giving the compiler a fully `pub` chain with no
-// `private_interfaces` or `private_bounds` lint.
-//
-// External callers see `pub trait IntoSliceRange` as the bound name, but
-// because the supertrait `SliceConvert` is implemented only for the five std
-// range types defined here, no external type can satisfy the bound.
 
 /// Public type alias used only to satisfy the `pub` visibility chain in the
 /// sealed-trait bound. Equivalent to `SliceSpec`; kept `pub` to prevent lint
@@ -170,10 +163,9 @@ pub(crate) fn execute_slice(
 #[doc(hidden)]
 pub struct SliceSpecRepr(pub(crate) SliceSpec);
 
-/// Supertrait that does the actual range-to-spec conversion.
-/// It is `pub` so it can appear in a public supertrait bound, but because
-/// `SliceConvert` has no public item in scope outside this crate except via the
-/// sealed pattern, external code cannot implement it.
+/// Supertrait that does the actual range-to-spec conversion. Public so it can
+/// appear in a public supertrait bound; sealed because no external type can
+/// satisfy it.
 pub trait SliceConvert {
     #[doc(hidden)]
     fn into_repr(self) -> SliceSpecRepr;
@@ -223,9 +215,11 @@ impl SliceConvert for std::ops::RangeFull {
 }
 impl SliceConvert for std::ops::RangeInclusive<usize> {
     fn into_repr(self) -> SliceSpecRepr {
+        // Use saturating_add to avoid overflow on usize::MAX..=usize::MAX;
+        // the resulting spec will fail bounds-checking at build() time.
         SliceSpecRepr(SliceSpec::Range {
             start: Some(*self.start()),
-            end: Some(self.end() + 1),
+            end: Some(self.end().saturating_add(1)),
             step: 1,
         })
     }
@@ -350,7 +344,8 @@ fn parse_axis_spec(part: &str, full: &str) -> Result<SliceSpec, MattenError> {
         let s = segments[2].trim();
         if s.is_empty() {
             return Err(err(format!(
-                "trailing colon in {part:?} is not valid; write {part:?} without the trailing colon,                  or supply a step value (e.g. \"0:10:2\")"
+                "trailing colon in {part:?} is not valid; write without the trailing \
+                 colon, or supply a step value (e.g. \"0:10:2\")"
             )));
         } else {
             s.parse::<usize>()

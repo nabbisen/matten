@@ -48,6 +48,10 @@ jobs:
         run: cargo test --no-default-features --features dynamic
       - name: dynamic+json+csv
         run: cargo test --no-default-features --features dynamic,json,csv
+      - name: dynamic+json isolated
+        run: cargo test --no-default-features --features dynamic,json
+      - name: dynamic+csv isolated
+        run: cargo test --no-default-features --features dynamic,csv
       - name: All features
         run: cargo test --all-features
 

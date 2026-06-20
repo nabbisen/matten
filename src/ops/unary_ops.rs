@@ -17,7 +17,7 @@ impl Neg for &Tensor {
         #[cfg(feature = "dynamic")]
         if self.is_dynamic() {
             panic!(
-                "matten unsupported error in neg: unary negation is not supported                  on dynamic tensors; call try_numeric() first"
+                "matten unsupported error in neg: unary negation is not supported on dynamic tensors; call try_numeric() first"
             );
         }
         Tensor {
