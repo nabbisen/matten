@@ -5,6 +5,29 @@ All notable changes to `matten` are documented here. The format is based on
 follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html) once it reaches
 a public API (`0.1.0`).
 
+## [0.1.0] - 2026-06-20
+
+Milestone **M1 — Core Tensor Contract** (RFC-003): the validated shape model and
+the observational `Tensor` surface. Still no arithmetic, reshape, or I/O.
+
+### Added
+
+- Full shape validation in a new `shape` module: rank cap (`MAX_NDIM = 8`),
+  rejection of zero-sized dimensions, and checked element-count arithmetic.
+  Constructors now route through it (`MattenError::Shape` / `Allocation`).
+- Scalar semantics: `Tensor::scalar(value)` (shape `[]`, length `1`).
+- Observational API: `is_scalar`, `is_vector`, `is_matrix`, and `to_vec`,
+  alongside the existing `shape` / `ndim` / `len` / `as_slice`.
+- `Tensor` now derives `Clone` and `PartialEq`.
+- Internal row-major index helpers (`strides_for_shape`, `coord_to_flat`,
+  `flat_to_coord`) with a flatten/unflatten round-trip property test.
+
+### Notes
+
+- `is_empty()` remains intentionally absent (deferred zero-sized-tensor RFC).
+- Creation conveniences (`from_vec`, `zeros`, `ones`, `full`, `arange`,
+  `From`/`TryFrom`) are M2; arithmetic and broadcasting are M3.
+
 ## [0.0.1] - 2026-06-20
 
 The **M0 crate skeleton**: a compiling, lint-clean, CI-ready foundation aligned

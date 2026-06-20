@@ -1,7 +1,7 @@
 //! `matten` — a developer-experience-first multidimensional array (tensor)
 //! library for Rust.
 //!
-//! `matten` is the *family car* of Rust tensor libraries: easy to start,
+//! `matten` is a *family car* of Rust tensor library: easy to start,
 //! predictable, and friendly for non-expert Rust developers doing small
 //! numerical, data-exploration, or business proof-of-concept work. It
 //! deliberately prioritizes **developer experience over peak performance**, and
@@ -9,11 +9,11 @@
 //!
 //! # Status
 //!
-//! This is the **M0 skeleton** (`0.0.1`). It establishes the crate structure,
-//! the stable public error surface, and a minimal [`Tensor`] so the project
-//! compiles, lints, and ships a smoke example. Math, reshaping, slicing,
-//! broadcasting, and the JSON/CSV boundaries arrive in later milestones; see the
-//! roadmap and RFC pack.
+//! This is **`0.1.0-alpha.3`** (milestone M3, Broadcasting and Element-wise
+//! Operators). The validated [`Tensor`] shape model — scalar/vector/matrix
+//! semantics, the observational API, and `Clone`/`PartialEq`. Math, reshaping,
+//! slicing, broadcasting, and the JSON/CSV boundaries arrive in later
+//! milestones; see the roadmap and RFC pack.
 //!
 //! # Quick start
 //!
@@ -70,12 +70,14 @@
 // `MattenError`, and `DataFormat`; storage, layout, and (future) `ops` modules
 // stay internal.
 //
-// Planned internal module map (added with their owning milestones):
+// Internal module map (each added with its owning milestone):
+//   shape       shape validation, strides, row-major index helpers (M1, here)
+//   convert     From/TryFrom impls and nested-row helpers (M2)
 //   ops/        element-wise + scalar operators and broadcasting (M3)
-//   shape/      shape validation, strides, index helpers (M1)
 //   parse/      JSON/CSV boundary parsers (M5)
 //   dynamic/    feature-gated `Element` engine (Phase 2)
 mod error;
+mod shape;
 mod tensor;
 
 pub use crate::error::{DataFormat, MattenError};

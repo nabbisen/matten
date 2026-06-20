@@ -1,18 +1,18 @@
 //! The primary public container, [`Tensor`].
 //!
-//! M0 provides only the minimal surface needed for a compiling skeleton and the
-//! smoke example: construction (`new` / `try_new`) and shape inspection. The
-//! full Core Tensor Contract — scalar/vector/matrix predicates, `to_vec`,
-//! reshape, transpose, arithmetic, broadcasting, slicing, and the data
-//! boundaries — lands in M1 and later milestones (see the RFC pack).
+//! M1 implements the Core Tensor Contract (RFC-003): construction with full
+//! shape validation, scalar/vector/matrix semantics, and the observational API.
+//! Arithmetic, reshape, transpose, slicing, and the data boundaries land in
+//! later milestones.
 
 use crate::error::MattenError;
+use crate::shape;
 use std::fmt;
 
 /// A dense, row-major, owned multidimensional array of `f64`.
 ///
 /// Fields are private: the storage layout is an implementation detail and is
-/// never exposed across the public API.
+/// never exposed across the public API. A scalar is shape `[]` with one element.
 ///
 /// # Examples
 ///
@@ -21,92 +21,99 @@ use std::fmt;
 ///
 /// let t = Tensor::new(vec![1.0, 2.0, 3.0, 4.0], &[2, 2]);
 /// assert_eq!(t.shape(), &[2, 2]);
-/// assert_eq!(t.len(), 4);
-/// assert_eq!(t.ndim(), 2);
+/// assert!(t.is_matrix());
+///
+/// let s = Tensor::scalar(42.0);
+/// assert!(s.is_scalar());
+/// assert_eq!(s.len(), 1);
 /// ```
+#[derive(Clone, PartialEq)]
 pub struct Tensor {
-    data: Vec<f64>,
-    shape: Vec<usize>,
+    pub(crate) data: Vec<f64>,
+    pub(crate) shape: Vec<usize>,
 }
 
-// `is_empty` is intentionally absent for 0.1.0 (zero-sized dims are rejected and
-// a scalar has `len() == 1`, so it would always be false). It is deferred to a
-// future zero-sized-tensor RFC; until then we silence clippy's paired-method lint.
 #[allow(clippy::len_without_is_empty)]
 impl Tensor {
     /// Creates a tensor from row-major `data` and `shape`.
     ///
-    /// This is a panic-zone convenience constructor: it panics with an
-    /// actionable message if `data.len()` does not equal the product of
-    /// `shape`. Use [`Tensor::try_new`] for recoverable, boundary-safe
-    /// construction.
+    /// Panics with an actionable message on any shape violation or data-length
+    /// mismatch. Use [`try_new`](Tensor::try_new) for recoverable construction.
     ///
     /// # Panics
     ///
-    /// Panics if the data length does not match the shape product, or if the
-    /// shape product overflows.
+    /// Panics if the shape is invalid or `data.len()` does not equal the shape
+    /// product.
     #[must_use]
     pub fn new(data: Vec<f64>, shape: &[usize]) -> Tensor {
-        Self::build(data, shape, "new").unwrap_or_else(|e| panic!("{e}"))
+        Self::try_new(data, shape).unwrap_or_else(|e| panic!("{e}"))
     }
 
     /// Creates a tensor from row-major `data` and `shape`, returning an error
-    /// instead of panicking on mismatch or overflow.
+    /// instead of panicking.
     ///
     /// # Errors
     ///
-    /// Returns [`MattenError::Shape`] if the data length does not match the
-    /// shape product, or [`MattenError::Allocation`] if the shape product
-    /// overflows `usize`.
+    /// Returns [`MattenError::Shape`] for a length mismatch or invalid shape,
+    /// or [`MattenError::Allocation`] on product overflow.
     pub fn try_new(data: Vec<f64>, shape: &[usize]) -> Result<Tensor, MattenError> {
-        Self::build(data, shape, "try_new")
-    }
-
-    fn build(
-        data: Vec<f64>,
-        shape: &[usize],
-        operation: &'static str,
-    ) -> Result<Tensor, MattenError> {
-        let expected = checked_product(shape, operation)?;
+        let expected = shape::validate_shape(shape, "try_new")?;
         if data.len() != expected {
             return Err(MattenError::Shape {
-                operation,
+                operation: "try_new",
                 message: format!(
                     "data length {} does not match shape {shape:?}, which requires {expected} elements",
                     data.len()
                 ),
             });
         }
-        Ok(Tensor {
-            data,
-            shape: shape.to_vec(),
-        })
+        Ok(Tensor { data, shape: shape.to_vec() })
     }
 
-    /// The shape as a slice of dimension lengths. Cheap and non-allocating.
+    /// Creates a rank-0 scalar tensor (shape `[]`, length `1`).
+    ///
+    /// ```
+    /// use matten::Tensor;
+    /// let s = Tensor::scalar(3.14);
+    /// assert!(s.is_scalar());
+    /// assert_eq!(s.len(), 1);
+    /// ```
     #[must_use]
-    pub fn shape(&self) -> &[usize] {
-        &self.shape
+    pub fn scalar(value: f64) -> Tensor {
+        Tensor { data: vec![value], shape: Vec::new() }
     }
+
+    /// The shape as a slice of dimension lengths. Non-allocating.
+    #[must_use]
+    pub fn shape(&self) -> &[usize] { &self.shape }
 
     /// The rank (number of dimensions): `shape().len()`.
     #[must_use]
-    pub fn ndim(&self) -> usize {
-        self.shape.len()
-    }
+    pub fn ndim(&self) -> usize { self.shape.len() }
 
     /// The logical element count: the product of the shape.
     #[must_use]
-    pub fn len(&self) -> usize {
-        self.data.len()
-    }
+    pub fn len(&self) -> usize { self.data.len() }
 
-    /// The flat, row-major data as a slice. Valid because Phase 1 storage is
-    /// contiguous and owned.
+    /// Returns `true` for a rank-0 scalar tensor (shape `[]`).
     #[must_use]
-    pub fn as_slice(&self) -> &[f64] {
-        &self.data
-    }
+    pub fn is_scalar(&self) -> bool { self.ndim() == 0 }
+
+    /// Returns `true` for a rank-1 tensor.
+    #[must_use]
+    pub fn is_vector(&self) -> bool { self.ndim() == 1 }
+
+    /// Returns `true` for a rank-2 tensor.
+    #[must_use]
+    pub fn is_matrix(&self) -> bool { self.ndim() == 2 }
+
+    /// The flat, row-major data as a slice.
+    #[must_use]
+    pub fn as_slice(&self) -> &[f64] { &self.data }
+
+    /// Returns an owned copy of the flat, row-major data.
+    #[must_use]
+    pub fn to_vec(&self) -> Vec<f64> { self.data.clone() }
 }
 
 impl fmt::Debug for Tensor {
@@ -114,9 +121,7 @@ impl fmt::Debug for Tensor {
         const MAX: usize = 8;
         write!(f, "Tensor(shape={:?}, data=[", self.shape)?;
         for (i, v) in self.data.iter().take(MAX).enumerate() {
-            if i > 0 {
-                f.write_str(", ")?;
-            }
+            if i > 0 { f.write_str(", ")?; }
             write!(f, "{v:?}")?;
         }
         if self.data.len() > MAX {
@@ -124,17 +129,4 @@ impl fmt::Debug for Tensor {
         }
         f.write_str("])")
     }
-}
-
-/// Computes the product of a shape with checked arithmetic, mapping overflow to
-/// [`MattenError::Allocation`]. Shared by all shape-validating constructors.
-fn checked_product(shape: &[usize], operation: &'static str) -> Result<usize, MattenError> {
-    let mut acc: usize = 1;
-    for &dim in shape {
-        acc = acc.checked_mul(dim).ok_or_else(|| MattenError::Allocation {
-            requested_elements: usize::MAX,
-            message: format!("shape {shape:?} overflows usize when computing the element count in {operation}"),
-        })?;
-    }
-    Ok(acc)
 }

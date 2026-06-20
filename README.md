@@ -25,10 +25,10 @@ JSON/CSV in and out — without wrestling with views, lifetimes, or trait bounds
 When a prototype becomes performance-critical, `matten` is designed to hand its
 flat data off to a specialized crate.
 
-> **Status: M0 skeleton (`0.0.1`).** This release establishes the crate
-> structure, the stable public error surface, and a minimal `Tensor`. Arithmetic,
-> reshaping, slicing, broadcasting, and the JSON/CSV boundaries land in later
-> milestones — see the roadmap and RFC pack in the repository.
+> **Status: `0.1.0` (M1, Core Tensor Contract).** The validated `Tensor`
+> shape model is in place — scalar/vector/matrix semantics and the observational
+> API. Arithmetic, reshaping, slicing, broadcasting, and the JSON/CSV boundaries
+> land in later milestones — see the roadmap and RFC pack in the repository.
 
 ## Quick start
 
