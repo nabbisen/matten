@@ -14,6 +14,7 @@
 - [Operators and broadcasting](./reference/operators.md)
 - [Shape operations](./reference/shape-ops.md)
 - [Slicing](./reference/slicing.md)
+- [Boundary integration](./reference/boundary.md)
 
 # Contributors
 

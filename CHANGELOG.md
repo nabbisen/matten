@@ -5,6 +5,32 @@ All notable changes to `matten` are documented here. The format is based on
 follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html) once it reaches
 a public API (`0.1.0`).
 
+## [0.5.0] - 2026-06-20
+
+Milestone **M5 — Boundary Integration** (RFC-009).
+
+### Added
+
+- `Tensor::from_json(input: &str)` — accepts the canonical
+  `{"shape":[…],"data":[…]}` object form and the convenience nested-array
+  form (rank 1 and 2); rejects non-numeric values, ragged arrays, and
+  malformed JSON. Gated by the `json` feature (default).
+- `Tensor::load_json(path)` — reads a file then delegates to `from_json`.
+  File errors map to `MattenError::Io`; parse errors to `MattenError::Parse`.
+- `Tensor::from_csv(input: &str)` — rectangular numeric CSV; infers shape
+  `[rows, cols]`; includes row/column context in error messages. Gated by
+  the `csv` feature (default).
+- `Tensor::load_csv(path)` — reads a file then delegates to `from_csv`.
+- `Serialize`/`Deserialize` for `Tensor` via the canonical object form
+  (gated by the `serde` feature, default).
+- New `src/ser.rs` (serde impls) and `src/parse/` module (`json.rs`,
+  `csv.rs`).
+- Fixture files `examples/data/tensor_2x2.json` and
+  `examples/data/numeric_2x3.csv`.
+- `src/tests/parse.rs` — 23 boundary tests covering both parsers, both
+  file loaders, serde round-trips, error variants, and malformed-input
+  safety.
+
 ## [0.4.0] - 2026-06-20
 
 Milestone **M4 — Shape Operations and Slicing** (RFC-007 + RFC-008).

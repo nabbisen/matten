@@ -7,6 +7,7 @@
 mod convert;
 mod error;
 mod ops;
+mod parse;
 mod reshape;
 mod shape;
 mod slice;

@@ -555,3 +555,82 @@ impl Tensor {
         crate::slice::execute_slice(self, &specs, "slice_str")
     }
 }
+
+// ---- Boundary integration (M5 / RFC-009) --------------------------------
+
+impl Tensor {
+    /// Parses a JSON string into a `Tensor`.
+    ///
+    /// Accepts the canonical `{"shape":[…],"data":[…]}` object form and the
+    /// convenience nested-array form (rank 1 and 2). Returns
+    /// [`MattenError::Parse`] for any error; never panics.
+    ///
+    /// ```
+    /// use matten::Tensor;
+    ///
+    /// // Canonical object form
+    /// let t = Tensor::from_json(r#"{"shape":[2,2],"data":[1.0,2.0,3.0,4.0]}"#).unwrap();
+    /// assert_eq!(t.shape(), &[2, 2]);
+    ///
+    /// // Nested-array convenience form
+    /// let t = Tensor::from_json("[[1.0,2.0],[3.0,4.0]]").unwrap();
+    /// assert_eq!(t.shape(), &[2, 2]);
+    /// ```
+    #[cfg(feature = "json")]
+    pub fn from_json(input: &str) -> Result<Tensor, MattenError> {
+        crate::parse::json::from_json_str(input)
+    }
+
+    /// Parses a CSV string into a `Tensor` with shape `[rows, cols]`.
+    ///
+    /// All fields must be valid `f64` values. Returns [`MattenError::Parse`]
+    /// for ragged rows or non-numeric fields; never panics.
+    ///
+    /// ```
+    /// use matten::Tensor;
+    ///
+    /// let t = Tensor::from_csv("1.0,2.0\n3.0,4.0\n").unwrap();
+    /// assert_eq!(t.shape(), &[2, 2]);
+    /// assert_eq!(t.as_slice(), &[1.0, 2.0, 3.0, 4.0]);
+    /// ```
+    #[cfg(feature = "csv")]
+    pub fn from_csv(input: &str) -> Result<Tensor, MattenError> {
+        crate::parse::csv::from_csv_str(input)
+    }
+
+    /// Loads and parses a JSON file into a `Tensor`.
+    ///
+    /// Returns [`MattenError::Io`] for file errors, [`MattenError::Parse`] for
+    /// parse errors.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the file cannot be read or the content is invalid.
+    #[cfg(feature = "json")]
+    pub fn load_json(path: impl AsRef<std::path::Path>) -> Result<Tensor, MattenError> {
+        let path = path.as_ref();
+        let content = std::fs::read_to_string(path).map_err(|e| MattenError::Io {
+            path: path.to_path_buf(),
+            source: e,
+        })?;
+        crate::parse::json::from_json_str(&content)
+    }
+
+    /// Loads and parses a CSV file into a `Tensor` with shape `[rows, cols]`.
+    ///
+    /// Returns [`MattenError::Io`] for file errors, [`MattenError::Parse`] for
+    /// parse errors.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the file cannot be read or the content is invalid.
+    #[cfg(feature = "csv")]
+    pub fn load_csv(path: impl AsRef<std::path::Path>) -> Result<Tensor, MattenError> {
+        let path = path.as_ref();
+        let content = std::fs::read_to_string(path).map_err(|e| MattenError::Io {
+            path: path.to_path_buf(),
+            source: e,
+        })?;
+        crate::parse::csv::from_csv_str(&content)
+    }
+}

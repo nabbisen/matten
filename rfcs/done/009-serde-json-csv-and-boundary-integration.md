@@ -1,6 +1,6 @@
 # RFC-009: Serde, JSON, CSV, and Boundary Integration
 
-> RFC status: Proposed (reconciled v2 — 2026-06-20)  
+> RFC status: Implemented (0.5.0)
 > Project: `matten`  
 > Target audience: library implementers, maintainers, reviewers  
 > Design level: external design first; internal design where needed  

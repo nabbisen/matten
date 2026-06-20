@@ -22,7 +22,7 @@ for RFC state; the Status field inside each file mirrors the folder.
 | ID | Title |
 |---:|---|
 | 001 | [Threat Model and Boundary Safety Policy](./proposed/001-threat-model-and-boundary-safety-policy.md) |
-| 009 | [Serde, JSON, CSV, and Boundary Integration](./proposed/009-serde-json-csv-and-boundary-integration.md) |
+| 009 | [Serde, JSON, CSV, and Boundary Integration](./done/009-serde-json-csv-and-boundary-integration.md) | 0.5.0 |
 | 010 | [Reductions, Basic Statistics, and Matrix Multiplication](./proposed/010-reductions-basic-statistics-and-matrix-multiplication.md) |
 | 011 | [Dynamic `Element` Model and Coercion](./proposed/011-dynamic-element-model-and-coercion.md) |
 | 012 | [Dynamic Storage, View Metadata, and Copy-on-Write](./proposed/012-dynamic-storage-view-metadata-and-cow.md) |

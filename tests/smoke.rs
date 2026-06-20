@@ -78,3 +78,30 @@ fn broadcasting_feels_like_numpy() {
     assert_eq!(result.shape(), &[2, 3]);
     assert_eq!(result.as_slice(), &[11.0, 22.0, 33.0, 14.0, 25.0, 36.0]);
 }
+
+// ---- M5: boundary integration ------------------------------------------
+
+#[cfg(feature = "json")]
+#[test]
+fn json_roundtrip_smoke() {
+    #[allow(unused_imports)]
+    use serde_json;
+    let t = Tensor::new(vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0], &[2, 3]);
+    let json = serde_json::to_string(&t).unwrap();
+    let t2: Tensor = serde_json::from_str(&json).unwrap();
+    assert_eq!(t, t2);
+}
+
+#[cfg(feature = "json")]
+#[test]
+fn from_json_nested_smoke() {
+    let t = Tensor::from_json("[[1.0,2.0],[3.0,4.0]]").unwrap();
+    assert_eq!(t.shape(), &[2, 2]);
+}
+
+#[cfg(feature = "csv")]
+#[test]
+fn from_csv_smoke() {
+    let t = Tensor::from_csv("1.0,2.0,3.0\n4.0,5.0,6.0\n").unwrap();
+    assert_eq!(t.shape(), &[2, 3]);
+}

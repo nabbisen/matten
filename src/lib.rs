@@ -9,10 +9,9 @@
 //!
 //! # Status
 //!
-//! This is **`0.4.0`** (milestone M4, Shape Operations and Slicing). Reshape,
-//! flatten, transpose, `swap_axes`, element access, a builder-based slicer,
-//! and `slice_str` are all in place. Reductions, matmul, and I/O arrive in
-//! later milestones.
+//! This is **`0.5.0`** (milestone M5, Boundary Integration). Serde,
+//! `from_json`/`load_json`, and `from_csv`/`load_csv` are now in place.
+//! Reductions, matmul, and the examples suite arrive in later milestones.
 //!
 //! # Quick start
 //!
@@ -73,14 +72,17 @@
 //   shape       shape validation, strides, row-major index helpers (M1)
 //   convert     From/TryFrom impls and nested-row helpers (M2)
 //   ops/        element-wise + scalar operators and broadcasting (M3)
-//   reshape     reshape, flatten, transpose, swap_axes helpers (M4, here)
-//   slice       SliceSpec, SliceBuilder, execute_slice, slice_str (M4, here)
-//   parse/      JSON/CSV boundary parsers (M5)
+//   reshape     reshape, flatten, transpose, swap_axes helpers (M4)
+//   slice       SliceSpec, SliceBuilder, execute_slice, slice_str (M4)
+//   ser         Serialize/Deserialize for Tensor (M5, here)
+//   parse/      JSON/CSV boundary parsers (M5, here)
 //   dynamic/    feature-gated `Element` engine (Phase 2)
 mod convert;
 mod error;
 mod ops;
+mod parse;
 mod reshape;
+mod ser;
 mod shape;
 mod slice;
 mod tensor;
