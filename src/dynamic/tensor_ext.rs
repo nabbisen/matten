@@ -56,6 +56,56 @@ impl Tensor {
         self.dynamic.as_ref()?.get_flat(flat).cloned()
     }
 
+    /// Converts a dynamic tensor to a numeric Phase 1 tensor using an explicit
+    /// [`NumericPolicy`](crate::NumericPolicy).
+    ///
+    /// This is the policy-aware version of [`try_numeric`](Tensor::try_numeric).
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # #[cfg(feature = "dynamic")] {
+    /// use matten::{Element, NumericPolicy, Tensor};
+    ///
+    /// let t = Tensor::from_elements(
+    ///     vec![Element::Float(1.0), Element::None, Element::Float(3.0)],
+    ///     &[3],
+    /// );
+    ///
+    /// let x = t
+    ///     .try_numeric_with(NumericPolicy::default().none_as(0.0))
+    ///     .unwrap();
+    /// assert_eq!(x.as_slice(), &[1.0, 0.0, 3.0]);
+    /// # }
+    /// ```
+    pub fn try_numeric_with(
+        &self,
+        policy: crate::dynamic::NumericPolicy,
+    ) -> Result<Tensor, crate::MattenError> {
+        let dyn_t = self
+            .dynamic
+            .as_ref()
+            .expect("try_numeric_with called on a non-dynamic tensor");
+        let mut floats = Vec::with_capacity(dyn_t.len);
+        for i in 0..dyn_t.len {
+            let elem = dyn_t.get_flat(i).unwrap_or(&crate::dynamic::Element::None);
+            match policy.coerce(elem, i) {
+                Ok(v) => floats.push(v),
+                Err(msg) => {
+                    return Err(crate::MattenError::Unsupported {
+                        operation: "try_numeric_with",
+                        message: msg,
+                    });
+                }
+            }
+        }
+        Ok(Tensor {
+            data: floats,
+            shape: dyn_t.shape.clone(),
+            dynamic: None,
+        })
+    }
+
     /// Returns `true` if this tensor uses dynamic (`Element`) storage.
     pub fn is_dynamic(&self) -> bool {
         self.dynamic.is_some()
@@ -277,5 +327,137 @@ impl Tensor {
             });
         }
         acc
+    }
+    // ---- RFC-016: dynamic inspection helpers --------------------------------
+
+    /// Returns a numeric mask tensor where `1.0` indicates an element that
+    /// can be coerced to `f64` by the default [`NumericPolicy`], and `0.0`
+    /// indicates one that cannot.
+    ///
+    /// Mirrors [`none_mask`](Tensor::none_mask): the result is a Phase 1
+    /// numeric tensor with the same shape.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # #[cfg(feature = "dynamic")] {
+    /// use matten::{Element, Tensor};
+    ///
+    /// let t = Tensor::from_elements(
+    ///     vec![Element::Float(1.0), Element::text("x"), Element::Int(2)],
+    ///     &[3],
+    /// );
+    /// let mask = t.numeric_mask();
+    /// assert_eq!(mask.as_slice(), &[1.0, 0.0, 1.0]);
+    /// # }
+    /// ```
+    pub fn numeric_mask(&self) -> Tensor {
+        use crate::dynamic::Element;
+        let dyn_t = self
+            .dynamic
+            .as_ref()
+            .expect("numeric_mask called on a non-dynamic tensor");
+        let data: Vec<f64> = (0..dyn_t.len)
+            .map(|i| {
+                let elem = dyn_t.get_flat(i).unwrap_or(&Element::None);
+                if elem.try_as_f64().is_some() {
+                    1.0
+                } else {
+                    0.0
+                }
+            })
+            .collect();
+        Tensor {
+            data,
+            shape: dyn_t.shape.clone(),
+            dynamic: None,
+        }
+    }
+
+    /// Returns `true` if every element in this dynamic tensor can be coerced
+    /// to `f64` by the default [`NumericPolicy`] (i.e., all `Float` or `Int`).
+    ///
+    /// Equivalent to `self.numeric_mask().min() == 1.0`.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # #[cfg(feature = "dynamic")] {
+    /// use matten::{Element, Tensor};
+    ///
+    /// let ok = Tensor::from_elements(
+    ///     vec![Element::Float(1.0), Element::Int(2)],
+    ///     &[2],
+    /// );
+    /// assert!(ok.is_numeric_convertible());
+    ///
+    /// let not_ok = Tensor::from_elements(
+    ///     vec![Element::Float(1.0), Element::None],
+    ///     &[2],
+    /// );
+    /// assert!(!not_ok.is_numeric_convertible());
+    /// # }
+    /// ```
+    pub fn is_numeric_convertible(&self) -> bool {
+        use crate::dynamic::Element;
+        let dyn_t = self
+            .dynamic
+            .as_ref()
+            .expect("is_numeric_convertible called on a non-dynamic tensor");
+        (0..dyn_t.len).all(|i| {
+            dyn_t
+                .get_flat(i)
+                .unwrap_or(&Element::None)
+                .try_as_f64()
+                .is_some()
+        })
+    }
+
+    /// Returns a compact human-readable summary of the element types present
+    /// in this dynamic tensor.
+    ///
+    /// Useful for quickly understanding the content before cleanup and
+    /// conversion. The summary shows counts of each [`Element`] variant.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # #[cfg(feature = "dynamic")] {
+    /// use matten::{Element, Tensor};
+    ///
+    /// let t = Tensor::from_elements(
+    ///     vec![
+    ///         Element::Float(1.0), Element::None, Element::text("x"),
+    ///         Element::Float(2.0), Element::Int(3),
+    ///     ],
+    ///     &[5],
+    /// );
+    /// let s = t.schema_summary();
+    /// assert!(s.contains("Float: 2"));
+    /// assert!(s.contains("None: 1"));
+    /// # }
+    /// ```
+    pub fn schema_summary(&self) -> String {
+        use crate::dynamic::Element;
+        let dyn_t = self
+            .dynamic
+            .as_ref()
+            .expect("schema_summary called on a non-dynamic tensor");
+        let (mut n_float, mut n_int, mut n_text, mut n_bool, mut n_none) = (0usize, 0, 0, 0, 0);
+        for i in 0..dyn_t.len {
+            match dyn_t.get_flat(i).unwrap_or(&Element::None) {
+                Element::Float(_) => n_float += 1,
+                Element::Int(_) => n_int += 1,
+                Element::Text(_) => n_text += 1,
+                Element::Bool(_) => n_bool += 1,
+                Element::None => n_none += 1,
+            }
+        }
+        let total = dyn_t.len;
+        let convertible = n_float + n_int;
+        format!(
+            "shape={:?} total={total} numeric={convertible}              (Float: {n_float}, Int: {n_int}, Bool: {n_bool}, Text: {n_text}, None: {n_none})",
+            dyn_t.shape
+        )
     }
 }

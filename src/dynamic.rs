@@ -16,7 +16,10 @@
 pub(crate) mod element;
 #[cfg(any(feature = "json", feature = "csv"))]
 pub(crate) mod parse;
+pub(crate) mod policy;
 pub(crate) mod storage;
 pub(crate) mod tensor_ext;
 
 pub use element::Element;
+
+pub use policy::NumericPolicy;

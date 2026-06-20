@@ -1,6 +1,6 @@
 # RFC-017: Numeric Conversion Policy
 
-**Status:** Proposed  
+**Status:** Implemented (v0.14.0)  
 **Target:** v0.14.x  
 **Theme:** Dynamic-to-numeric conversion  
 **Depends on:** RFC-011, RFC-016  

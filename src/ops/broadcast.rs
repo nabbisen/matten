@@ -77,7 +77,22 @@ impl BroadcastCtx {
                 .collect()
         };
 
-        let result_len: usize = result_shape.iter().product();
+        // Check for overflow and apply the default element budget before allocating.
+        let result_len: usize = {
+            let n = result_shape
+                .iter()
+                .try_fold(1usize, |acc, &d| acc.checked_mul(d))
+                .unwrap_or_else(|| {
+                    panic!(
+                        "matten broadcast error: broadcast result shape {result_shape:?} \
+                         overflows usize when computing element count"
+                    )
+                });
+            crate::limits::MattenLimits::default()
+                .check_elements(n, "broadcast")
+                .unwrap_or_else(|e| panic!("{e}"));
+            n
+        };
         Self {
             result_len,
             result_strides: strides_for_shape(result_shape),

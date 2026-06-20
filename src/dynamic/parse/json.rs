@@ -79,7 +79,7 @@ fn parse_object_dynamic(value: &Value) -> Result<Tensor, MattenError> {
 // ── nested array form ─────────────────────────────────────────────────────
 
 const MAX_DEPTH: usize = 8;
-const MAX_ELEMENTS: usize = 1 << 24;
+use crate::limits::MAX_DYNAMIC_ELEMENTS as MAX_ELEMENTS;
 
 fn parse_nested_dynamic(value: &Value) -> Result<Tensor, MattenError> {
     let (data, shape) = extract_nested_dynamic(value, 0)?;

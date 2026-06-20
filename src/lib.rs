@@ -87,6 +87,7 @@ mod convert;
 #[cfg(feature = "dynamic")]
 mod dynamic;
 mod error;
+mod limits;
 mod math;
 mod ops;
 mod parse;
@@ -98,7 +99,10 @@ mod tensor;
 
 #[cfg(feature = "dynamic")]
 pub use crate::dynamic::Element;
+#[cfg(feature = "dynamic")]
+pub use crate::dynamic::NumericPolicy;
 pub use crate::error::{DataFormat, MattenError};
+pub use crate::limits::MattenLimits;
 pub use crate::slice::SliceBuilder;
 // Slice trait plumbing — public for the sealed-bound chain but hidden from docs.
 #[doc(hidden)]

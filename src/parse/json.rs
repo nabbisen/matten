@@ -23,7 +23,7 @@ use serde_json::Value;
 const MAX_NESTING: usize = 8; // matches MAX_NDIM
 
 /// Maximum total element count accepted from a JSON payload.
-const MAX_JSON_ELEMENTS: usize = 1 << 24; // 16 million
+use crate::limits::MAX_JSON_ELEMENTS;
 
 fn parse_err(msg: impl Into<String>) -> MattenError {
     MattenError::Parse {

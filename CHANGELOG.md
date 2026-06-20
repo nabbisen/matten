@@ -5,6 +5,99 @@ All notable changes to `matten` are documented here. The format is based on
 follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html) once it reaches
 a public API (`0.1.0`).
 
+## [0.14.0] - 2026-06-20
+
+**Dynamic on-ramp hardening (RFC-016 + RFC-017 + RFC-018).**
+
+### Added — RFC-018: Shape, Allocation, and Resource Safety Limits
+
+`MattenLimits` is now the single source of truth for all allocation and shape
+bounds. Existing scattered constants are absorbed as its defaults.
+
+New public type:
+
+```rust
+pub struct MattenLimits {
+    pub max_dimensions: usize, // default: 8 (was MAX_NDIM)
+    pub max_elements: usize,   // default: 1_048_576 (was ARANGE_MAX_ELEMENTS)
+    pub max_parse_bytes: usize, // default: 128 MiB
+}
+```
+
+New boundary-safe constructors (net-new public API):
+
+```rust
+Tensor::try_zeros(shape)            -> Result<Tensor, MattenError>
+Tensor::try_ones(shape)             -> Result<Tensor, MattenError>
+Tensor::try_full(shape, value)      -> Result<Tensor, MattenError>
+Tensor::try_zeros_with_limits(shape, &MattenLimits) -> Result<Tensor, MattenError>
+Tensor::try_ones_with_limits(shape, &MattenLimits)  -> Result<Tensor, MattenError>
+Tensor::try_full_with_limits(shape, value, &MattenLimits) -> Result<Tensor, MattenError>
+```
+
+The panicking `zeros`, `ones`, `full` now delegate to `try_*_with_limits`,
+so they route through the same limit policy.
+
+Broadcast output size is now checked against `MattenLimits::default().max_elements`
+with overflow detection before allocation.
+
+9 new tests in `src/tests/tensor.rs::limits_tests`.
+
+### Added — RFC-017: Numeric Conversion Policy
+
+New public type `NumericPolicy` (under `#[cfg(feature = "dynamic")]`):
+
+```rust
+impl NumericPolicy {
+    pub fn strict() -> Self;       // default: Float/Int only
+    pub fn permissive() -> Self;   // Bool as 0/1, Text parsed, None as 0.0
+    pub fn allow_bool(self) -> Self;
+    pub fn allow_text_parse(self) -> Self;
+    pub fn none_as(self, value: f64) -> Self;
+    pub fn none_as_nan(self) -> Self;
+}
+```
+
+New method on `Tensor`:
+
+```rust
+#[cfg(feature = "dynamic")]
+pub fn try_numeric_with(&self, policy: NumericPolicy) -> Result<Tensor, MattenError>
+```
+
+Default `try_numeric()` behavior is unchanged (strict: Float/Int only).
+13 new tests in `src/tests/dynamic.rs::numeric_policy_tests`.
+
+### Added — RFC-016: Dynamic Ingestion and Explicit Numeric On-Ramp
+
+Three new dynamic inspection methods:
+
+```rust
+#[cfg(feature = "dynamic")]
+pub fn numeric_mask(&self) -> Tensor;           // 1.0/0.0 like none_mask
+pub fn is_numeric_convertible(&self) -> bool;   // true if all Float/Int
+pub fn schema_summary(&self) -> String;          // element-type count string
+```
+
+8 new tests in `src/tests/dynamic.rs::inspection_tests`.
+
+### Internal changes
+
+All scattered allocation constants migrated to `src/limits.rs`:
+- `MAX_NDIM` → `MattenLimits::default().max_dimensions`
+- `ARANGE_MAX_ELEMENTS` → `MattenLimits::default().max_elements`
+- `MAX_JSON_ELEMENTS`, `MAX_DYNAMIC_ELEMENTS`, `MAX_SLICE_STR_BYTES` imported
+  from `limits.rs` in their respective parsers/modules.
+
+### Closed RFCs
+
+- RFC-016: Dynamic Ingestion and Explicit Numeric On-Ramp → `rfcs/done/`
+- RFC-017: Numeric Conversion Policy → `rfcs/done/`
+- RFC-018: Shape, Allocation, and Resource Safety Limits → `rfcs/done/`
+
+All 20 completed RFCs (000–020) are now in `rfcs/done/`.
+7 proposed RFCs (021–026) remain in `rfcs/proposed/`.
+
 ## [0.13.3] - 2026-06-20
 
 **Stabilization and diagnostics release (RFC-015 + RFC-020).**

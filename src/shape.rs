@@ -10,7 +10,8 @@ use crate::error::MattenError;
 ///
 /// This is a DX / parser-abuse guard, not a mathematical limit: shapes are
 /// stored as `Vec<usize>`, so the cap can be relaxed by a later RFC.
-pub(crate) const MAX_NDIM: usize = 8;
+// MAX_NDIM is defined in crate::limits and re-exported from there.
+use crate::limits::MAX_NDIM;
 
 /// Validates a shape and returns its logical element count.
 ///

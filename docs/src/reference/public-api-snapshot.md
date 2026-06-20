@@ -1,6 +1,6 @@
 # Public API snapshot
 
-This page lists every public item in `matten` at v0.13.x. It serves as the
+This page lists every public item in `matten` at v0.14.x. It serves as the
 baseline for tracking breaking changes toward v1.0.0 and as the review gate
 required by RFC-015.
 
@@ -11,11 +11,14 @@ required by RFC-015.
 pub use matten::Tensor;
 pub use matten::MattenError;
 pub use matten::DataFormat;
+pub use matten::MattenLimits;  // RFC-018: resource safety limits
 pub use matten::SliceBuilder;
 
 // Feature-gated
 #[cfg(feature = "dynamic")]
 pub use matten::Element;
+#[cfg(feature = "dynamic")]
+pub use matten::NumericPolicy; // RFC-017: numeric conversion policy
 
 // Compiler-visibility plumbing — #[doc(hidden)], NOT user-facing extension points.
 // IntoSliceRange and SliceConvert use a private sealed::Sealed supertrait;
@@ -56,6 +59,12 @@ when called on a dynamic tensor. Call `try_numeric()` to convert first.
 | `arange(start, end, step)` | `Tensor` | panics on invalid / too large |
 | `try_arange(start, end, step)` | `Result<Tensor, MattenError>` | |
 | `try_from_rows(rows)` | `Result<Tensor, MattenError>` | ragged → error |
+| `try_zeros(shape)` | `Result<Tensor, MattenError>` | RFC-018; budget-checked |
+| `try_ones(shape)` | `Result<Tensor, MattenError>` | RFC-018; budget-checked |
+| `try_full(shape, value)` | `Result<Tensor, MattenError>` | RFC-018; budget-checked |
+| `try_zeros_with_limits(shape, limits)` | `Result<Tensor, MattenError>` | custom budget |
+| `try_ones_with_limits(shape, limits)` | `Result<Tensor, MattenError>` | custom budget |
+| `try_full_with_limits(shape, value, limits)` | `Result<Tensor, MattenError>` | custom budget |
 
 ## `Tensor` — shape inspection
 
@@ -159,6 +168,29 @@ All panic on dynamic tensors.
 | `forward_fill_none(fallback: impl Into<Element>)` | `Tensor` | |
 | `sum_skip_none()` | `f64` | skips `None`; panics on non-numeric |
 | `try_numeric()` | `Result<Tensor, MattenError>` | strict default |
+| `try_numeric_with(policy)` | `Result<Tensor, MattenError>` | RFC-017; explicit policy |
+| `numeric_mask()` | `Tensor` | RFC-016; 1.0/0.0 like `none_mask` |
+| `is_numeric_convertible()` | `bool` | RFC-016; true if all Float/Int |
+| `schema_summary()` | `String` | RFC-016; element-type counts |
+
+## `MattenLimits` (RFC-018)
+
+```rust
+pub struct MattenLimits {
+    pub max_dimensions: usize, // default: 8
+    pub max_elements: usize,   // default: 1 048 576 (~1 M / ~8 MiB)
+    pub max_parse_bytes: usize, // default: 128 MiB
+}
+```
+
+Methods: `MattenLimits::default()`, `MattenLimits::strict()`.
+
+## `NumericPolicy` (RFC-017, `#[cfg(feature = "dynamic")]`)
+
+Controls how `Element` values coerce to `f64` in `try_numeric_with`.
+
+Builder methods: `.strict()`, `.permissive()`, `.allow_bool()`,
+`.allow_text_parse()`, `.none_as(value)`, `.none_as_nan()`.
 
 ## Conversion traits
 

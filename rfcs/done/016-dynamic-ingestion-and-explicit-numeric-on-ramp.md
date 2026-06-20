@@ -1,6 +1,6 @@
 # RFC-016: Dynamic Ingestion and Explicit Numeric On-Ramp
 
-**Status:** Proposed  
+**Status:** Implemented (v0.14.0)  
 **Target:** v0.14.x  
 **Theme:** Dynamic on-ramp hardening  
 **Depends on:** RFC-011, RFC-012, RFC-017, RFC-018  

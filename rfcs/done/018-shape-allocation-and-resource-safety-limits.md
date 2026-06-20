@@ -1,6 +1,6 @@
 # RFC-018: Shape, Allocation, and Resource Safety Limits
 
-**Status:** Proposed  
+**Status:** Implemented (v0.14.0)  
 **Target:** v0.14.x  
 **Theme:** Safety and availability  
 **Depends on:** RFC-001, RFC-003, RFC-004, RFC-006, RFC-009  

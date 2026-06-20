@@ -11,7 +11,8 @@ use std::fmt;
 
 /// Maximum element count accepted by `arange` / `try_arange` before the
 /// allocation limit fires. Set conservatively for Phase 1.
-const ARANGE_MAX_ELEMENTS: usize = 1 << 20; // ~1 million (family-car budget: ~8 MiB)
+// ARANGE_MAX_ELEMENTS is defined in crate::limits::MAX_ELEMENTS.
+use crate::limits::MAX_ELEMENTS as ARANGE_MAX_ELEMENTS;
 
 /// A dense, row-major, owned multidimensional array of `f64`.
 ///

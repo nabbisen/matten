@@ -24,15 +24,15 @@ for RFC state; the Status field inside each file mirrors the folder.
 | 013 | [Testing, Compatibility, and Release Gates](./done/013-testing-compatibility-and-release-gates.md) | — |
 | 014 | [Example Suite and Executable Documentation](./done/014-example-suite-and-executable-documentation.md) | — |
 | 015 | [Public API Stabilization and Compatibility Policy](./done/015-public-api-stabilization-and-compatibility-policy.md) | v0.13.3 |
+| 016 | [Dynamic Ingestion and Explicit Numeric On-Ramp](./done/016-dynamic-ingestion-and-explicit-numeric-on-ramp.md) | v0.14.0 |
+| 017 | [Numeric Conversion Policy](./done/017-numeric-conversion-policy.md) | v0.14.0 |
+| 018 | [Shape, Allocation, and Resource Safety Limits](./done/018-shape-allocation-and-resource-safety-limits.md) | v0.14.0 |
 | 020 | [Human-Readable Diagnostics and Error Message Quality](./done/020-human-readable-diagnostics-and-error-message-quality.md) | v0.13.3 |
 
 ## Proposed
 
 | ID | Title | Target |
 |---:|---|---|
-| 016 | [Dynamic Ingestion and Explicit Numeric On-Ramp](./proposed/016-dynamic-ingestion-and-explicit-numeric-on-ramp.md) | v0.14.x |
-| 017 | [Numeric Conversion Policy](./proposed/017-numeric-conversion-policy.md) | v0.14.x |
-| 018 | [Shape, Allocation, and Resource Safety Limits](./proposed/018-shape-allocation-and-resource-safety-limits.md) | v0.14.x |
 | 019 | [Axis Reductions and Small Matrix Statistics](./proposed/019-axis-reductions-and-small-matrix-statistics.md) | v0.15.x |
 | 021 | [Tutorial Path and Example Quality Gate](./proposed/021-tutorial-path-and-example-quality-gate.md) | v0.15.x |
 | 022 | [Companion Crate Boundary Policy](./proposed/022-companion-crate-boundary-policy.md) | v0.16+ |

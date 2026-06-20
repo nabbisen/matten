@@ -9,8 +9,8 @@
 use crate::shape::coord_to_flat;
 use crate::{MattenError, Tensor};
 
-/// Maximum byte length accepted by the `slice_str` parser.
-const MAX_SLICE_STR_BYTES: usize = 512;
+// MAX_SLICE_STR_BYTES is defined in crate::limits.
+use crate::limits::MAX_SLICE_STR_BYTES;
 
 // ---- Internal slice specification ---------------------------------------
 

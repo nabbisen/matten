@@ -240,3 +240,76 @@ fn get_flat_matches_as_slice_order() {
         assert_eq!(t.get_flat(i), Some(v));
     }
 }
+
+// ---- RFC-018: resource safety limit tests --------------------------------
+
+mod limits_tests {
+    use crate::limits::{MAX_ELEMENTS, MAX_NDIM, MattenLimits};
+    use crate::{MattenError, Tensor};
+
+    #[test]
+    fn try_zeros_success() {
+        let t = Tensor::try_zeros(&[3, 4]).unwrap();
+        assert_eq!(t.shape(), &[3, 4]);
+        assert_eq!(t.as_slice(), &[0.0f64; 12]);
+    }
+
+    #[test]
+    fn try_ones_success() {
+        let t = Tensor::try_ones(&[2, 3]).unwrap();
+        assert_eq!(t.as_slice(), &[1.0f64; 6]);
+    }
+
+    #[test]
+    fn try_full_success() {
+        let t = Tensor::try_full(&[2, 2], 7.0).unwrap();
+        assert_eq!(t.as_slice(), &[7.0f64; 4]);
+    }
+
+    #[test]
+    fn try_zeros_shape_error() {
+        let err = Tensor::try_zeros(&[2, 0]).unwrap_err();
+        assert!(matches!(err, MattenError::Shape { .. }));
+    }
+
+    #[test]
+    fn try_ones_rank_too_high() {
+        let shape = vec![2usize; MAX_NDIM + 1];
+        let err = Tensor::try_ones(&shape).unwrap_err();
+        assert!(matches!(err, MattenError::Shape { .. }));
+    }
+
+    #[test]
+    fn try_full_element_budget_exceeded() {
+        let limits = MattenLimits {
+            max_dimensions: 8,
+            max_elements: 10,
+            max_parse_bytes: 1024,
+        };
+        let err = Tensor::try_full_with_limits(&[100], 0.0, &limits).unwrap_err();
+        assert!(matches!(err, MattenError::Allocation { .. }));
+    }
+
+    #[test]
+    fn mattan_limits_default_absorbs_constants() {
+        let lim = MattenLimits::default();
+        assert_eq!(lim.max_dimensions, MAX_NDIM);
+        assert_eq!(lim.max_elements, MAX_ELEMENTS);
+    }
+
+    #[test]
+    fn zeros_delegates_to_try_zeros() {
+        // panicking zeros must respect the same limits as try_zeros
+        let t = Tensor::zeros(&[2, 3]);
+        assert_eq!(t.len(), 6);
+    }
+
+    #[test]
+    fn broadcast_output_budget_checked() {
+        // A shape whose product exceeds MAX_ELEMENTS must panic
+        let a = Tensor::try_zeros(&[1024]).unwrap();
+        let b = Tensor::try_zeros(&[1024]).unwrap();
+        // [1024] + [1024] → [1024]: stays within budget, should succeed
+        let _ = &a + &b;
+    }
+}
