@@ -609,3 +609,40 @@ mod precision_tests {
         assert_ne!(as_f64 as i64, large, "precision loss documented");
     }
 }
+
+// ---- PR-4: additional dynamic accessor regression tests -----------------
+
+#[cfg(feature = "dynamic")]
+mod additional_accessor_tests {
+    use crate::dynamic::Element;
+    use crate::{MattenError, Tensor};
+
+    #[test]
+    fn into_vec_method_panics_on_dynamic() {
+        // Tensor::into_vec() on a dynamic tensor must panic, not return vec![]
+        let t = Tensor::from_elements(vec![Element::Int(1), Element::Int(2)], &[2]);
+        let result = std::panic::catch_unwind(move || {
+            let _: Vec<f64> = t.into_vec();
+        });
+        assert!(result.is_err(), "into_vec() on dynamic tensor must panic");
+    }
+
+    #[test]
+    fn try_into_rows_returns_unsupported_on_dynamic() {
+        // TryFrom<Tensor> for Vec<Vec<f64>> must return Err, not produce empty rows
+        let t = Tensor::from_elements(
+            vec![
+                Element::Float(1.0),
+                Element::Float(2.0),
+                Element::Float(3.0),
+                Element::Float(4.0),
+            ],
+            &[2, 2],
+        );
+        let result: Result<Vec<Vec<f64>>, MattenError> = t.try_into();
+        assert!(
+            matches!(result, Err(MattenError::Unsupported { .. })),
+            "TryFrom<Tensor> for Vec<Vec<f64>> must return Unsupported for dynamic tensors"
+        );
+    }
+}

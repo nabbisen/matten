@@ -13,7 +13,7 @@ use std::ops::{Add, Div, Mul, Sub};
 fn require_numeric(t: &crate::Tensor, operation: &'static str) {
     if t.is_dynamic() {
         panic!(
-            "matten unsupported error in {operation}: scalar arithmetic is not supported              on dynamic tensors; call try_numeric() first"
+            "matten unsupported error in {operation}: scalar arithmetic is not supported on dynamic tensors; call try_numeric() first"
         );
     }
 }

@@ -7,11 +7,16 @@
 //! deliberately prioritizes **developer experience over peak performance**, and
 //! is not a replacement for `ndarray`, `nalgebra`, or `candle` on hot paths.
 //!
-//! # Status
+//! # Scope
 //!
-//! This is **`0.11.0`** — post-audit release. Phase 1 numeric core and
-//! `from_json`/`load_json`, and `from_csv`/`load_csv` are now in place.
-//! Reductions, matmul, and the examples suite arrive in later milestones.
+//! Phase 1 (numeric `f64` core): construction, shape operations, arithmetic,
+//! broadcasting, slicing, reductions, matrix multiplication, JSON/CSV boundary
+//! APIs, and serde integration — all complete.
+//!
+//! The `dynamic` feature (`features = ["dynamic"]`) supports heterogeneous
+//! ingestion and missing-value cleanup before conversion to numeric tensors via
+//! [`Tensor::try_numeric`]. Dynamic reshape/slicing/arithmetic are intentionally
+//! guarded until a future CoW-view milestone.
 //!
 //! # Quick start
 //!
@@ -59,7 +64,7 @@
 //! For the smallest dependency footprint, disable defaults and opt in:
 //!
 //! ```toml
-//! matten = { version = "0.1", default-features = false }
+//! matten = { version = "0.13", default-features = false }
 //! ```
 
 #![forbid(unsafe_code)]
@@ -95,6 +100,9 @@ mod tensor;
 pub use crate::dynamic::Element;
 pub use crate::error::{DataFormat, MattenError};
 pub use crate::slice::SliceBuilder;
+// Slice trait plumbing — public for the sealed-bound chain but hidden from docs.
+#[doc(hidden)]
+pub use crate::slice::{IntoSliceRange, SliceConvert, SliceSpecRepr};
 pub use crate::tensor::Tensor;
 
 // `Element` is the Phase 2 dynamic value type, exported under `dynamic`.

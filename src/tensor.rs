@@ -90,7 +90,7 @@ impl Tensor {
     pub(crate) fn panic_if_dynamic(&self, operation: &'static str) {
         if self.is_dynamic() {
             panic!(
-                "matten unsupported error in {operation}: this numeric API is not                  supported on dynamic tensors; use to_elements() or try_numeric() first"
+                "matten unsupported error in {operation}: this numeric API is not supported on dynamic tensors; use to_elements() or try_numeric() first"
             );
         }
     }

@@ -5,6 +5,50 @@ All notable changes to `matten` are documented here. The format is based on
 follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html) once it reaches
 a public API (`0.1.0`).
 
+## [0.13.1] - 2026-06-20
+
+**Cleanup release.** Addresses all remaining findings from the v0.13.0 review.
+
+### Fixed — P0
+
+- **P0-1 (insurance).** `IntoSliceRange`, `SliceConvert`, and `SliceSpecRepr` are now
+  root-exported with `#[doc(hidden)]` in `src/lib.rs`, making the sealed-trait chain
+  visible to the compiler's public-API checks. `RUSTFLAGS="-D warnings" cargo check`
+  confirmed clean (no `private_bounds` lint fires on Rust 1.85, but the export provides
+  defence-in-depth for future toolchain versions).
+
+### Fixed — P1 documentation
+
+- **P1-1.** `README.md` status updated to `0.13.0` with an accurate, honest description
+  of the dynamic feature scope: guard-model ingestion/cleanup, not "complete Phase 2".
+
+- **P1-2.** `src/lib.rs` crate-level docs no longer contain stale `0.11.0` text or
+  "Reductions, matmul, and examples arrive in later milestones". Replaced with a
+  version-neutral scope description.
+
+- **P1-3.** All user-facing Cargo version snippets updated to `"0.13"`:
+  `README.md`, `docs/src/quick-start.md`, `docs/src/reference/boundary.md`,
+  `docs/src/reference/dynamic.md`, `docs/src/contributing/architecture.md`,
+  `src/lib.rs`, `rfcs/done/011-dynamic-element-model-and-coercion.md`.
+
+### Fixed — P2 polish
+
+- **P2-1.** Remaining embedded multi-space error messages fixed in
+  `src/ops/broadcast.rs`, `src/ops/scalar_ops.rs`, `src/ser.rs`, `src/tensor.rs`.
+
+- **P2-2.** `rfcs/README.md` RFC-000 "Shipped in" cell corrected to `0.0.1`
+  (was accidentally set to lifecycle-policy prose during the previous regeneration).
+
+- **P2-3.** `docs/src/reference/public-api-snapshot.md` body text updated from
+  `v0.10.0` to `v0.13.0`.
+
+### Added
+
+- **PR-4.** Two additional dynamic regression tests in `src/tests/dynamic.rs`:
+  - `into_vec_method_panics_on_dynamic` — `Tensor::into_vec()` must panic on dynamic.
+  - `try_into_rows_returns_unsupported_on_dynamic` — `TryFrom<Tensor>` must return
+    `MattenError::Unsupported`, not silently produce empty rows.
+
 ## [0.13.0] - 2026-06-20
 
 **Post-review hardening.** Addresses all P0, P1, and P2 findings from the

@@ -8,8 +8,7 @@ for RFC state; the Status field inside each file mirrors the folder.
 
 | ID | Title | Shipped in |
 |---:|---|---|
-| 000 | [RFC 000 — RFC lifecycle policy](./done/000-rfc-lifecycle-policy.md) | meaning "design is settled,
-implementer may start, but work has not yet shipped" |
+| 000 | [RFC lifecycle policy](./done/000-rfc-lifecycle-policy.md) | 0.0.1 |
 | 001 | [Threat Model and Boundary Safety Policy](./done/001-threat-model-and-boundary-safety-policy.md) | 0.9.0 |
 | 002 | [Public API Minimalism and `Tensor` Contract](./done/002-public-api-minimalism-and-tensor-contract.md) | 0.1.0 |
 | 003 | [Shape Model, Scalar Semantics, and Validation](./done/003-shape-model-scalar-semantics-and-validation.md) | 0.1.0 |

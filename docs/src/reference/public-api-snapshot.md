@@ -1,6 +1,6 @@
 # Public API snapshot — v0.13.0
 
-This page lists every public item in `matten` at v0.10.0. It serves as the
+This page lists every public item in `matten` at v0.13.0. It serves as the
 baseline for tracking breaking changes toward v1.0.0.
 
 ## Crate root exports

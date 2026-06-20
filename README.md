@@ -25,11 +25,14 @@ JSON/CSV in and out — without wrestling with views, lifetimes, or trait bounds
 When a prototype becomes performance-critical, `matten` is designed to hand its
 flat data off to a specialized crate.
 
-> **Status: `0.12.0` — Dynamic lifecycle hardened; all architect review items addressed.** The complete Phase 1 + Phase 2 API is
-> in place: construction, shape ops, arithmetic, broadcasting, slicing, reductions,
-> matrix multiplication, JSON/CSV serde, and the `dynamic` heterogeneous-data engine.
-> All 15 design RFCs are in `rfcs/done/`. v1.0.0 requires explicit maintainer
-> confirmation. See [CHANGELOG.md](./CHANGELOG.md) and [docs.rs](https://docs.rs/matten) for details.
+> **Status: `0.13.0`** — Phase 1 numeric core is implemented and close to release quality.
+> The `dynamic` feature supports heterogeneous ingestion (`from_json_dynamic`, `from_csv_dynamic`),
+> missing-value cleanup (`fill_none`, `none_mask`, `forward_fill_none`), and explicit conversion to
+> numeric tensors (`try_numeric`). Dynamic reshape, slicing, arithmetic, reductions, and serde are
+> **intentionally guarded** — call `try_numeric()` first. Dynamic is a guarded heterogeneous-ingestion
+> and cleanup feature, not a full dynamic tensor arithmetic engine. All 15 design RFCs are in
+> `rfcs/done/`. v1.0.0 requires explicit maintainer confirmation.
+> See [CHANGELOG.md](./CHANGELOG.md) and [docs.rs](https://docs.rs/matten) for details.
 > The full mdBook lives in `docs/` in the repository (not included in the crate package).
 
 ## Quick start
@@ -50,7 +53,7 @@ assert!(matches!(bad, Err(MattenError::Shape { .. })));
 Lean install (smallest dependency footprint):
 
 ```toml
-matten = { version = "0.12", default-features = false }
+matten = { version = "0.13", default-features = false }
 ```
 
 ## Design notes

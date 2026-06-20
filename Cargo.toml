@@ -1,6 +1,6 @@
 [package]
 name = "matten"
-version = "0.13.0"
+version = "0.13.1"
 edition = "2024"
 rust-version = "1.85"
 description = "A family car multidimensional array (tensor) library for small numerical trials / PoCs."
