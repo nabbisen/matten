@@ -24,4 +24,5 @@
 # Contributors
 
 - [Development process](./contributing/development-process.md)
+- [Release checklist](./contributing/release-checklist.md)
 - [Architecture](./contributing/architecture.md)

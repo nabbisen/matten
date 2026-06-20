@@ -273,7 +273,7 @@ impl Tensor {
                 continue;
             }
             acc += e.try_as_f64().unwrap_or_else(|| {
-                panic!("sum_skip_none: non-numeric element {e:?}; use fill_none first")
+                panic!("matten unsupported error in sum_skip_none: element {e:?} cannot be coerced to f64; use fill_none or filter non-numeric elements first")
             });
         }
         acc

@@ -1,190 +1,206 @@
-# Public API snapshot — v0.13.0
+# Public API snapshot
 
-This page lists every public item in `matten` at v0.13.0. It serves as the
-baseline for tracking breaking changes toward v1.0.0.
+This page lists every public item in `matten` at v0.13.x. It serves as the
+baseline for tracking breaking changes toward v1.0.0 and as the review gate
+required by RFC-015.
 
-## Crate root exports
+## Root exports
 
 ```rust
+// Primary user-facing types
 pub use matten::Tensor;
 pub use matten::MattenError;
 pub use matten::DataFormat;
+pub use matten::SliceBuilder;
+
+// Feature-gated
 #[cfg(feature = "dynamic")]
 pub use matten::Element;
-pub use matten::SliceBuilder; // returned by Tensor::slice(); blessed public export
-// IntoSliceRange and SliceConvert are root-exported #[doc(hidden)] for
-// compiler visibility. SliceConvert extends a private sealed::Sealed supertrait;
+
+// Compiler-visibility plumbing — #[doc(hidden)], NOT user-facing extension points.
+// IntoSliceRange and SliceConvert use a private sealed::Sealed supertrait;
 // downstream crates cannot meaningfully implement either trait.
 // Users never need to name them in imports.
-// SliceSpecRepr: #[doc(hidden)], internal visibility artefact
+#[doc(hidden)] pub use matten::IntoSliceRange;
+#[doc(hidden)] pub use matten::SliceConvert;
+#[doc(hidden)] pub use matten::SliceSpecRepr;
 ```
-
-## `Tensor` — construction
-
-| Method | Zone | Notes |
-|---|---|---|
-| `new(data, shape)` | Panic | convenience literal constructor |
-| `try_new(data, shape)` | Result | recoverable |
-| `scalar(value)` | Panic | shape `[]` |
-| `zeros(shape)` | Panic | |
-| `ones(shape)` | Panic | |
-| `full(shape, value)` | Panic | |
-| `from_vec(data)` | Panic | shape `[len]` |
-| `arange(start, end, step)` | Panic | |
-| `try_arange(start, end, step)` | Result | |
-| `try_from_rows(rows)` | Result | ragged → `Err` |
-| `From<Vec<f64>>` | Panic | shape `[len]` |
-| `From<Vec<Vec<f64>>>` | Panic | panics on ragged |
-| `From<Tensor> for Vec<f64>` | — | consuming |
-| `From<&Tensor> for Vec<f64>` | — | borrowing clone |
-| `TryFrom<Tensor> for Vec<Vec<f64>>` | Result | fails for non-rank-2 |
-
-## `Tensor` — inspection
-
-| Method | Returns |
-|---|---|
-| `shape()` | `&[usize]` |
-| `ndim()` | `usize` |
-| `len()` | `usize` |
-| `is_scalar()` | `bool` |
-| `is_vector()` | `bool` |
-| `is_matrix()` | `bool` |
-| `as_slice()` | `&[f64]` |
-| `to_vec()` | `Vec<f64>` |
-| `into_vec(self)` | `Vec<f64>` |
-| `get(coord)` | `Option<f64>` |
-| `get_flat(index)` | `Option<f64>` | flat row-major index |
 
 ## Dynamic tensor behaviour
 
-Methods marked as Phase 1 only **panic** with a clear `matten unsupported error` message when called on a dynamic tensor. Use `try_numeric()` to convert first.
+Methods marked Phase 1 only **panic** with a `matten unsupported error` message
+when called on a dynamic tensor. Call `try_numeric()` to convert first.
 
 | Phase 1 method group | Dynamic behaviour |
 |---|---|
 | `reshape`, `flatten`, `transpose`, `swap_axes` | panic |
 | `slice()` builder, `slice_str()` | returns `MattenError::Unsupported` |
-| arithmetic operators | panic |
-| reductions (`sum`, `mean`, etc.) | panic |
+| Arithmetic operators, scalar operators | panic |
+| Reductions (`sum`, `mean`, `min`, `max`, `*_axis`) | panic |
 | `dot` / `matmul` | panic |
+| `as_slice`, `to_vec`, `into_vec`, `get`, `get_flat` | panic |
+| `From<Tensor> for Vec<f64>`, `From<&Tensor>`, `TryFrom` | panic / `Err` |
 | `Serialize` | returns serde error |
 
-## `Tensor` — shape operations
-
-| Method | Zone |
-|---|---|
-| `reshape(shape)` | Panic |
-| `try_reshape(shape)` | Result |
-| `flatten()` | Panic |
-| `transpose()` / `t()` | Panic |
-| `swap_axes(a, b)` | Panic |
-
-## `Tensor` — slicing
-
-| Method | Zone |
-|---|---|
-| `slice()` → `SliceBuilder` | — |
-| `slice_str(spec)` | Result |
-| `SliceBuilder::all()` | — |
-| `SliceBuilder::index(n)` | — |
-| `SliceBuilder::range(R)` | — accepts `Range`, `RangeFrom`, `RangeTo`, `RangeFull`, `RangeInclusive` |
-| `SliceBuilder::build()` | Result |
-
-## `Tensor` — arithmetic operators
-
-| Operator | Notes |
-|---|---|
-| `&Tensor + &Tensor` | element-wise, broadcasting |
-| `&Tensor - &Tensor` | |
-| `&Tensor * &Tensor` | element-wise (**not** matmul) |
-| `&Tensor / &Tensor` | |
-| `-&Tensor` | unary negation |
-| `&Tensor ± * / f64` | scalar right |
-| `f64 ± * / &Tensor` | scalar left |
-
-## `Tensor` — reductions and linear algebra
+## `Tensor` — construction
 
 | Method | Returns | Notes |
 |---|---|---|
-| `sum()` | `f64` | NaN propagates |
-| `mean()` | `f64` | |
-| `min()` | `f64` | NaN if any NaN |
-| `max()` | `f64` | NaN if any NaN |
-| `sum_axis(axis)` | `Tensor` | axis removed |
-| `mean_axis(axis)` | `Tensor` | |
-| `min_axis(axis)` | `Tensor` | NaN if any NaN in axis |
-| `max_axis(axis)` | `Tensor` | NaN if any NaN in axis |
-| `dot(rhs)` | `Tensor` | 4 shape cases; panics on dynamic tensors |
-| `matmul(rhs)` | `Tensor` | alias for `dot`; panics on dynamic tensors |
+| `new(data, shape)` | `Tensor` | panics on mismatch |
+| `try_new(data, shape)` | `Result<Tensor, MattenError>` | |
+| `scalar(value)` | `Tensor` | shape `[]` |
+| `zeros(shape)` | `Tensor` | |
+| `ones(shape)` | `Tensor` | |
+| `full(shape, value)` | `Tensor` | |
+| `from_vec(data)` | `Tensor` | shape `[n]` |
+| `arange(start, end, step)` | `Tensor` | panics on invalid / too large |
+| `try_arange(start, end, step)` | `Result<Tensor, MattenError>` | |
+| `try_from_rows(rows)` | `Result<Tensor, MattenError>` | ragged → error |
 
-## `Tensor` — boundary I/O
+## `Tensor` — shape inspection
 
-| Method | Feature | Zone |
+| Method | Returns | Notes |
 |---|---|---|
-| `from_json(input)` | `json` | Result |
-| `load_json(path)` | `json` | Result |
-| `from_csv(input)` | `csv` | Result |
-| `load_csv(path)` | `csv` | Result |
-| `Serialize` / `Deserialize` | `serde` | via `serde_json` |
+| `shape()` | `&[usize]` | |
+| `ndim()` | `usize` | |
+| `len()` | `usize` | logical element count |
+| `is_scalar()` | `bool` | ndim == 0 |
+| `is_vector()` | `bool` | ndim == 1 |
+| `is_matrix()` | `bool` | ndim == 2 |
 
-## `Tensor` — dynamic (`#[cfg(feature = "dynamic")]`)
+## `Tensor` — data access (Phase 1 only)
 
-| Method | Zone |
-|---|---|
-| `from_elements(data, shape)` | Panic |
-| `try_from_elements(data, shape)` | Result |
-| `get_element(coord)` | `Option<Element>` |
-| `to_elements()` | `Vec<Element>` |
-| `is_dynamic()` | `bool` |
-| `fill_none(value)` | — |
-| `none_mask()` | Phase 1 `Tensor` |
-| `is_none_mask()` | Phase 1 `Tensor` | RFC-011 alias for `none_mask` |
-| `count_none()` | `usize` |
-| `forward_fill_none(fallback)` | — |
-| `sum_skip_none()` | `f64` |
-| `try_numeric()` | Result |
-| `from_json_dynamic(input)` | `json` + `dynamic`, Result |
-| `from_csv_dynamic(input)` | `csv` + `dynamic`, Result |
+| Method | Returns | Notes |
+|---|---|---|
+| `as_slice()` | `&[f64]` | panics on dynamic |
+| `to_vec()` | `Vec<f64>` | clone; panics on dynamic |
+| `into_vec(self)` | `Vec<f64>` | consuming; panics on dynamic |
+| `get(coord)` | `Option<f64>` | panics on dynamic |
+| `get_flat(index)` | `Option<f64>` | panics on dynamic |
 
-## `Element` (`#[cfg(feature = "dynamic")]`)
+## `Tensor` — shape operations (Phase 1 only)
 
-```rust
-pub enum Element { Float(f64), Int(i64), Text(Arc<str>), Bool(bool), None }
-```
+| Method | Returns | Notes |
+|---|---|---|
+| `reshape(shape)` | `Tensor` | panics on mismatch or dynamic |
+| `try_reshape(shape)` | `Result<Tensor, MattenError>` | panics on dynamic |
+| `flatten()` | `Tensor` | panics on dynamic |
+| `transpose()` | `Tensor` | reverses axes; panics on dynamic |
+| `t()` | `Tensor` | alias for `transpose` |
+| `swap_axes(a, b)` | `Tensor` | panics on dynamic |
+
+## `Tensor` — slicing (Phase 1 only)
+
+| Method | Returns | Notes |
+|---|---|---|
+| `slice()` | `SliceBuilder<'_>` | returns `Unsupported` on dynamic |
+| `slice_str(spec)` | `Result<Tensor, MattenError>` | returns `Unsupported` on dynamic |
+
+## `SliceBuilder` methods
 
 | Method | Returns |
 |---|---|
-| `text(s)` | `Element::Text` constructor |
-| `is_none()` | `bool` |
-| `is_numeric()` | `bool` |
-| `try_as_f64()` | `Option<f64>` |
-| `as_text()` | `Option<&str>` |
-| `as_bool()` | `Option<bool>` |
+| `all()` | `SliceBuilder` |
+| `index(i)` | `SliceBuilder` |
+| `range<R: IntoSliceRange>(r)` | `SliceBuilder` |
+| `build()` | `Result<Tensor, MattenError>` |
 
-`From` impls: `f64`, `i64`, `i32`, `bool`, `String`, `&str`, `Arc<str>`.
+## `Tensor` — arithmetic (Phase 1 only)
 
-## `MattenError`
+Operator traits implemented for `&Tensor`:
+`Add`, `Sub`, `Mul`, `Div`, `Neg` — element-wise with broadcasting.
+
+Scalar operators: `&Tensor + f64`, `&Tensor - f64`, `&Tensor * f64`, `&Tensor / f64`
+(and reverse: `f64 + &Tensor`, `f64 - &Tensor`, `f64 * &Tensor`, `f64 / &Tensor`).
+
+All panic on dynamic tensors.
+
+## `Tensor` — reductions (Phase 1 only)
+
+| Method | Returns | Notes |
+|---|---|---|
+| `sum()` | `f64` | |
+| `mean()` | `f64` | |
+| `min()` | `f64` | NaN if any element is NaN |
+| `max()` | `f64` | NaN if any element is NaN |
+| `sum_axis(axis)` | `Tensor` | |
+| `mean_axis(axis)` | `Tensor` | |
+| `min_axis(axis)` | `Tensor` | NaN propagated per slice |
+| `max_axis(axis)` | `Tensor` | NaN propagated per slice |
+| `dot(rhs)` | `Tensor` | 4 shape cases; panics on dynamic |
+| `matmul(rhs)` | `Tensor` | alias for `dot`; panics on dynamic |
+
+## `Tensor` — boundary / serde
+
+| Method | Returns | Notes |
+|---|---|---|
+| `from_json(input)` | `Result<Tensor, MattenError>` | |
+| `load_json(path)` | `Result<Tensor, MattenError>` | |
+| `from_csv(input)` | `Result<Tensor, MattenError>` | numeric only in Phase 1 |
+| `load_csv(path)` | `Result<Tensor, MattenError>` | |
+| `Serialize` (serde) | via feature `serde` | panics on dynamic |
+| `Deserialize` (serde) | via feature `serde` | |
+
+## `Tensor` — dynamic (`#[cfg(feature = "dynamic")]`)
+
+| Method | Returns | Notes |
+|---|---|---|
+| `from_elements(data, shape)` | `Tensor` | |
+| `try_from_elements(data, shape)` | `Result<Tensor, MattenError>` | |
+| `get_element(coord)` | `Option<Element>` | |
+| `is_dynamic()` | `bool` | |
+| `from_json_dynamic(input)` | `Result<Tensor, MattenError>` | needs `json` |
+| `from_csv_dynamic(input)` | `Result<Tensor, MattenError>` | needs `csv` |
+| `to_elements()` | `Vec<Element>` | |
+| `fill_none(value: impl Into<Element>)` | `Tensor` | |
+| `none_mask()` | `Tensor` | 1.0/0.0 mask |
+| `is_none_mask()` | `Tensor` | alias for `none_mask` |
+| `count_none()` | `usize` | |
+| `forward_fill_none(fallback: impl Into<Element>)` | `Tensor` | |
+| `sum_skip_none()` | `f64` | skips `None`; panics on non-numeric |
+| `try_numeric()` | `Result<Tensor, MattenError>` | strict default |
+
+## Conversion traits
+
+| Trait | Notes |
+|---|---|
+| `From<Vec<f64>> for Tensor` | shape `[n]` |
+| `From<Vec<Vec<f64>>> for Tensor` | panics if ragged |
+| `From<Tensor> for Vec<f64>` | consuming; panics on dynamic |
+| `From<&Tensor> for Vec<f64>` | clone; panics on dynamic |
+| `TryFrom<Tensor> for Vec<Vec<f64>>` | requires rank-2; errors on dynamic |
+
+## `MattenError` variants
 
 ```rust
 #[non_exhaustive]
 pub enum MattenError {
-    Shape { operation: &'static str, message: String },
-    Broadcast { left: Vec<usize>, right: Vec<usize> },
+    Shape      { operation: &'static str, message: String },
+    Broadcast  { left: Vec<usize>, right: Vec<usize> },
     Allocation { requested_elements: usize, message: String },
-    Slice { input: Option<String>, message: String },
-    Parse { format: DataFormat, message: String },
-    Io { path: PathBuf, source: std::io::Error },
+    Slice      { input: Option<String>, message: String },
+    Parse      { format: DataFormat, message: String },
+    Io         { path: PathBuf, source: std::io::Error },
     Unsupported { operation: &'static str, message: String },
 }
 ```
 
-`#[non_exhaustive]` — match with a wildcard arm.
-Derives only `Debug` (embeds `std::io::Error`). Not `Clone` or `PartialEq`.
-
-## `DataFormat`
+## `DataFormat` variants
 
 ```rust
-#[non_exhaustive]
 pub enum DataFormat { Json, Csv }
 ```
 
-Derives `Debug, Clone, Copy, PartialEq, Eq`.
+## `Element` variants (`#[cfg(feature = "dynamic")]`)
+
+```rust
+pub enum Element {
+    Float(f64),
+    Int(i64),
+    Text(Arc<str>),
+    Bool(bool),
+    None,
+}
+```
+
+Key methods: `try_as_f64()`, `is_none()`, `text(s)` constructor.

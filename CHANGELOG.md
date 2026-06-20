@@ -5,6 +5,59 @@ All notable changes to `matten` are documented here. The format is based on
 follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html) once it reaches
 a public API (`0.1.0`).
 
+## [0.13.3] - 2026-06-20
+
+**Stabilization and diagnostics release (RFC-015 + RFC-020).**
+
+### Added
+
+- `docs/src/contributing/release-checklist.md` — the formal pre-release gate
+  defined by RFC-015. Covers source verification, feature matrix, examples, MSRV,
+  public API audit, documentation truth pass, CHANGELOG discipline, and the v1.0.0
+  explicit-confirmation requirement. Linked from the mdBook SUMMARY.
+
+- `scripts/check-release-docs.sh` — automated release-documentation check that
+  catches stale runtime version strings, version-stamped crate docs, root-export
+  drift, and examples importing hidden plumbing. Passes clean on the current
+  codebase.
+
+- 2 diagnostic message format tests (`src/tests/dynamic.rs::diagnostic_message_tests`):
+  - `as_slice_message_format` — asserts that the numeric-accessor guard message
+    starts with `"matten unsupported error in as_slice:"`.
+  - `sum_skip_none_message_format` — asserts that the non-numeric element panic
+    starts with `"matten unsupported error in sum_skip_none:"`.
+
+### Fixed
+
+- **RFC-020.** `sum_skip_none` panic message normalized to the standard format:
+  `"matten unsupported error in sum_skip_none: element <e> cannot be coerced to
+  f64; use fill_none or filter non-numeric elements first"`. Previously it said
+  `"sum_skip_none: non-numeric element <e>; ..."` without the `matten` prefix.
+
+- **RFC-015.** `docs/src/reference/public-api-snapshot.md` rewritten as a full
+  authoritative v0.13.x API reference, covering all public methods by category,
+  the dynamic behaviour table, `MattenError` variants, `DataFormat`, `Element`,
+  and conversion traits. Previous versions were incomplete or version-stamped.
+
+### Closed RFCs
+
+- RFC-015: Public API Stabilization and Compatibility Policy → `rfcs/done/`
+- RFC-020: Human-Readable Diagnostics and Error Message Quality → `rfcs/done/`
+
+All 17 completed RFCs (000–015, 019–020) are now in `rfcs/done/`.
+10 proposed RFCs (016–018, 021–026) remain in `rfcs/proposed/`.
+
+### Audit findings (RFC-015 PR-015-A)
+
+All findings clean at v0.13.3:
+- Root exports match the allowlist exactly: `Tensor`, `MattenError`, `DataFormat`,
+  `SliceBuilder`, `Element` (dynamic-gated). Hidden plumbing `IntoSliceRange`,
+  `SliceConvert`, `SliceSpecRepr` correctly marked `#[doc(hidden)]`.
+- All modules are private (`mod`, not `pub mod`). No accidental public leaks.
+- No examples import hidden plumbing.
+- `MattenError` is `#[non_exhaustive]`.
+- No stale version strings in runtime messages or crate-level docs.
+
 ## [0.13.2] - 2026-06-20
 
 **Final cleanup release.** Addresses all remaining P1 and P2 findings from the

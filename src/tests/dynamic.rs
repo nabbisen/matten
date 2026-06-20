@@ -646,3 +646,50 @@ mod additional_accessor_tests {
         );
     }
 }
+
+// ---- RFC-020: diagnostic message quality tests --------------------------
+
+#[cfg(feature = "dynamic")]
+mod diagnostic_message_tests {
+    use crate::Tensor;
+    use crate::dynamic::Element;
+
+    /// Numeric accessor guard messages follow the standard format:
+    /// "matten unsupported error in <op>: ..."
+    #[test]
+    fn as_slice_message_format() {
+        let t = Tensor::from_elements(vec![Element::Int(1)], &[1]);
+        let result = std::panic::catch_unwind(|| {
+            let _ = t.as_slice();
+        });
+        let msg = result
+            .unwrap_err()
+            .downcast::<String>()
+            .map(|s| s.to_string())
+            .or_else(|e| e.downcast::<&str>().map(|s| s.to_string()))
+            .unwrap_or_default();
+        assert!(
+            msg.starts_with("matten unsupported error in as_slice:"),
+            "expected 'matten unsupported error in as_slice:', got: {msg}"
+        );
+    }
+
+    /// sum_skip_none with a non-numeric element produces a conforming panic message.
+    #[test]
+    fn sum_skip_none_message_format() {
+        let t = Tensor::from_elements(vec![Element::Float(1.0), Element::text("x")], &[2]);
+        let result = std::panic::catch_unwind(|| {
+            let _ = t.sum_skip_none();
+        });
+        let msg = result
+            .unwrap_err()
+            .downcast::<String>()
+            .map(|s| s.to_string())
+            .or_else(|e| e.downcast::<&str>().map(|s| s.to_string()))
+            .unwrap_or_default();
+        assert!(
+            msg.starts_with("matten unsupported error in sum_skip_none:"),
+            "expected 'matten unsupported error in sum_skip_none:', got: {msg}"
+        );
+    }
+}
