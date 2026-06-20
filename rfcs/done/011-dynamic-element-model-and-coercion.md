@@ -35,7 +35,7 @@ The `dynamic` feature is the Phase 2 SUV engine for messy business data: JSON, C
 ## 5. Cargo Features
 
 ```toml
-matten = {{ version = "0.13", features = ["dynamic"] }}
+matten = {{ version = "0.15", features = ["dynamic"] }}
 ```
 
 `dynamic` adds:

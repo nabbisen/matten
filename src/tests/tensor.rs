@@ -313,3 +313,26 @@ mod limits_tests {
         let _ = &a + &b;
     }
 }
+
+// ---- P0-1 fix: zeros/ones/full must route through MattenLimits ----------
+
+#[test]
+#[should_panic(expected = "matten allocation error")]
+fn zeros_panics_when_default_limit_exceeded() {
+    use crate::limits::MAX_ELEMENTS;
+    let _ = Tensor::zeros(&[MAX_ELEMENTS + 1]);
+}
+
+#[test]
+#[should_panic(expected = "matten allocation error")]
+fn ones_panics_when_default_limit_exceeded() {
+    use crate::limits::MAX_ELEMENTS;
+    let _ = Tensor::ones(&[MAX_ELEMENTS + 1]);
+}
+
+#[test]
+#[should_panic(expected = "matten allocation error")]
+fn full_panics_when_default_limit_exceeded() {
+    use crate::limits::MAX_ELEMENTS;
+    let _ = Tensor::full(&[MAX_ELEMENTS + 1], 1.0);
+}

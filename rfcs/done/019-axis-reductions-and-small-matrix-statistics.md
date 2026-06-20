@@ -186,7 +186,7 @@ Required examples:
 
 ```text
 examples/27_axis_reductions.rs
-examples/28_column_mean.rs
+examples/28_column_statistics.rs
 examples/29_row_scores.rs
 ```
 

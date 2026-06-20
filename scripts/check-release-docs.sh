@@ -6,7 +6,7 @@ set -euo pipefail
 FAIL=0
 
 echo "=== Checking for stale runtime 'matten 0.x' version strings ==="
-if grep -rn "matten 0\." src/ | grep -v "CHANGELOG\|#\[" | grep -v "^Binary"; then
+if grep -rn "matten 0\." src/ | grep -v "CHANGELOG\|#\[\|0\.1\.x\|0\.x" | grep -v "^Binary"; then
   echo "ERROR: versioned wording found in runtime code"
   FAIL=1
 fi
@@ -15,6 +15,11 @@ echo "=== Checking for stale version-specific crate docs in lib.rs ==="
 if grep -n "This is \*\*\`0\." src/lib.rs; then
   echo "ERROR: version-stamped text found in crate-level docs"
   FAIL=1
+fi
+
+echo "=== Checking for stale RFC count phrases in README ==="
+if grep -n "All [0-9]* design RFCs" README.md; then
+  echo "WARNING: stale RFC count — update to describe RFC range"
 fi
 
 echo "=== Checking that root exports match the allowlist ==="

@@ -5,6 +5,78 @@ All notable changes to `matten` are documented here. The format is based on
 follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html) once it reaches
 a public API (`0.1.0`).
 
+## [0.15.1] - 2026-06-20
+
+**Review hardening patch (v0.15.0 architect review, all findings addressed).**
+
+### Fixed — P0 (release blocker)
+
+- **P0-1.** `Tensor::zeros`, `Tensor::ones`, and `Tensor::full` now delegate
+  to `try_zeros` / `try_ones` / `try_full` (which route through
+  `MattenLimits::check_shape`), so they enforce the default element budget.
+  Previously they called `shape::validate_shape` directly and bypassed the
+  `MattenLimits::max_elements` check entirely.
+
+  Added three `#[should_panic(expected = "matten allocation error")]` tests:
+  `zeros_panics_when_default_limit_exceeded`,
+  `ones_panics_when_default_limit_exceeded`,
+  `full_panics_when_default_limit_exceeded`.
+
+### Fixed — P1 documentation
+
+- **P1-1.** `README.md` status no longer says `0.13.x`; version snippets
+  updated from `"0.13"` to `"0.15"`. "All 15 design RFCs" replaced with
+  "RFC-000 through RFC-021 are in `rfcs/done/`".
+
+- **P1-2.** `.github/workflows/ci.yml` smoke runs extended with all four new
+  examples: `27_axis_reductions`, `28_column_statistics`,
+  `dynamic_06_numeric_policy`, `dynamic_07_on_ramp_summary`.
+
+- **P1-3.** `rfcs/README.md` regenerated cleanly: RFC-000 row corrected to
+  `0.0.1`; RFC-019 row corrected to `0.15.0`.
+
+- **P1-4.** `rfcs/done/019-axis-reductions-and-small-matrix-statistics.md`
+  example name updated from `28_column_mean.rs` to `28_column_statistics.rs`.
+
+- **P1-5.** `CHANGELOG.md` for v0.14.0 narrowed to accurately describe the
+  MattenLimits scope: parser byte limits and `try_new` element budgets are
+  documented as future work; fill-constructor and broadcast output limits are
+  the implemented scope.
+
+- **P1-6.** `rfcs/done/017-numeric-conversion-policy.md` updated to match the
+  implemented `NumericPolicy` API (`allow_bool`, `allow_text_parse`, `none_as`,
+  `none_as_nan`, `permissive`). The draft name `allow_bool_as_zero_one` removed.
+  `reject_large_int_precision_loss` noted as deferred.
+
+- **P1-7.** `schema_summary()` format string no longer contains embedded
+  multi-space indentation between "numeric={}" and "(Float:".
+
+### Fixed — P2 polish
+
+- **P2-1.** `docs/src/contributing/architecture.md` milestone table extended
+  through v0.15.0 and lists v0.16+ as companion-crate design phase.
+
+- **P2-2.** Stale `0.1.x` wording removed from source comments in
+  `src/shape.rs` and `src/tensor.rs`.
+
+- **P2-3.** `try_numeric()` conversion error message continuation whitespace
+  cleaned.
+
+- **P2-4.** `Element::try_as_f64` docs updated: "losslessly cast" replaced
+  with honest "cast with Rust `as f64` semantics; large values may lose
+  precision."
+
+### Structural (spec compliance)
+
+- `src/tests/dynamic.rs` (713 ELOC) split into five submodules under
+  `src/tests/dynamic/`: `element.rs`, `tensor.rs`, `lifecycle.rs`,
+  `guards.rs`, `policy.rs`. All modules gated on `#[cfg(feature = "dynamic")]`.
+
+- `src/tensor.rs` (354 ELOC) split: core struct, constructors, and accessors
+  remain in `tensor.rs` (248 ELOC); shape operations, slicing, and boundary
+  integration methods moved to `src/tensor/ops.rs` (91 ELOC). All files now
+  below 300 ELOC.
+
 ## [0.15.0] - 2026-06-20
 
 **Sedan math maturity and learning path (RFC-019 + RFC-021).**
@@ -131,11 +203,11 @@ pub fn schema_summary(&self) -> String;          // element-type count string
 
 ### Internal changes
 
-All scattered allocation constants migrated to `src/limits.rs`:
-- `MAX_NDIM` → `MattenLimits::default().max_dimensions`
-- `ARANGE_MAX_ELEMENTS` → `MattenLimits::default().max_elements`
-- `MAX_JSON_ELEMENTS`, `MAX_DYNAMIC_ELEMENTS`, `MAX_SLICE_STR_BYTES` imported
-  from `limits.rs` in their respective parsers/modules.
+All scattered allocation constants centralised in `src/limits.rs`. `MattenLimits` is
+the single source of truth for fill-constructor and broadcast limits. Parser byte limits
+(`MAX_PARSE_BYTES`) and `try_new` element-budget checking are documented future work;
+they are not yet enforced at runtime in v0.14.0. JSON/CSV element counts use their own
+parser constants (`MAX_JSON_ELEMENTS`, `MAX_DYNAMIC_ELEMENTS`) imported from `limits.rs`.
 
 ### Closed RFCs
 

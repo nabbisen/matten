@@ -203,8 +203,7 @@ impl Tensor {
                     return Err(MattenError::Unsupported {
                         operation: "try_numeric",
                         message: format!(
-                            "element at position {i} is {elem:?} and cannot be coerced to f64; \
-                         use fill_none or explicit conversion first"
+                            "element at position {i} is {elem:?} and cannot be coerced to f64; use fill_none or explicit conversion first"
                         ),
                     });
                 }
@@ -456,7 +455,7 @@ impl Tensor {
         let total = dyn_t.len;
         let convertible = n_float + n_int;
         format!(
-            "shape={:?} total={total} numeric={convertible}              (Float: {n_float}, Int: {n_int}, Bool: {n_bool}, Text: {n_text}, None: {n_none})",
+            "shape={:?} total={total} numeric={convertible} (Float: {n_float}, Int: {n_int}, Bool: {n_bool}, Text: {n_text}, None: {n_none})",
             dyn_t.shape
         )
     }

@@ -6,7 +6,7 @@
 
 use crate::error::MattenError;
 
-/// Maximum supported rank for `0.1.x`.
+/// Maximum supported rank for the current shape model.
 ///
 /// This is a DX / parser-abuse guard, not a mathematical limit: shapes are
 /// stored as `Vec<usize>`, so the cap can be relaxed by a later RFC.

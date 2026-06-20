@@ -70,7 +70,7 @@ Example:
 ```rust
 let x = raw.try_numeric_with(
     NumericPolicy::strict()
-        .allow_bool_as_zero_one()
+        .allow_bool()
         .none_as(0.0)
 )?;
 ```
@@ -279,7 +279,7 @@ The permissive example should be explicit and readable:
 
 ```rust
 let policy = NumericPolicy::strict()
-    .allow_bool_as_zero_one()
+    .allow_bool()
     .none_as(0.0);
 
 let numeric = raw.try_numeric_with(policy)?;
@@ -313,3 +313,18 @@ let numeric = raw.try_numeric_with(policy)?;
 1. Is `TextConversion::ParseAsciiFloat` too permissive for core?
 2. Should the first version expose policy enums, or only builder methods?
 3. Should `NumericPolicy` be `#[non_exhaustive]`?
+
+## Implementation notes
+
+The implemented API in v0.14.0:
+
+```rust
+NumericPolicy::strict()        // default
+NumericPolicy::permissive()    // all variants
+.allow_bool()                  // true→1.0, false→0.0
+.allow_text_parse()            // parse &str as f64
+.none_as(value)               // treat None as value
+.none_as_nan()                 // treat None as NaN
+```
+
+The `reject_large_int_precision_loss` method was not implemented. Large `Int(i64)` values are documented in `Element::try_as_f64` as using `as f64` semantics with possible precision loss.
