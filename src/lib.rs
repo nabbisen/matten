@@ -9,10 +9,10 @@
 //!
 //! # Status
 //!
-//! This is **`0.1.0-alpha.3`** (milestone M3, Broadcasting and Element-wise
-//! Operators). The full construction surface is in place: fill constructors, `from_vec`,
-//! `arange`/`try_arange`, `into_vec`, `try_from_rows`, and `From`/`TryFrom`
-//! impls. Arithmetic, reshape, slicing, and I/O arrive in later milestones.
+//! This is **`0.3.0`** (milestone M3, Broadcasting and Element-wise Operators).
+//! The full arithmetic surface is in place: binary `&Tensor op &Tensor` with
+//! NumPy-style broadcasting, all eight scalar forms, and `Neg`. Reshape,
+//! slicing, reductions, and I/O arrive in later milestones.
 //!
 //! # Quick start
 //!
@@ -72,11 +72,12 @@
 // Internal module map (each added with its owning milestone):
 //   shape       shape validation, strides, row-major index helpers (M1)
 //   convert     From/TryFrom impls and nested-row helpers (M2)
-//   ops/        element-wise + scalar operators and broadcasting (M3)
+//   ops/        element-wise + scalar operators and broadcasting (M3, here)
 //   parse/      JSON/CSV boundary parsers (M5)
 //   dynamic/    feature-gated `Element` engine (Phase 2)
 mod convert;
 mod error;
+mod ops;
 mod shape;
 mod tensor;
 

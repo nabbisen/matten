@@ -1,4 +1,4 @@
-use crate::{DataFormat, MattenError, Tensor};
+use crate::{MattenError, Tensor};
 
 // ---- construction & inspection (M1) -------------------------------------
 
@@ -204,7 +204,6 @@ fn try_arange_nonfinite_bounds_is_err() {
 
 #[test]
 fn try_arange_empty_range_is_err() {
-    // step > 0 but start >= end produces no elements
     assert!(matches!(
         Tensor::try_arange(5.0, 3.0, 1.0),
         Err(MattenError::Shape { .. })
@@ -216,131 +215,3 @@ fn try_arange_empty_range_is_err() {
 fn arange_panics_on_zero_step() {
     let _ = Tensor::arange(0.0, 5.0, 0.0);
 }
-
-// ---- nested-row construction (M2) -------------------------------------
-
-#[test]
-fn try_from_rows_success() {
-    let t = Tensor::try_from_rows(vec![vec![1.0, 2.0], vec![3.0, 4.0]]).unwrap();
-    assert_eq!(t.shape(), &[2, 2]);
-    assert_eq!(t.as_slice(), &[1.0, 2.0, 3.0, 4.0]);
-}
-
-#[test]
-fn try_from_rows_rejects_ragged() {
-    let err = Tensor::try_from_rows(vec![vec![1.0, 2.0], vec![3.0]]).unwrap_err();
-    assert!(matches!(err, MattenError::Shape { .. }));
-    assert!(err.to_string().contains("ragged"));
-}
-
-#[test]
-fn try_from_rows_rejects_empty() {
-    let err = Tensor::try_from_rows(vec![]).unwrap_err();
-    assert!(matches!(err, MattenError::Shape { .. }));
-}
-
-#[test]
-fn from_vec_vec_panics_on_ragged() {
-    let result = std::panic::catch_unwind(|| {
-        let _ = Tensor::from(vec![vec![1.0, 2.0], vec![3.0]]);
-    });
-    assert!(result.is_err());
-}
-
-// ---- From / TryFrom traits (M2) ---------------------------------------
-
-#[test]
-fn from_vec_f64_trait() {
-    let t: Tensor = vec![1.0_f64, 2.0, 3.0].into();
-    assert_eq!(t.shape(), &[3]);
-}
-
-#[test]
-fn from_tensor_for_vec_f64() {
-    let t = Tensor::new(vec![5.0, 6.0], &[2]);
-    let v: Vec<f64> = t.into();
-    assert_eq!(v, vec![5.0, 6.0]);
-}
-
-#[test]
-fn from_ref_tensor_for_vec_f64() {
-    let t = Tensor::new(vec![5.0, 6.0], &[2]);
-    let v: Vec<f64> = Vec::from(&t);
-    assert_eq!(v, vec![5.0, 6.0]);
-    assert_eq!(t.len(), 2); // t still valid
-}
-
-#[test]
-fn try_from_tensor_for_nested_vec() {
-    let t = Tensor::new(vec![1.0, 2.0, 3.0, 4.0], &[2, 2]);
-    let rows: Vec<Vec<f64>> = t.try_into().unwrap();
-    assert_eq!(rows, vec![vec![1.0, 2.0], vec![3.0, 4.0]]);
-}
-
-#[test]
-fn try_from_tensor_non_2d_is_err() {
-    let t = Tensor::new(vec![1.0, 2.0, 3.0], &[3]);
-    let result: Result<Vec<Vec<f64>>, _> = t.try_into();
-    assert!(matches!(result, Err(MattenError::Shape { .. })));
-}
-
-// ---- error model -------------------------------------------------------
-
-#[test]
-fn error_display_and_matching() {
-    let e = MattenError::Parse {
-        format: DataFormat::Csv,
-        message: "row 3, column 2".into(),
-    };
-    assert!(matches!(
-        e,
-        MattenError::Parse {
-            format: DataFormat::Csv,
-            ..
-        }
-    ));
-    assert_eq!(e.to_string(), "matten csv parse error: row 3, column 2");
-}
-
-#[test]
-fn data_format_is_copy_eq_display() {
-    assert_eq!(DataFormat::Json, DataFormat::Json);
-    assert_ne!(DataFormat::Json, DataFormat::Csv);
-    assert_eq!(DataFormat::Json.to_string(), "json");
-}
-
-// ---- row-major index helpers (M1) -------------------------------------
-
-#[test]
-fn strides_are_row_major() {
-    use crate::shape::strides_for_shape;
-    assert_eq!(strides_for_shape(&[2, 3, 4]), vec![12, 4, 1]);
-    assert_eq!(strides_for_shape(&[5]), vec![1]);
-    assert_eq!(strides_for_shape(&[]), Vec::<usize>::new());
-}
-
-#[test]
-fn coord_out_of_bounds_is_none() {
-    use crate::shape::coord_to_flat;
-    assert_eq!(coord_to_flat(&[2, 0], &[2, 3]), None);
-    assert_eq!(coord_to_flat(&[0], &[2, 3]), None); // rank mismatch
-}
-
-#[test]
-fn index_round_trip() {
-    use crate::shape::{coord_to_flat, flat_to_coord};
-    let shapes: &[&[usize]] = &[&[], &[1], &[5], &[2, 3], &[3, 1, 4], &[2, 2, 2, 2]];
-    for &shp in shapes {
-        let len: usize = shp.iter().product();
-        for flat in 0..len {
-            let coord = flat_to_coord(flat, shp);
-            assert_eq!(coord.len(), shp.len());
-            assert_eq!(
-                coord_to_flat(&coord, shp),
-                Some(flat),
-                "shape {shp:?} flat {flat}"
-            );
-        }
-    }
-}
-

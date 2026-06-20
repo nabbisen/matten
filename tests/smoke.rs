@@ -55,3 +55,26 @@ fn try_arange_bad_step() {
     assert!(Tensor::try_arange(0.0, 5.0, 0.0).is_err());
 }
 
+// ---- M3: operators and broadcasting ------------------------------------
+
+#[test]
+fn element_wise_ops_public() {
+    let a = Tensor::new(vec![1.0, 2.0, 3.0, 4.0], &[2, 2]);
+    let b = Tensor::ones(&[2, 2]);
+    let c = &a + &b;
+    assert_eq!(c.as_slice(), &[2.0, 3.0, 4.0, 5.0]);
+    let d = &a * 2.0;
+    assert_eq!(d.as_slice(), &[2.0, 4.0, 6.0, 8.0]);
+    let e = 0.0 - &a;
+    assert_eq!(e.as_slice(), &[-1.0, -2.0, -3.0, -4.0]);
+}
+
+#[test]
+fn broadcasting_feels_like_numpy() {
+    // bias addition: [2, 3] + [3] -> [2, 3]
+    let matrix = Tensor::new(vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0], &[2, 3]);
+    let bias = Tensor::new(vec![10.0, 20.0, 30.0], &[3]);
+    let result = &matrix + &bias;
+    assert_eq!(result.shape(), &[2, 3]);
+    assert_eq!(result.as_slice(), &[11.0, 22.0, 33.0, 14.0, 25.0, 36.0]);
+}

@@ -5,6 +5,27 @@ All notable changes to `matten` are documented here. The format is based on
 follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html) once it reaches
 a public API (`0.1.0`).
 
+## [0.3.0] - 2026-06-20
+
+Milestone **M3 — Broadcasting and Element-wise Operators** (RFC-006).
+
+### Added
+
+- `ops/` module directory with four sub-files:
+  - `broadcast.rs` — `broadcast_shape` helper (right-aligned NumPy rules,
+    returns `MattenError::Broadcast` on incompatible pairs) and
+    `BroadcastCtx` (precomputed zero-stride index mapping, no expanded
+    intermediates).
+  - `tensor_ops.rs` — `Add`, `Sub`, `Mul`, `Div` for `&Tensor op &Tensor`.
+  - `scalar_ops.rs` — all eight scalar forms: `&Tensor op f64` and
+    `f64 op &Tensor` (the latter is legal; `&Tensor` is local in the trait
+    parameter position and does not violate the orphan rule).
+  - `unary_ops.rs` — `Neg` for `&Tensor`.
+- Broadcasting handles scalar `[]`, missing leading axes, and `dim == 1`
+  on either side without materialising expanded copies.
+- `*` remains element-wise; matrix multiplication is RFC-010 / M6.
+- Division by zero follows IEEE 754 (`inf`/`-inf`/`NaN`); no error produced.
+
 ## [0.2.0] - 2026-06-20
 
 Milestone **M2 — Creation and Conversion APIs** (RFC-004): the full Phase 1
