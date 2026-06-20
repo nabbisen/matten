@@ -1,0 +1,9 @@
+[book]
+title = "matten"
+description = "Developer-experience-first multidimensional arrays for Rust."
+authors = ["nabbisen"]
+language = "en"
+src = "src"
+
+[output.html]
+git-repository-url = "https://github.com/nabbisen/matten"
