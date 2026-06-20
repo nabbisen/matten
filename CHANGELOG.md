@@ -5,6 +5,54 @@ All notable changes to `matten` are documented here. The format is based on
 follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html) once it reaches
 a public API (`0.1.0`).
 
+## [0.15.0] - 2026-06-20
+
+**Sedan math maturity and learning path (RFC-019 + RFC-021).**
+
+### Added — RFC-021: Tutorial Path and Example Quality Gate
+
+Four new examples:
+
+| File | Demonstrates |
+|---|---|
+| `examples/27_axis_reductions.rs` | Axis reductions and NaN propagation |
+| `examples/28_column_statistics.rs` | Per-column stats PoC pattern |
+| `examples/dynamic_06_numeric_policy.rs` | `NumericPolicy` / `try_numeric_with` |
+| `examples/dynamic_07_on_ramp_summary.rs` | Complete dynamic on-ramp lifecycle |
+
+Two new docs pages:
+
+- `docs/src/tutorial/start-here.md` — numbered learning path (Phase 1 + Phase 2)
+- `docs/src/examples/index.md` — full examples index grouped by category
+
+New mdBook sections: **Tutorial** (start-here) and **Examples** (index).
+
+CI smoke runs extended with all four new examples.
+
+`dynamic_04_numeric_coercion.rs` header updated to cross-reference
+`dynamic_06_numeric_policy.rs` for the full policy API.
+
+### Changed — RFC-019: Axis Reductions (already implemented; audit confirms compliance)
+
+`sum_axis`, `mean_axis`, `min_axis`, `max_axis` were already implemented in
+Phase 1 and verified to comply with the RFC-019 spec:
+
+- reducing an axis removes it from the output shape;
+- NaN propagates correctly via the `nan_axis_reduce` helper (has_nan vector
+  + explicit NaN injection, never relying on `f64::min`/`max` ignoring NaN);
+- dynamic tensors are rejected with a clear `matten unsupported error`.
+
+RFC-019 deferred items (`var_axis`, `std_axis`, `keepdims`) remain deferred
+as the RFC documents.
+
+### Closed RFCs
+
+- RFC-019: Axis Reductions and Small Matrix Statistics → `rfcs/done/`
+- RFC-021: Tutorial Path and Example Quality Gate → `rfcs/done/`
+
+All 22 completed RFCs (000–021) are now in `rfcs/done/`.
+5 proposed RFCs (022–026) remain in `rfcs/proposed/`.
+
 ## [0.14.0] - 2026-06-20
 
 **Dynamic on-ramp hardening (RFC-016 + RFC-017 + RFC-018).**

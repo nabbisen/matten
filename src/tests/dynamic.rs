@@ -755,10 +755,7 @@ mod numeric_policy_tests {
 
     #[test]
     fn allow_bool_converts_true_false() {
-        let t = Tensor::from_elements(
-            vec![Element::Bool(true), Element::Bool(false)],
-            &[2],
-        );
+        let t = Tensor::from_elements(vec![Element::Bool(true), Element::Bool(false)], &[2]);
         let x = t
             .try_numeric_with(NumericPolicy::default().allow_bool())
             .unwrap();
@@ -767,27 +764,25 @@ mod numeric_policy_tests {
 
     #[test]
     fn allow_text_parse_converts_numeric_strings() {
-        let t = Tensor::from_elements(vec![Element::text("3.14")], &[1]);
+        let t = Tensor::from_elements(vec![Element::text("42.5")], &[1]);
         let x = t
             .try_numeric_with(NumericPolicy::default().allow_text_parse())
             .unwrap();
-        assert!((x.as_slice()[0] - 3.14).abs() < 1e-10);
+        assert!((x.as_slice()[0] - 42.5_f64).abs() < 1e-10);
     }
 
     #[test]
     fn allow_text_parse_rejects_non_numeric_strings() {
         let t = Tensor::from_elements(vec![Element::text("hello")], &[1]);
-        assert!(t
-            .try_numeric_with(NumericPolicy::default().allow_text_parse())
-            .is_err());
+        assert!(
+            t.try_numeric_with(NumericPolicy::default().allow_text_parse())
+                .is_err()
+        );
     }
 
     #[test]
     fn none_as_nan_produces_nan() {
-        let t = Tensor::from_elements(
-            vec![Element::Float(1.0), Element::None],
-            &[2],
-        );
+        let t = Tensor::from_elements(vec![Element::Float(1.0), Element::None], &[2]);
         let x = t
             .try_numeric_with(NumericPolicy::default().none_as_nan())
             .unwrap();
@@ -813,8 +808,8 @@ mod numeric_policy_tests {
 
 #[cfg(feature = "dynamic")]
 mod inspection_tests {
-    use crate::dynamic::Element;
     use crate::Tensor;
+    use crate::dynamic::Element;
 
     fn mixed() -> Tensor {
         Tensor::from_elements(
@@ -837,10 +832,7 @@ mod inspection_tests {
 
     #[test]
     fn numeric_mask_mirrors_none_mask_for_none_only() {
-        let t = Tensor::from_elements(
-            vec![Element::Float(1.0), Element::None],
-            &[2],
-        );
+        let t = Tensor::from_elements(vec![Element::Float(1.0), Element::None], &[2]);
         let nm = t.none_mask();
         let numm = t.numeric_mask();
         // numeric_mask is 1 where none_mask is 0, for Float/Int
@@ -850,10 +842,7 @@ mod inspection_tests {
 
     #[test]
     fn is_numeric_convertible_true_for_float_int_only() {
-        let t = Tensor::from_elements(
-            vec![Element::Float(1.0), Element::Int(2)],
-            &[2],
-        );
+        let t = Tensor::from_elements(vec![Element::Float(1.0), Element::Int(2)], &[2]);
         assert!(t.is_numeric_convertible());
     }
 

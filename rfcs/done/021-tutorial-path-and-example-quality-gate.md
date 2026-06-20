@@ -1,6 +1,6 @@
 # RFC-021: Tutorial Path and Example Quality Gate
 
-**Status:** Proposed  
+**Status:** Implemented (v0.15.0)  
 **Target:** v0.15.x  
 **Theme:** Executable documentation maturity  
 **Depends on:** RFC-014, RFC-016, RFC-019, RFC-020  

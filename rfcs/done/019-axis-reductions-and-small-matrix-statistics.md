@@ -1,6 +1,6 @@
 # RFC-019: Axis Reductions and Small Matrix Statistics
 
-**Status:** Proposed  
+**Status:** Implemented (v0.14.0 (core); v0.15.0 (examples))  
 **Target:** v0.15.x  
 **Theme:** Sedan math maturity  
 **Depends on:** RFC-003, RFC-006, RFC-010, RFC-018  

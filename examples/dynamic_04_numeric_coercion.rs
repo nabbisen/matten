@@ -1,10 +1,10 @@
-//! Explicit numeric coercion policy demonstration.
+//! Numeric coercion at the `Element` level and the `NumericPolicy` overview.
 //!
 //! Run: cargo run --example dynamic_04_numeric_coercion --features dynamic
 //!
-//! matten does NOT silently coerce Bool, Text, or None to numbers.
-//! Coercion must be explicit. This example shows the policy and how to
-//! work within it.
+//! `matten` does not silently coerce `Bool`, `Text`, or `None` to numbers.
+//! Use `try_numeric_with(NumericPolicy::...)` for explicit policy control.
+//! See also: `examples/dynamic_06_numeric_policy.rs` for the full policy API.
 
 #[cfg(not(feature = "dynamic"))]
 fn main() {
