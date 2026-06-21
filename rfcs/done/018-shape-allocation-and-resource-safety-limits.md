@@ -1,6 +1,6 @@
 # RFC-018: Shape, Allocation, and Resource Safety Limits
 
-**Status:** Implemented (v0.14.0)  
+**Status:** Implemented (v0.14.0) — see Implementation notes for scope  
 **Target:** v0.14.x  
 **Theme:** Safety and availability  
 **Depends on:** RFC-001, RFC-003, RFC-004, RFC-006, RFC-009  
@@ -321,3 +321,24 @@ assert!(result.is_err());
 1. What default `max_elements` is appropriate for a PoC crate?
 2. Should limits be global, per-call only, or both?
 3. Should parser byte limits be part of core limits or feature-specific parser config?
+
+
+## Implementation notes (v0.14.0–v0.15.1)
+
+### Implemented subset
+
+- `MattenLimits` struct with `max_dimensions`, `max_elements`, `max_parse_bytes`.
+- `try_zeros`, `try_ones`, `try_full` — budget-checked fill constructors.
+- `try_zeros_with_limits`, `try_ones_with_limits`, `try_full_with_limits` — explicit-limits variants.
+- Panicking `zeros`, `ones`, `full` now delegate to `try_zeros`/`try_ones`/`try_full`.
+- Broadcast output element count checked before allocation.
+- `arange` bounded by `MattenLimits::default().max_elements`.
+
+### Deferred (not yet implemented)
+
+- `try_new_with_limits` — `try_new` does not enforce `max_elements`.
+- `from_json_with_limits` / `from_csv_with_limits` — parsers use separate constants.
+- `MattenLimits::max_parse_bytes` — public field; not yet enforced by parsers.
+  Users embedding `matten` in boundary-facing services should note this field
+  exists as a future extension point but does not currently limit parser input size.
+- Dynamic element budget through `MattenLimits` — `try_from_elements` does not check `max_elements`.

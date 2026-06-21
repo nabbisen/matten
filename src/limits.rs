@@ -54,11 +54,20 @@ pub(crate) const MAX_PARSE_BYTES: usize = 128 * 1024 * 1024; // 128 MiB
 pub struct MattenLimits {
     /// Maximum number of axes (rank). Default: 8.
     pub max_dimensions: usize,
-    /// Maximum number of elements any constructor or parser may allocate.
+    /// Maximum number of elements any fill constructor or broadcast output may allocate.
     /// Default: 1 048 576 (~1 M, ~8 MiB for f64).
+    ///
+    /// Note: a 2048×2048 matrix has ~4 M elements and exceeds this default.
+    /// This is an intentionally conservative safety-first default for PoC use.
+    /// Use `try_zeros_with_limits` with a custom `MattenLimits` for larger tensors,
+    /// or use the panicking `zeros`/`ones`/`full` only when you know the shape is safe.
     pub max_elements: usize,
-    /// Maximum number of bytes a JSON or CSV parser will accept before
-    /// rejecting the input. Default: 128 MiB.
+    /// Maximum number of bytes a JSON or CSV parser may accept.
+    /// Default: 128 MiB.
+    ///
+    /// **Note:** this field is a future extension point. The current
+    /// parsers (`from_json`, `from_csv`, etc.) do not yet enforce this
+    /// limit at runtime. See RFC-018 implementation notes.
     pub max_parse_bytes: usize,
 }
 

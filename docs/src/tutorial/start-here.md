@@ -29,7 +29,7 @@ If your input has missing values, mixed types, or dirty CSV/JSON:
 | 1 | `cargo run --example dynamic_00_quickstart --features dynamic,json,csv` | Dynamic lifecycle |
 | 2 | `cargo run --example dynamic_02_missing_values --features dynamic,csv` | Missing values |
 | 3 | `cargo run --example dynamic_05_dirty_csv_cleanup --features dynamic,csv` | Dirty CSV |
-| 4 | `cargo run --example dynamic_07_on_ramp_summary --features dynamic,csv` | Full on-ramp |
+| 4 | `cargo run --example dynamic_07_on_ramp_summary --features dynamic` | Full on-ramp |
 | 5 | `cargo run --example dynamic_06_numeric_policy --features dynamic` | Conversion policy |
 
 ## The lifecycle rule

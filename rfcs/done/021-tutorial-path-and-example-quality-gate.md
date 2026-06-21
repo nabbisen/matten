@@ -163,11 +163,11 @@ Required additions or updates:
 
 ```text
 examples/27_axis_reductions.rs
-examples/28_column_mean.rs
-examples/29_row_scores.rs
-examples/dynamic_06_numeric_mask.rs
-examples/dynamic_07_on_ramp_to_matmul.rs
-examples/14_readable_errors.rs
+examples/28_column_statistics.rs
+# examples/29_row_scores.rs  [DEFERRED — not yet implemented]
+examples/dynamic_06_numeric_policy.rs
+examples/dynamic_07_on_ramp_summary.rs
+# examples/14_readable_errors.rs  [DEFERRED]
 ```
 
 Tutorial docs should reference existing examples rather than duplicate all code.

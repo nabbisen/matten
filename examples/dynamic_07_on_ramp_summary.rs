@@ -1,6 +1,6 @@
 //! The complete dynamic-to-numeric on-ramp workflow.
 //!
-//! Run: cargo run --example dynamic_07_on_ramp_summary --features dynamic,csv
+//! Run: cargo run --example dynamic_07_on_ramp_summary --features dynamic
 //!
 //! This example shows the recommended lifecycle for messy data:
 //!

@@ -5,6 +5,85 @@ All notable changes to `matten` are documented here. The format is based on
 follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html) once it reaches
 a public API (`0.1.0`).
 
+## [0.15.2] - 2026-06-20
+
+**Spec/CI reconciliation patch (all v0.15.1 review findings addressed).**
+
+### Fixed — code
+
+- **PR-4 / minor note.** `Tensor::zeros` no longer redundantly calls
+  `MattenLimits::default().check_shape` before `try_zeros` — `try_zeros`
+  already calls it. Now matches the simpler `ones`/`full` pattern.
+
+- **PR-4.** `arange` now reads its element budget through
+  `MattenLimits::default().max_elements` directly instead of the
+  `ARANGE_MAX_ELEMENTS` alias (same value, but now a single source of truth).
+
+- **P2-5.** `flatten_rectangular` in `src/convert.rs` uses `checked_mul`
+  for the `row_count × col_count` capacity calculation, consistent with the
+  resource-safety theme.
+
+### Fixed — CI and examples
+
+- **P1-1.** `.github/workflows/ci.yml` smoke runs now include all four new
+  examples: `13_resource_limits`, `27_axis_reductions`, `28_column_statistics`,
+  `dynamic_06_numeric_policy --features dynamic`,
+  `dynamic_07_on_ramp_summary --features dynamic`.
+
+- **P2-4.** `dynamic_07_on_ramp_summary.rs` run header corrected from
+  `--features dynamic,csv` to `--features dynamic` (the example uses
+  `from_elements`, not `from_csv_dynamic`). Same fix in `examples/index.md`
+  and `tutorial/start-here.md`.
+
+- **P2-1.** `examples/13_resource_limits.rs` added — demonstrates
+  `MattenLimits`, `try_zeros`/`try_ones`/`try_full`, custom limit enforcement,
+  and the panicking fill constructors. Added to examples index and CI smoke.
+
+### Fixed — RFC and spec reconciliation
+
+- **P1-2.** `rfcs/done/018-shape-allocation-and-resource-safety-limits.md`
+  updated with an explicit "Implementation notes" section listing implemented
+  vs deferred scope. Unimplemented APIs (`try_new_with_limits`,
+  `from_json_with_limits`, `from_csv_with_limits`) are now clearly marked
+  DEFERRED. `max_parse_bytes` noted as a future extension point.
+
+- **P1-3.** `src/limits.rs` `max_parse_bytes` field doc updated to state
+  explicitly that the parsers do not yet enforce this limit at runtime.
+
+- **PR-2.** `src/limits.rs` `max_elements` field doc documents the
+  intentionally conservative `1<<20` default and explains the 2048×2048 case
+  (4 M elements) exceeds it.
+
+- **P1-4 / RFC-017.** All remaining stale draft method names removed from
+  `rfcs/done/017-numeric-conversion-policy.md`:
+  `allow_bool_as_zero_one` → `allow_bool`,
+  `parse_ascii_float_text` → `allow_text_parse`,
+  `reject_large_int_precision_loss` marked DEFERRED.
+
+- **P1-5 / RFC-021.** All stale draft example names fixed in
+  `rfcs/done/021-tutorial-path-and-example-quality-gate.md`:
+  `28_column_mean.rs` → `28_column_statistics.rs`,
+  `dynamic_06_numeric_mask.rs` → `dynamic_06_numeric_policy.rs`,
+  `dynamic_07_on_ramp_to_matmul.rs` → `dynamic_07_on_ramp_summary.rs`,
+  `29_row_scores.rs` and `14_readable_errors.rs` marked DEFERRED.
+
+### Fixed — architecture documentation
+
+- **PR-3.** `docs/src/contributing/architecture.md` completely updated:
+  - Source layout extended to include `tensor/ops.rs`, `limits.rs`,
+    `tests/math.rs`, and the `tests/dynamic/` submodule tree.
+  - Public re-exports section updated to the actual v0.15.x root exports
+    (`MattenLimits`, `SliceBuilder`, `Element`, `NumericPolicy`, hidden plumbing).
+  - Milestone table extended from `0.6.0` through `0.15.x` and `0.16+`.
+
+### Reviewer's residue scan result
+
+```
+RFC-017 stale names:              CLEAN
+RFC-021 stale names:              CLEAN
+architecture.md Phase 2 stale:   CLEAN
+```
+
 ## [0.15.1] - 2026-06-20
 
 **Review hardening patch (v0.15.0 architect review, all findings addressed).**

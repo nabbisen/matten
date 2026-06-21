@@ -11,8 +11,7 @@ use std::fmt;
 
 /// Maximum element count accepted by `arange` / `try_arange` before the
 /// allocation limit fires. Set conservatively for Phase 1.
-// ARANGE_MAX_ELEMENTS is defined in crate::limits::MAX_ELEMENTS.
-use crate::limits::MAX_ELEMENTS as ARANGE_MAX_ELEMENTS;
+use crate::limits::MattenLimits;
 
 /// A dense, row-major, owned multidimensional array of `f64`.
 ///
@@ -165,9 +164,6 @@ impl Tensor {
     /// ```
     #[must_use]
     pub fn zeros(shape: &[usize]) -> Tensor {
-        crate::limits::MattenLimits::default()
-            .check_shape(shape, "zeros")
-            .unwrap_or_else(|e| panic!("{e}"));
         Self::try_zeros(shape).unwrap_or_else(|e| panic!("{e}"))
     }
 
@@ -413,12 +409,13 @@ fn arange_impl(
     let raw_count = ((end - start) / step).ceil();
     let count: usize = if raw_count <= 0.0 {
         0
-    } else if raw_count > ARANGE_MAX_ELEMENTS as f64 {
+    } else if raw_count > MattenLimits::default().max_elements as f64 {
         return Err(MattenError::Allocation {
             requested_elements: raw_count as usize,
             message: format!(
                 "arange would produce ~{} elements, exceeding the limit of {}",
-                raw_count as usize, ARANGE_MAX_ELEMENTS
+                raw_count as usize,
+                MattenLimits::default().max_elements
             ),
         });
     } else {
@@ -438,10 +435,13 @@ fn arange_impl(
         data.push(v);
         i += 1;
         // Guard against the estimate being too small (floating-point edge).
-        if i > ARANGE_MAX_ELEMENTS {
+        if i > MattenLimits::default().max_elements {
             return Err(MattenError::Allocation {
                 requested_elements: i,
-                message: format!("arange exceeded the element limit of {ARANGE_MAX_ELEMENTS}"),
+                message: format!(
+                    "arange exceeded the element limit of {}",
+                    MattenLimits::default().max_elements
+                ),
             });
         }
     }

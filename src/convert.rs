@@ -129,7 +129,16 @@ pub(crate) fn flatten_rectangular(
             message: "rows must have at least one column (zero-sized dimensions are not supported in the current matten shape model)".into(),
         });
     }
-    let mut flat = Vec::with_capacity(row_count * col_count);
+    let capacity =
+        row_count
+            .checked_mul(col_count)
+            .ok_or_else(|| crate::MattenError::Allocation {
+                requested_elements: usize::MAX,
+                message: format!(
+                    "flatten_rectangular: {row_count} × {col_count} rows overflows usize"
+                ),
+            })?;
+    let mut flat = Vec::with_capacity(capacity);
     for (i, row) in rows.into_iter().enumerate() {
         if row.len() != col_count {
             return Err(MattenError::Shape {

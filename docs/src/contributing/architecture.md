@@ -7,7 +7,10 @@ src/
   lib.rs          crate root: public re-exports, #![forbid(unsafe_code)]
   error.rs        MattenError + DataFormat (RFC-005)
   shape.rs        validate_shape, strides, coord↔flat helpers (RFC-003)
-  tensor.rs       Tensor struct + all impl Tensor blocks
+  tensor.rs       Tensor struct, constructors, accessors, arange
+  tensor/
+    ops.rs        shape ops, slicing, boundary APIs (split per 300-ELOC rule)
+  limits.rs       MattenLimits — single source of truth for allocation budgets
   convert.rs      From/TryFrom trait impls (RFC-004)
   reshape.rs      permute_axes, reshape helpers (RFC-007)
   slice.rs        SliceSpec, SliceBuilder, slice_str parser (RFC-008)
@@ -21,13 +24,21 @@ src/
     unary_ops.rs  Neg
   tests.rs        test module root
   tests/
-    tensor.rs     construction, shape validation, fill ctors, arange
+    tensor.rs     construction, shape validation, fill ctors, arange, limits
     convert.rs    From/TryFrom
     error.rs      MattenError / DataFormat model
     shape.rs      row-major index helpers
     ops.rs        broadcasting, scalar ops
     reshape.rs    reshape/flatten/transpose/swap_axes/get
     slice.rs      SliceBuilder, slice_str
+    math.rs       reductions, axis reductions, matmul, NaN policy
+    dynamic.rs    dynamic test dispatcher
+    dynamic/
+      element.rs  Element model tests
+      tensor.rs   dynamic construction, JSON, CSV
+      lifecycle.rs storage, utility, is_none_mask, lifecycle
+      guards.rs   accessor guards, diagnostics
+      policy.rs   NumericPolicy, inspection helpers
 ```
 
 Module style: `foo.rs` + `foo/` coexistence (Rust 2018+). No `mod.rs` files.
@@ -35,10 +46,18 @@ Module style: `foo.rs` + `foo/` coexistence (Rust 2018+). No `mod.rs` files.
 ## Public re-exports
 
 ```rust
+// Phase 1 — always available:
 pub use crate::error::{DataFormat, MattenError};
+pub use crate::limits::MattenLimits;
+pub use crate::slice::SliceBuilder;
 pub use crate::tensor::Tensor;
-// SliceBuilder is pub and reachable via Tensor::slice() return type;
-// users never need to name it in imports.
+
+// Phase 2 — under #[cfg(feature = "dynamic")]:
+pub use crate::dynamic::Element;
+pub use crate::dynamic::NumericPolicy;
+
+// Hidden compiler-visibility plumbing (sealed trait chain):
+#[doc(hidden)] pub use crate::slice::{IntoSliceRange, SliceConvert, SliceSpecRepr};
 ```
 
 ## Cargo feature matrix
@@ -75,15 +94,20 @@ is off by default.
 
 ## Milestone sequence
 
-| Version | Milestone | Content |
+| Version | RFC(s) | Content |
 |---|---|---|
-| 0.0.1 | M0 | Crate skeleton, `MattenError`/`DataFormat` surface |
-| 0.1.0 | M1 | Core Tensor Contract: shape model, scalar/vector/matrix, index helpers |
-| 0.2.0 | M2 | Construction & Conversion: fill ctors, `arange`, `From`/`TryFrom` |
-| 0.3.0 | M3 | Broadcasting & Operators: `Add`/`Sub`/`Mul`/`Div`/`Neg`, scalar forms |
-| 0.4.0 | M4 | Shape Operations & Slicing: reshape, transpose, `SliceBuilder`, `slice_str` |
-| 0.5.0 | M5 | Boundary Integration: serde, `from_json`/`load_json`, `from_csv`/`load_csv` |
-| 0.6.0 | M6 | Example suite (RFC-014), CI gates, `cargo check --examples` in CI |
-
-Phase 2 (dynamic `Element` engine, CoW storage) follows as a separate feature
-track gated behind `--features dynamic`.
+| 0.0.1 | — | M0: crate skeleton, `MattenError`/`DataFormat` |
+| 0.1.0 | RFC-001–005 | M1: Tensor contract, shape model, scalar/vector/matrix |
+| 0.2.0 | RFC-004 | M2: construction, `arange`, `From`/`TryFrom` |
+| 0.3.0 | RFC-006 | M3: broadcasting, `Add`/`Sub`/`Mul`/`Div`/`Neg` |
+| 0.4.0 | RFC-007/008 | M4: reshape, transpose, `SliceBuilder`, `slice_str` |
+| 0.5.0 | RFC-009 | M5: serde, `from_json`, `from_csv` |
+| 0.6.0–0.7.0 | RFC-010/014 | M6: reductions, matmul, examples, CI gates |
+| 0.8.0 | RFC-011/012 | Phase 2 alpha: `Element`, CoW `DynamicTensor`, dynamic JSON/CSV |
+| 0.9.0 | RFC-013 | Dynamic hardening: `min_axis`/`max_axis`, missing-value helpers |
+| 0.10.0–0.11.0 | — | Stabilization, post-audit, `get_flat`, NumPy fixtures |
+| 0.12.0–0.13.2 | — | Dynamic lifecycle hardening; accessor guards; sealed slice traits |
+| 0.13.3 | RFC-015/020 | API stabilization, release checklist, diagnostics |
+| 0.14.0 | RFC-016/017/018 | Dynamic on-ramp: `NumericPolicy`, `MattenLimits`, `try_zeros`/`try_ones`/`try_full` |
+| 0.15.0–0.15.1 | RFC-019/021 | Axis reductions, tutorial/example path, file splits |
+| 0.16+ | RFC-022–026 | Companion-crate design phase (design-only RFCs) |

@@ -194,10 +194,10 @@ impl Tensor {
 #[cfg(feature = "dynamic")]
 impl NumericPolicy {
     pub fn strict() -> Self;
-    pub fn allow_bool_as_zero_one(self) -> Self;
+    pub fn allow_bool(self) -> Self;
     pub fn none_as(self, value: f64) -> Self;
-    pub fn parse_ascii_float_text(self) -> Self;
-    pub fn reject_large_int_precision_loss(self) -> Self;
+    pub fn allow_text_parse(self) -> Self;
+    // reject_large_int_precision_loss — DEFERRED (see implementation notes)
 }
 ```
 
@@ -244,7 +244,7 @@ Tensor::try_new(out, self.shape())
 
 Default should allow this but document it.
 
-`reject_large_int_precision_loss` should reject values where roundtrip is not exact:
+**Deferred:** `reject_large_int_precision_loss` — rejected values where roundtrip is not exact:
 
 ```rust
 let f = i as f64;

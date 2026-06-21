@@ -21,6 +21,7 @@ These examples demonstrate the default `matten` API. No extra features required.
 | `10_json_roundtrip.rs` | JSON serialization round-trip |
 | `11_csv_numeric_loading.rs` | Numeric CSV loading |
 | `12_boundary_error_handling.rs` | Handling errors at data boundaries |
+| `13_resource_limits.rs` | `MattenLimits`, `try_zeros`/`try_ones`/`try_full` |
 
 ## Math examples
 
@@ -64,7 +65,7 @@ These require the `dynamic` feature for heterogeneous data ingestion.
 | `dynamic_04_numeric_coercion.rs` | `dynamic` | Element-level coercion |
 | `dynamic_05_dirty_csv_cleanup.rs` | `dynamic,csv` | Real-world CSV cleanup |
 | `dynamic_06_numeric_policy.rs` | `dynamic` | `NumericPolicy` API |
-| `dynamic_07_on_ramp_summary.rs` | `dynamic,csv` | Complete on-ramp workflow |
+| `dynamic_07_on_ramp_summary.rs` | `dynamic` | Complete on-ramp workflow |
 
 ## Running examples
 
