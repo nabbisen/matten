@@ -1,3 +1,4 @@
+#[cfg(any(feature = "json", feature = "csv"))]
 use crate::{MattenError, Tensor};
 
 // ---- serde round-trip ---------------------------------------------------

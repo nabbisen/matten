@@ -2,16 +2,19 @@
 
 ## Public API contract
 
-`matten` exports four public names from the crate root:
+`matten` exports the following public names from the crate root:
 
 ```rust
 use matten::Tensor;                  // always
 use matten::{MattenError, DataFormat}; // always
+use matten::MattenLimits;            // always (RFC-018)
+use matten::SliceBuilder;            // always; returned by Tensor::slice()
 use matten::Element;                 // #[cfg(feature = "dynamic")]
+use matten::NumericPolicy;           // #[cfg(feature = "dynamic")] (RFC-017)
 ```
 
 `SliceBuilder` is returned by `Tensor::slice()` and is held by value; users
-do not need to import it by name.
+do not need to import it by name in the common case.
 
 `IntoSliceRange` and `SliceConvert` are hidden implementation plumbing for
 `SliceBuilder::range`. They are exported `#[doc(hidden)]` and use a private

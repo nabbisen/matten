@@ -20,7 +20,7 @@ pub(crate) const MAX_ELEMENTS: usize = 1 << 20; // ~1 M elements / ~8 MiB f64
 pub(crate) const MAX_JSON_ELEMENTS: usize = 1 << 24; // 16 M — generous PoC bound
 
 /// Maximum number of elements the dynamic JSON parser will accept.
-#[cfg(feature = "dynamic")]
+#[cfg(all(feature = "dynamic", feature = "json"))]
 pub(crate) const MAX_DYNAMIC_ELEMENTS: usize = 1 << 24;
 
 /// Maximum byte length accepted by the `slice_str` parser.

@@ -5,6 +5,62 @@ All notable changes to `matten` are documented here. The format is based on
 follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html) once it reaches
 a public API (`0.1.0`).
 
+## [0.15.3] - 2026-06-21
+
+**Polish patch — five post-review improvements (no behaviour changes).**
+
+### Fixed — compiler warnings
+
+- `src/limits.rs`: `MAX_DYNAMIC_ELEMENTS` is now gated on
+  `#[cfg(all(feature = "dynamic", feature = "json"))]` to match its sole
+  consumer (`src/dynamic/parse/json.rs`), which is already gated on both
+  features. Previously this constant appeared dead — and triggered a
+  `dead_code` warning — when `dynamic` was enabled without `json`.
+
+- `src/tests/parse.rs`: the `use crate::{MattenError, Tensor}` import is now
+  gated on `#[cfg(any(feature = "json", feature = "csv"))]` to match the
+  tests that consume it. Previously it triggered an `unused_imports` warning
+  under `--no-default-features --features dynamic`.
+
+Both combinations now pass `cargo clippy -- -D warnings` cleanly.
+
+### Fixed — CI coverage
+
+- `.github/workflows/ci.yml`: the `check` job now runs three `clippy` passes
+  instead of one: `--all-features`, `--no-default-features`, and
+  `--no-default-features --features dynamic`. This ensures that warnings in
+  non-default feature combinations are caught by CI with `-D warnings`, not
+  only discovered during manual sweeps.
+
+### Fixed — live doctests
+
+- `src/dynamic/element.rs`: all five `Element` method doctests were annotated
+  `ignore` even though they are valid under `--features dynamic` (the file
+  itself is `#[cfg(feature = "dynamic")]`). Replaced all five `\`\`\`ignore`
+  fences with plain `\`\`\`rust`. The doctest count under `--all-features`
+  rises from 52 to 57; all pass.
+
+### Fixed — stale scaffolding in error.rs
+
+- Removed the `#[allow(dead_code)]` attributes and their M0-scaffold
+  "wired up as features land" comments from `MattenError` and `DataFormat`.
+  All variants have been constructed since v0.5.0; the allows were stale and
+  misleading.
+
+### Fixed — documentation drift
+
+- `rfcs/README.md`: the "Shipped in" column for RFCs 001–014 and 020 was
+  showing "—". Backfilled with the versions recorded in the RFC files'
+  own `> RFC status:` lines (001 → 0.9.0, 002/003/005 → 0.1.0, 004 → 0.2.0,
+  006 → 0.3.0, 007/008 → 0.4.0, 009 → 0.5.0, 013/014 → 0.6.0, 010 → 0.7.0,
+  011/012 → 0.8.0, 020 → 0.13.3).
+
+- `docs/src/reference/compatibility.md`: the opening sentence described
+  "four public names" while the actual root exports include `MattenLimits`,
+  `SliceBuilder`, and (under `dynamic`) `NumericPolicy` in addition to the
+  four previously listed. Updated the listing to enumerate all six public
+  exports accurately.
+
 ## [0.15.2] - 2026-06-20
 
 **Spec/CI reconciliation patch (all v0.15.1 review findings addressed).**

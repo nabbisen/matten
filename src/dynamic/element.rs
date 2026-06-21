@@ -51,7 +51,7 @@ impl Element {
 
     /// Creates a `Text` element from any `&str` or `String`.
     ///
-    /// ```ignore
+    /// ```
     /// use matten::Element;
     /// let e = Element::text("hello");
     /// assert_eq!(e.as_text(), Some("hello"));
@@ -64,7 +64,7 @@ impl Element {
 
     /// Returns `true` for `Element::None`.
     ///
-    /// ```ignore
+    /// ```
     /// use matten::Element;
     /// assert!(Element::None.is_none());
     /// assert!(!Element::Float(1.0).is_none());
@@ -75,7 +75,7 @@ impl Element {
 
     /// Returns `true` for `Float` or `Int` (numerically coercible) variants.
     ///
-    /// ```ignore
+    /// ```
     /// use matten::Element;
     /// assert!(Element::Float(1.0).is_numeric());
     /// assert!(Element::Int(42).is_numeric());
@@ -95,7 +95,7 @@ impl Element {
     /// `Int(i64)` is losslessly cast to `f64` unless the value cannot be
     /// exactly represented (values with magnitude > 2⁵³ may lose precision).
     ///
-    /// ```ignore
+    /// ```
     /// use matten::Element;
     /// assert_eq!(Element::Float(1.5).try_as_f64(), Some(1.5));
     /// assert_eq!(Element::Int(42).try_as_f64(), Some(42.0));
@@ -112,7 +112,7 @@ impl Element {
 
     /// Returns the text content if this element is `Text`, otherwise `None`.
     ///
-    /// ```ignore
+    /// ```
     /// use matten::Element;
     /// assert_eq!(Element::text("hello").as_text(), Some("hello"));
     /// assert_eq!(Element::Float(1.0).as_text(), None);

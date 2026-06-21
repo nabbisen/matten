@@ -18,12 +18,6 @@ use std::fmt;
 /// The variant set is canonical (RFC-005). It derives only `Debug`; it is not
 /// `Clone`, `PartialEq`, or `Eq`. Tests should match by variant, e.g.
 /// `matches!(err, MattenError::Shape { .. })`.
-//
-// M0 scaffold: only `Shape` and `Allocation` are constructed so far. The
-// remaining variants are part of the stable public surface from day one and
-// are wired up as their owning features land (M1-M5). The allow is removed once
-// every variant has a constructor.
-#[allow(dead_code)]
 #[derive(Debug)]
 #[non_exhaustive]
 pub enum MattenError {
@@ -129,9 +123,6 @@ impl std::error::Error for MattenError {
 /// This is a sanctioned public root export because it appears in the public
 /// error type. It is `#[non_exhaustive]` so that future formats can be added
 /// without a breaking change.
-//
-// M0 scaffold: variants are constructed once JSON/CSV parsing lands (M5).
-#[allow(dead_code)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[non_exhaustive]
 pub enum DataFormat {
