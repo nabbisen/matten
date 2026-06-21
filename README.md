@@ -19,6 +19,7 @@ small and dependency-light.
 |---|---|---|---|
 | [`matten`](./crates/matten) | 0.16.0 | stable (v0.x) | The core `f64` tensor library: construction, shape ops, broadcasting, slicing, reductions, matmul, JSON/CSV boundary APIs, and an optional `dynamic` ingestion on-ramp. |
 | [`matten-ndarray`](./crates/matten-ndarray) | 0.1.0 | experimental | Conversion bridge between `matten::Tensor` and `ndarray::ArrayD<f64>`. |
+| [`matten-mlprep`](./crates/matten-mlprep) | 0.1.0 | experimental | Transparent, deterministic preprocessing helpers (standardize, min-max scale, bias column, train/test split). |
 
 Companion crates use **independent SemVer** (RFC-022): a core `matten` version
 does not imply any companion's maturity.

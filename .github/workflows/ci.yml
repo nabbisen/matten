@@ -60,6 +60,16 @@ jobs:
       - run: cargo test -p matten-ndarray --features dynamic
       - run: cargo test -p matten-ndarray --doc
 
+  mlprep:
+    name: matten-mlprep
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo test -p matten-mlprep
+      - run: cargo test -p matten-mlprep --features dynamic
+      - run: cargo test -p matten-mlprep --doc
+
   msrv:
     name: MSRV 1.85
     runs-on: ubuntu-latest
@@ -94,3 +104,8 @@ jobs:
       # matten-ndarray
       - run: cargo run -p matten-ndarray --example to_arrayd
       - run: cargo run -p matten-ndarray --example from_arrayd
+      # matten-mlprep
+      - run: cargo run -p matten-mlprep --example mlprep_standardize_columns
+      - run: cargo run -p matten-mlprep --example mlprep_minmax_scale
+      - run: cargo run -p matten-mlprep --example mlprep_add_bias_column
+      - run: cargo run -p matten-mlprep --example mlprep_train_test_split

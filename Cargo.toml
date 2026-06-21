@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["crates/matten", "crates/matten-ndarray"]
+members = ["crates/matten", "crates/matten-ndarray", "crates/matten-mlprep"]
 
 # Shared package metadata, inherited by member crates via `field.workspace = true`.
 [workspace.package]
@@ -13,5 +13,5 @@ repository = "https://github.com/nabbisen/matten"
 # Core `matten` is path-published; companions depend on it by path + version so
 # they resolve locally in the workspace and by version on crates.io.
 [workspace.dependencies]
-matten = { version = "0.17", path = "crates/matten" }
+matten = { version = "0.18", path = "crates/matten" }
 ndarray = "0.16"

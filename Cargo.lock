@@ -47,11 +47,18 @@ dependencies = [
 
 [[package]]
 name = "matten"
-version = "0.17.0"
+version = "0.18.0"
 dependencies = [
  "csv",
  "serde",
  "serde_json",
+]
+
+[[package]]
+name = "matten-mlprep"
+version = "0.1.0"
+dependencies = [
+ "matten",
 ]
 
 [[package]]

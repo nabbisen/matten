@@ -5,7 +5,7 @@
 **Document Version:** `1.0.0`  
 **Date:** 2026-06-21  
 **Status:** First canonical issue — v0.16+ companion-crate reconciliation  
-**Planning Baseline:** core `matten` completed RFC-015 through RFC-021 (shipped through v0.15.3); RFC-022 boundary confirmation shipped in v0.16.0; the v0.17.0 milestone introduces the Cargo workspace and `matten-ndarray` 0.1.0 (RFC-025, RFC-027).
+**Planning Baseline:** core `matten` completed RFC-015 through RFC-021 (shipped through v0.15.3); RFC-022 boundary confirmation shipped in v0.16.0; v0.17.0 introduced the Cargo workspace and `matten-ndarray` 0.1.0 (RFC-025, RFC-027); v0.18.0 added `matten-mlprep` 0.1.0 (RFC-024, RFC-028). Next: v0.19.0 companion maturity hardening.
 
 ---
 

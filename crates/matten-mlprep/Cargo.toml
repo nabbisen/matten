@@ -1,0 +1,38 @@
+[package]
+name = "matten-mlprep"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Small, transparent, deterministic preprocessing helpers for matten::Tensor (no ML framework)."
+readme = "README.md"
+keywords = ["tensor", "preprocessing", "standardize", "matten", "ml"]
+categories = ["science", "mathematics"]
+
+[dependencies]
+matten = { path = "../matten", version = "0.18", default-features = false }
+
+[features]
+# Forwarded so dynamic-tensor rejection compiles only when dynamic tensors exist.
+dynamic = ["matten/dynamic"]
+
+# Namespaced example target names avoid a binary-name collision with core
+# matten's same-named pattern examples when the whole workspace is built at once.
+# (File names keep the RFC-024 §9 names; only the compiled target name changes.)
+[[example]]
+name = "mlprep_standardize_columns"
+path = "examples/standardize_columns.rs"
+
+[[example]]
+name = "mlprep_minmax_scale"
+path = "examples/minmax_scale.rs"
+
+[[example]]
+name = "mlprep_add_bias_column"
+path = "examples/add_bias_column.rs"
+
+[[example]]
+name = "mlprep_train_test_split"
+path = "examples/train_test_split.rs"
