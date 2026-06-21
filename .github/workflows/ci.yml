@@ -10,7 +10,7 @@ env:
 
 jobs:
   check:
-    name: fmt / clippy / test
+    name: fmt / clippy / test (workspace)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,45 +21,44 @@ jobs:
         run: cargo fmt --all --check
       - name: Core dependency boundary (RFC-022)
         run: bash scripts/check-core-dependency-boundary.sh
-      - name: Clippy (all features)
-        run: cargo clippy --all-targets --all-features -- -D warnings
-      - name: Clippy (no-default-features)
-        run: cargo clippy --all-targets --no-default-features -- -D warnings
-      - name: Clippy (dynamic only)
-        run: cargo clippy --all-targets --no-default-features --features dynamic -- -D warnings
-      - name: Test (default profile)
-        run: cargo test --all-targets
-      - name: Doctests
-        run: cargo test --doc
-      - name: Check examples compile
-        run: cargo check --examples
-      - name: Test examples
-        run: cargo test --examples
+      - name: Clippy (workspace, all features)
+        run: cargo clippy --workspace --all-targets --all-features -- -D warnings
+      - name: Clippy core (no-default-features)
+        run: cargo clippy -p matten --all-targets --no-default-features -- -D warnings
+      - name: Clippy core (dynamic only)
+        run: cargo clippy -p matten --all-targets --no-default-features --features dynamic -- -D warnings
+      - name: Test (workspace)
+        run: cargo test --workspace --all-targets
+      - name: Doctests (workspace)
+        run: cargo test --workspace --doc
+      - name: Check examples compile (workspace)
+        run: cargo check --workspace --examples --all-features
 
-  features:
-    name: feature profiles
+  core-features:
+    name: core feature profiles
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
-      - name: Lean core
-        run: cargo test --no-default-features
-      - name: serde isolated
-        run: cargo test --no-default-features --features serde
-      - name: json isolated
-        run: cargo test --no-default-features --features json
-      - name: csv isolated
-        run: cargo test --no-default-features --features csv
-      - name: dynamic isolated
-        run: cargo test --no-default-features --features dynamic
-      - name: dynamic+json+csv
-        run: cargo test --no-default-features --features dynamic,json,csv
-      - name: dynamic+json isolated
-        run: cargo test --no-default-features --features dynamic,json
-      - name: dynamic+csv isolated
-        run: cargo test --no-default-features --features dynamic,csv
-      - name: All features
-        run: cargo test --all-features
+      - run: cargo test -p matten --no-default-features
+      - run: cargo test -p matten --no-default-features --features serde
+      - run: cargo test -p matten --no-default-features --features json
+      - run: cargo test -p matten --no-default-features --features csv
+      - run: cargo test -p matten --no-default-features --features dynamic
+      - run: cargo test -p matten --no-default-features --features dynamic,json
+      - run: cargo test -p matten --no-default-features --features dynamic,csv
+      - run: cargo test -p matten --no-default-features --features dynamic,json,csv
+      - run: cargo test -p matten --all-features
+
+  bridge:
+    name: matten-ndarray
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo test -p matten-ndarray
+      - run: cargo test -p matten-ndarray --features dynamic
+      - run: cargo test -p matten-ndarray --doc
 
   msrv:
     name: MSRV 1.85
@@ -67,8 +66,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@1.85.0
-      - run: cargo build
-      - run: cargo test
+      - run: cargo build --workspace
+      - run: cargo test --workspace --all-features --quiet
 
   smoke:
     name: example smoke runs
@@ -76,18 +75,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
-      - run: cargo run --example 00_quickstart
-      - run: cargo run --example 06_broadcasting
-      - run: cargo run --example 08_slicing_builder
-      - run: cargo run --example 12_boundary_error_handling
-      - run: cargo run --example 25_normalize_vector
-      - run: cargo run --example 26_cosine_similarity
-      - run: cargo run --example dynamic_00_quickstart --features dynamic,json,csv
-      - run: cargo run --example dynamic_05_dirty_csv_cleanup --features dynamic,json,csv
-      - run: cargo run --example standardize_columns
-      - run: cargo run --example gram_matrix
-      - run: cargo run --example 13_resource_limits
-      - run: cargo run --example 27_axis_reductions
-      - run: cargo run --example 28_column_statistics
-      - run: cargo run --example dynamic_06_numeric_policy --features dynamic
-      - run: cargo run --example dynamic_07_on_ramp_summary --features dynamic
+      # core matten
+      - run: cargo run -p matten --example 00_quickstart
+      - run: cargo run -p matten --example 06_broadcasting
+      - run: cargo run -p matten --example 08_slicing_builder
+      - run: cargo run -p matten --example 12_boundary_error_handling
+      - run: cargo run -p matten --example 25_normalize_vector
+      - run: cargo run -p matten --example 26_cosine_similarity
+      - run: cargo run -p matten --example dynamic_00_quickstart --features dynamic,json,csv
+      - run: cargo run -p matten --example dynamic_05_dirty_csv_cleanup --features dynamic,json,csv
+      - run: cargo run -p matten --example standardize_columns
+      - run: cargo run -p matten --example gram_matrix
+      - run: cargo run -p matten --example 13_resource_limits
+      - run: cargo run -p matten --example 27_axis_reductions
+      - run: cargo run -p matten --example 28_column_statistics
+      - run: cargo run -p matten --example dynamic_06_numeric_policy --features dynamic
+      - run: cargo run -p matten --example dynamic_07_on_ramp_summary --features dynamic
+      # matten-ndarray
+      - run: cargo run -p matten-ndarray --example to_arrayd
+      - run: cargo run -p matten-ndarray --example from_arrayd

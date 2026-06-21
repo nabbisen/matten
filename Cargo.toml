@@ -1,40 +1,17 @@
-[package]
-name = "matten"
-version = "0.16.0"
+[workspace]
+resolver = "3"
+members = ["crates/matten", "crates/matten-ndarray"]
+
+# Shared package metadata, inherited by member crates via `field.workspace = true`.
+[workspace.package]
 edition = "2024"
 rust-version = "1.85"
-description = "A family car multidimensional array (tensor) library for small numerical trials / PoCs."
-authors = ["nabbisen"]
 license = "Apache-2.0"
-readme = "README.md"
+authors = ["nabbisen"]
 repository = "https://github.com/nabbisen/matten"
-keywords = ["tensor", "array", "ndarray", "numpy", "prototyping"]
-categories = ["science", "mathematics", "data-structures"]
-# Keep the published crate small: docs, RFCs, and CI are repo-only.
-exclude = ["/docs", "/rfcs", "/handoffs", "/.github"]
 
-[features]
-# Locked v2-reconciliation matrix. Convenient PoC profile by default;
-# `default-features = false` gives the lean core.
-default = ["serde", "json", "csv"]
-serde = ["dep:serde"]
-json = ["serde", "dep:serde_json"]
-csv = ["dep:csv"]
-dynamic = []
-
-[dependencies]
-serde = { version = "1", features = ["derive"], optional = true }
-serde_json = { version = "1", optional = true }
-csv = { version = "1", optional = true }
-
-[[example]]
-name = "10_json_roundtrip"
-required-features = ["json"]
-
-[[example]]
-name = "11_csv_numeric_loading"
-required-features = ["csv"]
-
-[[example]]
-name = "12_boundary_error_handling"
-required-features = ["json", "csv"]
+# Core `matten` is path-published; companions depend on it by path + version so
+# they resolve locally in the workspace and by version on crates.io.
+[workspace.dependencies]
+matten = { version = "0.17", path = "crates/matten" }
+ndarray = "0.16"

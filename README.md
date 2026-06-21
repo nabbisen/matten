@@ -1,76 +1,68 @@
-# matten
+# matten workspace
 
-[![crates.io](https://img.shields.io/crates/v/matten.svg)](https://crates.io/crates/matten)
-[![docs.rs](https://img.shields.io/docsrs/matten)](https://docs.rs/matten)
 [![CI](https://github.com/nabbisen/matten/actions/workflows/ci.yml/badge.svg)](https://github.com/nabbisen/matten/actions/workflows/ci.yml)
-[![license](https://img.shields.io/crates/l/matten.svg)](./LICENSE)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](./LICENSE)
 
-**A family car of Rust array (tensor) library — easy to start, predictable, and friendly for quick numerical trials / PoCs.**
+> A family-car multidimensional array (tensor) library for Rust — and a small,
+> optional ecosystem of companion crates around it.
 
 ## Overview
 
-`matten` is a developer-experience-first multidimensional array (tensor) library
-for Rust. It makes early-stage numerical and data-exploration work feel close to
-NumPy/Pandas ergonomics while staying native Rust: one concrete `Tensor` type, no
-visible lifetimes, no generic dtype puzzles, and human-readable failures.
+This repository is a Cargo workspace. Core `matten` is a developer-experience-first
+numeric `Tensor` library for small numerical trials and PoCs. Companion crates
+extend workflows *around* the core without enlarging it; core `matten` stays
+small and dependency-light.
 
-It deliberately favors **developer experience over peak performance**, and is not
-a replacement for `ndarray`, `nalgebra`, or `candle` on hot paths.
+## Crates
 
-## Why / when to use it
+| Crate | Version | Status | What it is |
+|---|---|---|---|
+| [`matten`](./crates/matten) | 0.16.0 | stable (v0.x) | The core `f64` tensor library: construction, shape ops, broadcasting, slicing, reductions, matmul, JSON/CSV boundary APIs, and an optional `dynamic` ingestion on-ramp. |
+| [`matten-ndarray`](./crates/matten-ndarray) | 0.1.0 | experimental | Conversion bridge between `matten::Tensor` and `ndarray::ArrayD<f64>`. |
 
-Reach for `matten` when you want to prototype quickly: represent vectors,
-matrices, and tensors, do simple shape work and arithmetic, and move messy
-JSON/CSV in and out — without wrestling with views, lifetimes, or trait bounds.
-When a prototype becomes performance-critical, `matten` is designed to hand its
-flat data off to a specialized crate.
+Companion crates use **independent SemVer** (RFC-022): a core `matten` version
+does not imply any companion's maturity.
 
-> **Status: active pre-1.0 development.** Phase 1 numeric core is strong;
-> The `dynamic` feature supports heterogeneous ingestion (`from_json_dynamic`, `from_csv_dynamic`),
-> missing-value cleanup (`fill_none`, `none_mask`, `forward_fill_none`), and explicit conversion to
-> numeric tensors (`try_numeric`). Dynamic reshape, slicing, arithmetic, reductions, and serde are
-> **intentionally guarded** — call `try_numeric()` first. Dynamic is a guarded heterogeneous-ingestion
-> and cleanup feature, not a full dynamic tensor arithmetic engine.
-> RFC-000 through RFC-021 are in `rfcs/done/`. v1.0.0 requires explicit maintainer confirmation.
-> See [CHANGELOG.md](./CHANGELOG.md) and [docs.rs](https://docs.rs/matten) for details.
-> The full mdBook lives in `docs/` in the repository (not included in the crate package).
+## Why / when
+
+Use core `matten` to get a NumPy-like tensor going quickly in Rust without
+generics, lifetimes, or view-type puzzles. Reach for a companion crate only when
+you need to cross a boundary — e.g. `matten-ndarray` to hand data to the ndarray
+ecosystem. Core stays a family car; companions are the trailer hitch.
 
 ## Quick start
+
+```toml
+[dependencies]
+matten = "0.16"
+```
 
 ```rust
 use matten::Tensor;
 
 let a = Tensor::new(vec![1.0, 2.0, 3.0, 4.0], &[2, 2]);
-assert_eq!(a.shape(), &[2, 2]);
-assert_eq!(a.ndim(), 2);
-
-// Boundary-style construction is recoverable instead of panicking:
-use matten::MattenError;
-let bad = Tensor::try_new(vec![1.0, 2.0, 3.0], &[2, 2]);
-assert!(matches!(bad, Err(MattenError::Shape { .. })));
+let b = Tensor::ones(&[2, 2]);
+let c = &a + &b;
+assert_eq!(c.shape(), &[2, 2]);
 ```
 
-Lean install (smallest dependency footprint):
-
-```toml
-matten = { version = "0.16", default-features = false }
-```
+See each crate's README for its own quick start.
 
 ## Design notes
 
-- **One primary type.** Users work through `matten::Tensor`. The public root also
-  exposes `MattenError` and `DataFormat`; the dynamic `Element` engine is a Phase 2,
-  feature-gated addition.
-- **Two error zones.** Local convenience APIs panic with actionable messages for
-  fast PoC feedback; every external boundary returns `Result<_, MattenError>` and
-  never panics on ordinary invalid input. `MattenError` derives only `Debug`, so
-  match it by variant, not `==`.
-- **Convenient by default, lean on request.** `default = ["serde", "json", "csv"]`
-  for a smooth first run; `default-features = false` for the lean core.
-- **Safe Rust only.** The crate is `#![forbid(unsafe_code)]`.
+- **Bounded core.** Core `matten` never depends on `ndarray`, `nalgebra`,
+  `candle`, `polars`, or any `matten-*` companion. This is enforced in CI by
+  `scripts/check-core-dependency-boundary.sh` (RFC-022 §10).
+- **Companions are optional.** Depending on `matten` never pulls a companion or
+  its heavy dependencies.
 
 ## More detail
 
-- Full documentation: [docs.rs](https://docs.rs/matten) (API reference) and the `docs/` mdBook in the repository.
-- Design and governance: the `rfcs/` pack and roadmap in the repository.
-- License: Apache-2.0 (see `LICENSE` and `NOTICE`).
+- Roadmap: [`ROADMAP.md`](./ROADMAP.md) (canonical for v0.16+).
+- Design decisions: [`rfcs/`](./rfcs) — see RFC-022 (boundary policy), RFC-025
+  (bridge policy), RFC-027 (`matten-ndarray` design).
+- Core docs: [`docs/`](./docs) (mdBook).
+
+## License
+
+Apache-2.0 © nabbisen
