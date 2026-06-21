@@ -1,60 +1,106 @@
 # RFC-023: `matten-data` Scope and Non-goals
 
 **Status:** Proposed  
-**Target:** v0.16+ design, v0.17+ possible PoC  
-**Theme:** Companion crate exploration  
+**Target:** experimental only before v0.20; beta decision no earlier than v0.20+  
+**Theme:** Table-to-Tensor companion crate, strict scope control  
 **Depends on:** RFC-016, RFC-017, RFC-022  
-**Related handoff:** `023-matten-data-scope-and-non-goals-handoff.md`
+**Supersedes:** older target language that allowed `matten-data` PoC as the main v0.17 companion milestone
+
+---
 
 ## 1. Summary
 
-This RFC defines the tentative scope of a future `matten-data` companion crate.
+This RFC defines the scope of a possible future `matten-data` companion crate.
 
-`matten-data` would provide lightweight table-like ingestion and cleanup helpers that produce `matten::Tensor`. It must not become pandas or polars. Its job is to help users get from practical CSV/JSON rows to numeric tensors while keeping `matten` core clean.
+`matten-data` may help users prepare small CSV/table-like data for `matten::Tensor`, but it must not become a dataframe engine. It is the most business-useful companion idea and also the highest scope-creep risk. Therefore, it is intentionally delayed behind the `matten-ndarray` and `matten-mlprep` tracks.
+
+The key lifecycle is:
+
+```text
+CSV / table-like data
+  -> schema summary
+  -> missing-value cleanup
+  -> column selection
+  -> explicit numeric conversion
+  -> matten::Tensor
+```
+
+---
 
 ## 2. Goals
 
-- Explore schema/column utilities outside core.
-- Provide table-to-tensor conversion helpers.
-- Keep dataframe-like complexity out of `matten`.
-- Support small PoC datasets.
-- Reuse `matten::Tensor`, `Element`, and `NumericPolicy`.
+- Help users reach `Tensor` from practical CSV/table data.
+- Keep table semantics outside core `matten`.
+- Provide small schema/column/missing-value helpers.
+- Support small-to-medium PoC workflows.
+- Preserve explicit numeric conversion.
+- Avoid becoming pandas, Polars, or DataFusion.
+
+---
 
 ## 3. Non-goals
 
-- No full dataframe engine.
-- No joins.
-- No group-by.
-- No pivot.
-- No SQL query API.
-- No lazy query optimizer.
-- No large streaming guarantee in this crate unless RFC-026 delegates it here.
-- No replacement for polars.
+`matten-data` must not implement, before a new RFC explicitly reopens scope:
 
-## 4. External design
+- joins;
+- group-by;
+- pivot;
+- SQL-like query API;
+- lazy execution;
+- expression optimizer;
+- window functions;
+- large-data streaming;
+- dataframe-style indexing;
+- ML preprocessing.
 
-Possible future API:
+---
+
+## 4. Revised target and maturity policy
+
+`matten-data` may be scaffolded before v0.20 for planning or API experiments, but it must not be promoted before v0.20.
+
+v0.20+ decision outcomes:
+
+```text
+A) promote to beta
+B) keep experimental
+C) freeze/defer
+```
+
+Beta is allowed only if the small table-to-Tensor workflow is useful, teachable, and not dataframe-like.
+
+---
+
+## 5. External design
+
+Possible beta API:
 
 ```rust
 use matten_data::Table;
 
-let table = Table::from_csv("sales.csv")?
-    .fill_missing("sales", 0.0)
-    .select_columns(["sales", "cost", "month"]);
+let table = Table::from_csv_path("sales.csv")?;
+println!("{}", table.schema_summary());
 
-let tensor = table.to_tensor()?;
+let x = table
+    .select_columns(["sales", "cost", "quantity"])?
+    .fill_missing(0.0)?
+    .to_tensor()?;
 ```
 
-This API is illustrative, not accepted implementation.
+This API is illustrative until implementation RFC acceptance.
 
-## 5. Data model
+---
 
-Possible model:
+## 6. Data model
+
+A future `Table` may store data row-wise or column-wise. Columnar storage is likely better if selection and conversion are primary operations, but the first implementation must not expose storage layout publicly.
+
+Conceptual model:
 
 ```rust
 pub struct Table {
     columns: Vec<Column>,
-    rows: Vec<Vec<Element>>,
+    // storage representation TBD
 }
 
 pub struct Column {
@@ -63,104 +109,59 @@ pub struct Column {
 }
 ```
 
-But memory layout should be carefully reviewed before implementation.
+---
 
-Alternative columnar storage may be better:
+## 7. Conversion policy
 
-```rust
-columns: Vec<(Column, Vec<Element>)>
-```
+`matten-data` should reuse or mirror core dynamic conversion policy:
 
-## 6. Data lifecycle
+- numeric conversion is explicit;
+- non-convertible values return an error;
+- missing-value handling is explicit;
+- column selection happens before tensor conversion.
 
-```text
-CSV/JSON rows
-  -> Table
-  -> schema summary / cleanup
-  -> selected numeric columns
-  -> matten::Tensor
-```
+Column-specific policy belongs in `matten-data`, not core `matten`.
 
-`matten-data` should end at `Tensor`.
+---
 
-Math remains in `matten`.
+## 8. Error policy
 
-## 7. Events and observable behavior
+`matten-data` defines its own error type.
 
-Observable user events:
-
-- schema inference result;
-- missing fill;
-- column selection;
-- conversion failure;
-- tensor output.
-
-All file/parser operations return `Result`.
-
-## 8. Store access
-
-`matten-data` should not access `matten` internals.
-
-It should construct tensors through:
+Example:
 
 ```rust
-Tensor::try_new
-Tensor::try_from_elements
-Tensor::try_numeric_with
+pub enum MattenDataError {
+    Csv(csv::Error),
+    MissingColumn(String),
+    DuplicateColumn(String),
+    RaggedRow { row: usize },
+    NonNumericColumn { column: String },
+    Matten(matten::MattenError),
+}
 ```
 
-or accepted public APIs.
+Core `MattenError` must not grow table-specific variants.
 
-## 9. Public API requirements
+---
 
-No `matten` core API requirement yet.
+## 9. Beta gate
 
-Potential future need:
+`matten-data` deserves beta only if:
 
-- stable `Element`;
-- stable `NumericPolicy`;
-- stable conversion errors.
+- README + three examples teach the full useful workflow;
+- malformed CSV, duplicate headers, missing values, mixed columns, row length mismatch, and non-convertible values are tested;
+- the API remains small;
+- no dataframe-like features enter the crate;
+- core `matten` has no dependency on `matten-data`.
 
-## 10. Cargo feature impact
+---
 
-`matten-data` should be a separate crate, not a `matten` feature.
+## 10. Examples
 
-Possible dependencies:
+Examples belong in `matten-data`, not core `matten`.
 
-```toml
-matten = { version = "...", features = ["dynamic", "csv", "json"] }
-```
-
-Avoid heavy dependencies until justified.
-
-## 11. Internal design
-
-### 11.1 Schema inference
-
-Keep schema inference simple:
-
-```text
-all numeric -> numeric
-mixed numeric + none -> numeric nullable
-text present -> text/mixed
-bool present -> bool/mixed
-```
-
-Do not infer dates, currencies, or locale numbers in the first PoC.
-
-### 11.2 Column names
-
-Column names belong in `matten-data`, not `matten`.
-
-### 11.3 Conversion
-
-`Table::to_tensor()` should require explicit column selection and conversion policy.
-
-## 12. Examples
-
-Examples should live in `matten-data`, not core `matten`, once the crate exists.
-
-Potential examples:
+Possible future examples:
 
 ```text
 examples/sales_table_to_tensor.rs
@@ -168,27 +169,4 @@ examples/messy_csv_select_numeric.rs
 examples/schema_summary.rs
 ```
 
-Core `matten` may link to them after release.
-
-## 13. Acceptance criteria for a future PoC
-
-- Uses `matten` public API only.
-- Does not add dependencies to core.
-- Clearly says it is not a dataframe engine.
-- Provides table-to-tensor path.
-- Handles small CSV fixtures.
-- Avoids joins/group-by/pivot.
-
-## 14. QA checklist
-
-- [ ] API does not leak into core
-- [ ] No heavy dependencies without review
-- [ ] Small fixtures only
-- [ ] Conversion policy explicit
-- [ ] Documentation states non-goals
-
-## 15. Open questions
-
-1. Should `matten-data` use row-major or columnar internal storage?
-2. Should it live in the same workspace?
-3. Should it depend on `csv` directly or reuse `matten` dynamic CSV ingestion?
+Core `matten` may link to released companion examples but must not include broken or feature-gated pseudo-examples.

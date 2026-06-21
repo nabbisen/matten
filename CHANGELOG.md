@@ -5,6 +5,78 @@ All notable changes to `matten` are documented here. The format is based on
 follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html) once it reaches
 a public API (`0.1.0`).
 
+## [0.16.0] - 2026-06-21
+
+**Companion-crate boundary confirmation — RFC-022 resolved. No core code or public
+API changes; this is a policy + documentation + CI release.**
+
+This release draws the boundary between core `matten` and future `matten-*`
+companion crates before any companion implementation begins. It lands the v0.16+
+reconciliation (after architect review) with the four agreed corrections applied.
+
+### Added
+
+- **`ROADMAP.md`** (repo root) — now the canonical project roadmap for v0.16+,
+  with an explicit document-authority order (accepted RFC > external design >
+  roadmap > requirements > drafts). Replaces the older scheduling that placed
+  `matten-data` at v0.17 and bundled all bridge crates at v0.19.
+- **`scripts/check-core-dependency-boundary.sh`** — a mechanical CI gate proving
+  core `matten` has no forbidden dependency direction
+  (`ndarray`/`nalgebra`/`candle-core`/`polars`/`arrow`/`datafusion` or any
+  `matten-*` companion). Wired into the `check` CI job and the release checklist.
+- **`docs/design/external-design.md`** (v0.3.0) — external design reconciled with
+  the companion-crate direction: in-core feature-gated bridge examples (§13.8/§13.12)
+  are marked superseded, and a new §18 "Companion-Crate External Contract" codifies
+  the dependency rule, companion order, independent SemVer, and per-crate error policy.
+
+### RFC lifecycle
+
+- **RFC-022 (Companion Crate Boundary Policy) → `done/`, Implemented (0.16.0).**
+  Its acceptance criteria (boundary CI, canonical ROADMAP, superseded bridge
+  examples, documented SemVer/error/maturity policies, clean core dependency graph)
+  all ship here. Its open questions (workspace timing, changelog strategy) are
+  recorded as deferred to v0.17.0; per-crate implementation RFCs start at RFC-027.
+- **RFCs 023–026 reconciled (remain Proposed)** with corrected targets:
+  `matten-ndarray` is the first companion (v0.17 experimental); `matten-data` is
+  delayed to a v0.20+ beta decision; `matten-mlprep` is v0.18 experimental;
+  `nalgebra`/`candle`/streaming are explicitly deferred behind later RFCs.
+
+### Corrections applied during landing (architect-reviewed)
+
+- **Boundary script must use `--all-features`.** The originally proposed
+  `cargo tree -p matten` gave a *false pass* for an optional dependency behind a
+  non-default feature (the most likely way a forbidden dep would enter core). The
+  shipped script uses
+  `cargo tree -p matten --all-features --edges normal,build --no-dedupe`; RFC-022
+  §10 and ROADMAP §13 are updated to match. Verified: the check now fails on an
+  optional `ndarray` dependency that the old form missed.
+- **RFC-025 bridge correctness criteria added.** `from_arrayd` MUST convert by
+  logical element order (not raw buffer order) so non-standard-layout `ArrayD`
+  inputs are not silently transposed, and MUST reject zero-sized axes with a clear
+  companion error. Added to §5.1 and the §9 acceptance criteria (and ROADMAP §5).
+- **RFC-015–021 kept in `done/`/Implemented.** The reconciliation bundle's copies
+  of these already-shipped RFCs carried regressed `Proposed` status *and* stale
+  pre-0.15.2 content (e.g. the old `allow_bool_as_zero_one` / `parse_ascii_float_text`
+  draft names corrected in 0.15.2). They were discarded; the repo's correct `done/`
+  versions are retained unchanged.
+- **Document metadata.** External design versioned `0.3.0` (continuing the `0.2.0`
+  line; no `1.0` baseline existed) with the actual revision date; ROADMAP issued at
+  `1.0.0`.
+
+### Documentation
+
+- `rfcs/README.md`: RFC-022 moved to Done (0.16.0); 023–026 targets updated.
+- `docs/src/contributing/release-checklist.md`: boundary check added to source
+  verification; allowed-root-exports list corrected to include `MattenLimits` and
+  `NumericPolicy`; added the reduced-feature clippy passes.
+
+### Security / threat model
+
+No new data flows, external integrations, or auth logic. The dependency-boundary
+script is a read-only `cargo tree` invocation that runs in CI only and is not part
+of the published crate. The RFC-001 threat model is unchanged; existing controls
+remain valid.
+
 ## [0.15.3] - 2026-06-21
 
 **Polish patch — five post-review improvements (no behaviour changes).**

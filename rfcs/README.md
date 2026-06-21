@@ -30,13 +30,13 @@ for RFC state; the Status field inside each file mirrors the folder.
 | 019 | [Axis Reductions and Small Matrix Statistics](./done/019-axis-reductions-and-small-matrix-statistics.md) | 0.14.0 (core); 0.15.0 (examples) |
 | 020 | [Human-Readable Diagnostics and Error Message Quality](./done/020-human-readable-diagnostics-and-error-message-quality.md) | 0.13.3 |
 | 021 | [Tutorial Path and Example Quality Gate](./done/021-tutorial-path-and-example-quality-gate.md) | 0.15.0 |
+| 022 | [Companion Crate Boundary Policy](./done/022-companion-crate-boundary-policy.md) | 0.16.0 |
 
 ## Proposed
 
 | ID | Title | Target |
 |---:|---|---|
-| 022 | [Companion Crate Boundary Policy](./proposed/022-companion-crate-boundary-policy.md) | v0.16+ |
-| 023 | [`matten-data` Scope and Non-goals](./proposed/023-matten-data-scope-and-non-goals.md) | v0.16+ design, v0.17+ possible PoC |
-| 024 | [`matten-mlprep` Scope and Non-goals](./proposed/024-matten-mlprep-scope-and-non-goals.md) | v0.16+ design, v0.18+ possible PoC |
-| 025 | [Bridge Crate Policy for ndarray, nalgebra, and candle](./proposed/025-bridge-crate-policy-for-ndarray-nalgebra-and-candle.md) | v0.16+ design, v0.19+ possible PoC |
-| 026 | [Large CSV and Streaming Data Policy](./proposed/026-large-csv-and-streaming-data-policy.md) | v0.16+ design, v0.20+ exploration |
+| 023 | [`matten-data` Scope and Non-goals](./proposed/023-matten-data-scope-and-non-goals.md) | experimental only before v0.20; beta decision no earlier than v0.20+ |
+| 024 | [`matten-mlprep` Scope and Non-goals](./proposed/024-matten-mlprep-scope-and-non-goals.md) | v0.18 experimental; v0.19 beta decision |
+| 025 | [Bridge Crate Policy for ndarray, nalgebra, and candle](./proposed/025-bridge-crate-policy-for-ndarray-nalgebra-and-candle.md) | policy in v0.16; `matten-ndarray` experimental in v0.17; nalgebra/candle deferred |
+| 026 | [Large CSV and Streaming Data Policy](./proposed/026-large-csv-and-streaming-data-policy.md) | design spike no earlier than v0.20+ |

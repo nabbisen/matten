@@ -1,191 +1,184 @@
 # RFC-025: Bridge Crate Policy for ndarray, nalgebra, and candle
 
 **Status:** Proposed  
-**Target:** v0.16+ design, v0.19+ possible PoC  
-**Theme:** Ecosystem bridge strategy  
+**Target:** policy in v0.16; `matten-ndarray` experimental in v0.17; nalgebra/candle deferred  
+**Theme:** External numeric ecosystem bridge strategy  
 **Depends on:** RFC-015, RFC-022  
-**Related handoff:** `025-bridge-crate-policy-for-ndarray-nalgebra-and-candle-handoff.md`
+**Supersedes:** older plan that bundled ndarray/nalgebra/candle implementation together around v0.19
+
+---
 
 ## 1. Summary
 
-This RFC defines how `matten` should interoperate with specialized Rust mathematical and ML crates without adding their dependencies to core.
+This RFC defines bridge-crate policy. It does not require all bridges to be implemented together.
 
-The core crate should remain light. Bridges to `ndarray`, `nalgebra`, and `candle` should be implemented as companion crates or carefully isolated optional crates, not as default features.
+The first concrete bridge should be `matten-ndarray` because it is low-risk, broadly useful for N-dimensional numeric work, and validates the companion-crate model without changing core `matten`.
+
+`matten-nalgebra` and `matten-candle` are deferred and require later per-crate RFCs or explicit reopening.
+
+---
 
 ## 2. Goals
 
-- Avoid lock-in for `matten` users.
+- Let users graduate from `matten` to specialized crates.
 - Keep core dependency-light.
-- Provide migration paths to performance/specialized crates.
-- Avoid forcing `ndarray`, `nalgebra`, or `candle` compile costs on core users.
-- Document when users should graduate from `matten`.
+- Keep bridge APIs small and boring.
+- Define external dependency version policy.
+- Avoid broad wrapper frameworks.
+
+---
 
 ## 3. Non-goals
 
-- No bridge implementation in core.
-- No wrapper around all external crate APIs.
+- No bridge dependency in core `matten`.
+- No optional `ndarray` feature in core.
+- No broad re-export of external crate APIs.
 - No automatic backend switching.
-- No GPU bridge in core.
-- No attempt to compete with specialized crates.
+- No Candle/device/dtype bridge until a later RFC.
 
-## 4. External design
+---
 
-Possible future crates:
+## 4. Bridge order
 
 ```text
-matten-ndarray
-matten-nalgebra
-matten-candle
+v0.17
+  matten-ndarray experimental
+
+v0.19+
+  matten-ndarray production-ready candidate if mature
+
+later
+  matten-nalgebra after separate RFC
+  matten-candle after separate RFC
 ```
+
+---
+
+## 5. `matten-ndarray` initial scope
+
+Target API:
+
+```rust
+use matten_ndarray::{from_arrayd, to_arrayd};
+
+let arr = to_arrayd(&tensor)?;
+let tensor = from_arrayd(arr)?;
+```
+
+Allowed:
+
+- `Tensor -> ndarray::ArrayD<f64>`;
+- `ndarray::ArrayD<f64> -> Tensor`;
+- scalar/vector/matrix/N-D tests;
+- clear conversion errors;
+- dynamic tensors return `Err` unless explicitly converted to numeric first.
+
+Forbidden:
+
+- zero-copy promise before design;
+- wrappers for ndarray operations;
+- broad type/lifetime exposure;
+- dependency in core `matten`.
+
+### 5.1 Layout and shape correctness rules
+
+An `ndarray::ArrayD<f64>` is **not** guaranteed to be standard row-major
+contiguous: transposed, sliced, or otherwise non-standard-stride arrays carry a
+logical shape that does not match their backing-buffer order. Core `matten::Tensor`
+is always row-major contiguous, so:
+
+- `from_arrayd` MUST convert by **logical element order**, not by copying the raw
+  backing buffer. It MUST NOT assume the input is standard row-major. The
+  implementation MUST either call ndarray's standard-layout conversion
+  (`array.as_standard_layout()`) or iterate in logical order before constructing
+  the row-major `Tensor`. Copying the raw buffer of a non-standard-layout array
+  would silently transpose or scramble the data.
+- `from_arrayd` MUST return `Err` if the input shape contains any **zero-length
+  axis**, because core `matten` rejects zero-sized dimensions. The error MUST be
+  a clear companion-crate error, not a panic.
+- `to_arrayd` produces a standard-layout `ArrayD<f64>` from the (already
+  contiguous) `Tensor` buffer.
+
+---
+
+## 6. External dependency version policy
+
+Bridge crates inherit dependency-version risk from their target crates.
+
+For experimental `matten-ndarray`:
+
+- choose one narrow tested `ndarray` minor version;
+- document the supported version range;
+- treat `ndarray` minor bumps as compatibility events;
+- update `matten-ndarray` minor version when external breaking changes affect users.
+
+Do not promise broad `ndarray` version compatibility until CI tests it.
+
+The same rule will matter more strongly for `candle`, whose dependency tree is heavier.
+
+---
+
+## 7. Error policy
+
+Each bridge crate defines its own error type.
 
 Example:
 
 ```rust
-use matten_ndarray::to_arrayd;
-
-let t = Tensor::new(vec![1.0, 2.0, 3.0, 4.0], &[2, 2]);
-let arr = to_arrayd(&t)?;
+pub enum MattenNdarrayError {
+    DynamicTensor,
+    Shape(String),
+    NdarrayShape(ndarray::ShapeError),
+    Matten(matten::MattenError),
+}
 ```
 
-## 5. Data model
+A dynamic tensor should return `Err(MattenNdarrayError::DynamicTensor)` rather than panic.
 
-Bridge crates should convert:
+---
 
-```text
-matten::Tensor <-> external tensor/matrix type
-```
+## 8. Examples
 
-For dynamic tensors:
-
-```text
-dynamic Tensor -> try_numeric() -> bridge
-```
-
-Do not bridge heterogeneous tensors directly unless a target crate supports it naturally.
-
-## 6. Data lifecycle
-
-```text
-matten PoC tensor
-  -> bridge conversion
-  -> specialized crate workflow
-```
-
-Or:
-
-```text
-specialized crate result
-  -> matten Tensor for simple downstream processing
-```
-
-## 7. Events and observable behavior
-
-Bridge conversions may fail if:
-
-- shape rank unsupported;
-- data is dynamic;
-- target crate requires contiguous layout differently;
-- device allocation fails for ML backend.
-
-Failures should use bridge-crate errors, not necessarily `MattenError`.
-
-## 8. Store access
-
-Bridge crates must use public APIs:
-
-- `shape`;
-- `as_slice`;
-- `to_vec`;
-- `Tensor::try_new`.
-
-They must not access internal fields.
-
-## 9. Public API candidates
-
-### 9.1 ndarray
-
-```rust
-pub fn to_arrayd(t: &Tensor) -> Result<ndarray::ArrayD<f64>, BridgeError>;
-pub fn from_arrayd(a: ndarray::ArrayD<f64>) -> Result<Tensor, BridgeError>;
-```
-
-### 9.2 nalgebra
-
-Because nalgebra is strongest for statically/dynamically sized 2D matrices:
-
-```rust
-pub fn to_dmatrix(t: &Tensor) -> Result<nalgebra::DMatrix<f64>, BridgeError>;
-pub fn from_dmatrix(m: nalgebra::DMatrix<f64>) -> Tensor;
-```
-
-### 9.3 candle
-
-```rust
-pub fn to_candle_tensor(
-    t: &Tensor,
-    device: &candle_core::Device,
-) -> Result<candle_core::Tensor, BridgeError>;
-```
-
-## 10. Cargo feature impact
-
-No core feature in `matten`.
-
-Each bridge crate owns its dependency.
-
-## 11. Internal design
-
-### 11.1 Dependency isolation
-
-Never add this to core:
-
-```toml
-ndarray = ...
-nalgebra = ...
-candle-core = ...
-```
-
-unless a future RFC reverses this policy with strong justification.
-
-### 11.2 Shape mapping
-
-- ndarray supports N-D, best general bridge.
-- nalgebra supports 2D matrix/vector best.
-- candle supports ML tensor but may involve device/dtype constraints.
-
-## 12. Examples
-
-Examples belong in bridge crates.
-
-Core docs may include non-runnable conceptual links until crates exist.
-
-Future examples:
+Bridge examples live in bridge crates:
 
 ```text
 matten-ndarray/examples/to_arrayd.rs
-matten-nalgebra/examples/to_dmatrix.rs
-matten-candle/examples/to_candle_tensor.rs
+matten-ndarray/examples/from_arrayd.rs
 ```
 
-## 13. Acceptance criteria
+Core `matten` must not include:
 
-- Core `matten` has no bridge dependencies.
-- Bridge crates use public API only.
-- Conversion limitations are documented.
-- Dynamic bridge path requires explicit `try_numeric`.
-- Examples compile in bridge crate CI.
+```text
+examples/integration/ndarray_bridge.rs
+cargo check --examples --features ndarray
+```
 
-## 14. QA checklist
+Those old in-core feature-gated examples are superseded by companion crates.
 
-- [ ] Dependency scan confirms isolation
-- [ ] 1D/2D/ND conversion tests
-- [ ] shape mismatch tests
-- [ ] dynamic rejection tests
-- [ ] roundtrip tests where possible
-- [ ] feature compile tests
+---
 
-## 15. Open questions
+## 9. Acceptance criteria for `matten-ndarray` experimental
 
-1. Should bridge crates share version numbers with `matten`?
-2. Which bridge should be first?
-3. Should bridges use `MattenError` or crate-specific `BridgeError`?
+- Conversion roundtrips pass for scalar/vector/matrix/N-D.
+- `from_arrayd` preserves logical element order for **non-standard-layout**
+  `ArrayD` inputs (transposed / sliced / non-standard-stride), proven by a test
+  that converts a transposed `ArrayD` and checks element order.
+- `from_arrayd` rejects shapes containing a zero-sized axis with a clear
+  companion error (not a panic).
+- Dynamic inputs return `Err` (e.g. `MattenNdarrayError::DynamicTensor`), not a panic.
+- Copy behavior is documented.
+- Supported `ndarray` version is documented.
+- Examples compile in `matten-ndarray` CI.
+- Core dependency-boundary CI still passes.
+
+---
+
+## 10. Deferred bridges
+
+### `matten-nalgebra`
+
+Deferred until after `matten-ndarray` proves the pattern. It is 2D-focused and should not be bundled with N-D array conversion.
+
+### `matten-candle`
+
+Deferred longer due device, dtype, backend, and ML expectation complexity. Requires separate RFC.

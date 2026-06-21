@@ -9,7 +9,10 @@ It is the canonical gate referenced by RFC-015.
 
 ```bash
 cargo fmt --all --check
+bash scripts/check-core-dependency-boundary.sh   # RFC-022 core boundary gate
 cargo clippy --all-targets --all-features -- -D warnings
+cargo clippy --all-targets --no-default-features -- -D warnings
+cargo clippy --all-targets --no-default-features --features dynamic -- -D warnings
 RUSTFLAGS="-D warnings" cargo check --all-targets --all-features
 cargo test --all-targets
 cargo test --doc --all-features
@@ -58,8 +61,10 @@ Allowed root exports:
 - `Tensor`
 - `MattenError`
 - `DataFormat`
+- `MattenLimits`
 - `SliceBuilder`
 - `Element` (under `#[cfg(feature = "dynamic")]`)
+- `NumericPolicy` (under `#[cfg(feature = "dynamic")]`)
 
 Allowed `#[doc(hidden)]` exports (compiler visibility only, not user-facing):
 

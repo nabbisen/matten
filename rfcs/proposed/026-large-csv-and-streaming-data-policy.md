@@ -1,199 +1,104 @@
 # RFC-026: Large CSV and Streaming Data Policy
 
 **Status:** Proposed  
-**Target:** v0.16+ design, v0.20+ exploration  
-**Theme:** Large data boundary  
-**Depends on:** RFC-018, RFC-022, RFC-023  
-**Related handoff:** `026-large-csv-and-streaming-data-policy-handoff.md`
+**Target:** design spike no earlier than v0.20+; implementation later only after separate approval  
+**Theme:** Large data and streaming boundary  
+**Depends on:** RFC-018, RFC-022, RFC-023
+
+---
 
 ## 1. Summary
 
 This RFC defines the policy for large CSV and streaming data support.
 
-`matten` core is not currently a large-data engine. It should not claim to handle huge datasets “without breaking a sweat” until there is an explicit memory and streaming design. This RFC keeps that future open while preventing premature scope expansion.
+Streaming remains design-only until the project has explicit answers for batch lifecycle, schema drift, malformed rows, memory budget, and sync-vs-async strategy.
+
+Streaming must not enter core `matten` as `Tensor::stream_csv`.
+
+---
 
 ## 2. Goals
 
-- Define what large-data support would require.
-- Prevent misleading core claims.
-- Decide whether streaming belongs in core or companion crate.
-- Align with resource safety limits.
-- Preserve the simple numeric tensor API.
+- Prevent misleading large-data claims.
+- Keep core `matten` in-memory and simple.
+- Identify what a future streaming design must prove.
+- Clarify relationship to `matten-data` or a possible `matten-stream` crate.
+
+---
 
 ## 3. Non-goals
 
-- No immediate streaming implementation.
+- No implementation in v0.16/v0.17/v0.18.
+- No streaming API in core `matten`.
 - No out-of-core tensor store.
-- No parquet/arrow support in this RFC.
-- No async file pipeline.
-- No distributed processing.
-- No replacement for polars/datafusion.
+- No async pipeline until sync semantics are proven.
+- No replacement for Polars/DataFusion.
 
-## 4. External design
+---
 
-Current honest statement:
+## 4. Current honest statement
 
-```text
-matten is intended for small-to-medium PoC workloads.
-For large datasets, use explicit limits and consider future companion crates.
-```
+`matten` is intended for small-to-medium PoC workloads.
 
-Future possible API in companion crate:
+For huge CSV/table workloads, users should use appropriate external tools, then convert to `Tensor` when a small numeric matrix is needed.
+
+---
+
+## 5. Future design questions
+
+A future implementation RFC must answer:
+
+- What is a batch?
+- What happens on schema drift?
+- Are malformed rows fail-fast, skipped, or collected?
+- How is memory budget enforced?
+- Is the API sync-only first?
+- Does streaming belong in `matten-data` or `matten-stream`?
+- How are dynamic cleanup and numeric conversion applied per batch?
+
+---
+
+## 6. Possible future API
+
+Illustrative only:
 
 ```rust
 use matten_stream::CsvBatches;
 
 for batch in CsvBatches::open("large.csv")?.batch_size(1024) {
-    let tensor = batch?.try_numeric()?;
-    process(tensor);
+    let x = batch?.try_numeric()?;
+    process(x);
 }
 ```
 
-This is illustrative only.
+This must not be added before a dedicated implementation RFC.
 
-## 5. Data model
+---
 
-Core tensor remains in-memory and contiguous for numeric data.
+## 7. Relationship to `matten-data`
 
-Streaming support would use batch tensors:
-
-```text
-large input
-  -> batch 1 Tensor
-  -> batch 2 Tensor
-  -> ...
-```
-
-No single huge logical tensor is promised.
-
-## 6. Data lifecycle
-
-Current:
+Streaming may eventually belong in:
 
 ```text
-CSV input -> parse all -> Tensor
-```
-
-Future streaming:
-
-```text
-CSV input -> parse batch -> Tensor -> user processing -> next batch
-```
-
-Batching changes lifecycle substantially, so it should not be hidden inside current `load_csv`.
-
-## 7. Events and observable behavior
-
-Streaming events would include:
-
-- open file;
-- read batch;
-- parse row;
-- convert batch;
-- handle parse error;
-- finish stream.
-
-These are outside current core.
-
-## 8. Store access
-
-Core store remains in-memory.
-
-Future streaming crate should not access core internals. It should construct normal tensors per batch.
-
-## 9. Public API policy
-
-`matten` core should not add:
-
-```rust
-Tensor::stream_csv(...)
-```
-
-without a dedicated implementation RFC.
-
-Acceptable in core:
-
-- resource limits;
-- clear docs;
-- small CSV loaders;
-- examples showing limits.
-
-Future companion:
-
-```text
-matten-stream
 matten-data streaming mode
 ```
 
-## 10. Cargo feature impact
-
-No core feature now.
-
-Avoid:
-
-```toml
-streaming = [...]
-```
-
-in core until design is accepted.
-
-## 11. Internal design considerations for future
-
-### 11.1 Batch size
-
-Must be explicit.
-
-### 11.2 Error policy
-
-Streaming parse errors need policy:
-
-- fail fast;
-- skip bad rows;
-- collect errors.
-
-This belongs in companion design, not core.
-
-### 11.3 Schema consistency
-
-Streaming batches need consistent shape/schema. This is table-like and likely belongs with `matten-data`.
-
-## 12. Examples
-
-No core runnable examples until streaming exists.
-
-Core docs may include warning:
+or:
 
 ```text
-For huge CSV files, prefer external streaming tools or future companion crates.
+matten-stream
 ```
 
-Future companion examples:
+The decision is deferred. Do not force it into v0.16.
 
-```text
-examples/stream_numeric_csv_batches.rs
-examples/stream_dynamic_cleanup_batches.rs
-```
+---
 
-## 13. Acceptance criteria for future design
+## 8. Acceptance criteria for any future implementation
 
-- Explicit memory budget model.
+- Explicit memory budget.
 - Explicit batch lifecycle.
-- No hidden huge allocation.
+- Explicit malformed-row policy.
+- Explicit schema consistency policy.
+- Tests for bounded memory behavior.
 - No core dependency pollution.
-- Clear relationship to `matten-data`.
-- Honest docs about limitations.
-
-## 14. QA checklist for future implementation
-
-- [ ] large synthetic CSV smoke test
-- [ ] bounded RSS check
-- [ ] malformed row policy tests
-- [ ] schema drift tests
-- [ ] batch shape tests
-- [ ] no core API pollution
-
-## 15. Open questions
-
-1. Should streaming live in `matten-data` or `matten-stream`?
-2. Should streaming be sync-only first?
-3. Should schema inference require reading the whole file, or use a prefix sample?
+- No claim that core `matten` is a large-data engine.

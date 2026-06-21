@@ -1,170 +1,138 @@
 # RFC-024: `matten-mlprep` Scope and Non-goals
 
 **Status:** Proposed  
-**Target:** v0.16+ design, v0.18+ possible PoC  
-**Theme:** Companion crate exploration  
-**Depends on:** RFC-019, RFC-022  
-**Related handoff:** `024-matten-mlprep-scope-and-non-goals-handoff.md`
+**Target:** v0.18 experimental; v0.19 beta decision / hardening  
+**Theme:** Transparent preprocessing companion crate  
+**Depends on:** RFC-019, RFC-022
+
+---
 
 ## 1. Summary
 
-This RFC defines the tentative scope of a future `matten-mlprep` companion crate.
+This RFC defines the scope of a future `matten-mlprep` companion crate.
 
-`matten-mlprep` would provide small, transparent preprocessing helpers for proof-of-concept machine learning workflows. It must not become an ML framework. It should help users prepare numeric tensors, not train models.
+`matten-mlprep` provides small, transparent preprocessing helpers for numeric `Tensor` workflows. It must not become an ML framework. It should help users prepare data for external tools, not train models.
+
+---
 
 ## 2. Goals
 
-- Provide small preprocessing helpers.
-- Keep ML-specific concepts out of `matten` core.
+- Provide deterministic preprocessing helpers.
+- Keep ML-specific concepts out of core `matten`.
 - Reuse `Tensor` as the data container.
-- Keep functions transparent and easy to inspect.
-- Support small PoC workflows.
+- Document shape rules clearly.
+- Avoid hidden randomness.
+
+---
 
 ## 3. Non-goals
 
 - No model training.
 - No autograd.
-- No neural network layers.
-- No optimizer implementations.
-- No GPU.
-- No full scikit-learn clone.
-- No hidden statistical magic.
+- No neural networks.
+- No optimizers.
+- No Candle dependency.
+- No automatic ML pipelines.
+- No hidden random split behavior.
 
-## 4. External design
+---
 
-Illustrative future API:
+## 4. Shape convention
 
-```rust
-use matten_mlprep::{standardize_columns, train_test_split};
+All initial `matten-mlprep` APIs operate on 2D numeric tensors.
 
-let x = Tensor::load_csv("features.csv")?;
-let x = standardize_columns(&x)?;
-let (train, test) = train_test_split(&x, 0.8)?;
-```
-
-## 5. Data model
-
-No new core data model.
-
-`matten-mlprep` consumes numeric `Tensor` and returns numeric `Tensor`.
-
-Possible small metadata structs:
-
-```rust
-pub struct Split<T> {
-    pub train: T,
-    pub test: T,
-}
-```
-
-Avoid storing training state unless a transformer API is explicitly designed.
-
-## 6. Data lifecycle
+Convention:
 
 ```text
-numeric Tensor
-  -> preprocessing helper
-  -> numeric Tensor
-  -> user model / external ML crate
+rows = samples
+columns = features
 ```
 
-If input is dynamic, user must call `try_numeric()` before using `matten-mlprep`.
+This must be enforced. Silent transposition or ambiguous interpretation is not allowed.
 
-## 7. Events and observable behavior
+---
 
-Preprocessing failures return `Result` when parameters are invalid.
+## 5. Initial API scope
 
-Examples:
-
-- split ratio outside `(0, 1)`;
-- wrong tensor rank;
-- zero standard deviation policy conflict.
-
-## 8. Store access
-
-Use public numeric accessors:
-
-- `shape`;
-- `as_slice`;
-- construction APIs.
-
-Do not access internal storage.
-
-## 9. Public API candidates
-
-Potential functions:
+Allowed experimental APIs:
 
 ```rust
-pub fn minmax_scale_columns(x: &Tensor) -> Result<Tensor, MattenError>;
-pub fn standardize_columns(x: &Tensor) -> Result<Tensor, MattenError>;
-pub fn add_bias_column(x: &Tensor) -> Result<Tensor, MattenError>;
-pub fn train_test_split(x: &Tensor, ratio: f64) -> Result<(Tensor, Tensor), MattenError>;
+pub fn standardize_columns(x: &Tensor) -> Result<Tensor, MattenMlprepError>;
+pub fn minmax_scale_columns(x: &Tensor) -> Result<Tensor, MattenMlprepError>;
+pub fn add_bias_column(x: &Tensor) -> Result<Tensor, MattenMlprepError>;
+pub fn train_test_split(x: &Tensor, train_ratio: f64) -> Result<(Tensor, Tensor), MattenMlprepError>;
 ```
 
-All are tentative.
-
-## 10. Cargo feature impact
-
-Separate crate.
-
-No new `matten` core feature.
-
-## 11. Internal design
-
-### 11.1 Simplicity
-
-Implement with straightforward loops and `matten` APIs.
-
-### 11.2 Axis reductions
-
-`matten-mlprep` should use RFC-019 axis reductions once available.
-
-### 11.3 Randomness
-
-Avoid random split initially, or make RNG explicit.
-
-Deterministic split by row index is simpler:
+Default `train_test_split` is ordered and deterministic:
 
 ```text
-first N rows -> train
+first floor(n_rows * train_ratio) rows -> train
 remaining rows -> test
 ```
 
-## 12. Examples
+No shuffling happens in the default function.
 
-Examples belong in `matten-mlprep` after crate creation.
+---
 
-Potential:
+## 6. Seeded split policy
+
+If shuffled splitting is added later, it must be a separate explicit API:
+
+```rust
+pub fn train_test_split_seeded(
+    x: &Tensor,
+    train_ratio: f64,
+    seed: u64,
+) -> Result<(Tensor, Tensor), MattenMlprepError>;
+```
+
+The RNG must be dependency-light and documented. A tiny deterministic PRNG such as SplitMix64 is acceptable if exact reproducibility is tested and documented. Pulling `rand` is not allowed without a new dependency review.
+
+---
+
+## 7. Error policy
+
+`matten-mlprep` defines its own error type.
+
+Example:
+
+```rust
+pub enum MattenMlprepError {
+    DynamicTensor,
+    ExpectedMatrix { shape: Vec<usize> },
+    InvalidRatio(f64),
+    EmptyInput,
+    ZeroVariance { column: usize },
+    Matten(matten::MattenError),
+}
+```
+
+---
+
+## 8. Beta gate
+
+`matten-mlprep` may move toward beta only if:
+
+- APIs remain small;
+- all transformations are deterministic;
+- shape rules are documented;
+- zero-variance behavior is explicit;
+- train/test split behavior is explicit;
+- examples are realistic;
+- no training/autograd/framework scope enters the crate;
+- core `matten` has no dependency on `matten-mlprep`.
+
+---
+
+## 9. Examples
+
+Examples belong in `matten-mlprep`:
 
 ```text
 examples/standardize_columns.rs
 examples/minmax_scale.rs
-examples/train_test_split.rs
 examples/add_bias_column.rs
+examples/train_test_split.rs
 ```
 
-Core `matten` may keep small pattern examples but should not grow full ML-prep utilities.
-
-## 13. Acceptance criteria for future PoC
-
-- No training API.
-- No external ML framework dependency.
-- Functions are transparent and documented.
-- Uses public `matten` API only.
-- Works for small 2D numeric tensors.
-- Rejects dynamic tensors clearly.
-
-## 14. QA checklist
-
-- [ ] Parameter validation tests
-- [ ] Shape validation tests
-- [ ] zero variance tests
-- [ ] deterministic split tests
-- [ ] examples compile
-- [ ] no core dependency pollution
-
-## 15. Open questions
-
-1. Should `matten-mlprep` exist before bridge crates?
-2. Should preprocessing helpers return `MattenError` or crate-specific errors?
-3. Should transformer objects be introduced later for fit/transform workflows?
+Core `matten` should not grow ML-prep APIs or examples beyond small user-side patterns.
