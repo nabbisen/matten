@@ -3,7 +3,7 @@
 [![crates.io](https://img.shields.io/crates/v/matten.svg)](https://crates.io/crates/matten)
 [![docs.rs](https://img.shields.io/docsrs/matten)](https://docs.rs/matten)
 [![CI](https://github.com/nabbisen/matten/actions/workflows/ci.yml/badge.svg)](https://github.com/nabbisen/matten/actions/workflows/ci.yml)
-[![license](https://img.shields.io/crates/l/matten.svg)](./LICENSE)
+[![license](https://img.shields.io/crates/l/matten.svg)](../../LICENSE)
 
 **A family car of Rust array (tensor) library — easy to start, predictable, and friendly for quick numerical trials / PoCs.**
 
@@ -32,7 +32,7 @@ flat data off to a specialized crate.
 > **intentionally guarded** — call `try_numeric()` first. Dynamic is a guarded heterogeneous-ingestion
 > and cleanup feature, not a full dynamic tensor arithmetic engine.
 > RFC-000 through RFC-021 are in `rfcs/done/`. v1.0.0 requires explicit maintainer confirmation.
-> See [CHANGELOG.md](./CHANGELOG.md) and [docs.rs](https://docs.rs/matten) for details.
+> See [CHANGELOG.md](../../CHANGELOG.md) and [docs.rs](https://docs.rs/matten) for details.
 > The full mdBook lives in `docs/` in the repository (not included in the crate package).
 
 ## Quick start
@@ -53,7 +53,7 @@ assert!(matches!(bad, Err(MattenError::Shape { .. })));
 Lean install (smallest dependency footprint):
 
 ```toml
-matten = { version = "0.16", default-features = false }
+matten = { version = "0.19", default-features = false }
 ```
 
 ## Design notes
@@ -73,4 +73,4 @@ matten = { version = "0.16", default-features = false }
 
 - Full documentation: [docs.rs](https://docs.rs/matten) (API reference) and the `docs/` mdBook in the repository.
 - Design and governance: the `rfcs/` pack and roadmap in the repository.
-- License: Apache-2.0 (see `LICENSE` and `NOTICE`).
+- License: Apache-2.0 (see the root `LICENSE` and `NOTICE`).

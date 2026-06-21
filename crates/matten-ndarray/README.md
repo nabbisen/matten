@@ -4,9 +4,12 @@
 [![Docs.rs](https://docs.rs/matten-ndarray/badge.svg)](https://docs.rs/matten-ndarray)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](../../LICENSE)
 
-> **Experimental (0.1.x).** A small conversion bridge between
+> **Production-ready candidate (`0.19.x` family release).** A small conversion bridge between
 > [`matten::Tensor`](https://crates.io/crates/matten) and
-> `ndarray::ArrayD<f64>`. The API may change; pin the version.
+> `ndarray::ArrayD<f64>`. The scope is closed and the API is stable; still
+> pre-1.0, so pin the minor version.
+
+Part of the [`matten` workspace](../../README.md) — see it for the full family.
 
 ## Overview
 
@@ -44,6 +47,17 @@ let back = from_arrayd(arr)?;     // ArrayD<f64> -> Tensor
   passing a dynamic (`Element`) tensor returns `MattenNdarrayError::DynamicTensor`;
   convert it with `Tensor::try_numeric()` first.
 - **Supported `ndarray`:** the `0.16` minor.
+
+## Compatibility
+
+- **SemVer:** pre-1.0 (`0.x`). A `0.x` minor bump may contain breaking changes;
+  patch releases are additive only. Pin the minor (`matten-ndarray = "0.19"`).
+- **MSRV:** Rust 1.85 (edition 2024).
+- **`matten`:** shares the `0.19` family version (RFC-030).
+- **`ndarray`:** supports the `0.16` minor. An `ndarray` minor bump is treated as
+  a compatibility event and handled by a `matten-ndarray` minor bump (RFC-025 §6);
+  broad `ndarray` version compatibility is not promised until CI tests it.
+- A `1.0` release requires explicit maintainer confirmation.
 
 ## More detail
 

@@ -169,3 +169,42 @@ fn dynamic_input_is_rejected_not_panicked() {
         Err(MattenMlprepError::DynamicTensor)
     ));
 }
+
+// ── v0.19 hardening: documented NaN propagation + degenerate input (RFC-029 §3.3) ──
+
+#[test]
+fn standardize_nan_column_propagates_not_zero_variance() {
+    // A column containing NaN has NaN mean/std (not 0), so it is NOT reported as
+    // ZeroVariance; the documented behavior is NaN propagation to the output.
+    let x = Tensor::new(vec![1.0, 10.0, f64::NAN, 20.0], &[2, 2]);
+    let z = standardize_columns(&x).unwrap();
+    assert!(z.as_slice()[0].is_nan()); // col 0 row 0
+    assert!(z.as_slice()[2].is_nan()); // col 0 row 1
+    // col 1 ([10, 20]) standardizes normally.
+    approx(&[z.as_slice()[1], z.as_slice()[3]], &[-1.0, 1.0]);
+}
+
+#[test]
+fn minmax_nan_column_propagates() {
+    let x = Tensor::new(vec![f64::NAN, 0.0, 5.0, 10.0], &[2, 2]);
+    let s = minmax_scale_columns(&x).unwrap();
+    assert!(s.as_slice()[0].is_nan());
+    assert!(s.as_slice()[2].is_nan());
+    // col 1 ([0, 10]) -> [0, 1]
+    assert_eq!(s.as_slice()[1], 0.0);
+    assert_eq!(s.as_slice()[3], 1.0);
+}
+
+#[test]
+fn single_row_matrix_is_zero_variance() {
+    // One sample -> every column is constant -> ZeroVariance for the first column.
+    let x = Tensor::new(vec![3.0, 7.0], &[1, 2]);
+    assert!(matches!(
+        standardize_columns(&x),
+        Err(MattenMlprepError::ZeroVariance { column: 0 })
+    ));
+    assert!(matches!(
+        minmax_scale_columns(&x),
+        Err(MattenMlprepError::ZeroVariance { column: 0 })
+    ));
+}

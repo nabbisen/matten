@@ -101,6 +101,11 @@ But the layout alone does not imply lock-step releases or equal maturity. Each c
 
 ## 7. Versioning model
 
+> **Superseded by RFC-030 (v0.19.0).** The workspace adopted **lock-step family
+> versioning** (every crate shares one version; maturity is the Status label, not
+> the version number). The independent-per-crate-SemVer rationale below is retained
+> for history.
+
 Each crate uses **independent per-crate SemVer**.
 
 Examples:
@@ -268,6 +273,12 @@ to `done/` (see RFC-000 § "Granularity of transitions"):
 2. **Per-crate implementation RFC numbering — resolved: start at RFC-027.**
    Numbers are sequential and never reused (RFC-000), so the first companion
    implementation RFC is RFC-027.
-3. **Changelog strategy — deferred to v0.17.0.** Decided alongside the workspace
-   move; the working assumption is per-crate changelogs with coordinated
-   workspace release notes, consistent with independent per-crate SemVer (§7).
+3. **Changelog and per-crate file strategy — resolved in v0.19.0.** While the
+   crates ship together as milestone tarballs (not yet on crates.io), the
+   workspace keeps a *single root* `CHANGELOG.md` (organized by milestone, with
+   per-crate version changes noted inside each entry) and *root-only*
+   `LICENSE`/`NOTICE`. Each crate is licensed by its inherited SPDX
+   `license = "Apache-2.0"` field, so per-crate license files are unnecessary.
+   Per-crate changelogs and license files are reintroduced when crates begin
+   publishing to crates.io on independent cadences — the point at which a crate's
+   own version history and self-contained `.crate` artifact start to matter.

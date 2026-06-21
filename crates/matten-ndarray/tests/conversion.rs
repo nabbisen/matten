@@ -111,3 +111,54 @@ fn numeric_tensor_under_dynamic_feature_still_converts() {
     let a = to_arrayd(&t).unwrap();
     assert_eq!(a.shape(), &[2]);
 }
+
+// ── v0.19 hardening: reliability of roundtrips and edge values (RFC-029 §2.3) ──
+
+#[test]
+fn roundtrip_rank4() {
+    let data: Vec<f64> = (0..16).map(|x| x as f64 * 0.5).collect();
+    let t = Tensor::new(data.clone(), &[2, 2, 2, 2]);
+    let back = from_arrayd(to_arrayd(&t).unwrap()).unwrap();
+    assert_eq!(back.shape(), &[2, 2, 2, 2]);
+    assert_eq!(back.as_slice(), &data[..]);
+}
+
+#[test]
+fn from_arrayd_3d_permuted_axes_preserves_logical_order() {
+    // [2,3,4] permuted to axis order (2,0,1) -> logical [4,2,3], non-standard layout.
+    let data: Vec<f64> = (0..24).map(|x| x as f64).collect();
+    let a = arr(&[2, 3, 4], data);
+    let permuted = a.clone().permuted_axes(vec![2, 0, 1]); // view, non-standard layout
+    let t = from_arrayd(permuted.to_owned()).unwrap();
+    assert_eq!(t.shape(), &[4, 2, 3]);
+    // Compare against ndarray's own logical iteration as ground truth.
+    let expected: Vec<f64> = a.permuted_axes(vec![2, 0, 1]).iter().copied().collect();
+    assert_eq!(t.as_slice(), &expected[..]);
+}
+
+#[test]
+fn nan_and_inf_pass_through_both_directions() {
+    let t = Tensor::new(vec![1.0, f64::NAN, f64::INFINITY, -2.0], &[2, 2]);
+    let a = to_arrayd(&t).unwrap();
+    assert!(a[[0, 1]].is_nan());
+    assert!(a[[1, 0]].is_infinite());
+    let back = from_arrayd(a).unwrap();
+    assert!(back.as_slice()[1].is_nan());
+    assert!(back.as_slice()[2].is_infinite());
+    assert_eq!(back.as_slice()[0], 1.0);
+}
+
+#[test]
+fn fractional_value_fidelity() {
+    let data = vec![0.1, 0.2, 0.3, 0.123_456_789, -9.87654321, 1e-12];
+    let t = Tensor::new(data.clone(), &[2, 3]);
+    let back = from_arrayd(to_arrayd(&t).unwrap()).unwrap();
+    assert_eq!(back.as_slice(), &data[..]); // exact bit-for-bit, no rounding
+}
+
+#[test]
+fn to_arrayd_is_standard_layout() {
+    let t = Tensor::new(vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0], &[2, 3]);
+    let a = to_arrayd(&t).unwrap();
+    assert!(a.is_standard_layout());
+}

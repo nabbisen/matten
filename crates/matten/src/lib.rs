@@ -64,7 +64,7 @@
 //! For the smallest dependency footprint, disable defaults and opt in:
 //!
 //! ```toml
-//! matten = { version = "0.16", default-features = false }
+//! matten = { version = "0.19", default-features = false }
 //! ```
 
 #![forbid(unsafe_code)]

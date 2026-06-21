@@ -1,9 +1,17 @@
 [workspace]
 resolver = "3"
-members = ["crates/matten", "crates/matten-ndarray", "crates/matten-mlprep"]
+members = [
+    "crates/matten",
+    "crates/matten-ndarray",
+    "crates/matten-mlprep",
+]
 
-# Shared package metadata, inherited by member crates via `field.workspace = true`.
+# Shared package metadata inherited by member crates via `field.workspace = true`.
+# The workspace uses lock-step family versioning (RFC-030): every crate shares
+# this version. Per-crate `keywords`/`categories`/`description` are NOT shared —
+# they differ per crate and aid crates.io discoverability.
 [workspace.package]
+version = "0.19.0"
 edition = "2024"
 rust-version = "1.85"
 license = "Apache-2.0"
@@ -13,5 +21,5 @@ repository = "https://github.com/nabbisen/matten"
 # Core `matten` is path-published; companions depend on it by path + version so
 # they resolve locally in the workspace and by version on crates.io.
 [workspace.dependencies]
-matten = { version = "0.18", path = "crates/matten" }
+matten = { version = "0.19", path = "crates/matten" }
 ndarray = "0.16"

@@ -1,18 +1,18 @@
 [package]
 name = "matten-mlprep"
-version = "0.1.0"
-edition.workspace = true
-rust-version.workspace = true
-authors.workspace = true
-license.workspace = true
-repository.workspace = true
 description = "Small, transparent, deterministic preprocessing helpers for matten::Tensor (no ML framework)."
-readme = "README.md"
-keywords = ["tensor", "preprocessing", "standardize", "matten", "ml"]
-categories = ["science", "mathematics"]
+readme      = "README.md"
+categories  = ["science", "mathematics"]
+keywords    = ["tensor", "preprocessing", "standardize", "matten", "ml"]
+version.workspace       = true
+edition.workspace       = true
+rust-version.workspace  = true
+authors.workspace       = true
+license.workspace       = true
+repository.workspace    = true
 
 [dependencies]
-matten = { path = "../matten", version = "0.18", default-features = false }
+matten = { version = "0.19", path = "../matten", default-features = false }
 
 [features]
 # Forwarded so dynamic-tensor rejection compiles only when dynamic tensors exist.

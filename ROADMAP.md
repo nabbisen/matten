@@ -5,7 +5,7 @@
 **Document Version:** `1.0.0`  
 **Date:** 2026-06-21  
 **Status:** First canonical issue — v0.16+ companion-crate reconciliation  
-**Planning Baseline:** core `matten` completed RFC-015 through RFC-021 (shipped through v0.15.3); RFC-022 boundary confirmation shipped in v0.16.0; v0.17.0 introduced the Cargo workspace and `matten-ndarray` 0.1.0 (RFC-025, RFC-027); v0.18.0 added `matten-mlprep` 0.1.0 (RFC-024, RFC-028). Next: v0.19.0 companion maturity hardening.
+**Planning Baseline:** core `matten` completed RFC-015 through RFC-021 (shipped through v0.15.3); RFC-022 boundary confirmation shipped in v0.16.0; v0.17.0 introduced the Cargo workspace and `matten-ndarray` 0.1.0 (RFC-025, RFC-027); v0.18.0 added `matten-mlprep` 0.1.0 (RFC-024, RFC-028); v0.19.0 promoted `matten-ndarray` to production-ready candidate (0.1.1) and `matten-mlprep` to beta (0.1.1) (RFC-029). Next: v0.20+ `matten-data` beta-decision phase.
 
 ---
 
@@ -97,7 +97,8 @@ Make the companion-crate model concrete without expanding core `matten`.
 
 - Implement RFC-022 as policy and project mechanics.
 - Decide workspace layout.
-- Define independent per-crate SemVer.
+- Define the workspace versioning model (independent per-crate SemVer initially;
+  superseded by lock-step family versioning in v0.19.0, RFC-030).
 - Define companion error-type policy.
 - Define maturity labels.
 - Add mechanical dependency-boundary CI.
@@ -350,22 +351,44 @@ Design-only until batch lifecycle, schema drift, malformed-row policy, memory bu
 
 ---
 
-## 10. Companion crate versioning policy
+## 10. Workspace versioning policy
 
-Each companion crate uses **independent per-crate SemVer**.
-
-A workspace may have coordinated release notes, but crate maturity is declared per crate.
-
-Examples:
+The workspace uses **lock-step family versioning** (RFC-030, which supersedes the
+earlier independent-per-crate-SemVer plan). Every crate shares one version, set in
+`[workspace.package].version`:
 
 ```text
-matten          0.16.0
-matten-ndarray 0.1.0
-matten-mlprep  0.1.0
-matten-data    0.1.0 experimental
+matten          0.19.0
+matten-ndarray 0.19.0
+matten-mlprep  0.19.0
 ```
 
-Core `matten` version does not imply companion crate maturity.
+- **Version = compatibility.** Matching numbers mean a matched, compatible set —
+  no per-crate compatibility matrix for users.
+- **Maturity = the Status label** (experimental / beta / production-ready
+  candidate / production-ready), declared per crate in its README/docs. A crate
+  at `0.19.0` may still be `beta`; the version does not imply maturity.
+
+This fits the project's reality: the crates are released together as milestone
+artifacts. If a crate ever needs an independent release cadence, the model is
+revisited (back to independent SemVer, with the per-crate `CHANGELOG`/`LICENSE`
+split of RFC-022 §12).
+
+### 10.1 Workspace file conventions (resolved v0.19.0)
+
+While the crates ship together as **milestone tarballs** (not yet published to
+crates.io), the workspace keeps the structure simple:
+
+- a **single root `CHANGELOG.md`**, ordered by milestone, recording each crate's
+  version change inside the relevant entry;
+- **root-only `LICENSE`/`NOTICE`**; each crate is licensed by its inherited SPDX
+  `license = "Apache-2.0"` field (no per-crate license file is required by cargo
+  or crates.io when that field is set).
+
+Per-crate `CHANGELOG`s and per-crate `LICENSE`/`NOTICE` files are reintroduced at
+the point crates begin **independent crates.io publication** — the moment a
+crate's own version history and self-contained `.crate` artifact start to earn
+their maintenance cost (RFC-022 §12).
 
 ---
 

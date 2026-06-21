@@ -4,9 +4,11 @@
 [![Docs.rs](https://docs.rs/matten-mlprep/badge.svg)](https://docs.rs/matten-mlprep)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](../../LICENSE)
 
-> **Experimental (0.1.x).** Small, transparent, deterministic preprocessing
-> helpers for [`matten::Tensor`](https://crates.io/crates/matten). Not an ML
-> framework. The API may change; pin the version.
+> **Beta (`0.19.x` family release).** Small, transparent, deterministic preprocessing helpers for
+> [`matten::Tensor`](https://crates.io/crates/matten). Not an ML framework. The
+> API is intended to be mostly stable but is still pre-1.0; pin the minor version.
+
+Part of the [`matten` workspace](../../README.md) — see it for the full family.
 
 ## Overview
 
@@ -52,6 +54,46 @@ let (train, test) = train_test_split(&z, 0.75)?;
   rows are train, the rest are test. No shuffle. (A seeded variant is planned;
   see RFC-024 §6.)
 - **Dynamic tensors are rejected, not panicked** (with the `dynamic` feature).
+
+## Public API
+
+The complete surface (the breaking-change baseline for this crate):
+
+```rust
+pub fn standardize_columns(x: &Tensor) -> Result<Tensor, MattenMlprepError>;
+pub fn minmax_scale_columns(x: &Tensor) -> Result<Tensor, MattenMlprepError>;
+pub fn add_bias_column(x: &Tensor)      -> Result<Tensor, MattenMlprepError>;
+pub fn train_test_split(x: &Tensor, train_ratio: f64)
+    -> Result<(Tensor, Tensor), MattenMlprepError>;
+
+#[non_exhaustive]
+pub enum MattenMlprepError {
+    DynamicTensor,
+    ExpectedMatrix { shape: Vec<usize> },
+    InvalidRatio(f64),
+    EmptySplit { rows: usize, train_ratio: f64 },
+    ZeroVariance { column: usize },
+    Matten(matten::MattenError),
+}
+```
+
+## Limitations
+
+- **Rank-2 only.** Inputs must be `[rows = samples, columns = features]`; other
+  ranks are an error. No automatic reshaping or transposition.
+- **No data cleaning.** `NaN`/`Inf` propagate to the output; clean your data
+  first (e.g. via the core `dynamic` on-ramp) if it is not already numeric-clean.
+- **Population std.** `standardize_columns` divides by `n` (not `n-1`).
+- **Ordered split only.** `train_test_split` does not shuffle. A seeded shuffled
+  variant is planned but not yet available (RFC-024 §6).
+- **Not for large/streaming data.** These are eager, in-memory transforms.
+
+## Compatibility
+
+- **SemVer:** pre-1.0 (`0.x`). A `0.x` minor bump may break and carries migration
+  notes; patch releases are additive only. Pin the minor (`matten-mlprep = "0.19"`).
+- **MSRV:** Rust 1.85 (edition 2024). **`matten`:** shares the `0.19` family version (RFC-030).
+- A `1.0` release requires explicit maintainer confirmation.
 
 ## More detail
 

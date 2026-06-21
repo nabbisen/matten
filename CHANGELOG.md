@@ -19,19 +19,50 @@ those versions coincide.
 
 ## [0.19.0] - 2026-06-21
 
-**Companion maturity hardening (RFC-029) plus workspace housekeeping. Docs, tests, and repo structure only; no code or public API changes.**
+**Companion maturity hardening (RFC-029), workspace versioning model (RFC-030),
+and housekeeping. Docs, metadata, tests, and repo structure only; no code or
+public API changes.**
 
-- **`matten-ndarray` 0.1.1 → production-ready candidate.** Added the
-  compatibility policy (the last gate item) and strengthened roundtrip tests
-  (rank-4, 3-D permuted-axes, NaN/Inf passthrough, fractional fidelity,
-  standard-layout output).
-- **`matten-mlprep` 0.1.1 → beta.** Added documented limitations, a public-API
+### Versioning model — lock-step family versioning (RFC-030)
+
+The workspace now uses **lock-step family versioning** (RFC-030, superseding
+RFC-022 §7's independent per-crate SemVer): every crate shares one version via
+`[workspace.package].version`, and **maturity is the Status label, not the
+version number**. This is a one-time alignment of the family to `0.19.0`:
+
+```text
+matten          0.16.0 -> 0.19.0
+matten-ndarray  0.1.1  -> 0.19.0
+matten-mlprep   0.1.1  -> 0.19.0
+```
+
+No crate's public API or behavior changes in this alignment — only the version
+number moves. The jump is **not** 18 minor releases of churn; it is the family
+adopting a shared number. A user can now rely on matching versions
+(`matten = "0.19"`, `matten-ndarray = "0.19"`, `matten-mlprep = "0.19"`) meaning a
+compatible set. Per-crate `keywords`/`categories` stay per crate; only truly
+shared metadata is inherited.
+
+### Documentation
+
+- README reworked into a single ecosystem landing page covering all three crates,
+  with the family-versioning statement replacing the (now-incorrect)
+  independent-SemVer claim. Per-crate READMEs are retained (each is what
+  crates.io renders for that crate) and now link back to the workspace.
+- RFC-022 §7 annotated as superseded by RFC-030; ROADMAP §10 updated.
+
+### Maturity hardening (RFC-029)
+
+- **`matten-ndarray` → production-ready candidate.** Added the compatibility
+  policy (the last gate item) and strengthened roundtrip tests (rank-4, 3-D
+  permuted-axes, NaN/Inf passthrough, fractional fidelity, standard-layout output).
+- **`matten-mlprep` → beta.** Added documented limitations, a public-API
   snapshot, and a compatibility policy; added tests for NaN-column propagation
   and single-row degenerate inputs. This is an early beta (closed scope, limited
   field usage); the label is reversible while pre-1.0.
-- Core `matten` (0.16.0) is unchanged. `matten-data`, `matten-nalgebra`,
-  `matten-candle`, and streaming are **not** promoted (RFC-023, RFC-025 §10,
-  RFC-026).
+- Core `matten` has no code change (it aligns to the `0.19.0` family version per
+  RFC-030). `matten-data`, `matten-nalgebra`, `matten-candle`, and streaming are
+  **not** promoted (RFC-023, RFC-025 §10, RFC-026).
 - **RFC-029** (maturity evaluation + decisions) → `done/`.
 - **Workspace housekeeping (simplification).** Consolidated to a single root
   `CHANGELOG.md` (this file) and root-only `LICENSE`/`NOTICE`; removed the

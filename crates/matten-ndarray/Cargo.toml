@@ -1,18 +1,18 @@
 [package]
 name = "matten-ndarray"
-version = "0.1.0"
-edition.workspace = true
-rust-version.workspace = true
-authors.workspace = true
-license.workspace = true
-repository.workspace = true
 description = "Experimental conversion bridge between matten::Tensor and ndarray::ArrayD<f64>."
-readme = "README.md"
-keywords = ["tensor", "ndarray", "conversion", "bridge", "matten"]
-categories = ["science", "mathematics"]
+readme      = "README.md"
+categories  = ["science", "mathematics"]
+keywords    = ["tensor", "ndarray", "conversion", "bridge", "matten"]
+version.workspace       = true
+edition.workspace       = true
+rust-version.workspace  = true
+authors.workspace       = true
+license.workspace       = true
+repository.workspace    = true
 
 [dependencies]
-matten = { path = "../matten", version = "0.18", default-features = false }
+matten = { version = "0.19", path = "../matten", default-features = false }
 ndarray = { workspace = true }
 
 [features]
