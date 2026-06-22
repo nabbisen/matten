@@ -322,6 +322,34 @@ impl Tensor {
         self.ndim() == 2
     }
 
+    /// Returns `true` if this tensor uses dynamic ([`Element`]) storage.
+    ///
+    /// This method is available in **all builds**, regardless of whether the
+    /// `dynamic` feature is enabled:
+    ///
+    /// - When `dynamic` is **off**, no dynamic tensor can be constructed, so
+    ///   this always returns `false`.
+    /// - When `dynamic` is **on**, it returns `true` for tensors built via the
+    ///   dynamic API (e.g. [`Tensor::from_elements`]) and `false` for ordinary
+    ///   numeric tensors.
+    ///
+    /// Companion crates call this unconditionally before numeric conversion so
+    /// that a dynamic `Tensor` is rejected with a typed `Err` rather than
+    /// reaching internal numeric accessors and panicking — even when Cargo
+    /// feature unification enables core `dynamic` while the companion's own
+    /// mirror feature is off.
+    #[must_use]
+    pub fn is_dynamic(&self) -> bool {
+        #[cfg(feature = "dynamic")]
+        {
+            self.dynamic.is_some()
+        }
+        #[cfg(not(feature = "dynamic"))]
+        {
+            false
+        }
+    }
+
     /// The flat, row-major data as a slice.
     #[must_use]
     pub fn as_slice(&self) -> &[f64] {

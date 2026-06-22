@@ -15,6 +15,23 @@ mod tensor_tests {
         assert!(t.is_dynamic());
     }
 
+    // RFC-031: is_dynamic() must return true for dynamic tensors and false for
+    // numeric tensors, regardless of feature configuration.
+    #[test]
+    fn is_dynamic_distinguishes_storage_kind() {
+        let dynamic = Tensor::from_elements(vec![Element::Float(1.0), Element::Float(2.0)], &[2]);
+        assert!(
+            dynamic.is_dynamic(),
+            "dynamic tensor must report is_dynamic() = true"
+        );
+
+        let numeric = Tensor::new(vec![1.0, 2.0], &[2]);
+        assert!(
+            !numeric.is_dynamic(),
+            "numeric tensor must report is_dynamic() = false"
+        );
+    }
+
     #[test]
     fn try_from_elements_shape_mismatch() {
         let err = Tensor::try_from_elements(vec![Element::Float(1.0)], &[2]).unwrap_err();

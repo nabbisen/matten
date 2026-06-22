@@ -106,11 +106,6 @@ impl Tensor {
         })
     }
 
-    /// Returns `true` if this tensor uses dynamic (`Element`) storage.
-    pub fn is_dynamic(&self) -> bool {
-        self.dynamic.is_some()
-    }
-
     /// Parses a JSON string into a dynamic `Tensor`, mapping JSON values to
     /// `Element` variants.
     ///

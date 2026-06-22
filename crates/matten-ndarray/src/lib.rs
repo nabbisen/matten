@@ -1,5 +1,5 @@
-//! `matten-ndarray` — an experimental conversion bridge between
-//! [`matten::Tensor`] and [`ndarray::ArrayD<f64>`].
+//! `matten-ndarray` — a conversion bridge between [`matten::Tensor`] and
+//! [`ndarray::ArrayD<f64>`].
 //!
 //! This is a deliberately *boring* companion crate (RFC-025, RFC-027): it
 //! converts between the two owned representations and does nothing else. It adds
@@ -18,8 +18,8 @@
 //!
 //! # Status
 //!
-//! **Experimental (0.1.x).** The API may change. Pin the version if you depend
-//! on it. Supported `ndarray`: the `0.16` minor.
+//! **Production-ready candidate.** The API is stable for the `0.19` family.
+//! Supported `ndarray`: the `0.16` minor.
 //!
 //! # Behavior
 //!
@@ -28,8 +28,16 @@
 //!   (transposed / sliced) `ArrayD` inputs.
 //! - [`from_arrayd`] rejects shapes with a zero-length axis ([`matten`] forbids
 //!   zero-sized dimensions).
-//! - With the `dynamic` feature, a dynamic tensor passed to [`to_arrayd`]
-//!   returns [`MattenNdarrayError::DynamicTensor`] instead of panicking.
+//! - A dynamic tensor passed to [`to_arrayd`] always returns
+//!   [`MattenNdarrayError::DynamicTensor`] — this guard is unconditional and
+//!   does not depend on the companion `dynamic` feature (RFC-031).
+//!
+//! # Feature flags
+//!
+//! - `dynamic` — Compatibility forwarding feature. No longer required for
+//!   dynamic rejection as of v0.19.1. Dynamic tensors are rejected at companion
+//!   boundaries regardless of whether this feature is enabled. Reconsider
+//!   removal no earlier than v0.20.0.
 
 #![forbid(unsafe_code)]
 

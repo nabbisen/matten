@@ -32,6 +32,17 @@ fn shape_predicates() {
     assert!(!t3.is_matrix());
 }
 
+// RFC-031: is_dynamic() is unconditionally available.
+// When the `dynamic` feature is off, it must always return false.
+// When it is on, numeric tensors return false and dynamic tensors return true
+// (covered by the dynamic sub-suite below).
+#[test]
+fn is_dynamic_false_for_numeric_tensor() {
+    assert!(!Tensor::scalar(1.0).is_dynamic());
+    assert!(!Tensor::new(vec![1.0, 2.0, 3.0, 4.0], &[2, 2]).is_dynamic());
+    assert!(!Tensor::zeros(&[3, 3]).is_dynamic());
+}
+
 #[test]
 fn to_vec_returns_owned_copy() {
     let t = Tensor::new(vec![1.0, 2.0, 3.0], &[3]);

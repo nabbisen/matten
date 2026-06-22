@@ -208,3 +208,13 @@ fn single_row_matrix_is_zero_variance() {
         Err(MattenMlprepError::ZeroVariance { column: 0 })
     ));
 }
+
+// RFC-031: numeric tensors must never be flagged as dynamic, regardless of
+// whether the companion `dynamic` feature is enabled.
+#[test]
+fn numeric_tensor_is_not_dynamic() {
+    let x = Tensor::new(vec![1.0, 2.0, 3.0, 4.0], &[2, 2]);
+    assert!(!x.is_dynamic());
+    // Guard must pass and preprocessing must succeed.
+    assert!(standardize_columns(&x).is_ok());
+}

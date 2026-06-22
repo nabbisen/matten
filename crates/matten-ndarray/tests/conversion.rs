@@ -162,3 +162,13 @@ fn to_arrayd_is_standard_layout() {
     let a = to_arrayd(&t).unwrap();
     assert!(a.is_standard_layout());
 }
+
+// RFC-031: numeric tensors must never be flagged as dynamic, regardless of
+// whether the companion `dynamic` feature is enabled.
+#[test]
+fn numeric_tensor_is_not_dynamic() {
+    let t = Tensor::new(vec![1.0, 2.0, 3.0, 4.0], &[2, 2]);
+    assert!(!t.is_dynamic());
+    // Guard must pass and conversion must succeed.
+    assert!(to_arrayd(&t).is_ok());
+}

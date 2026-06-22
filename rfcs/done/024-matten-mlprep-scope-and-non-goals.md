@@ -1,9 +1,10 @@
 # RFC-024: `matten-mlprep` Scope and Non-goals
 
-**Status:** Proposed  
+**Status:** Implemented (shipped v0.18.0; beta decision v0.19.0 via RFC-029)  
 **Target:** v0.18 experimental; v0.19 beta decision / hardening  
 **Theme:** Transparent preprocessing companion crate  
-**Depends on:** RFC-019, RFC-022
+**Depends on:** RFC-019, RFC-022  
+**Implemented by:** RFC-028 (implementation); RFC-029 (maturity evaluation)
 
 ---
 

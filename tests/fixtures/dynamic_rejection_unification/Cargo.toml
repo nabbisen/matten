@@ -1,0 +1,20 @@
+[package]
+name = "dynamic-rejection-unification"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+# Regression fixture for RFC-031.
+#
+# Simulates a downstream crate that enables core `matten/dynamic` while leaving
+# the companion `dynamic` mirror features OFF. Under Cargo feature unification a
+# single `matten` is compiled WITH `dynamic`, but the companion cfg gates
+# (removed in v0.19.1) would previously have been compiled out, allowing a
+# dynamic Tensor to reach numeric accessors and panic.
+#
+# Expected: every companion API returns Err(DynamicTensor) — no panic.
+
+[dependencies]
+matten        = { path = "../../../crates/matten",        features = ["dynamic"], default-features = false }
+matten-ndarray = { path = "../../../crates/matten-ndarray", default-features = true }
+matten-mlprep  = { path = "../../../crates/matten-mlprep",  default-features = true }

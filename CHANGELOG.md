@@ -2,13 +2,14 @@
 
 All notable changes to the **matten** workspace are documented here. The format
 follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the project
-follows [Semantic Versioning](https://semver.org/) per crate.
+follows [Semantic Versioning](https://semver.org/).
 
 Entries are ordered by release milestone (which is also the tarball version).
-The workspace uses independent per-crate SemVer (RFC-022 §7), so each entry notes
-the version of every crate it changes — core `matten`, `matten-ndarray`, and
-`matten-mlprep`. Through `0.16.0` the project was the single `matten` crate, so
-those versions coincide.
+The workspace uses **lock-step family versioning** (RFC-030): every crate shares
+one version, so each entry applies to the whole family — core `matten`,
+`matten-ndarray`, and `matten-mlprep`. Maturity differences between crates are
+expressed by per-crate status labels, not by separate version numbers. Through
+`0.16.0` the project was the single `matten` crate.
 
 > **Convention (resolved in v0.19.0, RFC-022 §12).** While the crates ship
 > together as milestone tarballs, the project keeps a *single* root `CHANGELOG.md`
@@ -16,6 +17,59 @@ those versions coincide.
 > `license` field, so no per-crate license file is required. Per-crate changelogs
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
+
+## [0.19.1] - 2026-06-21
+
+**Companion maturity hardening patch (RFC-031). Feature-robust dynamic rejection,
+maturity-label alignment, RFC lifecycle cleanup, and release-doc script extension.
+No breaking changes.**
+
+### Added
+
+- `Tensor::is_dynamic()` is now **unconditionally available** in all builds
+  (RFC-031). Previously it was defined only inside the `#[cfg(feature = "dynamic")]`
+  module; it now lives in the main `Tensor` impl and returns `false` when `dynamic`
+  is off, the true storage state when it is on.
+- Regression fixture `tests/fixtures/dynamic_rejection_unification` — a standalone
+  crate (excluded from the workspace) that reproduces the Cargo feature-unification
+  panic scenario and asserts `Err(DynamicTensor)` from both companions under the
+  fixed behaviour (RFC-031 §6.2).
+- `scripts/check-release-docs.sh` extended with companion checks: stale
+  Experimental status labels, stale independent-SemVer wording in CHANGELOG, and
+  a guard ensuring companion rejection guards are not `#[cfg]`-gated (RFC-031).
+
+### Fixed
+
+- **P1 — dynamic rejection panic under Cargo feature unification (RFC-031).**
+  When a downstream crate enabled `matten/dynamic` while leaving a companion
+  `dynamic` mirror feature off, Cargo compiled one `matten` with `dynamic` active
+  but the companion's `#[cfg(feature = "dynamic")]` guard was compiled out. A
+  dynamic `Tensor` reaching `to_arrayd` or any `matten-mlprep` entry point
+  would panic inside `Tensor::to_vec()` / `Tensor::as_slice()` instead of
+  returning `Err`. Both companion guards now call `Tensor::is_dynamic()`
+  unconditionally (no `#[cfg]`).
+- **Clippy `manual_contains`** at `matten-ndarray/src/convert.rs:59` (surfaced
+  on clippy ≥ 1.96): `shape.iter().any(|&d| d == 0)` → `shape.contains(&0)`.
+- **CHANGELOG preamble** incorrectly stated independent per-crate SemVer
+  (RFC-022 §7, superseded by RFC-030). Updated to state lock-step family
+  versioning.
+
+### Changed
+
+- `matten-ndarray` status updated from **Experimental** to **production-ready
+  candidate** in `src/lib.rs` and `Cargo.toml` description (RFC-029).
+- `matten-mlprep` status updated from **Experimental (0.1.x)** to **beta** in
+  `src/lib.rs` (RFC-029).
+- Companion `dynamic` feature re-documented as a **compatibility forwarding
+  feature** in both `lib.rs` crate-level docs. It is no longer required for
+  dynamic-rejection correctness; the rejection guard is unconditional. Reconsider
+  removal no earlier than v0.20.0.
+- RFC-024 (`matten-mlprep` scope) moved from `rfcs/proposed/` to `rfcs/done/`
+  with status "Implemented by RFC-028; maturity evaluated by RFC-029".
+- RFC-025 (bridge-crate policy) moved from `rfcs/proposed/` to `rfcs/done/`
+  with status "Implemented for `matten-ndarray`; `matten-nalgebra` and
+  `matten-candle` deferred to future per-crate RFCs".
+- RFC-031 added to `rfcs/done/`.
 
 ## [0.19.0] - 2026-06-21
 

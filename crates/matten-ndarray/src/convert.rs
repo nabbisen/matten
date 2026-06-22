@@ -10,9 +10,10 @@ use ndarray::{ArrayD, IxDyn};
 
 /// Converts a numeric [`Tensor`] into an [`ndarray::ArrayD<f64>`].
 ///
-/// The result is standard (row-major) layout. A dynamic tensor (under the
-/// `dynamic` feature) returns [`MattenNdarrayError::DynamicTensor`] rather than
-/// panicking.
+/// The result is standard (row-major) layout. A dynamic tensor returns
+/// [`MattenNdarrayError::DynamicTensor`] rather than panicking. This guard is
+/// unconditional — it does not depend on the companion `dynamic` feature being
+/// enabled (RFC-031).
 ///
 /// ```
 /// use matten::Tensor;
@@ -24,7 +25,6 @@ use ndarray::{ArrayD, IxDyn};
 /// assert_eq!(arr[[1, 0]], 3.0);
 /// ```
 pub fn to_arrayd(tensor: &Tensor) -> Result<ArrayD<f64>, MattenNdarrayError> {
-    #[cfg(feature = "dynamic")]
     if tensor.is_dynamic() {
         return Err(MattenNdarrayError::DynamicTensor);
     }
@@ -56,7 +56,7 @@ pub fn to_arrayd(tensor: &Tensor) -> Result<ArrayD<f64>, MattenNdarrayError> {
 pub fn from_arrayd(array: ArrayD<f64>) -> Result<Tensor, MattenNdarrayError> {
     let shape: Vec<usize> = array.shape().to_vec();
 
-    if shape.iter().any(|&dim| dim == 0) {
+    if shape.contains(&0) {
         return Err(MattenNdarrayError::ZeroSizedAxis(shape));
     }
 

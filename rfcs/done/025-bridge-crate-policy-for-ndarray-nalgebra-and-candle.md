@@ -1,9 +1,10 @@
 # RFC-025: Bridge Crate Policy for ndarray, nalgebra, and candle
 
-**Status:** Proposed  
+**Status:** Implemented for `matten-ndarray` (v0.17.0 experimental; production-ready candidate decision v0.19.0 via RFC-029). `matten-nalgebra` and `matten-candle` are deferred and require future per-crate RFCs before implementation.  
 **Target:** policy in v0.16; `matten-ndarray` experimental in v0.17; nalgebra/candle deferred  
 **Theme:** External numeric ecosystem bridge strategy  
 **Depends on:** RFC-015, RFC-022  
+**Implemented by:** RFC-027 (matten-ndarray implementation)  
 **Supersedes:** older plan that bundled ndarray/nalgebra/candle implementation together around v0.19
 
 ---

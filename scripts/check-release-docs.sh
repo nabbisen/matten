@@ -1,11 +1,17 @@
 #!/usr/bin/env bash
-# Release documentation truth check (RFC-015 §4).
+# Release documentation truth check (RFC-015 §4, RFC-031).
 # Run from the workspace root before any public release. Exits 1 on any issue.
 
 set -euo pipefail
 FAIL=0
 
 CORE="crates/matten"
+NDARRAY="crates/matten-ndarray"
+MLPREP="crates/matten-mlprep"
+
+# ---------------------------------------------------------------------------
+# Core checks
+# ---------------------------------------------------------------------------
 
 echo "=== Checking for stale runtime 'matten 0.x' version strings ==="
 if grep -rn "matten 0\." "$CORE/src/" | grep -v "CHANGELOG\|#\[\|0\.1\.x\|0\.x" | grep -v "^Binary"; then
@@ -38,6 +44,53 @@ if grep -rn "IntoSliceRange\|SliceConvert\|SliceSpecRepr" "$CORE/examples/"; the
   echo "ERROR: examples import hidden plumbing"
   FAIL=1
 fi
+
+# ---------------------------------------------------------------------------
+# CHANGELOG versioning model (RFC-030, RFC-031)
+# ---------------------------------------------------------------------------
+
+echo "=== Checking CHANGELOG preamble does not claim independent per-crate SemVer ==="
+# Only inspect the preamble — lines before the first release heading ("## [").
+# Historical entries legitimately reference the old model by name.
+PREAMBLE=$(sed '/^## \[/q' CHANGELOG.md | head -n -1)
+if echo "$PREAMBLE" | grep -n "independent per-crate SemVer\|independent per-crate versioning"; then
+  echo "ERROR: CHANGELOG preamble still claims independent per-crate SemVer (superseded by RFC-030)"
+  FAIL=1
+fi
+
+# ---------------------------------------------------------------------------
+# Companion maturity-label checks (RFC-029, RFC-031)
+# ---------------------------------------------------------------------------
+
+echo "=== Checking matten-ndarray does not claim Experimental status ==="
+if grep -in "experimental" "$NDARRAY/src/lib.rs" | grep -v "//\|#\["; then
+  echo "ERROR: matten-ndarray lib.rs still claims Experimental status (should be production-ready candidate)"
+  FAIL=1
+fi
+if grep -i "experimental" "$NDARRAY/Cargo.toml" | grep "description"; then
+  echo "ERROR: matten-ndarray Cargo.toml description still says Experimental"
+  FAIL=1
+fi
+
+echo "=== Checking matten-mlprep does not claim Experimental status ==="
+if grep -in "Experimental (0\." "$MLPREP/src/lib.rs"; then
+  echo "ERROR: matten-mlprep lib.rs still claims Experimental (0.x) status (should be beta)"
+  FAIL=1
+fi
+
+# ---------------------------------------------------------------------------
+# Companion dynamic-rejection guard soundness (RFC-031)
+# ---------------------------------------------------------------------------
+
+echo "=== Checking companion dynamic guards are NOT cfg-gated (RFC-031) ==="
+if grep -n '#\[cfg(feature = "dynamic")\]' "$NDARRAY/src/convert.rs" "$MLPREP/src/util.rs" 2>/dev/null; then
+  echo "ERROR: companion dynamic rejection guard is still behind #[cfg(feature = \"dynamic\")] (RFC-031 regression)"
+  FAIL=1
+fi
+
+# ---------------------------------------------------------------------------
+# Result
+# ---------------------------------------------------------------------------
 
 if [ "$FAIL" -eq 0 ]; then
   echo ""

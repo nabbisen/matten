@@ -34,9 +34,18 @@
 //!
 //! # Status
 //!
-//! **Experimental (0.1.x).** The API may change. Constant (zero-variance)
-//! columns are rejected explicitly by the scalers rather than silently producing
-//! a zero column — see [`MattenMlprepError::ZeroVariance`].
+//! **Beta.** The API may still change. Constant (zero-variance) columns are
+//! rejected explicitly by the scalers rather than silently producing a zero
+//! column — see [`MattenMlprepError::ZeroVariance`]. Dynamic tensors are
+//! rejected at every public entry point unconditionally — the guard does not
+//! depend on the companion `dynamic` feature (RFC-031).
+//!
+//! # Feature flags
+//!
+//! - `dynamic` — Compatibility forwarding feature. No longer required for
+//!   dynamic rejection as of v0.19.1. Dynamic tensors are rejected at companion
+//!   boundaries regardless of whether this feature is enabled. Reconsider
+//!   removal no earlier than v0.20.0.
 
 #![forbid(unsafe_code)]
 
