@@ -2,10 +2,10 @@
 
 **Project:** `matten`  
 **Document Kind:** Canonical Project Roadmap  
-**Document Version:** `1.0.0`  
-**Date:** 2026-06-21  
-**Status:** First canonical issue — v0.16+ companion-crate reconciliation  
-**Planning Baseline:** core `matten` completed RFC-015 through RFC-021 (shipped through v0.15.3); RFC-022 boundary confirmation shipped in v0.16.0; v0.17.0 introduced the Cargo workspace and `matten-ndarray` 0.1.0 (RFC-025, RFC-027); v0.18.0 added `matten-mlprep` 0.1.0 (RFC-024, RFC-028); v0.19.0 promoted `matten-ndarray` to production-ready candidate (0.1.1) and `matten-mlprep` to beta (0.1.1) (RFC-029). Next: v0.20+ `matten-data` beta-decision phase.
+**Document Version:** `1.2.0`  
+**Date:** 2026-06-22  
+**Status:** Canonical roadmap updated for v0.20+ materialization planning; RFC-032 is reserved/consumed by another issue, so the v0.20+ RFC sequence starts at RFC-033  
+**Planning Baseline:** core `matten` completed RFC-015 through RFC-021 (shipped through v0.15.3); RFC-022 boundary confirmation shipped in v0.16.0; v0.17.0 introduced the Cargo workspace and the `matten-ndarray` companion crate under the family version (RFC-025, RFC-027); v0.18.0 introduced the `matten-mlprep` companion crate under the family version (RFC-024, RFC-028); v0.19.0 promoted `matten-ndarray` to production-ready candidate status and `matten-mlprep` to beta status under lock-step family versioning (RFC-029); v0.19.1 shipped feature-robust dynamic rejection (RFC-031); v0.19.2 confirmed the companion dependency/import convention (RFC-032). Under lock-step family versioning (RFC-030), every crate shares the family version (e.g. `0.19.2`); maturity is expressed by per-crate Status labels, not by separate version numbers. Next: v0.20+ materialization phase. RFC-032 is consumed by the companion dependency/import convention; v0.20+ planning starts at RFC-033. The first v0.20+ branch is `matten-data` decision/materialization; the second is small NumPy-inspired core comfort APIs that preserve the `matten` philosophy.
 
 ---
 
@@ -22,6 +22,8 @@ When documents disagree, resolve in this order:
 5. drafts, prototypes, and discussion memos.
 
 The v0.16+ prospect supersedes older schedule lines that placed `matten-data` at v0.17 and bundled all bridge crates at v0.19.
+
+**RFC numbering note:** RFC-032 is reserved/consumed by another issue. New v0.20+ roadmap RFCs therefore begin at **RFC-033**.
 
 ---
 
@@ -81,9 +83,13 @@ matten -> datafusion
 | **v0.17.0** | `matten-ndarray` experimental | First low-risk companion crate | Small conversion implementation |
 | **v0.18.0** | `matten-mlprep` experimental | Transparent numeric preprocessing | Small helper implementation |
 | **v0.19.0** | Companion maturity hardening | `matten-ndarray` production-ready candidate; `matten-mlprep` beta decision | Hardening / QA / docs |
-| **v0.20+** | `matten-data` beta decision | Decide whether small CSV/table-to-Tensor workflow deserves beta | Strategic gate, not automatic promotion |
-| **v0.21+** | Selective production readiness | Promote only proven crates | Per-crate decisions |
-| **Later** | Streaming / large CSV, `nalgebra`, `candle` | Separate RFCs required | Design-only until reopened |
+| **v0.19.1** | Companion hardening patch | RFC-031 feature-robust dynamic rejection; RFC lifecycle/doc cleanup | Patch / quality release |
+| **v0.19.2** | Companion dependency/import policy | RFC-032: explicit dependency style confirmed; companion `pub use matten;` deferred; release-doc guard added | Documentation/tooling patch |
+| **v0.19.3** | v0.20+ planning materialization | RFC-033–042 added as proposed design set; ROADMAP reconciled to lock-step + RFC-032; architect rulings applied | Documentation/planning patch |
+| **v0.20.0** | v0.20+ design/materialization start | RFC-033 through RFC-037 for `matten-data`; RFC-038 for core comfort APIs | Design + selective implementation approval |
+| **v0.20.x** | Minimal implementation phase | Small core comfort APIs; optional experimental `matten-data` if approved | Low-risk implementation only |
+| **v0.21+** | Selective production readiness | `matten-data` beta/experimental/freeze decision; companion maturity decisions | Per-crate decisions |
+| **Later** | Streaming / large CSV, `nalgebra`, `candle`, stats/linalg companions | Separate RFCs required | Design-only until reopened |
 
 ---
 
@@ -264,15 +270,96 @@ Promote only companion crates that stayed small and useful.
 
 ---
 
-## 8. v0.20+ milestone: `matten-data` beta decision phase
+## 8. v0.19.1 milestone: companion hardening patch
 
 ### Goal
 
+Finish the v0.19 maturity work before expanding scope.
+
+### Required work
+
+- Implement RFC-031: feature-robust dynamic rejection and unconditional `Tensor::is_dynamic()`.
+- Keep companion `dynamic` mirror features for compatibility; document them as compatibility forwarding features.
+- Move / mark RFC-024 as done.
+- Move / mark RFC-025 as done for `matten-ndarray`, with `nalgebra` and `candle` explicitly deferred.
+- Align companion rustdoc, README, Cargo descriptions, and status labels.
+- Strengthen release-doc checks for stale version snippets, stale maturity labels, and active independent-SemVer wording.
+- Fix known small lints such as `manual_contains` in `matten-ndarray`.
+
+### Acceptance gate
+
+```text
+[ ] dynamic Tensor passed to matten-ndarray returns MattenNdarrayError::DynamicTensor, not panic
+[ ] dynamic Tensor passed to matten-mlprep returns MattenMlprepError::DynamicTensor, not panic
+[ ] the guarantee does not depend on enabling companion dynamic mirror features
+[ ] companion dynamic mirror features remain present for v0.19.1 compatibility
+[ ] RFC-024 / RFC-025 lifecycle status is no longer contradictory
+[ ] release-doc script detects stale status/version/versioning drift
+[ ] workspace tests and core dependency-boundary check pass
+```
+
+### Explicit non-goals
+
+- No `matten-data` implementation in v0.19.1.
+- No removal of companion `dynamic` features.
+- No breaking change.
+- No v0.20 scope bundled into the patch.
+
+
+---
+
+## 9. v0.20+ milestone: materialize the next safe expansion
+
+### Goal
+
+v0.20+ has two parallel tracks:
+
+```text
+Track A: matten-data decision/materialization
+  Decide whether a small table-to-Tensor companion is worth building.
+
+Track B: core numeric comfort APIs
+  Add small NumPy-inspired Tensor conveniences only if they preserve the Sedan-first philosophy.
+```
+
+The release must not become a broad clone of NumPy, SciPy, or Pandas.
+
+The v0.20+ motto is:
+
+> Borrow familiar API ideas. Shrink them to `matten`-sized scope. Stop before dataframe, SciPy, or ML-framework expectations.
+
+---
+
+### 9.1 RFC numbering for v0.20+
+
+RFC-032 is already consumed by another issue. v0.20+ roadmap RFCs therefore start at RFC-033.
+
+| RFC | Theme | Target |
+|---:|---|---|
+| RFC-033 | `matten-data` Beta-Decision and Scope Lock | v0.20.0 |
+| RFC-034 | `matten-data` Table Model and Public API Boundary | v0.20.0 |
+| RFC-035 | CSV Ingestion, Schema Summary, Missing Values, and Numeric Conversion | v0.20.0 |
+| RFC-036 | `matten-data` Examples, Documentation, and Release Gate | v0.20.0 |
+| RFC-037 | Deferred Streaming and Large CSV Policy | v0.20.0 / later |
+| RFC-038 | Core Numeric Comfort APIs | v0.20.x / v0.21 |
+| RFC-039 | Shape Composition API Boundary | v0.21+ |
+| RFC-040 | Small Statistics Boundary: Core vs Companion | v0.21+ |
+| RFC-041 | Linear Algebra Boundary: Core Lite vs External Crates | v0.21+ |
+| RFC-042 | Pandas-Inspired Scope Guard for `matten-data` | v0.21+ if needed |
+
+RFC-042 may be folded into RFC-033 if the scope guard is already strong enough.
+
+---
+
+### 9.2 Track A: `matten-data` decision/materialization
+
+#### Goal
+
 Decide whether `matten-data` deserves beta without becoming a dataframe engine.
 
-`matten-data` may be scaffolded earlier, but it must not become the main v0.17 implementation target and must not be promoted before this decision gate.
+`matten-data` may be scaffolded earlier, but it must not be promoted before the v0.20+ decision gate.
 
-### Required proof
+#### Required proof
 
 The crate must prove this small workflow:
 
@@ -285,7 +372,7 @@ CSV / table-like data
   -> matten::Tensor
 ```
 
-Possible beta API:
+Possible API shape:
 
 ```rust
 use matten_data::Table;
@@ -296,10 +383,11 @@ println!("{}", table.schema_summary());
 let x = table
     .select_columns(["sales", "cost", "quantity"])?
     .fill_missing(0.0)?
+    .try_numeric()?
     .to_tensor()?;
 ```
 
-### Allowed beta scope
+#### Allowed beta scope
 
 - CSV string/path ingestion;
 - schema summary;
@@ -309,7 +397,7 @@ let x = table
 - explicit numeric conversion;
 - Tensor output.
 
-### Still forbidden
+#### Still forbidden
 
 - joins;
 - group-by;
@@ -321,7 +409,7 @@ let x = table
 - dataframe-style indexing;
 - ML preprocessing.
 
-### Decision outcomes
+#### Decision outcomes
 
 At v0.20+, choose one:
 
@@ -333,13 +421,111 @@ C) freeze/defer
 
 Keeping it experimental is acceptable if the API is useful but not mature. Freezing is acceptable if the crate starts drifting into dataframe territory.
 
+#### Acceptance gate
+
+```text
+[ ] RFC-033 through RFC-036 accepted before implementation expands
+[ ] RFC-037 explicitly defers streaming / large CSV implementation
+[ ] core matten has no dependency on matten-data
+[ ] matten-data has no dataframe/query/lazy API
+[ ] missing-value and numeric-conversion policy is explicit
+[ ] duplicate-header and ragged-row policy is documented
+[ ] error type is crate-local
+[ ] examples are small and do not imply Pandas replacement
+```
+
 ---
 
-## 9. Later themes
+### 9.3 Track B: core numeric comfort APIs
+
+#### Goal
+
+Make core `matten` more pleasant for PoC mathematical work by adding small familiar APIs inspired by NumPy, without changing project identity.
+
+Candidate RFC:
+
+```text
+RFC-038: Core Numeric Comfort APIs
+```
+
+#### Good core candidates
+
+```rust
+Tensor::linspace(start, end, count)
+Tensor::eye(n)
+tensor.clip(min, max)
+tensor.abs()
+tensor.sqrt()
+tensor.exp()
+tensor.ln()
+tensor.argmin()
+tensor.argmax()
+tensor.squeeze()
+tensor.expand_dims(axis)
+```
+
+These fit core if they remain:
+
+- Tensor-centered;
+- dependency-light;
+- easy to document;
+- shape-obvious;
+- useful for beginner/intermediate numeric workflows.
+
+#### Needs separate boundary review
+
+```rust
+stack(...)
+concatenate(...)
+repeat(...)
+tile(...)
+meshgrid(...)
+var(...)
+std(...)
+quantile(...)
+histogram(...)
+```
+
+These are useful but have enough shape/statistics policy risk to need focused RFC review.
+
+#### Core comfort acceptance gate
+
+```text
+[ ] no heavy dependency added
+[ ] API is small and teachable
+[ ] behavior is obvious for scalar/vector/matrix/N-D where applicable
+[ ] NaN/Inf behavior is documented where relevant
+[ ] panic-zone vs Result-zone is clear
+[ ] examples compile in CI
+[ ] no generic Tensor<T> or dtype system introduced
+```
+
+---
+
+### 9.4 What v0.20+ must not do
+
+v0.20+ must not become:
+
+```text
+a NumPy clone
+a SciPy clone
+a Pandas clone
+a dataframe engine
+an ML framework
+a large-data streaming engine
+a linalg backend wrapper
+```
+
+Borrow ergonomic ideas, not ecosystem scope.
+
+
+---
+
+## 10. Later themes
 
 ### `matten-nalgebra`
 
-Deferred until after `matten-ndarray` proves the bridge pattern. Requires a separate RFC or explicit reopening of RFC-025.
+Deferred until after `matten-ndarray` proves the bridge pattern. Requires a separate RFC. RFC-025 is considered implemented for `matten-ndarray`; future `nalgebra` work must not rely on implied acceptance.
 
 ### `matten-candle`
 
@@ -349,9 +535,17 @@ Deferred longer because it brings device, dtype, ML, and dependency-tree complex
 
 Design-only until batch lifecycle, schema drift, malformed-row policy, memory budget, and sync-vs-async strategy are proven. May later live in `matten-data` or a separate `matten-stream`; undecided.
 
+### `matten-stats`
+
+Possible later companion or small-core extension area. Requires RFC-040 before implementation. Candidate topics include variance, standard deviation, covariance, correlation, quantile, and histogram. These APIs have policy traps (`ddof`, NaN behavior, interpolation), so they must not be rushed into core.
+
+### `matten-linalg-lite`
+
+Possible later boundary topic. Requires RFC-041 before implementation. Core may keep only small obvious helpers such as `norm`, `trace`, or `outer` if accepted. Serious linear algebra such as inverse, determinant, eigenvalues, SVD, QR, and Cholesky should remain outside core or be delegated through external crates.
+
 ---
 
-## 10. Workspace versioning policy
+## 11. Workspace versioning policy
 
 The workspace uses **lock-step family versioning** (RFC-030, which supersedes the
 earlier independent-per-crate-SemVer plan). Every crate shares one version, set in
@@ -374,7 +568,7 @@ artifacts. If a crate ever needs an independent release cadence, the model is
 revisited (back to independent SemVer, with the per-crate `CHANGELOG`/`LICENSE`
 split of RFC-022 §12).
 
-### 10.1 Workspace file conventions (resolved v0.19.0)
+### 11.1 Workspace file conventions (resolved v0.19.0)
 
 While the crates ship together as **milestone tarballs** (not yet published to
 crates.io), the workspace keeps the structure simple:
@@ -392,7 +586,7 @@ their maintenance cost (RFC-022 §12).
 
 ---
 
-## 11. Maturity labels
+## 12. Maturity labels
 
 ### Experimental
 
@@ -447,7 +641,51 @@ This label does not automatically imply version 1.0. A v1 release still requires
 
 ---
 
-## 12. Companion error policy
+## 13. Companion dependency and import style
+
+Canonical documentation should preserve this ownership model:
+
+```text
+matten owns Tensor.
+companions add focused workflows around Tensor.
+```
+
+Official examples SHOULD prefer explicit user dependencies:
+
+```toml
+[dependencies]
+matten = "0.19"
+matten-ndarray = "0.19"
+```
+
+and canonical imports:
+
+```rust
+use matten::Tensor;
+use matten_ndarray::to_arrayd;
+```
+
+In the current policy a companion MUST NOT re-export `matten`. The limited
+single-dependency convenience path (`pub use matten;`) is **deferred by RFC-032**
+(§3.3) and may be revisited only after demonstrated user demand and a follow-up
+RFC/decision. The release-doc check (`scripts/check-release-docs.sh`) enforces this:
+it fails if any companion contains `pub use matten`.
+
+```rust
+// FORBIDDEN in the current policy (RFC-032 §3.2/§3.3)
+pub use matten;            // whole-crate convenience re-export: deferred
+pub use matten::Tensor;    // broad core-type re-export: forbidden
+pub use matten::MattenError;
+pub use matten::Element;
+pub use matten::NumericPolicy;
+```
+
+This policy keeps ownership, feature selection, maturity labels, and dependency/security review clear.
+
+
+---
+
+## 14. Companion error policy
 
 Each companion crate defines its own error type.
 
@@ -463,7 +701,7 @@ Dynamic inputs to companion bridge/prep/data APIs should return `Err`, not panic
 
 ---
 
-## 13. Mechanical dependency-boundary gate
+## 15. Mechanical dependency-boundary gate
 
 The v0.16 release must add a CI check proving that core `matten` has no forbidden dependency direction.
 
@@ -491,3 +729,14 @@ cargo tree -p "$CORE_PACKAGE" --all-features --edges normal,build --no-dedupe
 
 A plain `cargo tree -p matten` is insufficient: an `ndarray = { optional = true }`
 dependency gated by a non-default feature would not appear, producing a false pass.
+
+
+---
+
+## 16. Document history
+
+| Version | Date | Change |
+|---|---|---|
+| 1.0.0 | 2026-06-21 | First canonical v0.16+ roadmap after companion-crate reconciliation. |
+| 1.1.0 | 2026-06-22 | Updated v0.20+ materialization plan. RFC-032 is reserved/consumed elsewhere, so v0.20+ planning starts at RFC-033. Added v0.19.1 hardening milestone, `matten-data` RFC sequence RFC-033–037, core comfort RFC-038+, companion dependency/import style, and later stats/linalg boundary themes. |
+| 1.2.0 | 2026-06-22 | Reconciled to shipped reality and architect rulings (v0.19.3): §13 corrected so the companion `pub use matten;` convenience re-export is deferred per RFC-032 (release-doc guard forbids it); planning baseline corrected to lock-step family versions (no per-crate `0.1.x`); added v0.19.2 and v0.19.3 release-theme rows. |

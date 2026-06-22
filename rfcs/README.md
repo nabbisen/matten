@@ -31,16 +31,32 @@ for RFC state; the Status field inside each file mirrors the folder.
 | 020 | [Human-Readable Diagnostics and Error Message Quality](./done/020-human-readable-diagnostics-and-error-message-quality.md) | 0.13.3 |
 | 021 | [Tutorial Path and Example Quality Gate](./done/021-tutorial-path-and-example-quality-gate.md) | 0.15.0 |
 | 022 | [Companion Crate Boundary Policy](./done/022-companion-crate-boundary-policy.md) | 0.16.0 |
-| 027 | [`matten-ndarray` Design and Implementation](./done/027-matten-ndarray-design-and-implementation.md) | 0.17.0 (matten-ndarray 0.1.0) |
-| 028 | [`matten-mlprep` Design and Implementation](./done/028-matten-mlprep-design-and-implementation.md) | 0.18.0 (matten-mlprep 0.1.0) |
+| 024 | [`matten-mlprep` Scope and Non-goals](./done/024-matten-mlprep-scope-and-non-goals.md) | 0.18.0 (impl RFC-028; maturity RFC-029) |
+| 025 | [Bridge Crate Policy for ndarray, nalgebra, and candle](./done/025-bridge-crate-policy-for-ndarray-nalgebra-and-candle.md) | 0.17.0 (matten-ndarray; nalgebra/candle deferred) |
+| 027 | [`matten-ndarray` Design and Implementation](./done/027-matten-ndarray-design-and-implementation.md) | 0.17.0 |
+| 028 | [`matten-mlprep` Design and Implementation](./done/028-matten-mlprep-design-and-implementation.md) | 0.18.0 |
 | 029 | [Companion Maturity Evaluation (v0.19.0)](./done/029-companion-maturity-evaluation-v0-19.md) | 0.19.0 |
 | 030 | [Workspace Versioning Model — Lock-step Family Versioning](./done/030-workspace-versioning-model-lockstep.md) | 0.19.0 |
+| 031 | [Feature-Robust Dynamic Rejection and Unconditional `Tensor::is_dynamic()`](./done/031-feature-robust-dynamic-rejection.md) | 0.19.1 |
+| 032 | [Companion Dependency and Import Convention](./done/032-companion-dependency-and-import-convention.md) | 0.19.2 |
 
 ## Proposed
 
 | ID | Title | Target |
 |---:|---|---|
 | 023 | [`matten-data` Scope and Non-goals](./proposed/023-matten-data-scope-and-non-goals.md) | experimental only before v0.20; beta decision no earlier than v0.20+ |
-| 024 | [`matten-mlprep` Scope and Non-goals](./proposed/024-matten-mlprep-scope-and-non-goals.md) | v0.18 experimental; v0.19 beta decision |
-| 025 | [Bridge Crate Policy for ndarray, nalgebra, and candle](./proposed/025-bridge-crate-policy-for-ndarray-nalgebra-and-candle.md) | policy in v0.16; `matten-ndarray` experimental in v0.17; nalgebra/candle deferred |
 | 026 | [Large CSV and Streaming Data Policy](./proposed/026-large-csv-and-streaming-data-policy.md) | design spike no earlier than v0.20+ |
+| 033 | [`matten-data` Beta-Decision and Scope Lock](./proposed/033-matten-data-beta-decision-and-scope-lock.md) | v0.20.0 decision/design |
+| 034 | [`matten-data` Table Model and Public API Boundary](./proposed/034-matten-data-table-model-and-public-api-boundary.md) | v0.20.0 design; v0.20.x impl |
+| 035 | [CSV Ingestion, Schema Summary, Missing Values, and Numeric Conversion](./proposed/035-csv-ingestion-schema-summary-missing-values-and-numeric-conversion.md) | v0.20.x if RFC-033 approves |
+| 036 | [`matten-data` Examples, Documentation, and Release Gate](./proposed/036-matten-data-examples-documentation-and-release-gate.md) | v0.20.0 |
+| 037 | [Deferred Streaming and Large CSV Policy](./proposed/037-deferred-streaming-and-large-csv-policy.md) | v0.20.0 / later |
+| 038 | [Core Numeric Comfort APIs](./proposed/038-core-numeric-comfort-apis.md) | v0.20.x / v0.21 |
+| 039 | [Shape Composition API Boundary](./proposed/039-shape-composition-api-boundary.md) | v0.21+ |
+| 040 | [Small Statistics Boundary — Core vs Companion](./proposed/040-small-statistics-boundary-core-vs-companion.md) | v0.21+ |
+| 041 | [Linear Algebra Boundary — Core Lite vs External Crates](./proposed/041-linear-algebra-boundary-core-lite-vs-external-crates.md) | v0.21+ |
+| 042 | [Pandas-Inspired Scope Guard for `matten-data`](./proposed/042-pandas-inspired-scope-guard-for-matten-data.md) | v0.20+ / v0.21+ |
+
+Implementation handoffs for the v0.20+ proposed set (RFC-033–042) live in
+[`./handoffs/`](./handoffs/). They translate each RFC into PR boundaries, checks,
+and acceptance criteria; the RFC remains the design authority.

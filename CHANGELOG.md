@@ -18,6 +18,42 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.19.3] - 2026-06-22
+
+**Planning and documentation patch. Adds the v0.20+ proposed RFC set (RFC-033–042)
+and their implementation handoffs, reconciles the ROADMAP to lock-step versioning
+and RFC-032, and applies the architect's review rulings. No source-logic or public
+API changes.**
+
+### Added
+
+- **RFC-033–042** added as a proposed v0.20+ design set in `rfcs/proposed/`:
+  `matten-data` decision/scope-lock, table model, CSV ingestion, examples/release
+  gate, deferred streaming; core numeric comfort APIs; and the shape-composition,
+  statistics, linear-algebra, and Pandas-scope-guard boundary RFCs. All remain
+  **proposed** (design only) — no implementation is authorized by their presence.
+- **Implementation handoffs** for RFC-033–042 in `rfcs/handoffs/` (with a directory
+  `README.md`), translating each RFC into PR boundaries and acceptance criteria.
+
+### Changed
+
+- **ROADMAP reconciled** (now v1.2.0) to shipped reality and architect rulings:
+  §13 corrected so the companion `pub use matten;` convenience re-export is
+  **deferred** per RFC-032 (the release-doc guard forbids it); the planning baseline
+  corrected to lock-step family versions (no per-crate `0.1.x`); v0.19.2 and v0.19.3
+  release-theme rows added.
+- **Architect rulings applied to the RFC set**: RFC-034 states `CellValue` is
+  intentionally crate-local (not a `matten::Element` alias); RFC-035 locks the
+  inference + strict `try_numeric` model; RFC-038 pins the NaN house policy, the
+  `MattenError::InvalidArgument` variant for invalid numeric arguments, and new-module
+  placement; RFC-039 uses non-square stack examples; RFC-040 documents the NaN house
+  policy; RFC-042 replaces the broad term-scan with a precise filename + public-API
+  guard; the 033/038/042 handoffs updated to match.
+- **RFC index (`rfcs/README.md`) corrected**: RFC-024 and RFC-025 moved to the
+  Implemented list (they were shipped/relabeled in v0.19.1 but still listed as
+  proposed); RFC-031 and RFC-032 added to the Implemented list; stale per-crate
+  `0.1.x` annotations removed; RFC-033–042 listed under Proposed.
+
 ## [0.19.2] - 2026-06-21
 
 **Documentation and tooling patch (RFC-032). Records the companion dependency and
