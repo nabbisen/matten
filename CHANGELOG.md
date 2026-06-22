@@ -18,6 +18,35 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.19.2] - 2026-06-21
+
+**Documentation and tooling patch (RFC-032). Records the companion dependency and
+import convention, adds release-doc guardrails, and corrects stale companion README
+wording. No source-logic or public API changes.**
+
+### Added
+
+- **RFC-032** (companion dependency and import convention) implemented and moved to
+  `rfcs/done/`. The canonical user-facing style is explicit dependencies — declare
+  `matten` *and* each companion, and import `Tensor` (and other core types) from
+  `matten`. Broad core-type re-exports from companions are forbidden; the
+  single-dependency `pub use matten;` convenience is deliberately deferred.
+- A short **Dependency style** note added to both companion READMEs
+  (`matten-ndarray`, `matten-mlprep`).
+- `scripts/check-release-docs.sh` extended with two RFC-032 guardrails: companions
+  must not re-export core `matten` (`pub use matten…`), and `Tensor` must not be
+  imported from a companion in examples/README/mdBook.
+
+### Fixed
+
+- **Stale companion README wording (doc accuracy vs. shipped RFC-031).** Both
+  companion READMEs described dynamic-tensor rejection as conditional on the
+  `dynamic` feature; rejection has been unconditional since v0.19.1 (RFC-031). The
+  wording now states rejection happens regardless of the feature.
+- `matten-ndarray` README design note referred to the crate as "an experimental
+  bridge"; updated to "a copy-based bridge" to match its production-ready-candidate
+  status (RFC-029).
+
 ## [0.19.1] - 2026-06-21
 
 **Companion maturity hardening patch (RFC-031). Feature-robust dynamic rejection,

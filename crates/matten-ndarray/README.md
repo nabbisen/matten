@@ -34,18 +34,31 @@ let back = from_arrayd(arr)?;     // ArrayD<f64> -> Tensor
 # Ok::<(), matten_ndarray::MattenNdarrayError>(())
 ```
 
+> **Dependency style.** This crate depends on `matten`, but official examples import
+> `Tensor` (and other core types) from `matten` directly:
+>
+> ```rust
+> use matten::Tensor;
+> use matten_ndarray::to_arrayd;
+> ```
+>
+> This keeps ownership and feature selection clear: `Tensor` belongs to `matten`, and
+> core features (e.g. `dynamic`) are enabled on the `matten` dependency. Declare both
+> `matten` and this crate in your `Cargo.toml` (RFC-032).
+
 ## Design notes
 
 - **Both directions copy.** No zero-copy is claimed; that would need layout
-  guarantees out of scope for an experimental bridge.
+  guarantees out of scope for a copy-based bridge.
 - **Logical order is preserved.** `from_arrayd` converts a non-standard-layout
   `ArrayD` (transposed / sliced) by its *logical* element order, never the raw
   backing buffer.
 - **Zero-sized axes are rejected.** Core `matten` does not support zero-length
   dimensions, so `from_arrayd` returns an error for them.
-- **Dynamic tensors are rejected, not panicked.** With the `dynamic` feature,
-  passing a dynamic (`Element`) tensor returns `MattenNdarrayError::DynamicTensor`;
-  convert it with `Tensor::try_numeric()` first.
+- **Dynamic tensors are rejected, not panicked.** Passing a dynamic (`Element`)
+  tensor returns `MattenNdarrayError::DynamicTensor` regardless of whether the
+  companion `dynamic` feature is enabled (RFC-031); convert it with
+  `Tensor::try_numeric()` first.
 - **Supported `ndarray`:** the `0.16` minor.
 
 ## Compatibility

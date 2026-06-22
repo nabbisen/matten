@@ -40,6 +40,18 @@ let (train, test) = train_test_split(&z, 0.75)?;
 # Ok::<(), matten_mlprep::MattenMlprepError>(())
 ```
 
+> **Dependency style.** This crate depends on `matten`, but official examples import
+> `Tensor` (and other core types) from `matten` directly:
+>
+> ```rust
+> use matten::Tensor;
+> use matten_mlprep::standardize_columns;
+> ```
+>
+> This keeps ownership and feature selection clear: `Tensor` belongs to `matten`, and
+> core features (e.g. `dynamic`) are enabled on the `matten` dependency. Declare both
+> `matten` and this crate in your `Cargo.toml` (RFC-032).
+
 ## Design notes
 
 - **Convention:** rank-2 only, `rows = samples`, `columns = features`. No silent
@@ -53,7 +65,8 @@ let (train, test) = train_test_split(&z, 0.75)?;
 - **`train_test_split` is ordered and deterministic** — `first floor(n*ratio)`
   rows are train, the rest are test. No shuffle. (A seeded variant is planned;
   see RFC-024 §6.)
-- **Dynamic tensors are rejected, not panicked** (with the `dynamic` feature).
+- **Dynamic tensors are rejected, not panicked** — regardless of whether the
+  companion `dynamic` feature is enabled (RFC-031).
 
 ## Public API
 

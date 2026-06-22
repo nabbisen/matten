@@ -89,6 +89,27 @@ if grep -n '#\[cfg(feature = "dynamic")\]' "$NDARRAY/src/convert.rs" "$MLPREP/sr
 fi
 
 # ---------------------------------------------------------------------------
+# Companion dependency / import convention (RFC-032)
+# ---------------------------------------------------------------------------
+
+echo "=== Checking companions do not re-export core matten (RFC-032 §3.2/§3.3) ==="
+# Matches `pub use matten;` and `pub use matten::<Item>;`. Whole-crate re-export
+# (§3.3) is deferred; introducing it requires amending RFC-032 and relaxing this check.
+if grep -rn "pub use matten\b" "$NDARRAY/src" "$MLPREP/src" 2>/dev/null; then
+  echo "ERROR: companions must not re-export core matten types/crate (RFC-032)"
+  FAIL=1
+fi
+
+echo "=== Checking Tensor is imported from matten, not a companion (RFC-032 §3.4) ==="
+if grep -rn "use matten_ndarray::[^;]*Tensor\|use matten_mlprep::[^;]*Tensor" \
+     "$NDARRAY/examples" "$MLPREP/examples" \
+     "$NDARRAY/README.md" "$MLPREP/README.md" \
+     docs/src 2>/dev/null; then
+  echo "ERROR: import Tensor from matten, not a companion (RFC-032 §3.4)"
+  FAIL=1
+fi
+
+# ---------------------------------------------------------------------------
 # Result
 # ---------------------------------------------------------------------------
 
