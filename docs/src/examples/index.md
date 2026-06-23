@@ -86,6 +86,17 @@ These require the `dynamic` feature for heterogeneous data ingestion.
 | `dynamic_06_numeric_policy.rs` | `dynamic` | `NumericPolicy` API |
 | `dynamic_07_on_ramp_summary.rs` | `dynamic` | Complete on-ramp workflow |
 
+## Companion crate examples
+
+These live in each companion crate's own `examples/` directory, not in core
+`matten`. See [Companion crate examples](./companions.md) for the write-up.
+
+| Crate | Example | What it shows |
+|---|---|---|
+| `matten-ndarray` | `from_arrayd`, `to_arrayd` | `ArrayD` ↔ `Tensor` interop (copies, shape-preserving) |
+| `matten-mlprep` | `mlprep_standardize_columns`, `mlprep_minmax_scale`, `mlprep_add_bias_column`, `mlprep_train_test_split` | Small deterministic preprocessing |
+| `matten-data` | `csv_to_tensor` | CSV → clean → numeric `Tensor` (Experimental) |
+
 ## Running examples
 
 ```bash

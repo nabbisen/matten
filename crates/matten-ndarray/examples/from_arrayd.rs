@@ -1,8 +1,17 @@
-//! Convert an `ndarray::ArrayD<f64>` into a `matten::Tensor`, including a
+//! # Companion example: `ArrayD` -> `Tensor` (matten-ndarray)
+//!
+//! Run: cargo run -p matten-ndarray --example from_arrayd
+//!
+//! ## What this shows
+//! Converting an `ndarray::ArrayD<f64>` into a `matten::Tensor`, including a
 //! non-standard-layout (transposed) input.
 //!
-//! Run:
-//! cargo run -p matten-ndarray --example from_arrayd
+//! ## Teaching points
+//! - the conversion **copies** data into the `Tensor` (no zero-copy / borrow);
+//! - logical shape and element order are preserved, even for a transposed
+//!   (non-contiguous) input;
+//! - the dependency direction is one-way: `matten-ndarray` depends on `matten`
+//!   and `ndarray`, while core `matten` depends on neither.
 
 use matten_ndarray::from_arrayd;
 use ndarray::{ArrayD, IxDyn};

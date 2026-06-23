@@ -18,6 +18,45 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.20.6] - 2026-06-23
+
+**Examples program — companion-crate examples audited and improved in place
+(RFC-048). Additive documentation and example hardening under lock-step family
+versioning; no API, behavior, or breaking change to any crate, and no new or renamed
+example files.**
+
+### Changed
+
+- **Audited and improved the existing companion examples in place** (RFC-048, per
+  architect Q2/Q3 — no duplicate or renamed files):
+  - `matten-ndarray`: `from_arrayd`, `to_arrayd` — richer teaching headers (copies
+    data / no zero-copy claim, shape preserved, numeric-only conversion, one-way
+    dependency direction); added a shape-preservation assertion to `to_arrayd`.
+  - `matten-mlprep`: `standardize_columns`, `minmax_scale`, `add_bias_column`,
+    `train_test_split` — teaching headers (rows = samples, columns = features,
+    deterministic, no model training) and **deterministic correctness assertions**
+    (previously print-only).
+  - `matten-data`: `csv_to_tensor` — header now states Experimental status and the
+    "not a dataframe" boundary; added a full data assertion on the converted tensor.
+
+### Added
+
+- **Examples documentation**: new `docs/src/examples/companions.md`, a "Companion
+  crate examples" section in `docs/src/examples/index.md`, and a `SUMMARY.md` entry.
+- **CI smoke run** for `matten-data csv_to_tensor` in `test.yaml` (the `matten-ndarray`
+  and `matten-mlprep` examples were already covered).
+
+### Notes
+
+- All companion examples keep their filenames, `[[example]]` names, and printed
+  output stable; they remain RFC-032-compliant (import `Tensor` from `matten`, no
+  companion re-export) — the release-doc guard confirms this. No new files were
+  added; vector distance, cosine similarity, and the companion examples are
+  cross-referenced, not duplicated.
+- No new data flows, external integrations, or auth: examples use only in-memory
+  hard-coded data. `#![forbid(unsafe_code)]`, the core→companion dependency
+  boundary, and the release-doc guards remain valid and unchanged.
+
 ## [0.20.5] - 2026-06-23
 
 **Benchmarking & positioning program planning (RFC-049). Documentation/planning
