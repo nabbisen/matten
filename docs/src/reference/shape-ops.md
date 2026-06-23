@@ -79,6 +79,32 @@ Swapping an axis with itself is a no-op. Out-of-range axes panic:
 matten shape error in swap_axes: axis 5 is out of range for rank-3 tensor
 ```
 
+## Squeeze and expand_dims (RFC-038)
+
+```rust
+use matten::Tensor;
+
+// squeeze: drop every length-1 axis (data order unchanged)
+let t = Tensor::new(vec![1.0, 2.0, 3.0], &[1, 3, 1]);
+let s = t.squeeze();           // shape [3]
+
+// an all-ones shape squeezes to a scalar
+let one = Tensor::new(vec![5.0], &[1, 1]).squeeze();  // shape []
+
+// expand_dims: insert a length-1 axis at `axis` (0..=ndim)
+let v = Tensor::from_vec(vec![1.0, 2.0, 3.0]);
+let row = v.expand_dims(0);    // [1, 3]
+let col = v.expand_dims(1);    // [3, 1]
+
+// Result zone: axis > ndim is an InvalidArgument
+let r = v.try_expand_dims(axis)?;
+```
+
+`squeeze` removes all length-1 axes and never fails (a scalar stays a scalar).
+`expand_dims` accepts `axis` in `0..=ndim`; an out-of-range axis panics, while
+`try_expand_dims` returns `MattenError::InvalidArgument`. Both clone data and reject
+dynamic tensors (call `try_numeric()` first).
+
 ## Element access
 
 ```rust

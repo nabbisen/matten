@@ -15,5 +15,6 @@ mod parse;
 mod reshape;
 mod selection;
 mod shape;
+mod shape_ops;
 mod slice;
 mod tensor;

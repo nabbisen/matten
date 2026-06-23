@@ -117,6 +117,99 @@ impl Tensor {
         crate::reshape::permute_axes(self, &perm)
     }
 
+    /// Removes all axes of length `1`, returning a new owned tensor.
+    ///
+    /// Data order is unchanged. A scalar stays a scalar, and a tensor whose every
+    /// axis is `1` (e.g. `[1, 1]`) becomes a scalar (shape `[]`).
+    ///
+    /// # Panics
+    ///
+    /// Panics on a dynamic tensor; call `try_numeric()` first.
+    ///
+    /// ```
+    /// use matten::Tensor;
+    /// let t = Tensor::new(vec![1.0, 2.0, 3.0], &[1, 3, 1]);
+    /// assert_eq!(t.squeeze().shape(), &[3]);
+    /// ```
+    #[must_use]
+    pub fn squeeze(&self) -> Tensor {
+        #[cfg(feature = "dynamic")]
+        if self.is_dynamic() {
+            panic!(
+                "matten unsupported error in squeeze: dynamic tensors do not support squeeze; call try_numeric() first to convert to a numeric tensor"
+            );
+        }
+        let shape: Vec<usize> = self.shape.iter().copied().filter(|&d| d != 1).collect();
+        Tensor {
+            data: self.data.clone(),
+            shape,
+            #[cfg(feature = "dynamic")]
+            dynamic: None,
+        }
+    }
+
+    /// Inserts a new axis of length `1` at `axis`, returning a new owned tensor.
+    ///
+    /// `axis` may be `0..=ndim` (inserting at `ndim` appends a trailing axis).
+    /// Data order is unchanged.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `axis > ndim`, or on a dynamic tensor. Use
+    /// [`try_expand_dims`](Tensor::try_expand_dims) for the non-panicking form.
+    ///
+    /// ```
+    /// use matten::Tensor;
+    /// let t = Tensor::from_vec(vec![1.0, 2.0, 3.0]);
+    /// assert_eq!(t.expand_dims(0).shape(), &[1, 3]);
+    /// assert_eq!(t.expand_dims(1).shape(), &[3, 1]);
+    /// ```
+    #[must_use]
+    pub fn expand_dims(&self, axis: usize) -> Tensor {
+        self.try_expand_dims(axis).unwrap_or_else(|e| panic!("{e}"))
+    }
+
+    /// Non-panicking [`expand_dims`](Tensor::expand_dims).
+    ///
+    /// # Errors
+    ///
+    /// Returns [`MattenError::InvalidArgument`] if `axis > ndim`, or
+    /// [`MattenError::Unsupported`] on a dynamic tensor.
+    ///
+    /// ```
+    /// use matten::Tensor;
+    /// let t = Tensor::from_vec(vec![1.0, 2.0, 3.0]);
+    /// assert!(t.try_expand_dims(5).is_err());
+    /// ```
+    pub fn try_expand_dims(&self, axis: usize) -> Result<Tensor, MattenError> {
+        #[cfg(feature = "dynamic")]
+        if self.is_dynamic() {
+            return Err(MattenError::Unsupported {
+                operation: "expand_dims",
+                message: "dynamic tensors do not support expand_dims; call try_numeric() first"
+                    .to_string(),
+            });
+        }
+        let ndim = self.shape.len();
+        if axis > ndim {
+            return Err(MattenError::InvalidArgument {
+                operation: "expand_dims",
+                argument: "axis",
+                message: format!(
+                    "axis {axis} is out of range for a rank-{ndim} tensor (valid 0..={ndim})"
+                ),
+            });
+        }
+        let mut shape = self.shape.clone();
+        shape.insert(axis, 1);
+        Ok(Tensor {
+            data: self.data.clone(),
+            shape,
+            #[cfg(feature = "dynamic")]
+            dynamic: None,
+        })
+    }
+
     /// Returns the element at the multidimensional `coord`, or `None` if the
     /// coordinate rank doesn't match or any component is out of bounds.
     ///

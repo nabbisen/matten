@@ -36,7 +36,7 @@ when called on a dynamic tensor. Call `try_numeric()` to convert first.
 
 | Phase 1 method group | Dynamic behaviour |
 |---|---|
-| `reshape`, `flatten`, `transpose`, `swap_axes` | panic |
+| `reshape`, `flatten`, `transpose`, `swap_axes`, `squeeze`, `expand_dims` | panic |
 | `slice()` builder, `slice_str()` | returns `MattenError::Unsupported` |
 | Arithmetic operators, scalar operators | panic |
 | Reductions (`sum`, `mean`, `min`, `max`, `*_axis`) | panic |
@@ -101,6 +101,9 @@ when called on a dynamic tensor. Call `try_numeric()` to convert first.
 | `transpose()` | `Tensor` | reverses axes; panics on dynamic |
 | `t()` | `Tensor` | alias for `transpose` |
 | `swap_axes(a, b)` | `Tensor` | panics on dynamic |
+| `squeeze()` | `Tensor` | RFC-038; removes length-1 axes; panics on dynamic |
+| `expand_dims(axis)` | `Tensor` | RFC-038; inserts a length-1 axis; panics if `axis > ndim` or dynamic |
+| `try_expand_dims(axis)` | `Result<Tensor, MattenError>` | RFC-038; `InvalidArgument` if `axis > ndim`; `Unsupported` on dynamic |
 
 ## `Tensor` — slicing (Phase 1 only)
 

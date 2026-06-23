@@ -42,6 +42,7 @@ for RFC state; the Status field inside each file mirrors the folder.
 | 033 | [`matten-data` Beta-Decision and Scope Lock](./done/033-matten-data-beta-decision-and-scope-lock.md) | 0.20.0 (experimental scaffold; beta deferred to v0.21+) |
 | 034 | [`matten-data` Table Model and Public API Boundary](./done/034-matten-data-table-model-and-public-api-boundary.md) | 0.20.1 |
 | 035 | [CSV Ingestion, Schema Summary, Missing Values, and Numeric Conversion](./done/035-csv-ingestion-schema-summary-missing-values-and-numeric-conversion.md) | 0.20.1 |
+| 038 | [Core Numeric Comfort APIs](./done/038-core-numeric-comfort-apis.md) | 0.20.9 (elementwise); 0.20.10 (selection); 0.20.11 (creation); 0.20.12 (shape) |
 
 ## Proposed
 
@@ -51,7 +52,6 @@ for RFC state; the Status field inside each file mirrors the folder.
 | 026 | [Large CSV and Streaming Data Policy](./proposed/026-large-csv-and-streaming-data-policy.md) | design spike no earlier than v0.20+ |
 | 036 | [`matten-data` Examples, Documentation, and Release Gate](./proposed/036-matten-data-examples-documentation-and-release-gate.md) | v0.20.0 |
 | 037 | [Deferred Streaming and Large CSV Policy](./proposed/037-deferred-streaming-and-large-csv-policy.md) | v0.20.0 / later |
-| 038 | [Core Numeric Comfort APIs](./proposed/038-core-numeric-comfort-apis.md) | v0.20.x / v0.21 |
 | 039 | [Shape Composition API Boundary](./proposed/039-shape-composition-api-boundary.md) | v0.21+ |
 | 040 | [Small Statistics Boundary — Core vs Companion](./proposed/040-small-statistics-boundary-core-vs-companion.md) | v0.21+ |
 | 041 | [Linear Algebra Boundary — Core Lite vs External Crates](./proposed/041-linear-algebra-boundary-core-lite-vs-external-crates.md) | v0.21+ |

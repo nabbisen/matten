@@ -1,6 +1,6 @@
 # RFC-038: Core Numeric Comfort APIs
 
-**Status:** Proposed  
+**Status:** Implemented (v0.20.9–v0.20.12) — elementwise (v0.20.9), selection (v0.20.10), creation (v0.20.11), and shape (v0.20.12) bands shipped.  
 **Target Release:** v0.20.x or v0.21.0  
 **Related:** RFC-019, RFC-020, RFC-039, RFC-040, RFC-041  
 **Scope:** Small NumPy-inspired APIs for core `matten::Tensor`

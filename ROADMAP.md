@@ -2,7 +2,7 @@
 
 **Project:** `matten`  
 **Document Kind:** Canonical Project Roadmap  
-**Document Version:** `1.5.0`  
+**Document Version:** `1.6.0`  
 **Date:** 2026-06-23  
 **Status:** Canonical roadmap updated for v0.20+ materialization planning, the examples program, and the benchmarking & positioning program. RFC-032 is consumed by the companion dependency/import convention; v0.20+ design starts at RFC-033; the examples program is RFC-043 through RFC-048; benchmarking & positioning is RFC-049 (Track D).  
 **Planning Baseline:** core `matten` completed RFC-015 through RFC-021 (shipped through v0.15.3); RFC-022 boundary confirmation shipped in v0.16.0; v0.17.0 introduced the Cargo workspace and the `matten-ndarray` companion crate under the family version (RFC-025, RFC-027); v0.18.0 introduced the `matten-mlprep` companion crate under the family version (RFC-024, RFC-028); v0.19.0 promoted `matten-ndarray` to production-ready candidate status and `matten-mlprep` to beta status under lock-step family versioning (RFC-029); v0.19.1 shipped feature-robust dynamic rejection (RFC-031); v0.19.2 confirmed the companion dependency/import convention (RFC-032); v0.19.3 added the RFC-033-042 v0.20+ design set; v0.20.0 shipped the matten-data experimental scaffold (RFC-033); v0.20.1 shipped the matten-data table/CSV-to-Tensor API (RFC-034, RFC-035, Experimental). Under lock-step family versioning (RFC-030), every crate shares the family version (e.g. `0.19.2`); maturity is expressed by per-crate Status labels, not by separate version numbers. Next: v0.20+ materialization phase. RFC-032 is consumed by the companion dependency/import convention; v0.20+ planning starts at RFC-033. The first v0.20+ branch is `matten-data` decision/materialization; the second is small NumPy-inspired core comfort APIs that preserve the `matten` philosophy; the third is the examples program (RFC-043–048), which demonstrates famous small math/numerical problems and companion workflows without expanding product scope.
@@ -355,7 +355,7 @@ RFC-032 is already consumed by another issue. v0.20+ roadmap RFCs therefore star
 | RFC-035 | CSV Ingestion, Schema Summary, Missing Values, and Numeric Conversion | v0.20.0 |
 | RFC-036 | `matten-data` Examples, Documentation, and Release Gate | v0.20.0 |
 | RFC-037 | Deferred Streaming and Large CSV Policy | v0.20.0 / later |
-| RFC-038 | Core Numeric Comfort APIs | v0.20.x / v0.21 |
+| RFC-038 | Core Numeric Comfort APIs | **Done** (v0.20.9–v0.20.12) |
 | RFC-039 | Shape Composition API Boundary | v0.21+ |
 | RFC-040 | Small Statistics Boundary: Core vs Companion | v0.21+ |
 | RFC-041 | Linear Algebra Boundary: Core Lite vs External Crates | v0.21+ |
@@ -458,6 +458,10 @@ Keeping it experimental is acceptable if the API is useful but not mature. Freez
 ---
 
 ### 9.3 Track B: core numeric comfort APIs
+
+**Status: Complete (RFC-038, shipped across v0.20.9–v0.20.12).** The four bands below
+all shipped: elementwise math (v0.20.9), selection `argmin`/`argmax` (v0.20.10),
+creation `linspace`/`eye` (v0.20.11), and shape `squeeze`/`expand_dims` (v0.20.12).
 
 #### Goal
 
@@ -959,3 +963,4 @@ dependency gated by a non-default feature would not appear, producing a false pa
 | 1.3.0 | 2026-06-23 | Added examples program planning for RFC-043–048 and compact examples implementation handoff. Added v0.19.4 release-theme row; expanded v0.20+ to Track C for examples; added RFC-043–048 table entries, example groups, implementation order, acceptance gates, and non-goals. |
 | 1.4.0 | 2026-06-23 | Reconciled the examples program to architect rulings (v0.20.2): new famous-problem examples use an additive 30+ band (existing 00-28 suite preserved); cosine/distance and companion examples are cross-referenced/audited, not duplicated; matten-data csv_to_tensor marked shipped in v0.20.1; docs path examples/index.md; CI smoke-list update requirement added. Fixed the v0.19.4 version regression: replaced with accurate v0.20.0/v0.20.1/v0.20.2 release-theme rows. |
 | 1.5.0 | 2026-06-23 | Added the benchmarking & positioning program (RFC-049) as Track D: goal, posture/sequencing, phases, hard constraints, and acceptance gate; added RFC-049 to the v0.20+ RFC table; recorded the shipped v0.20.3/v0.20.4 example bands and the v0.20.5 benchmarking-planning row in the release-theme table. RFC-049 is non-API and measurement-only. |
+| 1.6.0 | 2026-06-23 | Marked Track B (core numeric comfort APIs, RFC-038) complete: all four bands shipped across v0.20.9 (elementwise), v0.20.10 (selection), v0.20.11 (creation), and v0.20.12 (shape). Updated the RFC-038 row to Done and added a completion status note to §9.3. RFC-038 moved to `rfcs/done/`. |

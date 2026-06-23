@@ -18,6 +18,43 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.20.12] - 2026-06-23
+
+**Core numeric comfort APIs — shape band (RFC-038, final sub-band). This completes
+RFC-038. Additive, non-breaking public API under lock-step family versioning.**
+
+With this band, all four parts of RFC-038 are shipped: elementwise (v0.20.9),
+selection (v0.20.10), creation (v0.20.11), and shape (this release). RFC-038 is moved
+to `rfcs/done/` and Track B is marked complete in the ROADMAP.
+
+### Added
+
+- **Shape comfort ops on `Tensor`** (RFC-038 §4.5–4.6), added alongside the existing
+  shape operations in `tensor/ops.rs` (`reshape`/`flatten`/`transpose`/`swap_axes`),
+  which is the close-fit module per RFC-038 §5.3:
+  - `squeeze()` — removes every length-1 axis (an all-ones shape such as `[1, 1]`
+    becomes a scalar; a scalar stays a scalar). No failure mode, so no `try_` form.
+  - `expand_dims(axis)` / `try_expand_dims(axis)` — inserts a length-1 axis at
+    `axis`, valid over `0..=ndim` (inserting at `ndim` appends a trailing axis).
+  - Both preserve data order. `expand_dims` with `axis > ndim` panics; the `try_`
+    form returns `MattenError::InvalidArgument`. On a dynamic tensor the convenience
+    forms panic and `try_expand_dims` returns `MattenError::Unsupported` — consistent
+    with the other shape ops.
+
+### Changed
+
+- Reference docs updated to match: `shape-ops.md` (new section),
+  `public-api-snapshot.md` (shape-operations rows + dynamic-behavior row).
+- RFC-038 closed: moved `rfcs/proposed/038` → `rfcs/done/038` (Status: Implemented),
+  index updated, ROADMAP Track B marked complete (document version 1.6.0).
+
+### Notes
+
+- No new data flows, external integrations, or auth: pure in-memory shape
+  reinterpretation with data cloned into a fresh buffer. `#![forbid(unsafe_code)]`,
+  the core→companion dependency boundary, and the release-doc guards remain valid; the
+  threat model is unchanged.
+
 ## [0.20.11] - 2026-06-23
 
 **Core numeric comfort APIs — creation band (RFC-038, third sub-band). Additive,
