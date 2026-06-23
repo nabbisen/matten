@@ -1,6 +1,6 @@
 # Dynamic feature (`Element` model)
 
-The `dynamic` feature enables Phase 2 heterogeneous tensors. Enable it in
+The `dynamic` feature enables heterogeneous dynamic tensors. Enable it in
 `Cargo.toml`:
 
 ```toml
@@ -90,7 +90,7 @@ let t = Tensor::from_elements(
 // Count None values
 t.count_none()          // 2
 
-// Boolean-like mask: 1.0 where None, 0.0 elsewhere (Phase 1 f64 tensor)
+// Boolean-like mask: 1.0 where None, 0.0 elsewhere (numeric f64 tensor)
 let mask = t.none_mask();   // [0.0, 1.0, 0.0, 1.0]
 // RFC-011 named alias:
 let mask = t.is_none_mask(); // identical result
@@ -124,7 +124,7 @@ let t = Tensor::from_csv_dynamic("1,active,true\n2,,false\n")?;
 
 ## Current limitations (guard model)
 
-In the current release, many Phase 1 numeric operations **reject** dynamic
+In the current release, many numeric operations **reject** dynamic
 tensors with a clear `matten unsupported error` message. You must convert
 to a numeric tensor first using `try_numeric()`.
 
@@ -144,8 +144,8 @@ release.
 // Correct pattern: ingest → clean → convert → arithmetic
 let raw = Tensor::from_csv_dynamic("1.0,2.0\n3.0,4.0\n")?;
 let filled  = raw.fill_none(Element::Float(0.0));
-let numeric: Tensor = filled.try_numeric()?; // convert to Phase 1
-let result = &numeric * 2.0;                 // Phase 1 arithmetic
+let numeric: Tensor = filled.try_numeric()?; // convert to numeric
+let result = &numeric * 2.0;                 // numeric arithmetic
 ```
 
 ## Workflow pattern
@@ -160,10 +160,10 @@ fn process_messy_csv(input: &str) -> Result<Tensor, Box<dyn std::error::Error>> 
     // 2. Fill missing values
     let clean = raw.fill_none(Element::Float(0.0));
 
-    // 3. Convert to numeric Phase 1 tensor for arithmetic
+    // 3. Convert to numeric tensor for arithmetic
     let numeric = clean.try_numeric()?;
 
-    // 4. Use Phase 1 arithmetic, reductions, matmul...
+    // 4. Use numeric arithmetic, reductions, matmul...
     Ok(numeric)
 }
 ```

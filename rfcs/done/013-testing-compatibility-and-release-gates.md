@@ -211,3 +211,21 @@ Feature-gated methods may be added, but disabling a feature must not break ordin
 - Broadcasting and slicing have golden tests.
 - Dynamic memory/coercion tests are required before Phase 2 beta.
 - Release checklist prevents scope creep and performance-first drift.
+
+---
+
+## Lifecycle note (pre-v0.19.0 audit, 2026-06-23)
+
+RFC-013 established the *intent* for systematic testing, including property tests, fuzz
+tests, and golden checks. The discipline actually implemented and enforced as release
+gates relies on unit/integration tests, golden/reference checks, example smoke runs,
+feature-matrix sweeps, the dependency-boundary guard, and the release-docs guard
+(374 `#[test]` functions across the workspace at v0.20.x).
+
+Property-based tests and a fuzz harness are **not** part of the current release gates and
+their absence is not a defect — they remain *future hardening candidates*, to be added
+selectively (shape/broadcast/reduction invariants for property tests; CSV/JSON/parser
+boundaries for fuzzing) rather than broadly. A future focused item ("Testing Strategy
+Refresh: Property Tests and Fuzz Boundary", candidate RFC-050 after RFC-049) may formalize
+this if the team chooses. This note records that RFC-013's broad strategy is
+partially aspirational relative to the shipped discipline.

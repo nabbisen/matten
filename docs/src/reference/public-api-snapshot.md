@@ -31,10 +31,10 @@ pub use matten::NumericPolicy; // RFC-017: numeric conversion policy
 
 ## Dynamic tensor behaviour
 
-Methods marked Phase 1 only **panic** with a `matten unsupported error` message
+Methods marked numeric-only **panic** with a `matten unsupported error` message
 when called on a dynamic tensor. Call `try_numeric()` to convert first.
 
-| Phase 1 method group | Dynamic behaviour |
+| Numeric method group | Dynamic behaviour |
 |---|---|
 | `reshape`, `flatten`, `transpose`, `swap_axes`, `squeeze`, `expand_dims` | panic |
 | `slice()` builder, `slice_str()` | returns `MattenError::Unsupported` |
@@ -81,7 +81,7 @@ when called on a dynamic tensor. Call `try_numeric()` to convert first.
 | `is_vector()` | `bool` | ndim == 1 |
 | `is_matrix()` | `bool` | ndim == 2 |
 
-## `Tensor` — data access (Phase 1 only)
+## `Tensor` — data access (numeric Tensor)
 
 | Method | Returns | Notes |
 |---|---|---|
@@ -91,7 +91,7 @@ when called on a dynamic tensor. Call `try_numeric()` to convert first.
 | `get(coord)` | `Option<f64>` | panics on dynamic |
 | `get_flat(index)` | `Option<f64>` | panics on dynamic |
 
-## `Tensor` — shape operations (Phase 1 only)
+## `Tensor` — shape operations (numeric Tensor)
 
 | Method | Returns | Notes |
 |---|---|---|
@@ -105,7 +105,7 @@ when called on a dynamic tensor. Call `try_numeric()` to convert first.
 | `expand_dims(axis)` | `Tensor` | RFC-038; inserts a length-1 axis; panics if `axis > ndim` or dynamic |
 | `try_expand_dims(axis)` | `Result<Tensor, MattenError>` | RFC-038; `InvalidArgument` if `axis > ndim`; `Unsupported` on dynamic |
 
-## `Tensor` — slicing (Phase 1 only)
+## `Tensor` — slicing (numeric Tensor)
 
 | Method | Returns | Notes |
 |---|---|---|
@@ -121,7 +121,7 @@ when called on a dynamic tensor. Call `try_numeric()` to convert first.
 | `range<R: IntoSliceRange>(r)` | `SliceBuilder` |
 | `build()` | `Result<Tensor, MattenError>` |
 
-## `Tensor` — arithmetic (Phase 1 only)
+## `Tensor` — arithmetic (numeric Tensor)
 
 Operator traits implemented for `&Tensor`:
 `Add`, `Sub`, `Mul`, `Div`, `Neg` — element-wise with broadcasting.
@@ -131,7 +131,7 @@ Scalar operators: `&Tensor + f64`, `&Tensor - f64`, `&Tensor * f64`, `&Tensor / 
 
 All panic on dynamic tensors.
 
-## `Tensor` — elementwise comfort math (Phase 1 only, RFC-038)
+## `Tensor` — elementwise comfort math (numeric Tensor, RFC-038)
 
 | Method | Returns | Notes |
 |---|---|---|
@@ -166,7 +166,7 @@ All panic on dynamic tensors (except `try_clip`, which returns `Unsupported`).
 |---|---|---|
 | `from_json(input)` | `Result<Tensor, MattenError>` | |
 | `load_json(path)` | `Result<Tensor, MattenError>` | |
-| `from_csv(input)` | `Result<Tensor, MattenError>` | numeric only in Phase 1 |
+| `from_csv(input)` | `Result<Tensor, MattenError>` | numeric only |
 | `load_csv(path)` | `Result<Tensor, MattenError>` | |
 | `Serialize` (serde) | via feature `serde` | panics on dynamic |
 | `Deserialize` (serde) | via feature `serde` | |

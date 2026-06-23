@@ -112,7 +112,7 @@ assert_eq!(c.as_slice(), &[19.0, 22.0, 43.0, 50.0]);
 ```
 
 Incompatible shapes panic with an actionable message including both shapes.
-Batched matmul (rank > 2) is out of scope for Phase 1.
+Batched matmul (rank > 2) is out of scope for the numeric core.
 
 
 ## Axis reductions (min and max)
@@ -150,7 +150,7 @@ product, always call `matmul` or `dot` explicitly.
 
 ## Performance note
 
-Phase 1 matmul uses plain nested loops — correct and readable, but not
+matmul uses plain nested loops — correct and readable, but not
 cache-optimised. For large matrices, migrate the flat data to `ndarray` or
 `nalgebra`:
 

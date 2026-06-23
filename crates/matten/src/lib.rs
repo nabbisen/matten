@@ -9,7 +9,7 @@
 //!
 //! # Scope
 //!
-//! Phase 1 (numeric `f64` core): construction, shape operations, arithmetic,
+//! Numeric core (`f64`): construction, shape operations, arithmetic,
 //! broadcasting, slicing, reductions, matrix multiplication, JSON/CSV boundary
 //! APIs, and serde integration — all complete.
 //!
@@ -59,7 +59,7 @@
 //! - `serde` *(default)* — `Serialize` / `Deserialize` for [`Tensor`].
 //! - `json` *(default, implies `serde`)* — `from_json` / `load_json`.
 //! - `csv` *(default)* — `from_csv` / `load_csv`.
-//! - `dynamic` — the Phase 2 heterogeneous `Element` engine (off by default).
+//! - `dynamic` — the heterogeneous `Element` engine / dynamic on-ramp (off by default).
 //!
 //! For the smallest dependency footprint, disable defaults and opt in:
 //!
@@ -82,7 +82,7 @@
 //   math        sum/mean/min/max, axis reductions, dot, matmul (M7, here)
 //   ser         Serialize/Deserialize for Tensor
 //   parse/      JSON/CSV boundary parsers
-//   dynamic/    feature-gated `Element` engine (Phase 2)
+//   dynamic/    feature-gated `Element` engine (dynamic on-ramp)
 mod convert;
 mod creation;
 #[cfg(feature = "dynamic")]
@@ -111,7 +111,7 @@ pub use crate::slice::SliceBuilder;
 pub use crate::slice::{IntoSliceRange, SliceConvert, SliceSpecRepr};
 pub use crate::tensor::Tensor;
 
-// `Element` is the Phase 2 dynamic value type, exported under `dynamic`.
+// `Element` is the dynamic value type, exported under `dynamic`.
 
 #[cfg(test)]
 mod tests;

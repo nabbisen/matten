@@ -18,6 +18,49 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.20.17] - 2026-06-23
+
+**Documentation / RFC-lifecycle housekeeping, applying the pre-v0.19.0 audit architect
+rulings (Q1–Q4). No runtime code, API, behavior, or dependency change to any crate.**
+
+The architect accepted the pre-v0.19.0 reflection audit (no correctness defect) and ruled
+on the four raised questions. This release applies those rulings.
+
+### Changed (Q1 — terminology, P1)
+
+- Retired the "Phase 1 / Phase 2" vocabulary from all user-facing docs (48 occurrences
+  across 14 files: root and crate READMEs, `crates/matten/src/lib.rs`, and `docs/src`),
+  replacing it with stable domain terminology — "numeric Tensor / numeric core" for the
+  static path and "dynamic ingestion / dynamic on-ramp / dynamic Tensor" for the
+  `dynamic` path. The `(Phase 1 only)` labels were removed from the public-API snapshot's
+  core method tables. Historical RFCs (`rfcs/`) and `CHANGELOG.md` intentionally retain
+  the original wording.
+- Hardened `scripts/check-release-docs.sh` to fail on "Phase 1 / Phase 2" in user-facing
+  docs (scoped to README/crate-READMEs/`lib.rs`/`docs/src`; `rfcs/` and `CHANGELOG.md`
+  allowed). Verified to pass on the cleaned tree and to catch reintroduction.
+
+### Changed (Q2 / Q3 / Q4 — RFC lifecycle notes)
+
+- **RFC-013** (Q2): added a lifecycle note recording that the broad property/fuzz testing
+  strategy is partially aspirational — the shipped release gates are unit/integration/
+  golden/example/feature/release-doc checks (374 tests); property and fuzz testing remain
+  selective future-hardening candidates, not current gates. A future "Testing Strategy
+  Refresh" (candidate RFC-050, after RFC-049) is tracked in the ROADMAP.
+- **RFC-014 ↔ RFC-043** (Q3): added cross-references — RFC-043 is the current
+  examples-program authority (v0.20+, the `30_`–`40_` band, future conventions); RFC-014
+  remains the historical authority for the original `00_`–`28_` suite.
+- **RFC-012** (Q4): added a clarification that the internal `Arc`-shared dynamic storage /
+  CoW mechanics are implemented, while the public mutation API exposing CoW is
+  intentionally deferred. The `compatibility.md` note was reworded accordingly (this also
+  removed its "Phase 2" reference under Q1).
+
+### Notes
+
+- No runtime behavior, data flows, integrations, or auth change — documentation, RFC
+  lifecycle notes, the ROADMAP, and one CI guard script only. Threat model unchanged.
+- The separately-deferred Patch C from the v0.20.14 deep review (RFC-023/026/036/037
+  lifecycle clarification) remains pending its own ruling and is not addressed here.
+
 ## [0.20.16] - 2026-06-23
 
 **Audit fix: public-API snapshot completeness. No runtime code, API, behavior, or

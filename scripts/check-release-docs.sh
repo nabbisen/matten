@@ -145,6 +145,15 @@ if ! grep -q 'InvalidArgument' docs/src/reference/public-api-snapshot.md; then
   FAIL=1
 fi
 
+echo "=== Checking for retired 'Phase 1 / Phase 2' wording in user-facing docs ==="
+# RFC-lifecycle ruling (pre-v0.19.0 audit, Q1): the Phase 1/Phase 2 vocabulary is
+# retired from current user-facing docs in favor of numeric-Tensor / dynamic-ingestion
+# terminology. Historical RFCs (rfcs/) and CHANGELOG.md may retain it.
+if grep -rIn 'Phase 1\|Phase 2' "${USER_DOCS[@]}" 2>/dev/null; then
+  echo "ERROR: retired 'Phase 1 / Phase 2' wording in user-facing docs (use 'numeric Tensor' / 'dynamic ingestion' terminology)"
+  FAIL=1
+fi
+
 echo "=== Checking root README crate table uses family wording, not bare patch versions ==="
 # Crate-table rows look like: | [`name`](path) | VERSION | STATUS | desc |
 # A bare patch version (0.20.0) in the version cell drifts every release; require

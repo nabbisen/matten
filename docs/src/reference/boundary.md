@@ -61,7 +61,7 @@ File errors map to `MattenError::Io`; parse errors to `MattenError::Parse`.
 
 ## CSV
 
-Phase 1 accepts rectangular numeric-only CSV. Shape is inferred as
+Numeric CSV ingestion accepts rectangular numeric-only CSV. Shape is inferred as
 `[rows, cols]`.
 
 ```rust

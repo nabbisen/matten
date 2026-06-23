@@ -621,3 +621,12 @@ The correct policy is:
 
 > Examples make accepted APIs easier to understand.  
 > They do not expand `matten` into a dataframe library, advanced linear algebra package, ML framework, or benchmark-oriented numerical engine.
+
+---
+
+## Lifecycle note (pre-v0.19.0 audit, 2026-06-23)
+
+RFC-014 is the historical authority for the original `00_`–`28_` example/tutorial suite
+and the early example-quality foundation. For the current v0.20+ examples program,
+the `30_`–`40_` famous-problem band, and future example-program structure / quality-gate
+policy, see **RFC-043**, which extends this RFC and is the current authority.

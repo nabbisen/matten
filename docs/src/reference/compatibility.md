@@ -42,10 +42,10 @@ See [Error model](./error-model.md) for the full list of each zone's APIs.
 | `serde` | yes | stable |
 | `json` | yes | stable |
 | `csv` | yes | stable |
-| `dynamic` | no | stable (Phase 2) |
+| `dynamic` | no | stable (dynamic ingestion) |
 
 Disabling default features is supported: `default-features = false` gives
-the lean core. Enabling `dynamic` does not rename or remove any Phase 1 API.
+the lean core. Enabling `dynamic` does not rename or remove any numeric Tensor API.
 
 ## v0.x compatibility
 
@@ -79,13 +79,13 @@ The following items were considered and explicitly deferred:
 | Item | Status | Reason |
 |---|---|---|
 | `is_empty()` | Deferred | Zero-sized dims rejected; always false. Future RFC. |
-| `set_flat` | Not implemented | Mutation deferred to Phase 2. |
+| `set_flat` | Not implemented | Mutation API deferred. |
 | `arange` max elements | `1<<20` (~1 M) | Lowered from `1<<28` in v0.12.0 for OOM safety. |
 | `get_flat` | **Implemented** | `Tensor::get_flat(index) -> Option<f64>` added in v0.11.0. |
 | Negative slice indices | Deferred | Not in RFC-008 grammar for `0.1.0`. |
 | Step slicing `::2` | Supported | `slice_str("0:10:2")` grammar works. |
-| Mutable element API | Deferred | Phase 2 CoW not yet exposed publicly. |
-| Dynamic slicing via builder | Deferred | `slice().build()` works on Phase 1 only. Use `get_element` column-by-column for dynamic. |
+| Mutable element API | Deferred | Internal Arc-shared storage / CoW is implemented; the public mutation API that would expose CoW is intentionally deferred. |
+| Dynamic slicing via builder | Deferred | `slice().build()` works on numeric tensors only. Use `get_element` column-by-column for dynamic. |
 | Batched matmul (rank > 2) | Deferred | RFC-010 scope: `[m,n]×[n,p]` maximum. |
 | Axis reductions on dynamic | Not needed yet | Convert with `try_numeric()` first. |
 

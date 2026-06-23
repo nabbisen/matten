@@ -84,7 +84,7 @@ println!("data ready for candle: {flat_f32:?}, shape: {shape:?}");
 
 ## Dynamic tensors: clean then migrate
 
-If your data went through `matten`'s `dynamic` feature, convert to Phase 1
+If your data went through `matten`'s `dynamic` feature, convert to a numeric tensor
 numeric first:
 
 ```rust
@@ -96,9 +96,9 @@ let numeric: Tensor = filled.try_numeric()?; // MattenError if non-numeric
 let flat: Vec<f64>  = numeric.into_vec();    // hand off
 ```
 
-## Phase 1 allocation warning
+## Allocation warning
 
-`matten` Phase 1 clones on every reshape and slice. For large datasets,
+`matten` clones on every reshape and slice. For large datasets,
 migrate before performing many transformations:
 
 ```rust

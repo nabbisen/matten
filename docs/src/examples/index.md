@@ -2,7 +2,7 @@
 
 All `matten` examples live in `examples/`. They are grouped by purpose.
 
-## Core examples (Phase 1 numeric)
+## Core examples (numeric Tensor)
 
 These examples demonstrate the default `matten` API. No extra features required.
 
@@ -65,7 +65,7 @@ rather than a duplicate in this band.
 
 ## Pattern examples
 
-Small practical PoC patterns using accepted Phase 1 APIs.
+Small practical PoC patterns using the numeric Tensor APIs.
 
 | File | What it shows |
 |---|---|
@@ -107,7 +107,7 @@ These live in each companion crate's own `examples/` directory, not in core
 ## Running examples
 
 ```bash
-# Phase 1 (no features needed):
+# Numeric core (no features needed):
 cargo run --example 00_quickstart
 cargo run --example 27_axis_reductions
 

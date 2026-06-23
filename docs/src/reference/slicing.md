@@ -80,7 +80,7 @@ assert_eq!(a, b);
 When in doubt, use the builder — it gives better error messages and is
 documented in examples as canonical.
 
-## Phase 1 ownership
+## Numeric Tensor ownership
 
 Every slice result is a **new contiguous owned tensor**. No borrowed view of
 the source tensor is returned. This means slicing always allocates, but the

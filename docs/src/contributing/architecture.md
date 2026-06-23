@@ -46,13 +46,13 @@ Module style: `foo.rs` + `foo/` coexistence (Rust 2018+). No `mod.rs` files.
 ## Public re-exports
 
 ```rust
-// Phase 1 — always available:
+// Numeric core — always available:
 pub use crate::error::{DataFormat, MattenError};
 pub use crate::limits::MattenLimits;
 pub use crate::slice::SliceBuilder;
 pub use crate::tensor::Tensor;
 
-// Phase 2 — under #[cfg(feature = "dynamic")]:
+// Dynamic on-ramp — under #[cfg(feature = "dynamic")]:
 pub use crate::dynamic::Element;
 pub use crate::dynamic::NumericPolicy;
 
@@ -79,11 +79,11 @@ is off by default.
 ## Design invariants
 
 1. **One primary user type.** Every user workflow starts with `use matten::Tensor`.
-2. **No public lifetimes.** All Phase 1 methods that take or return tensors use
+2. **No public lifetimes.** All numeric-core methods that take or return tensors use
    owned values. Internal helpers may borrow, but lifetimes never appear in the
    public API signature of a method that returns a `Tensor`.
 3. **No public generics on Tensor.** The type is `Tensor`, not `Tensor<T>` or
-   `Tensor<T, D>`. Generic dtype and dimension support is Phase 2 (`dynamic`).
+   `Tensor<T, D>`. Generic dtype and dimension support belongs to the dynamic path (`dynamic`).
 4. **`#![forbid(unsafe_code)]`.** Any future exception requires a dedicated RFC.
 5. **Panic zone / Result zone split.** Convenience APIs for trusted local code
    may panic. Every external boundary returns `Result<_, MattenError>`.
@@ -103,7 +103,7 @@ is off by default.
 | 0.4.0 | RFC-007/008 | M4: reshape, transpose, `SliceBuilder`, `slice_str` |
 | 0.5.0 | RFC-009 | M5: serde, `from_json`, `from_csv` |
 | 0.6.0–0.7.0 | RFC-010/014 | M6: reductions, matmul, examples, CI gates |
-| 0.8.0 | RFC-011/012 | Phase 2 alpha: `Element`, CoW `DynamicTensor`, dynamic JSON/CSV |
+| 0.8.0 | RFC-011/012 | Dynamic alpha: `Element`, CoW `DynamicTensor`, dynamic JSON/CSV |
 | 0.9.0 | RFC-013 | Dynamic hardening: `min_axis`/`max_axis`, missing-value helpers |
 | 0.10.0–0.11.0 | — | Stabilization, post-audit, `get_flat`, NumPy fixtures |
 | 0.12.0–0.13.2 | — | Dynamic lifecycle hardening; accessor guards; sealed slice traits |

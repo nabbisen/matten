@@ -1,7 +1,7 @@
 # Shape operations
 
 All shape-transformation methods return **new independent owned tensors**.
-Phase 1 copies data internally; no view lifetime is ever exposed.
+The numeric core copies data internally; no view lifetime is ever exposed.
 
 ## Reshape
 
@@ -119,9 +119,9 @@ Tensor::scalar(99.0).get(&[])  // Some(99.0)
 ```
 
 `get` returns `Option<f64>` and never panics. There is no mutable element
-setter in Phase 1.
+setter.
 
-## Phase 1 ownership note
+## Numeric Tensor ownership note
 
 Every method above clones or physically reorders data into a fresh contiguous
 buffer. This keeps the API lifetime-free and predictable, at the cost of

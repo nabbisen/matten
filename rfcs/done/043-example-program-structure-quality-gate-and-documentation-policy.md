@@ -305,3 +305,12 @@ Recommended order:
 ```
 
 RFC-046 and RFC-047 may depend on RFC-038 comfort APIs for cleaner implementation.
+
+---
+
+## Lifecycle note (pre-v0.19.0 audit, 2026-06-23)
+
+RFC-043 extends the earlier **RFC-014** example/tutorial foundation and is the current
+authority for examples-program structure, quality gates, and documentation policy
+(governing the v0.20+ examples, the `30_`–`40_` band, and future example conventions).
+RFC-014 remains the historical authority for the original `00_`–`28_` suite.

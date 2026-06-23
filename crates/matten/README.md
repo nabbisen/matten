@@ -24,7 +24,7 @@ JSON/CSV in and out — without wrestling with views, lifetimes, or trait bounds
 When a prototype becomes performance-critical, `matten` is designed to hand its
 flat data off to a specialized crate.
 
-> **Status: active pre-1.0 development.** Phase 1 numeric core is strong;
+> **Status: active pre-1.0 development.** The numeric core is strong;
 > The `dynamic` feature supports heterogeneous ingestion (`from_json_dynamic`, `from_csv_dynamic`),
 > missing-value cleanup (`fill_none`, `none_mask`, `forward_fill_none`), and explicit conversion to
 > numeric tensors (`try_numeric`). Dynamic reshape, slicing, arithmetic, reductions, and serde are
@@ -58,8 +58,8 @@ matten = { version = "0.20", default-features = false }
 ## Design notes
 
 - **One primary type.** Users work through `matten::Tensor`. The public root also
-  exposes `MattenError` and `DataFormat`; the dynamic `Element` engine is a Phase 2,
-  feature-gated addition.
+  exposes `MattenError` and `DataFormat`; the dynamic `Element` engine is a feature-gated dynamic on-ramp;
+  it is off by default.
 - **Two error zones.** Local convenience APIs panic with actionable messages for
   fast PoC feedback; every external boundary returns `Result<_, MattenError>` and
   never panics on ordinary invalid input. `MattenError` derives only `Debug`, so

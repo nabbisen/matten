@@ -2,7 +2,7 @@
 
 This is the recommended learning path for `matten`.
 
-## Phase 1: Numeric tensors
+## Numeric tensors
 
 If your data is already clean numeric values, follow these examples in order:
 
@@ -18,9 +18,9 @@ If your data is already clean numeric values, follow these examples in order:
 | 8 | `cargo run --example 27_axis_reductions` | Row/column reductions |
 | 9 | `cargo run --example 12_boundary_error_handling` | Safe error handling |
 
-After these nine examples you understand the Phase 1 numeric core.
+After these nine examples you understand the numeric core.
 
-## Phase 2: Messy data with `dynamic`
+## Dynamic ingestion: messy data with `dynamic`
 
 If your input has missing values, mixed types, or dirty CSV/JSON:
 

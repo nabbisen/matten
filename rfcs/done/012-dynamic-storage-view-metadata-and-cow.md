@@ -235,3 +235,13 @@ Exact mutation API may be deferred, but internal CoW should be designed for it.
 - Users do not need to know `Arc` or view metadata.
 - CoW mutation isolation is defined and testable.
 - Memory trade-offs are documented before `0.2.0` beta.
+
+---
+
+## Lifecycle note (pre-v0.19.0 audit, 2026-06-23)
+
+Clarification of the "Implemented" status: RFC-012 is implemented for the *internal*
+shared dynamic storage (`Arc<Vec<Element>>`) and the internal copy-on-write mechanics.
+The *public mutation API* that would expose CoW behavior to users remains intentionally
+deferred (consistent with this RFC's own note that the exact mutation API may be
+deferred while internal CoW is designed for it).

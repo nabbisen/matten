@@ -140,8 +140,8 @@ More examples are [here](crates/matten-mlprep/examples/).
 ### matten
 
 - **One primary type.** Users work through `matten::Tensor`. The public root also
-  exposes `MattenError` and `DataFormat`; the dynamic `Element` engine is a Phase 2,
-  feature-gated addition.
+  exposes `MattenError` and `DataFormat`; the dynamic `Element` engine is a feature-gated dynamic on-ramp;
+  it is off by default.
 - **Two error zones.** Local convenience APIs panic with actionable messages for
   fast PoC feedback; every external boundary returns `Result<_, MattenError>` and
   never panics on ordinary invalid input. `MattenError` derives only `Debug`, so
