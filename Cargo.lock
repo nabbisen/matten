@@ -47,7 +47,7 @@ dependencies = [
 
 [[package]]
 name = "matten"
-version = "0.20.0"
+version = "0.20.1"
 dependencies = [
  "csv",
  "serde",
@@ -56,21 +56,22 @@ dependencies = [
 
 [[package]]
 name = "matten-data"
-version = "0.20.0"
+version = "0.20.1"
 dependencies = [
+ "csv",
  "matten",
 ]
 
 [[package]]
 name = "matten-mlprep"
-version = "0.20.0"
+version = "0.20.1"
 dependencies = [
  "matten",
 ]
 
 [[package]]
 name = "matten-ndarray"
-version = "0.20.0"
+version = "0.20.1"
 dependencies = [
  "matten",
  "ndarray",

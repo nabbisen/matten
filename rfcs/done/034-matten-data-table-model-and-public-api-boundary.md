@@ -1,6 +1,6 @@
 # RFC-034: `matten-data` Table Model and Public API Boundary
 
-**Status:** Proposed  
+**Status:** Implemented (v0.20.1) — `matten-data` table model and public API boundary shipped.  
 **Target Release:** v0.20.0 design; v0.20.x implementation if RFC-033 approves  
 **Related:** RFC-033, RFC-035, RFC-036, RFC-042  
 **Scope:** Public table model and API boundary for `matten-data`

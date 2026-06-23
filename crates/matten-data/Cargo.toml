@@ -12,7 +12,18 @@ license.workspace       = true
 repository.workspace    = true
 
 # Companion crate: depends on core `matten` only (no default features), one
-# direction (matten-data -> matten). No CSV/dataframe dependency yet — CSV
-# ingestion arrives with RFC-035. Scope is locked by RFC-033 / RFC-042.
+# direction (matten-data -> matten). CSV ingestion (RFC-035) is behind the
+# default-on `csv` feature. Scope is locked by RFC-033 / RFC-042.
 [dependencies]
 matten = { version = "0.20", path = "../matten", default-features = false }
+csv = { version = "1.3", optional = true }
+
+[features]
+default = ["csv"]
+# CSV ingestion (`Table::from_csv_str` / `from_csv_path`).
+csv = ["dep:csv"]
+
+# The example uses the CSV constructors, so it only builds when `csv` is enabled.
+[[example]]
+name = "csv_to_tensor"
+required-features = ["csv"]

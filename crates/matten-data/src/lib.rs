@@ -3,17 +3,13 @@
 //!
 //! # Status
 //!
-//! **Experimental (scaffold).** This crate is an approved, scope-locked companion
-//! (RFC-033) but currently contains no public API. Table ingestion and conversion
-//! land in later releases once RFC-034 (table model) and RFC-035 (CSV ingestion and
-//! numeric conversion) are accepted and implemented. Maturity is expressed by this
-//! Status label, not by the crate version: under lock-step family versioning
-//! (RFC-030) the crate shares the workspace family version.
+//! **Experimental.** This is a scope-locked companion (RFC-033) for the boring
+//! step between table-like input and a numeric [`matten::Tensor`]. The API may
+//! change before beta; pin the minor version. Under lock-step family versioning
+//! (RFC-030) the crate shares the workspace family version; maturity is the Status
+//! label, not the version number.
 //!
-//! # What it will be
-//!
-//! A small helper for the boring step between table-like input and a numeric
-//! [`matten::Tensor`]:
+//! # The workflow
 //!
 //! ```text
 //! small CSV / table-like data
@@ -24,34 +20,64 @@
 //!   -> matten::Tensor
 //! ```
 //!
+//! ```
+//! # #[cfg(not(feature = "csv"))] fn main() {}
+//! # #[cfg(feature = "csv")] fn main() -> Result<(), matten_data::MattenDataError> {
+//! use matten_data::Table;
+//!
+//! let csv = "sales,cost,note\n10,2,a\n20,,b\n30,4,c";
+//! let table = Table::from_csv_str(csv)?;
+//!
+//! // Inspect, select, clean, convert — every step explicit.
+//! let tensor = table
+//!     .select_columns(["sales", "cost"])?
+//!     .fill_missing(0.0)?
+//!     .try_numeric()?
+//!     .to_tensor()?;
+//!
+//! assert_eq!(tensor.shape(), &[3, 2]);
+//! assert_eq!(tensor.as_slice(), &[10.0, 2.0, 20.0, 0.0, 30.0, 4.0]);
+//! # Ok(())
+//! # }
+//! ```
+//!
 //! # What it is not
 //!
 //! `matten-data` is **not a dataframe library**. It has no joins, group-by, pivot,
 //! query DSL, lazy execution, indexing/`loc`/`iloc`, rolling/window operations,
 //! datetime engine, categorical dtype system, or large-data streaming. For those
 //! workloads use [Polars](https://pola.rs), [DataFusion](https://datafusion.apache.org),
-//! Pandas, or another dataframe/query tool.
+//! Pandas, or another dataframe/query tool. It is a small conversion helper for
+//! application-validated or trusted data, not a CSV firewall or input sandbox.
 //!
 //! # Relationship to core `dynamic`
 //!
-//! Core `matten`'s `dynamic` feature is *value-level* ingestion (mixed values inside
-//! a `Tensor`, with explicit `try_numeric()`). `matten-data` is *table-level*
+//! Core `matten`'s `dynamic` feature is *value-level* ingestion (mixed values
+//! inside a `Tensor`, with explicit `try_numeric()`). `matten-data` is *table-level*
 //! preparation (headers, named columns, schema summary, table-shaped missing-value
-//! policy) whose end goal is a numeric `Tensor`. `matten-data` may use core
-//! `dynamic` internally, but it does not expose a second computation engine.
+//! policy) whose end goal is a numeric `Tensor`. It does not expose a second
+//! computation engine.
 //!
-//! # Dependency direction
+//! # Conversion rules
 //!
-//! `matten-data` depends on core `matten`; core `matten` never depends on
-//! `matten-data`. The dependency-boundary CI check enforces this.
+//! Numeric conversion is strict and explicit (`try_numeric` then `to_tensor`):
+//! integers and floats become `f64`; booleans and non-numeric text are rejected;
+//! a remaining missing cell is rejected (fill it first). Missing values never
+//! silently become zero, and booleans never silently become `1`/`0`.
 
 #![forbid(unsafe_code)]
 
-// Reserved module boundaries for later RFCs. These are intentionally private and
-// empty in the scaffold; they are filled and selectively exposed only when their
-// RFCs are accepted and implemented. Do not add public API here in the scaffold.
-mod csv; // RFC-035: CSV ingestion
-mod error; // RFC-034 / RFC-035: MattenDataError
-mod numeric; // RFC-035: numeric conversion -> NumericTable -> Tensor
-mod schema; // RFC-034 / RFC-035: SchemaSummary / ColumnKind
-mod table; // RFC-034: Table model
+#[cfg(feature = "csv")]
+mod csv;
+mod error;
+mod numeric;
+mod schema;
+mod table;
+
+#[cfg(all(test, feature = "csv"))]
+mod tests;
+
+pub use error::MattenDataError;
+pub use numeric::NumericTable;
+pub use schema::{ColumnKind, ColumnSummary, SchemaSummary};
+pub use table::{CellValue, Table};

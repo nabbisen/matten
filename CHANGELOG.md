@@ -18,6 +18,43 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.20.1] - 2026-06-23
+
+**`matten-data` becomes functional: the experimental table-to-Tensor API ships
+(RFC-034 + RFC-035). Additive minor work under lock-step family versioning; no
+breaking change to existing crates.**
+
+### Added
+
+- **`matten-data` public API** (RFC-034, RFC-035), still **Experimental**:
+  - `Table` with CSV constructors `from_csv_str` / `from_csv_path` (behind the
+    default-on `csv` feature), inspection (`row_count`, `column_count`,
+    `column_names`, `schema_summary`), `select_columns` (by name, order-preserving),
+    and explicit `fill_missing`.
+  - Strict, explicit numeric conversion: `try_numeric` → `NumericTable` → `to_tensor`
+    (shape `[rows, selected_columns]`, row-major `f64`). Integers/floats convert;
+    booleans, non-numeric text, and unfilled missing cells are rejected — never
+    silently coerced or zero-filled.
+  - `CellValue` (crate-local, distinct from core `Element` — architect Q4),
+    `SchemaSummary` / `ColumnSummary` / `ColumnKind`, and a crate-local
+    `MattenDataError` with row/column context (one-based CSV line numbers).
+  - CSV policy: header required; empty/duplicate headers and ragged rows rejected
+    with precise errors; only empty cells are missing by default; surrounding
+    whitespace trimmed.
+  - `csv` feature (default-on) gating the `csv`-crate dependency and constructors.
+  - Runnable example `examples/csv_to_tensor.rs`; 33 unit tests + doctests.
+- RFC-034 and RFC-035 moved to `rfcs/done/`.
+
+### Notes
+
+- No source-logic or public-API change to `matten`, `matten-ndarray`, or
+  `matten-mlprep`; the `matten` dependency pins (`0.20`) already cover `0.20.1`.
+- `matten-data` produces a numeric `Tensor`; it does not use or expose core
+  `dynamic`, and remains scope-locked (RFC-033, RFC-042) — no dataframe/query/lazy
+  APIs. The beta decision remains deferred to v0.21+.
+- Remaining RFC-036 work (broader example suite, the RFC-042 example scope-guard in
+  the release-docs script) is a follow-up, not included here.
+
 ## [0.20.0] - 2026-06-23
 
 **v0.20+ materialization start. Introduces the experimental `matten-data` companion

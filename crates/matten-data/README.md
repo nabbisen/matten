@@ -2,28 +2,36 @@
 
 [![license](https://img.shields.io/crates/l/matten-data.svg)](../../LICENSE)
 
-> **Experimental (scaffold, `0.20.x` family).** An approved, scope-locked companion
-> crate (RFC-033). It currently has **no public API** — table ingestion and
-> conversion arrive in later releases (RFC-034, RFC-035). Pin the minor version.
+> **Experimental (`0.20.x` family).** A scope-locked companion crate (RFC-033).
+> The table-to-Tensor API (CSV ingestion, schema summary, column selection,
+> missing-value handling, explicit numeric conversion) is available as of v0.20.1
+> (RFC-034, RFC-035). The API may change before beta; pin the minor version.
 
 Part of the [`matten` workspace](../../README.md) — see it for the full family.
 
 ## Overview
 
-`matten-data` will be a tiny helper for the boring step between table-like input
-and a numeric `matten::Tensor`:
+`matten-data` is a tiny helper for the boring step between table-like input and a
+numeric `matten::Tensor`:
 
-```text
-small CSV / table-like data
-  -> inspect schema
-  -> select columns by name
-  -> clean missing values explicitly
-  -> convert to numeric explicitly
-  -> matten::Tensor
+```rust
+use matten_data::Table;
+
+let csv = "sales,cost,note\n10,2,a\n20,,b\n30,4,c";
+let tensor = Table::from_csv_str(csv)?
+    .select_columns(["sales", "cost"])?   // pick numeric columns, by name
+    .fill_missing(0.0)?                    // clean missing values explicitly
+    .try_numeric()?                        // strict, explicit conversion
+    .to_tensor()?;                         // -> matten::Tensor, shape [3, 2]
+
+assert_eq!(tensor.shape(), &[3, 2]);
+assert_eq!(tensor.as_slice(), &[10.0, 2.0, 20.0, 0.0, 30.0, 4.0]);
+# Ok::<(), matten_data::MattenDataError>(())
 ```
 
-That is its whole purpose. It helps you *reach* a `Tensor`; core `matten` computes
-with the `Tensor`; `matten-mlprep` prepares the numeric `Tensor` for modelling.
+Output shape is `[rows, selected_columns]`; row order is the input row order and
+column order is the requested selection order. See
+[`examples/`](./examples/) for a runnable version.
 
 ## Not a dataframe library
 
@@ -61,7 +69,7 @@ import `Tensor` from `matten` directly:
 
 ```rust
 use matten::Tensor;
-// use matten_data::Table;   // (not yet available)
+use matten_data::Table;
 ```
 
 Declare both `matten` and this crate in your `Cargo.toml` (RFC-032).

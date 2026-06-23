@@ -1,6 +1,6 @@
 # RFC-035: CSV Ingestion, Schema Summary, Missing Values, and Numeric Conversion
 
-**Status:** Proposed  
+**Status:** Implemented (v0.20.1) — CSV ingestion, schema summary, missing-value, and strict numeric conversion shipped.  
 **Target Release:** v0.20.x if RFC-033 approves implementation  
 **Related:** RFC-033, RFC-034, RFC-036, RFC-042  
 **Scope:** Input boundary behavior for `matten-data`
