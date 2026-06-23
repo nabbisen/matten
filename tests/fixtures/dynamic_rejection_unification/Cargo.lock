@@ -29,18 +29,18 @@ dependencies = [
 
 [[package]]
 name = "matten"
-version = "0.20.7"
+version = "0.20.8"
 
 [[package]]
 name = "matten-mlprep"
-version = "0.20.7"
+version = "0.20.8"
 dependencies = [
  "matten",
 ]
 
 [[package]]
 name = "matten-ndarray"
-version = "0.20.7"
+version = "0.20.8"
 dependencies = [
  "matten",
  "ndarray",

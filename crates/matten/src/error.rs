@@ -73,6 +73,19 @@ pub enum MattenError {
         /// Human-readable detail.
         message: String,
     },
+    /// A supported operation received an invalid local argument — the operation
+    /// itself is available, but the supplied value is out of range or ill-defined
+    /// (for example, `clip` with `min > max`, or `argmin` on a tensor containing
+    /// NaN). Distinct from [`MattenError::Unsupported`], which means the operation
+    /// is not available for this tensor kind/feature/mode at all.
+    InvalidArgument {
+        /// The operation that rejected the argument, e.g. `"clip"`.
+        operation: &'static str,
+        /// The offending argument, e.g. `"min/max"`.
+        argument: &'static str,
+        /// Human-readable, actionable detail.
+        message: String,
+    },
 }
 
 impl fmt::Display for MattenError {
@@ -105,6 +118,14 @@ impl fmt::Display for MattenError {
             MattenError::Unsupported { operation, message } => {
                 write!(f, "matten unsupported error in {operation}: {message}")
             }
+            MattenError::InvalidArgument {
+                operation,
+                argument,
+                message,
+            } => write!(
+                f,
+                "matten invalid argument error in {operation}: {argument}: {message}"
+            ),
         }
     }
 }

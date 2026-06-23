@@ -6,6 +6,7 @@
 
 mod convert;
 mod dynamic;
+mod elementwise;
 mod error;
 mod math;
 mod ops;

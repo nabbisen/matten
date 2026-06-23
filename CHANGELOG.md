@@ -18,6 +18,45 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.20.9] - 2026-06-23
+
+**Core numeric comfort APIs — elementwise band (RFC-038, first sub-band). Additive,
+non-breaking public API under lock-step family versioning.**
+
+This begins RFC-038 (core comfort APIs), delivered as small sub-bands rather than one
+drop. Subsequent bands (selection `argmin`/`argmax`, shape `squeeze`/`expand_dims`,
+creation `linspace`/`eye`) follow as separate releases.
+
+### Added
+
+- **Elementwise comfort math on `Tensor`** (RFC-038 §4.3), in a new
+  `ops/elementwise.rs` module (placed there per RFC-038 §5.3 so the near-threshold
+  `math.rs` is not pushed over the ELOC limit):
+  - `abs()`, `sqrt()`, `exp()`, `ln()` — elementwise, shape-preserving, ordinary
+    `f64` NaN/Inf behavior (e.g. `sqrt` of a negative is `NaN`, `ln(0.0)` is `-inf`);
+  - `clip(min, max)` — clamp into a range (panics if `min > max`);
+  - `try_clip(min, max)` — non-panicking form returning `Result`.
+- **`MattenError::InvalidArgument { operation, argument, message }`** (RFC-038 §5.2) —
+  for supported operations given an out-of-range argument (e.g. `clip` with
+  `min > max`), distinct from `Unsupported`. Added under the existing
+  `#[non_exhaustive]` enum, so it is **non-breaking**.
+
+### Changed
+
+- Reference docs updated to match: `error-model.md` (new variant + guide row),
+  `public-api-snapshot.md` (new elementwise section), and `operators.md` (user-facing
+  comfort-math section).
+
+### Notes
+
+- All new methods are numeric-only: on a dynamic tensor the convenience forms panic
+  with an `Unsupported` message and `try_clip` returns `MattenError::Unsupported`;
+  call `try_numeric()` first. This follows the established dynamic-rejection pattern.
+- No new data flows, external integrations, or auth: these are pure in-memory numeric
+  transforms and local argument validation. `#![forbid(unsafe_code)]`, the
+  core→companion dependency boundary, and the release-doc guards remain valid; the
+  threat model is unchanged.
+
 ## [0.20.8] - 2026-06-23
 
 **Examples program — ML-like band (RFC-047). Additive examples and documentation

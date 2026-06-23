@@ -7,6 +7,7 @@
 //! - `unary_ops` — `Neg`
 
 pub(crate) mod broadcast;
+mod elementwise;
 mod scalar_ops;
 mod tensor_ops;
 mod unary_ops;

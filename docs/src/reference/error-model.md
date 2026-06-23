@@ -41,6 +41,7 @@ pub enum MattenError {
     Parse     { format: DataFormat, message: String },
     Io        { path: std::path::PathBuf, source: std::io::Error },
     Unsupported { operation: &'static str, message: String },
+    InvalidArgument { operation: &'static str, argument: &'static str, message: String },
 }
 ```
 
@@ -65,7 +66,8 @@ pub enum DataFormat { Json, Csv }
 | `Slice` | slice builder bounds errors, `slice_str` parse/bounds errors |
 | `Parse` | `from_json`, `from_csv`, and their file-loading variants |
 | `Io` | `load_json`, `load_csv` file I/O errors |
-| `Unsupported` | disabled-feature or not-yet-implemented operation |
+| `Unsupported` | disabled-feature or not-yet-implemented operation, or a numeric-only API called on a dynamic tensor |
+| `InvalidArgument` | a supported operation given an out-of-range/ill-defined argument (e.g. `clip` with `min > max`); distinct from `Unsupported` |
 
 ## Matching errors
 

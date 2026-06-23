@@ -124,7 +124,19 @@ Scalar operators: `&Tensor + f64`, `&Tensor - f64`, `&Tensor * f64`, `&Tensor / 
 
 All panic on dynamic tensors.
 
-## `Tensor` — reductions (Phase 1 only)
+## `Tensor` — elementwise comfort math (Phase 1 only, RFC-038)
+
+| Method | Returns | Notes |
+|---|---|---|
+| `abs()` | `Tensor` | elementwise; shape preserved |
+| `sqrt()` | `Tensor` | negative element → `NaN` |
+| `exp()` | `Tensor` | natural exponential `e^x` |
+| `ln()` | `Tensor` | `ln(0.0)` → `-inf`, negative → `NaN` |
+| `clip(min, max)` | `Tensor` | clamp; panics if `min > max` |
+| `try_clip(min, max)` | `Result<Tensor>` | `InvalidArgument` if `min > max`; `Unsupported` on dynamic |
+
+All panic on dynamic tensors (except `try_clip`, which returns `Unsupported`).
+
 
 | Method | Returns | Notes |
 |---|---|---|

@@ -84,3 +84,27 @@ matten broadcast error in add: shapes [2, 3] and [2] are not compatible
 The broadcast implementation maps result coordinates directly to source
 element indices using zero-stride tricks. No expanded broadcast copies of
 the operands are allocated.
+
+## Elementwise comfort math (RFC-038)
+
+Beyond the operators above, `Tensor` provides a few familiar elementwise
+transforms. Each preserves shape, follows ordinary `f64` NaN/Inf behavior, and
+panics on dynamic tensors (call `try_numeric()` first):
+
+| Method | Effect |
+|---|---|
+| `abs()` | absolute value |
+| `sqrt()` | square root (negative → `NaN`) |
+| `exp()` | `e^x` |
+| `ln()` | natural log (`ln(0.0)` → `-inf`, negative → `NaN`) |
+| `clip(min, max)` | clamp each element into `[min, max]` |
+
+```rust
+use matten::Tensor;
+let t = Tensor::from_vec(vec![-5.0, 0.5, 9.0]);
+assert_eq!(t.clip(0.0, 1.0).as_slice(), &[0.0, 0.5, 1.0]);
+```
+
+`clip` panics if `min > max`; `try_clip(min, max)` returns
+`MattenError::InvalidArgument` instead (or `MattenError::Unsupported` on a dynamic
+tensor).
