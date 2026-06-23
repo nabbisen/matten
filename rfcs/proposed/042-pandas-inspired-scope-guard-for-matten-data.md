@@ -1,6 +1,6 @@
 # RFC-042: Pandas-Inspired Scope Guard for `matten-data`
 
-**Status:** Proposed  
+**Status:** Proposed (accepted for implementation — v0.21 boundary review, 2026-06-23; see Architect Rulings below). Target v0.21.3 (or earlier).
 **Target Release:** v0.20+ / v0.21+  
 **Related:** RFC-033, RFC-034, RFC-035, RFC-036  
 **Scope:** Explicit anti-scope guard for Pandas/dataframe expectations
@@ -257,3 +257,24 @@ A future RFC may reconsider specific table operations only if:
 - it does not change `matten-data`'s identity.
 
 Default answer should remain no.
+
+---
+
+## Architect Rulings — v0.21 Boundary Review (2026-06-23)
+
+Both questions accepted. RFC-042 stays standalone; the three-check release-docs guard
+is authorized (target **v0.21.3**, or any earlier patch — it is mechanical).
+
+**Q12 — Keep RFC-042 standalone** (even though it references RFC-033): the
+dataframe-creep risk warrants a visible, named, enforceable artifact.
+
+**Q13 — Authorize the three-check guard** exactly as §8 specifies: (1) example
+file-name guard, (2) public-API identifier guard over `crates/matten-data/src`,
+(3) non-goal documentation context handling. Do **not** body-scan broad terms
+(`index`, `join`, `loc`, `query`).
+
+- **Must fail on:** a public `DataFrame`/`Series` type; a public
+  `groupby`/`group_by`/`join`/`merge`/`pivot`/`query` API; an example file name
+  implying dataframe operations.
+- **Must not fail on:** an ordinary variable named `index`; `Path::join`; forbidden
+  words inside documentation non-goal sections; words like `local`/`location`/`block`.

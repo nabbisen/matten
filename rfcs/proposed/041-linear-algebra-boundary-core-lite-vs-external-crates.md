@@ -1,6 +1,6 @@
 # RFC-041: Linear Algebra Boundary — Core Lite vs External Crates
 
-**Status:** Proposed  
+**Status:** Proposed (accepted for implementation — v0.21 boundary review, 2026-06-23; see Architect Rulings below). Target v0.21.1.
 **Target Release:** v0.21+ decision  
 **Related:** RFC-010, RFC-025, RFC-038  
 **Scope:** Boundary for linear algebra APIs in core and companions
@@ -222,3 +222,39 @@ For serious workloads, recommend specialized crates.
 - No GPU acceleration.
 - No sparse algebra.
 - No dtype-generic linalg.
+
+---
+
+## Architect Rulings — v0.21 Boundary Review (2026-06-23)
+
+All questions accepted. `norm` + `trace` + `outer` are authorized for core (target
+**v0.21.1**); serious linalg/decomposition/BLAS/sparse rejected from core.
+
+**Q8 — Accept all three (option a):** `norm(&self) -> f64`, `trace(&self) -> f64`,
+`outer(&self, other: &Tensor) -> Tensor`, with `try_*` forms if consistent with the
+current panic/Result split.
+
+**Q9 — `norm` = L2/Frobenius over all elements only:** `sqrt(sum(x_i^2))` (Frobenius
+for matrices). Do not add `norm_l1`/`norm_inf`/`norm_axis`/`norm_with_order` in the
+first cut. NaN propagates (any NaN element → NaN). No special scaling/overflow
+algorithm guaranteed in the first cut (document this).
+
+**Q10 — `trace` rectangular via `min(rows, cols)` (option a):** rank-2 only; sum
+`self[i, i]` for `i in 0..min(rows, cols)`. Invalid rank → `try_trace` returns
+`MattenError::Shape`, `trace` panics with a clear message. Rustdoc must state the
+rectangular behavior explicitly.
+
+**Q11 — Confirm core rejection:** `inverse`, `determinant`, `solve`, eigen*, SVD,
+QR, LU, Cholesky, sparse formats, BLAS/LAPACK dependencies are rejected from core;
+`matten-nalgebra` / `matten-ndarray-linalg` bridges require separate future RFCs.
+Required docs wording: "Core `matten` provides small linalg-adjacent helpers, not a
+linear algebra backend."
+
+**`outer`:** rank-1 × rank-1 → `[m, n]`; `MattenLimits` allocation check; reject
+non-rank-1 input.
+
+**Required tests** (architect checklist): norm `[3,4]` = 5; norm matrix uses all
+elements; norm NaN propagates; trace square; trace rectangular rows<cols and
+rows>cols; trace rank≠2→Shape; outer `[m]×[n]`→`[m,n]` with correct values; outer
+rejects non-rank-1; dynamic rejection where applicable; `MattenLimits` failure for
+outer.

@@ -18,6 +18,46 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.20.14] - 2026-06-23
+
+**Planning/reconciliation: v0.21 boundary architect rulings ingested (RFC-039–042).
+No code, API, behavior, or dependency change to any crate.**
+
+The architect reviewed the v0.21 boundary decisions and accepted all 13 questions,
+adding implementation constraints. Those rulings are now recorded so v0.21
+implementation can proceed.
+
+### Changed
+
+- **RFC-039/040/041/042 marked accepted-for-implementation.** Each RFC's Status is
+  updated and an "Architect Rulings — v0.21 Boundary Review" section records the
+  accepted decisions and added constraints. The RFCs remain in `rfcs/proposed/` per
+  the 4-folder lifecycle (RFC-000) until each ships, then they move to `rfcs/done/`.
+  Key rulings:
+  - **RFC-039** → v0.21.0: `concatenate` + `stack` in core (borrowed `&[&Tensor]`,
+    `try_`/panic pairs, `MattenLimits`, dynamic-reject). Empty list →
+    `InvalidArgument`; structural/axis errors → `Shape`; `stack` axis `0..=rank`,
+    `concatenate` axis `0..<rank`; `n=1` allowed but still fully validated.
+    repeat/tile/meshgrid deferred.
+  - **RFC-041** → v0.21.1: `norm` (L2/Frobenius over all elements), `trace` (rank-2,
+    rectangular via `min(rows,cols)`), `outer` (rank-1×rank-1). Decomposition/BLAS/
+    sparse rejected from core.
+  - **RFC-040** → v0.21.2: `var`/`std` + `var_axis`/`std_axis`, population variance
+    (ddof=0), two-pass algorithm, NaN-propagating; quantile/histogram/cov/corr
+    deferred; no `matten-stats` companion yet.
+  - **RFC-042** → v0.21.3 (or earlier): keep standalone; three-check release-docs
+    guard authorized.
+- **ROADMAP** updated (document version 1.8.0): boundary RFC rows marked accepted with
+  v0.21.x targets, and the accepted v0.21.0–.3 sequence added to the release-theme
+  table.
+
+### Notes
+
+- No data flows, integrations, auth, or runtime behavior change — this release only
+  records design rulings in planning documents. `#![forbid(unsafe_code)]`, the
+  core→companion boundary, and the release-doc guards remain valid; the threat model
+  is unchanged. Per-RFC threat-model review will accompany each v0.21.x implementation.
+
 ## [0.20.13] - 2026-06-23
 
 **Examples: deferred numerical methods (RFC-046). This completes the RFC-043–048

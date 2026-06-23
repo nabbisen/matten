@@ -1,6 +1,6 @@
 # RFC-040: Small Statistics Boundary — Core vs Companion
 
-**Status:** Proposed  
+**Status:** Proposed (accepted for implementation — v0.21 boundary review, 2026-06-23; see Architect Rulings below). Target v0.21.2.
 **Target Release:** v0.21+ decision  
 **Related:** RFC-019, RFC-038  
 **Scope:** Decide where variance, standard deviation, covariance, correlation, quantile, and histogram belong
@@ -224,3 +224,50 @@ Experimental
 - No statistical tests.
 - No regression models.
 - No time series.
+
+---
+
+## Architect Rulings — v0.21 Boundary Review (2026-06-23)
+
+All questions accepted. `var`/`std` and `var_axis`/`std_axis` are authorized for core
+(target **v0.21.2**), population variance only; quantile/histogram/cov/corr/z-score
+deferred; no `matten-stats` companion yet.
+
+**Q3 — Add `var(&self) -> f64` and `std(&self) -> f64`** (option a). Provide `try_*`
+forms if the existing reduction family uses them or if empty/dynamic cases need
+non-panicking behavior; otherwise preserve the existing panic-zone convention and
+document clearly.
+
+**Q4 — Population variance only (ddof = 0):** `var = sum((x_i - mean)^2) / n`,
+`std = sqrt(var)`. Rustdoc must state "population variance, not sample variance" and
+include the formula note. Do **not** add `var_sample`/`std_sample`/`var_with_ddof`/
+`std_with_ddof` in the first cut.
+
+**Q5 — Add `var_axis(axis)` / `std_axis(axis)`** (+ `try_*` if consistent). Axis
+reductions remove the reduced axis; no `keepdims` in the first cut (e.g. `[2,3]`
+axis 0 → `[3]`, axis 1 → `[2]`).
+
+**Q6 — Defer** quantile, percentile, histogram, covariance, correlation, z-score from
+core (future `matten-stats` candidates).
+
+**Q7 — Do not scaffold `matten-stats` yet:** create it only after ≥3 clearly-useful,
+well-scoped APIs are accepted. No empty/speculative companion.
+
+**Additional statistics constraints (architect):**
+
+- **Empty-tensor policy:** `try_var`/`try_std` on an empty tensor →
+  `Err(MattenError::InvalidArgument { operation, argument: "self", .. })`; the panic
+  forms panic with a clear message. (`Tensor` already forbids zero-sized dimensions —
+  document this and add tests; an empty tensor is not constructible.)
+- **NaN policy:** `var`/`std` propagate NaN; `var_axis`/`std_axis` propagate NaN
+  within the reduced slice. No `nanvar`/`nanstd` in core.
+- **Numerical algorithm:** use a **two-pass** variance (mean first, then squared
+  deviations). Avoid the naive one-pass `E[x^2] - E[x]^2` if it risks avoidable
+  cancellation. Compensated algorithms are not required in the first cut, but do not
+  choose the weakest formulation when a simple two-pass one is available.
+
+**Required tests** (architect checklist): var/std for a simple vector; population
+variance documented + tested; singleton variance = 0.0; NaN propagates; empty-tensor
+behavior matches policy; `var_axis`/`std_axis` axes 0 & 1; invalid axis → Shape;
+dynamic rejection if applicable. Suggested values: `[1,2,3,4]` → mean 2.5, population
+variance 1.25, std `sqrt(1.25)`.

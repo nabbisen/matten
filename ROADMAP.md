@@ -2,7 +2,7 @@
 
 **Project:** `matten`  
 **Document Kind:** Canonical Project Roadmap  
-**Document Version:** `1.7.0`  
+**Document Version:** `1.8.0`  
 **Date:** 2026-06-23  
 **Status:** Canonical roadmap updated for v0.20+ materialization planning, the examples program, and the benchmarking & positioning program. RFC-032 is consumed by the companion dependency/import convention; v0.20+ design starts at RFC-033; the examples program is RFC-043 through RFC-048; benchmarking & positioning is RFC-049 (Track D).  
 **Planning Baseline:** core `matten` completed RFC-015 through RFC-021 (shipped through v0.15.3); RFC-022 boundary confirmation shipped in v0.16.0; v0.17.0 introduced the Cargo workspace and the `matten-ndarray` companion crate under the family version (RFC-025, RFC-027); v0.18.0 introduced the `matten-mlprep` companion crate under the family version (RFC-024, RFC-028); v0.19.0 promoted `matten-ndarray` to production-ready candidate status and `matten-mlprep` to beta status under lock-step family versioning (RFC-029); v0.19.1 shipped feature-robust dynamic rejection (RFC-031); v0.19.2 confirmed the companion dependency/import convention (RFC-032); v0.19.3 added the RFC-033-042 v0.20+ design set; v0.20.0 shipped the matten-data experimental scaffold (RFC-033); v0.20.1 shipped the matten-data table/CSV-to-Tensor API (RFC-034, RFC-035, Experimental). Under lock-step family versioning (RFC-030), every crate shares the family version (e.g. `0.19.2`); maturity is expressed by per-crate Status labels, not by separate version numbers. Next: v0.20+ materialization phase. RFC-032 is consumed by the companion dependency/import convention; v0.20+ planning starts at RFC-033. The first v0.20+ branch is `matten-data` decision/materialization; the second is small NumPy-inspired core comfort APIs that preserve the `matten` philosophy; the third is the examples program (RFC-043–048), which demonstrates famous small math/numerical problems and companion workflows without expanding product scope.
@@ -93,6 +93,10 @@ matten -> datafusion
 | **v0.20.4** | Examples: matrix-iteration band | RFC-045 examples (`33_` Markov chain, `34_` tiny PageRank); docs + smoke runs | Additive examples/docs |
 | **v0.20.5** | Benchmarking program planning | RFC-049 added as proposed (benchmark harness, complexity metrics, positioning report); ROADMAP Track D added | Documentation/planning patch |
 | **v0.20.x** | Minimal implementation phase | Small core comfort APIs; new 30+ famous-problem examples; audit/improve existing companion examples | Low-risk implementation only |
+| **v0.21.0** | Shape composition (RFC-039) | `concatenate` + `stack` in core (borrowed slices, try_/panic, MattenLimits, dynamic-reject); repeat/tile/meshgrid deferred | Additive core API (v0.21 boundary review) |
+| **v0.21.1** | Linalg core-lite (RFC-041) | `norm` (L2/Frobenius), `trace` (rectangular via min(rows,cols)), `outer`; decomposition/BLAS/sparse rejected | Additive core API |
+| **v0.21.2** | Statistics core (RFC-040) | `var`/`std` + `var_axis`/`std_axis`, population variance (ddof=0), two-pass; quantile/histogram/cov/corr deferred | Additive core API |
+| **v0.21.3** | matten-data scope guard (RFC-042) | Three-check release-docs guard (filename / public-API identifier / non-goal context); may land earlier | Docs/tooling |
 | **v0.21+** | Selective production readiness | `matten-data` beta/experimental/freeze decision; companion maturity decisions; harder numerical/ML-like examples as APIs mature; benchmarking & positioning (RFC-049) maturity hardening | Per-crate decisions |
 | **Later** | Streaming / large CSV, `nalgebra`, `candle`, stats/linalg companions | Separate RFCs required | Design-only until reopened |
 
@@ -356,10 +360,10 @@ RFC-032 is already consumed by another issue. v0.20+ roadmap RFCs therefore star
 | RFC-036 | `matten-data` Examples, Documentation, and Release Gate | v0.20.0 |
 | RFC-037 | Deferred Streaming and Large CSV Policy | v0.20.0 / later |
 | RFC-038 | Core Numeric Comfort APIs | **Done** (v0.20.9–v0.20.12) |
-| RFC-039 | Shape Composition API Boundary | v0.21+ |
-| RFC-040 | Small Statistics Boundary: Core vs Companion | v0.21+ |
-| RFC-041 | Linear Algebra Boundary: Core Lite vs External Crates | v0.21+ |
-| RFC-042 | Pandas-Inspired Scope Guard for `matten-data` | v0.21+ if needed |
+| RFC-039 | Shape Composition API Boundary | **Accepted** (v0.21 boundary review) → v0.21.0 |
+| RFC-040 | Small Statistics Boundary: Core vs Companion | **Accepted** (v0.21 boundary review) → v0.21.2 |
+| RFC-041 | Linear Algebra Boundary: Core Lite vs External Crates | **Accepted** (v0.21 boundary review) → v0.21.1 |
+| RFC-042 | Pandas-Inspired Scope Guard for `matten-data` | **Accepted** (v0.21 boundary review) → v0.21.3 (or earlier) |
 | RFC-043 | Example Program Structure, Quality Gate, and Documentation Policy | v0.20.x |
 | RFC-044 | Beginner Core Math Examples | v0.20.x |
 | RFC-045 | Matrix Iteration and Graph/Probability Examples | v0.20.x |
@@ -971,3 +975,4 @@ dependency gated by a non-default feature would not appear, producing a false pa
 | 1.5.0 | 2026-06-23 | Added the benchmarking & positioning program (RFC-049) as Track D: goal, posture/sequencing, phases, hard constraints, and acceptance gate; added RFC-049 to the v0.20+ RFC table; recorded the shipped v0.20.3/v0.20.4 example bands and the v0.20.5 benchmarking-planning row in the release-theme table. RFC-049 is non-API and measurement-only. |
 | 1.6.0 | 2026-06-23 | Marked Track B (core numeric comfort APIs, RFC-038) complete: all four bands shipped across v0.20.9 (elementwise), v0.20.10 (selection), v0.20.11 (creation), and v0.20.12 (shape). Updated the RFC-038 row to Done and added a completion status note to §9.3. RFC-038 moved to `rfcs/done/`. |
 | 1.7.0 | 2026-06-23 | Marked Track C (examples program, RFC-043–048) complete: shipped the deferred numerical examples 39–40 (finite-difference derivative, trapezoidal integration) in v0.20.13, which finishes the additive 30+ band. Closed RFC-043–048 to `rfcs/done/` with shipped-version annotations; added a §9.4 completion note and corrected the 39/40 lines from deferred to shipped. The optional `41_adjacency_walks_extended` remains a not-reserved conditional candidate. |
+| 1.8.0 | 2026-06-23 | Ingested the v0.21 boundary architect rulings (RFC-039–042, all 13 questions accepted with added constraints). Marked RFC-039/040/041/042 accepted-for-implementation (Status updated; rulings recorded in each RFC) and set targets v0.21.0 (039 concatenate/stack), v0.21.1 (041 norm/trace/outer), v0.21.2 (040 var/std/var_axis/std_axis), v0.21.3 (042 scope guard). Added the v0.21.0–.3 release-theme rows. RFCs remain in `proposed/` per the 4-folder lifecycle until each ships. |

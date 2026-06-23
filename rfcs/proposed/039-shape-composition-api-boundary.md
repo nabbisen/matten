@@ -1,6 +1,6 @@
 # RFC-039: Shape Composition API Boundary
 
-**Status:** Proposed  
+**Status:** Proposed (accepted for implementation — v0.21 boundary review, 2026-06-23; see Architect Rulings below). Target v0.21.0.
 **Target Release:** v0.21+  
 **Related:** RFC-038  
 **Scope:** Boundary for stack, concatenate, repeat, tile, meshgrid, and related shape APIs
@@ -237,3 +237,31 @@ Do not implement these until separate acceptance.
 - No ragged arrays.
 - No dtype promotion.
 - No dataframe-style concatenation.
+
+---
+
+## Architect Rulings — v0.21 Boundary Review (2026-06-23)
+
+All questions accepted. `concatenate` + `stack` are authorized for core (target
+**v0.21.0**); `repeat`/`tile`/`meshgrid` remain deferred.
+
+**Q1 — Accept both `concatenate` and `stack` (option a).** Borrowed-slice input
+only (`&[&Tensor]`); `try_*` returns `Result`; non-`try` form panics with a clear
+message; `MattenLimits` allocation checks required; dynamic tensors rejected;
+`repeat`/`tile`/`meshgrid` deferred (separate indexing/allocation policy).
+
+**Q2 — Edge-input policy (accepted with explicit constraints):**
+
+- Empty input list → `MattenError::InvalidArgument { operation: "concatenate" | "stack", argument: "tensors", message: "at least one tensor is required" }`.
+- Rank mismatch, non-axis dimension mismatch, out-of-range axis, invalid stack axis → `MattenError::Shape`.
+- Dynamic tensor → `MattenError::Unsupported { operation, message: "dynamic tensors must be converted with try_numeric() before shape composition" }` (or the existing project-standard numeric-only variant). `try_*` forms must not panic.
+- Single-element list allowed: `concatenate([x], axis)` returns a clone of `x` after validating axis + dynamic status; `stack([x], axis)` returns `x` with a new axis inserted.
+- Axis ranges: **`stack` accepts `0 <= axis <= rank`; `concatenate` accepts `0 <= axis < rank`.**
+- Even for `n = 1`, still validate axis, dynamic status, and allocation safety — no fast path that bypasses checks.
+
+**Required tests** (architect checklist): concatenate vectors/matrices axis 0 & 1;
+concatenate single→clone-equivalent; empty→InvalidArgument; rank/dimension/axis
+errors→Shape; stack vectors/matrices axes 0–2; stack single→inserts axis;
+stack empty→InvalidArgument; stack invalid axis→Shape; dynamic→Err in `try_*`;
+`MattenLimits` allocation failure tested. Use non-square shapes (e.g. three `[2,4]`
+→ axis 0 `[3,2,4]`, axis 1 `[2,3,4]`, axis 2 `[2,4,3]`).
