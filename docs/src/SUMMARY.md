@@ -14,6 +14,7 @@
 # Examples
 
 - [Examples index](./examples/index.md)
+- [Beginner applied math](./examples/beginner-math.md)
 
 # Reference
 

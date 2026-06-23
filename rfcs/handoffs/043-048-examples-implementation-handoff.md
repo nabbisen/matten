@@ -441,11 +441,14 @@ crates/matten/examples/33_markov_chain_weather.rs
 crates/matten/examples/34_tiny_pagerank.rs
 ```
 
-Optional:
+Optional candidate, not reserved:
 
 ```text
-crates/matten/examples/XX_adjacency_walks_extended.rs
+41_adjacency_walks_extended.rs
 ```
+
+Only add after the Phase 0 inventory if it is clearly non-redundant with
+`32_graph_path_counting.rs`.
 
 ---
 
@@ -521,13 +524,18 @@ Acceptance:
 
 ---
 
-### 5.3 Optional `08_adjacency_walks_extended.rs`
+### 5.3 Optional candidate: `41_adjacency_walks_extended.rs` (not reserved)
 
-Only add if it teaches something beyond RFC-044's graph path counting.
+Only add — at the candidate number `41_` — if it teaches something materially
+beyond `32_graph_path_counting.rs` (e.g. multiple powers side by side, walk growth
+over k, directed vs undirected contrast, self-loop effect, or reachability). If it
+only repeats `A^2` / `A^3` path counting on a larger graph, do not add it.
 
 Acceptance:
 
 ```text
+[ ] if 41_adjacency_walks_extended.rs is added, it teaches a distinct concept
+    beyond 32_graph_path_counting.rs
 [ ] not redundant
 [ ] tiny graph
 [ ] small output

@@ -37,6 +37,22 @@ These examples demonstrate the default `matten` API. No extra features required.
 | `27_axis_reductions.rs` | Axis reductions and NaN propagation |
 | `28_column_statistics.rs` | Per-column statistics workflow |
 
+## Applied problems (famous small math)
+
+Recognizable small math / numerical-computing problems, used to show what a
+`Tensor` can represent. These live in a fresh `30+` band so the core suite above
+stays stable. See [Beginner applied math](./beginner-math.md) for the write-up.
+
+| File | What it shows |
+|---|---|
+| `30_magic_square_checker.rs` | Row/column/diagonal sums via `get` |
+| `31_fibonacci_matrix_power.rs` | Fibonacci via repeated `matmul` |
+| `32_graph_path_counting.rs` | Walk counting via adjacency-matrix powers |
+
+Vector distance and cosine similarity are already covered above — see
+`pairwise_distance.rs`, `25_normalize_vector.rs`, and `26_cosine_similarity.rs`
+rather than a duplicate in this band.
+
 ## Pattern examples
 
 Small practical PoC patterns using accepted Phase 1 APIs.

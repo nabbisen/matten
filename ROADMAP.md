@@ -569,8 +569,11 @@ Matrix iteration / graph / probability examples:
 ```text
 33_markov_chain_weather.rs
 34_tiny_pagerank.rs
-XX_adjacency_walks_extended.rs   # optional, next free 30+ number, only if not redundant with 32_graph_path_counting
 ```
+
+Optional candidate, not reserved — `41_adjacency_walks_extended.rs`: add only if the
+Phase 0 inventory shows it teaches a distinct concept beyond `32_graph_path_counting.rs`
+(otherwise drop it).
 
 Numerical methods examples:
 

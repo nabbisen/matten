@@ -18,6 +18,45 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.20.3] - 2026-06-23
+
+**Examples program — structure + beginner applied-math band (RFC-043 + RFC-044).
+Additive examples and documentation under lock-step family versioning; no API,
+behavior, or breaking change to any crate.**
+
+### Added
+
+- **Beginner applied-math examples** (RFC-044), using only the default Phase-1
+  numeric API, small hard-coded inputs, and deterministic self-checking output:
+  - `examples/30_magic_square_checker.rs` — row/column/diagonal sums via
+    `Tensor::get`;
+  - `examples/31_fibonacci_matrix_power.rs` — Fibonacci via the `Q^n` identity and
+    repeated `Tensor::matmul`;
+  - `examples/32_graph_path_counting.rs` — walk counting via adjacency-matrix
+    powers.
+- **Examples documentation** (RFC-043): new `docs/src/examples/beginner-math.md`,
+  an "Applied problems (famous small math)" section in
+  `docs/src/examples/index.md`, and a `SUMMARY.md` entry.
+- **CI smoke runs** for the three new examples in `test.yaml`.
+
+### Changed
+
+- Finalized the optional adjacency-walks wording across RFC-045, the examples
+  handoff, and the ROADMAP: conditional candidate `41_adjacency_walks_extended.rs`,
+  **not reserved**, to be added only if the Phase 0 inventory shows it teaches a
+  distinct concept beyond `32_graph_path_counting.rs` (architect follow-up ruling).
+
+### Notes
+
+- New famous-problem examples use the additive `30+` band; the existing `00_`–`28_`
+  suite, the `dynamic_*` set, and the named examples are unchanged. Vector distance
+  and cosine similarity are cross-referenced to the existing `pairwise_distance` /
+  `25_normalize_vector` / `26_cosine_similarity`, not duplicated (RFC-043–048
+  review Q2).
+- No new data flows, external integrations, or auth: examples use only in-memory
+  hard-coded data. `#![forbid(unsafe_code)]`, the core→companion dependency
+  boundary, and the release-doc guards remain valid and unchanged.
+
 ## [0.20.2] - 2026-06-23
 
 **Examples-program planning. Documentation/planning patch under lock-step family

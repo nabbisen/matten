@@ -16,7 +16,18 @@ Initial examples:
 ```text
 examples/33_markov_chain_weather.rs
 examples/34_tiny_pagerank.rs
-examples/XX_adjacency_walks_extended.rs   # OPTIONAL — only if not redundant with 32_graph_path_counting
+```
+
+Optional candidate, not reserved:
+
+```text
+41_adjacency_walks_extended.rs
+
+Add only if the Phase 0 inventory shows it teaches a distinct concept beyond
+32_graph_path_counting.rs (e.g. comparing multiple powers side by side, walk
+growth over k, directed vs undirected contrast, self-loop effect, or
+reachability). If it only repeats A^2 / A^3 path counting on a larger graph,
+do not add it.
 ```
 
 These examples teach the power of matrix multiplication and repeated updates without adding new framework scope.

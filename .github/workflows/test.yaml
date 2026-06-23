@@ -102,6 +102,9 @@ jobs:
       - run: cargo run -p matten --example 12_boundary_error_handling
       - run: cargo run -p matten --example 25_normalize_vector
       - run: cargo run -p matten --example 26_cosine_similarity
+      - run: cargo run -p matten --example 30_magic_square_checker
+      - run: cargo run -p matten --example 31_fibonacci_matrix_power
+      - run: cargo run -p matten --example 32_graph_path_counting
       - run: cargo run -p matten --example dynamic_00_quickstart --features dynamic,json,csv
       - run: cargo run -p matten --example dynamic_05_dirty_csv_cleanup --features dynamic,json,csv
       - run: cargo run -p matten --example standardize_columns
