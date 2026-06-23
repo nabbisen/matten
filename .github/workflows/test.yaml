@@ -109,6 +109,8 @@ jobs:
       - run: cargo run -p matten --example 34_tiny_pagerank
       - run: cargo run -p matten --example 35_linear_regression_gradient_descent
       - run: cargo run -p matten --example 36_heat_equation_1d
+      - run: cargo run -p matten --example 37_kmeans_small
+      - run: cargo run -p matten --example 38_nearest_neighbor_classification
       - run: cargo run -p matten --example dynamic_00_quickstart --features dynamic,json,csv
       - run: cargo run -p matten --example dynamic_05_dirty_csv_cleanup --features dynamic,json,csv
       - run: cargo run -p matten --example standardize_columns

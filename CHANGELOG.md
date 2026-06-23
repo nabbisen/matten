@@ -18,6 +18,40 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.20.8] - 2026-06-23
+
+**Examples program — ML-like band (RFC-047). Additive examples and documentation
+under lock-step family versioning; no API, behavior, or breaking change to any crate.
+This completes the implementable example bands of RFC-043–048.**
+
+### Added
+
+- **ML-like examples** (RFC-047), default Phase-1 numeric API, small hard-coded
+  inputs, deterministic self-checking output, with an explicit "algorithm demo, not
+  an ML framework" boundary:
+  - `examples/37_kmeans_small.rs` — Lloyd's k-means on a `[points, features]` `Tensor`
+    with fixed (deterministic) initial centroids; converges to two clusters;
+  - `examples/38_nearest_neighbor_classification.rs` — 1-nearest-neighbor
+    classification over a labeled data matrix.
+  - Both use a small local `argmin` helper (core `matten` has no `argmin` yet; a
+    future RFC-038 candidate), so they stay on current APIs.
+- **Examples documentation**: new `docs/src/examples/ml-like.md`, the two examples
+  added to the "Applied problems" table in `docs/src/examples/index.md`, and a
+  `SUMMARY.md` entry.
+- **CI smoke runs** for both new examples in `test.yaml`.
+
+### Notes
+
+- This finishes the additive `30+` famous-problem band that current APIs support:
+  `30_`–`38_` are now implemented across RFC-044 (`30_`–`32_`), RFC-045 (`33_`–`34_`),
+  RFC-046 (`35_`–`36_`), and RFC-047 (`37_`–`38_`); RFC-048 audited the existing
+  companion examples in place. Still deferred: `39_finite_difference_derivative` and
+  `40_trapezoidal_integration` (await RFC-038), and the optional, not-reserved
+  `41_adjacency_walks_extended`.
+- No new data flows, external integrations, or auth: examples use only in-memory
+  hard-coded data. `#![forbid(unsafe_code)]`, the core→companion dependency boundary,
+  and the release-doc guards remain valid and unchanged.
+
 ## [0.20.7] - 2026-06-23
 
 **Examples program — numerical-methods band (RFC-046). Additive examples and

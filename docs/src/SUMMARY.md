@@ -17,6 +17,7 @@
 - [Beginner applied math](./examples/beginner-math.md)
 - [Matrix iteration](./examples/matrix-iteration.md)
 - [Numerical methods](./examples/numerical-methods.md)
+- [ML-like](./examples/ml-like.md)
 - [Companion crate examples](./examples/companions.md)
 
 # Reference
