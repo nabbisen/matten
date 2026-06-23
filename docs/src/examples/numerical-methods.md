@@ -1,13 +1,10 @@
 # Numerical methods
 
-Small numerical-method examples that demonstrate how iterative algorithms look in
-`matten` — an optimizer and a PDE solver, each reduced to repeated `Tensor::matmul`.
-They use only the default Phase-1 numeric API, small hard-coded inputs, and
-deterministic output.
+Small numerical-method examples that demonstrate how iterative and sampled-grid
+algorithms look in `matten`. They use only the default Phase-1 numeric API (plus the
+RFC-038 comfort APIs), small hard-coded inputs, and deterministic output.
 
-These are teaching examples, not a SciPy replacement. Two further numerical examples
-(`39_finite_difference_derivative`, `40_trapezoidal_integration`) are deferred until
-the core comfort APIs of RFC-038 land.
+These are teaching examples, not a SciPy replacement.
 
 ## Examples
 
@@ -32,6 +29,29 @@ between the boundary temperatures.
 
 ```bash
 cargo run --example 36_heat_equation_1d
+```
+
+### `39_finite_difference_derivative.rs`
+
+*Difficulty: Intermediate.* Approximates the derivative of `f(x) = x³` sampled on a
+`linspace` grid using the central difference `(f(x+h) − f(x−h)) / (2h)`. The grid and
+the function values are `Tensor`s (the latter via elementwise `&x * &x`). For a cubic
+the central-difference error is exactly `h²`, so the example shows the approximation
+quality directly. It is a numerical approximation, not symbolic differentiation.
+
+```bash
+cargo run --example 39_finite_difference_derivative
+```
+
+### `40_trapezoidal_integration.rs`
+
+*Difficulty: Intermediate.* Approximates `∫₀¹ x² dx` with the composite trapezoidal
+rule and compares against the known exact value `1/3`. The grid comes from `linspace`,
+the values from elementwise squaring, and the running total from a `Tensor::sum`
+reduction. It is a numerical approximation, not an integration library.
+
+```bash
+cargo run --example 40_trapezoidal_integration
 ```
 
 ## What this is not

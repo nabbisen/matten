@@ -1,6 +1,6 @@
 # RFC-044: Beginner Core Math Examples
 
-**Status:** Proposed  
+**Status:** Implemented (v0.20.3) — beginner examples 30–32 (magic square, Fibonacci-by-matrix, graph path counting).  
 **Target Release:** v0.20.x  
 **Related:** RFC-043, RFC-038  
 **Scope:** Beginner examples using stable core `Tensor` APIs

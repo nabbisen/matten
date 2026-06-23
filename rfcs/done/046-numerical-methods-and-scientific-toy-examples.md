@@ -1,6 +1,6 @@
 # RFC-046: Numerical Methods and Scientific Toy Examples
 
-**Status:** Proposed  
+**Status:** Implemented (v0.20.7 examples 35–36; v0.20.13 examples 39–40) — numerical-methods examples.  
 **Target Release:** v0.21.0, partially v0.20.x if APIs already exist  
 **Related:** RFC-038, RFC-039, RFC-041  
 **Scope:** Medium examples for numerical methods and scientific computation

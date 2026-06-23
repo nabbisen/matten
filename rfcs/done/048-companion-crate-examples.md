@@ -1,6 +1,6 @@
 # RFC-048: Companion-Crate Examples
 
-**Status:** Proposed  
+**Status:** Implemented (v0.20.6) — companion-crate examples audited and improved in place.  
 **Target Release:** v0.20.x / v0.21.0  
 **Related:** RFC-022, RFC-030, RFC-033, RFC-036, RFC-043  
 **Scope:** Examples for `matten-ndarray`, `matten-mlprep`, and `matten-data` (all shipped; audit existing examples)

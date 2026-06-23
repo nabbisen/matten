@@ -56,6 +56,8 @@ stays stable. Write-ups: [Beginner applied math](./beginner-math.md),
 | `36_heat_equation_1d.rs` | Explicit finite-difference stencil as `matmul` iteration |
 | `37_kmeans_small.rs` | Lloyd's k-means on a `[points, features]` data matrix |
 | `38_nearest_neighbor_classification.rs` | 1-NN classification over a labeled data matrix |
+| `39_finite_difference_derivative.rs` | Central-difference derivative on a `linspace` grid |
+| `40_trapezoidal_integration.rs` | Trapezoidal rule via `linspace` + elementwise + `sum` |
 
 Vector distance and cosine similarity are already covered above — see
 `pairwise_distance.rs`, `25_normalize_vector.rs`, and `26_cosine_similarity.rs`

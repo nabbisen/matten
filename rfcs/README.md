@@ -43,6 +43,12 @@ for RFC state; the Status field inside each file mirrors the folder.
 | 034 | [`matten-data` Table Model and Public API Boundary](./done/034-matten-data-table-model-and-public-api-boundary.md) | 0.20.1 |
 | 035 | [CSV Ingestion, Schema Summary, Missing Values, and Numeric Conversion](./done/035-csv-ingestion-schema-summary-missing-values-and-numeric-conversion.md) | 0.20.1 |
 | 038 | [Core Numeric Comfort APIs](./done/038-core-numeric-comfort-apis.md) | 0.20.9 (elementwise); 0.20.10 (selection); 0.20.11 (creation); 0.20.12 (shape) |
+| 043 | [Example Program Structure, Quality Gate, and Documentation Policy](./done/043-example-program-structure-quality-gate-and-documentation-policy.md) | 0.20.3 |
+| 044 | [Beginner Core Math Examples](./done/044-beginner-core-math-examples.md) | 0.20.3 (examples 30–32) |
+| 045 | [Matrix Iteration and Graph/Probability Examples](./done/045-matrix-iteration-and-graph-probability-examples.md) | 0.20.4 (examples 33–34) |
+| 046 | [Numerical Methods and Scientific Toy Examples](./done/046-numerical-methods-and-scientific-toy-examples.md) | 0.20.7 (35–36); 0.20.13 (39–40) |
+| 047 | [Small ML-Like Examples Without ML-Framework Scope](./done/047-small-ml-like-examples-without-ml-framework-scope.md) | 0.20.8 (examples 37–38) |
+| 048 | [Companion-Crate Examples](./done/048-companion-crate-examples.md) | 0.20.6 |
 
 ## Proposed
 
@@ -56,12 +62,6 @@ for RFC state; the Status field inside each file mirrors the folder.
 | 040 | [Small Statistics Boundary — Core vs Companion](./proposed/040-small-statistics-boundary-core-vs-companion.md) | v0.21+ |
 | 041 | [Linear Algebra Boundary — Core Lite vs External Crates](./proposed/041-linear-algebra-boundary-core-lite-vs-external-crates.md) | v0.21+ |
 | 042 | [Pandas-Inspired Scope Guard for `matten-data`](./proposed/042-pandas-inspired-scope-guard-for-matten-data.md) | v0.20+ / v0.21+ |
-| 043 | [Example Program Structure, Quality Gate, and Documentation Policy](./proposed/043-example-program-structure-quality-gate-and-documentation-policy.md) | v0.20.x |
-| 044 | [Beginner Core Math Examples](./proposed/044-beginner-core-math-examples.md) | v0.20.x |
-| 045 | [Matrix Iteration and Graph/Probability Examples](./proposed/045-matrix-iteration-and-graph-probability-examples.md) | v0.20.x |
-| 046 | [Numerical Methods and Scientific Toy Examples](./proposed/046-numerical-methods-and-scientific-toy-examples.md) | v0.21+ / after RFC-038 |
-| 047 | [Small ML-Like Examples Without ML-Framework Scope](./proposed/047-small-ml-like-examples-without-ml-framework-scope.md) | v0.21+ |
-| 048 | [Companion-Crate Examples](./proposed/048-companion-crate-examples.md) | v0.20.x / v0.21+ |
 | 049 | [Benchmarking, Complexity Metrics, and Positioning Report](./proposed/049-benchmarking-complexity-metrics-and-positioning-report.md) | v0.20.x planning / v0.21+ maturity hardening |
 
 Implementation handoffs for the v0.20+ proposed set (RFC-033–042), the examples

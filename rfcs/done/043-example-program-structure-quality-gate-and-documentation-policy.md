@@ -1,6 +1,6 @@
 # RFC-043: Example Program Structure, Quality Gate, and Documentation Policy
 
-**Status:** Proposed  
+**Status:** Implemented (v0.20.3) — example program structure, additive 30+ naming band, CI smoke gate, and documentation policy applied.  
 **Target Release:** v0.20.x / v0.21.0  
 **Owner:** `matten` maintainers  
 **Related:** RFC-038, RFC-039, RFC-040, RFC-041, RFC-044, RFC-045, RFC-046, RFC-047, RFC-048  

@@ -1,6 +1,6 @@
 # RFC-045: Matrix Iteration and Graph/Probability Examples
 
-**Status:** Proposed  
+**Status:** Implemented (v0.20.4) — matrix-iteration examples 33–34 (Markov chain, tiny PageRank); optional 41 adjacency-walks remains a conditional candidate.  
 **Target Release:** v0.20.x / v0.21.0  
 **Related:** RFC-043, RFC-044, RFC-038  
 **Scope:** Intermediate examples based on repeated matrix/vector iteration

@@ -1,6 +1,6 @@
 # RFC-047: Small ML-Like Examples Without ML-Framework Scope
 
-**Status:** Proposed  
+**Status:** Implemented (v0.20.8) — ML-like examples 37–38 (k-means, nearest-neighbor) with an algorithm-demo (not ML-framework) boundary.  
 **Target Release:** v0.21.0  
 **Related:** RFC-038, RFC-040, RFC-048  
 **Scope:** Demonstrate small algorithms often associated with ML while preserving non-ML-framework identity

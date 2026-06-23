@@ -2,7 +2,7 @@
 
 **Project:** `matten`  
 **Document Kind:** Canonical Project Roadmap  
-**Document Version:** `1.6.0`  
+**Document Version:** `1.7.0`  
 **Date:** 2026-06-23  
 **Status:** Canonical roadmap updated for v0.20+ materialization planning, the examples program, and the benchmarking & positioning program. RFC-032 is consumed by the companion dependency/import convention; v0.20+ design starts at RFC-033; the examples program is RFC-043 through RFC-048; benchmarking & positioning is RFC-049 (Track D).  
 **Planning Baseline:** core `matten` completed RFC-015 through RFC-021 (shipped through v0.15.3); RFC-022 boundary confirmation shipped in v0.16.0; v0.17.0 introduced the Cargo workspace and the `matten-ndarray` companion crate under the family version (RFC-025, RFC-027); v0.18.0 introduced the `matten-mlprep` companion crate under the family version (RFC-024, RFC-028); v0.19.0 promoted `matten-ndarray` to production-ready candidate status and `matten-mlprep` to beta status under lock-step family versioning (RFC-029); v0.19.1 shipped feature-robust dynamic rejection (RFC-031); v0.19.2 confirmed the companion dependency/import convention (RFC-032); v0.19.3 added the RFC-033-042 v0.20+ design set; v0.20.0 shipped the matten-data experimental scaffold (RFC-033); v0.20.1 shipped the matten-data table/CSV-to-Tensor API (RFC-034, RFC-035, Experimental). Under lock-step family versioning (RFC-030), every crate shares the family version (e.g. `0.19.2`); maturity is expressed by per-crate Status labels, not by separate version numbers. Next: v0.20+ materialization phase. RFC-032 is consumed by the companion dependency/import convention; v0.20+ planning starts at RFC-033. The first v0.20+ branch is `matten-data` decision/materialization; the second is small NumPy-inspired core comfort APIs that preserve the `matten` philosophy; the third is the examples program (RFC-043–048), which demonstrates famous small math/numerical problems and companion workflows without expanding product scope.
@@ -529,6 +529,12 @@ These are useful but have enough shape/statistics policy risk to need focused RF
 
 ### 9.4 Track C: examples program
 
+**Status: Complete (RFC-043–048, shipped across v0.20.3–v0.20.13).** All example
+bands shipped: structure/policy (v0.20.3), beginner 30–32 (v0.20.3), matrix iteration
+33–34 (v0.20.4), companion audit (v0.20.6), numerical methods 35–36 (v0.20.7) and
+39–40 (v0.20.13), and ML-like 37–38 (v0.20.8). RFC-043–048 are in `rfcs/done/`. The
+optional `41_adjacency_walks_extended` remains a not-reserved conditional candidate.
+
 #### Goal
 
 Increase `matten` examples using famous and recognizable small math / numerical-computing problems while preserving the project philosophy.
@@ -593,8 +599,8 @@ Numerical methods examples:
 ```text
 35_linear_regression_gradient_descent.rs
 36_heat_equation_1d.rs
-39_finite_difference_derivative.rs   # deferred, after RFC-038 if needed
-40_trapezoidal_integration.rs        # deferred, after RFC-038 if needed
+39_finite_difference_derivative.rs   # shipped v0.20.13 (RFC-038 linspace)
+40_trapezoidal_integration.rs        # shipped v0.20.13 (RFC-038 linspace)
 ```
 
 Small ML-like examples:
@@ -964,3 +970,4 @@ dependency gated by a non-default feature would not appear, producing a false pa
 | 1.4.0 | 2026-06-23 | Reconciled the examples program to architect rulings (v0.20.2): new famous-problem examples use an additive 30+ band (existing 00-28 suite preserved); cosine/distance and companion examples are cross-referenced/audited, not duplicated; matten-data csv_to_tensor marked shipped in v0.20.1; docs path examples/index.md; CI smoke-list update requirement added. Fixed the v0.19.4 version regression: replaced with accurate v0.20.0/v0.20.1/v0.20.2 release-theme rows. |
 | 1.5.0 | 2026-06-23 | Added the benchmarking & positioning program (RFC-049) as Track D: goal, posture/sequencing, phases, hard constraints, and acceptance gate; added RFC-049 to the v0.20+ RFC table; recorded the shipped v0.20.3/v0.20.4 example bands and the v0.20.5 benchmarking-planning row in the release-theme table. RFC-049 is non-API and measurement-only. |
 | 1.6.0 | 2026-06-23 | Marked Track B (core numeric comfort APIs, RFC-038) complete: all four bands shipped across v0.20.9 (elementwise), v0.20.10 (selection), v0.20.11 (creation), and v0.20.12 (shape). Updated the RFC-038 row to Done and added a completion status note to §9.3. RFC-038 moved to `rfcs/done/`. |
+| 1.7.0 | 2026-06-23 | Marked Track C (examples program, RFC-043–048) complete: shipped the deferred numerical examples 39–40 (finite-difference derivative, trapezoidal integration) in v0.20.13, which finishes the additive 30+ band. Closed RFC-043–048 to `rfcs/done/` with shipped-version annotations; added a §9.4 completion note and corrected the 39/40 lines from deferred to shipped. The optional `41_adjacency_walks_extended` remains a not-reserved conditional candidate. |

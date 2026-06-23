@@ -18,6 +18,43 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.20.13] - 2026-06-23
+
+**Examples: deferred numerical methods (RFC-046). This completes the RFC-043–048
+example program. Additive examples and documentation under lock-step family
+versioning; no API, behavior, or breaking change to any crate.**
+
+These two examples were deferred until the RFC-038 comfort APIs landed; with
+`linspace` shipped (v0.20.11), they are now implementable.
+
+### Added
+
+- **Numerical-methods examples** (RFC-046 §5–6), default Phase-1 numeric API plus the
+  RFC-038 comfort APIs, small hard-coded inputs, deterministic self-checking output,
+  each explicitly marked as a numerical approximation:
+  - `examples/39_finite_difference_derivative.rs` — central-difference derivative of
+    `x³` on a `linspace` grid (function values via elementwise `&x * &x`); for a cubic
+    the error is exactly `h²`, shown directly.
+  - `examples/40_trapezoidal_integration.rs` — composite trapezoidal rule for
+    `∫₀¹ x² dx` (grid via `linspace`, values via elementwise squaring, total via a
+    `Tensor::sum` reduction), compared against the exact value `1/3`.
+  - CI smoke runs for both; write-ups added to `docs/src/examples/numerical-methods.md`
+    and the index table.
+
+### Changed
+
+- **RFC-043–048 closed.** This finishes the additive `30+` example band (`30_`–`40_`).
+  All six example-program RFCs are moved to `rfcs/done/` with shipped-version
+  annotations, the index is updated, and ROADMAP Track C is marked complete (document
+  version 1.7.0). The optional `41_adjacency_walks_extended` remains a not-reserved
+  conditional candidate.
+
+### Notes
+
+- No new data flows, external integrations, or auth: examples use only in-memory
+  hard-coded data. `#![forbid(unsafe_code)]`, the core→companion dependency boundary,
+  and the release-doc guards remain valid; the threat model is unchanged.
+
 ## [0.20.12] - 2026-06-23
 
 **Core numeric comfort APIs — shape band (RFC-038, final sub-band). This completes
