@@ -1,13 +1,16 @@
 # matten
 
 [![license](https://img.shields.io/crates/l/matten.svg)](./LICENSE)
-[![matten docs.rs](https://img.shields.io/docsrs/matten)](https://docs.rs/matten)
-[![matten-ndarray docs.rs](https://img.shields.io/docsrs/matten-ndarray)](https://docs.rs/matten-ndarray)
-[![matten-mlprep docs.rs](https://img.shields.io/docsrs/matten-mlprep)](https://docs.rs/matten-mlprep)
-[![CI](https://github.com/nabbisen/matten/actions/workflows/ci.yml/badge.svg)](https://github.com/nabbisen/matten/actions/workflows/ci.yml)
-[![matten crates.io](https://img.shields.io/crates/v/matten.svg)](https://crates.io/crates/matten)
-[![matten-ndarray crates.io](https://img.shields.io/crates/v/matten-ndarray.svg)](https://crates.io/crates/matten-ndarray)
-[![matten-mlprep crates.io](https://img.shields.io/crates/v/matten-mlprep.svg)](https://crates.io/crates/matten-mlprep)
+[![matten docs.rs](https://img.shields.io/docsrs/matten?label=matten%20docs)](https://docs.rs/matten)
+[![matten-ndarray docs.rs](https://img.shields.io/docsrs/matten-ndarray?label=ndarray%20docs)](https://docs.rs/matten-ndarray)
+[![matten-mlprep docs.rs](https://img.shields.io/docsrs/matten-mlprep?label=mlprep%20docs)](https://docs.rs/matten-mlprep)
+[![matten-data docs.rs](https://img.shields.io/docsrs/matten-data?label=data%20docs)](https://docs.rs/matten-data)
+[![CI Test](https://github.com/nabbisen/matten/actions/workflows/test.yaml/badge.svg)](https://github.com/nabbisen/matten/actions/workflows/test.yaml)
+[![CI Docs](https://github.com/nabbisen/matten/actions/workflows/docs.yaml/badge.svg)](https://github.com/nabbisen/matten/actions/workflows/docs.yaml)
+[![matten crates.io](https://img.shields.io/crates/v/matten.svg?label=matten)](https://crates.io/crates/matten)
+[![matten-ndarray crates.io](https://img.shields.io/crates/v/matten-ndarray.svg?label=ndarray)](https://crates.io/crates/matten-ndarray)
+[![matten-mlprep crates.io](https://img.shields.io/crates/v/matten-mlprep.svg?label=mlprep)](https://crates.io/crates/matten-mlprep)
+[![matten-data crates.io](https://img.shields.io/crates/v/matten-data.svg?label=data)](https://crates.io/crates/matten-data)
 
 **A family-car multidimensional array (tensor) library for Rust** —
 and a small, optional ecosystem of companion crates around it.
@@ -20,9 +23,9 @@ This repository is a Cargo workspace, where core `matten` stays small and depend
 
 | Crate | Version | Status | What it is |
 |---|---|---|---|
-| [`matten`](./crates/matten) | 0.19.0 | stable (v0.x) | The core `f64` tensor library: construction, shape ops, broadcasting, slicing, reductions, matmul, JSON/CSV boundary APIs, and an optional `dynamic` ingestion on-ramp. |
-| [`matten-ndarray`](./crates/matten-ndarray) | 0.19.0 | production-ready candidate | Conversion bridge between `matten::Tensor` and `ndarray::ArrayD<f64>`. |
-| [`matten-mlprep`](./crates/matten-mlprep) | 0.19.0 | beta | Transparent, deterministic preprocessing helpers (standardize, min-max scale, bias column, train/test split). |
+| [`matten`](./crates/matten) | 0.20.0 | stable (v0.x) | The core `f64` tensor library: construction, shape ops, broadcasting, slicing, reductions, matmul, JSON/CSV boundary APIs, and an optional `dynamic` ingestion on-ramp. |
+| [`matten-ndarray`](./crates/matten-ndarray) | 0.20.0 | production-ready candidate | Conversion bridge between `matten::Tensor` and `ndarray::ArrayD<f64>`. |
+| [`matten-mlprep`](./crates/matten-mlprep) | 0.20.0 | beta | Transparent, deterministic preprocessing helpers (standardize, min-max scale, bias column, train/test split). |
 
 All crates share one **family version** (RFC-030): matching numbers mean a
 matched, compatible set. A crate's **maturity is the Status column**, not its
@@ -71,7 +74,7 @@ ecosystem. Core stays a family car; companions are the trailer hitch.
 
 ```toml
 [dependencies]
-matten = "0.19"
+matten = "0.20"
 ```
 
 ```rust
@@ -93,8 +96,8 @@ More examples are [here](crates/matten/examples/).
 
 ```toml
 [dependencies]
-matten = "0.19"
-matten-ndarray = "0.19"
+matten = "0.20"
+matten-ndarray = "0.20"
 ```
 
 ```rust
@@ -114,8 +117,8 @@ More examples are [here](crates/matten-ndarray/examples/).
 
 ```toml
 [dependencies]
-matten = "0.19"
-matten-mlprep = "0.19"
+matten = "0.20"
+matten-mlprep = "0.20"
 ```
 
 ```rust

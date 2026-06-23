@@ -18,6 +18,43 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.20.0] - 2026-06-23
+
+**v0.20+ materialization start. Introduces the experimental `matten-data` companion
+crate as a scope-locked scaffold (RFC-033). Minor bump under lock-step family
+versioning: a new workspace member is added; no breaking change to existing crates.**
+
+### Added
+
+- **`matten-data`** companion crate (RFC-033) — an **experimental scaffold** for
+  table-to-Tensor preparation of small PoC datasets. It currently has **no public
+  API**; table ingestion and conversion land in later releases (RFC-034, RFC-035).
+  The crate is `#![forbid(unsafe_code)]`, depends only on core `matten`, reserves
+  private module boundaries (`table`, `csv`, `schema`, `numeric`, `error`) for the
+  follow-up RFCs, and documents its scope lock (not a dataframe library; use
+  Polars/DataFusion/Pandas for dataframe or large-data workloads).
+- Dedicated `matten-data` CI job (`cargo check` / `clippy -D warnings` / doctests).
+- `matten-data` added to the `pub use matten` companion guard list in
+  `scripts/check-release-docs.sh` (RFC-032 / RFC-033 architect Q1 tooling note).
+
+### Changed
+
+- **Family version → 0.20.0** (lock-step, RFC-030). The `matten` dependency pins in
+  the workspace and in every companion manifest are bumped `0.19` → `0.20` so the
+  family resolves at the new version. Root README install snippets and crate-table
+  versions updated to `0.20`.
+- **RFC-033 decision recorded** and moved to `rfcs/done/`: `matten-data` proceeds as
+  a scope-locked **experimental** companion — **not** beta. The beta / keep-experimental
+  / freeze decision is deferred to v0.21+ pending real implementation evidence. RFC
+  index updated.
+
+### Notes
+
+- No source-logic or public-API change to `matten`, `matten-ndarray`, or
+  `matten-mlprep`. `matten-data` adds no public surface in this release.
+- Scope guardrails for `matten-data` (RFC-033, RFC-042) are in force; table behavior
+  (RFC-034/RFC-035) and core comfort APIs (RFC-038) remain gated and unstarted.
+
 ## [0.19.3] - 2026-06-22
 
 **Planning and documentation patch. Adds the v0.20+ proposed RFC set (RFC-033–042)

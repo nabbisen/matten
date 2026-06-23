@@ -2,7 +2,6 @@
 
 [![crates.io](https://img.shields.io/crates/v/matten.svg)](https://crates.io/crates/matten)
 [![docs.rs](https://img.shields.io/docsrs/matten)](https://docs.rs/matten)
-[![CI](https://github.com/nabbisen/matten/actions/workflows/ci.yml/badge.svg)](https://github.com/nabbisen/matten/actions/workflows/ci.yml)
 [![license](https://img.shields.io/crates/l/matten.svg)](../../LICENSE)
 
 **A family car of Rust array (tensor) library — easy to start, predictable, and friendly for quick numerical trials / PoCs.**

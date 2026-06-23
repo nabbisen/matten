@@ -4,6 +4,7 @@ members = [
     "crates/matten",
     "crates/matten-ndarray",
     "crates/matten-mlprep",
+    "crates/matten-data",
 ]
 # Regression fixtures are standalone crates; exclude them from the workspace
 # so their non-workspace dependency declarations do not conflict.
@@ -16,7 +17,7 @@ exclude = [
 # this version. Per-crate `keywords`/`categories`/`description` are NOT shared —
 # they differ per crate and aid crates.io discoverability.
 [workspace.package]
-version = "0.19.3"
+version = "0.20.0"
 edition = "2024"
 rust-version = "1.85"
 license = "Apache-2.0"
@@ -26,5 +27,5 @@ repository = "https://github.com/nabbisen/matten"
 # Core `matten` is path-published; companions depend on it by path + version so
 # they resolve locally in the workspace and by version on crates.io.
 [workspace.dependencies]
-matten = { version = "0.19", path = "crates/matten" }
+matten = { version = "0.20", path = "crates/matten" }
 ndarray = "0.16"

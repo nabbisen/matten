@@ -1,6 +1,6 @@
 # RFC-033: `matten-data` Beta-Decision and Scope Lock
 
-**Status:** Proposed  
+**Status:** Implemented (v0.20.0) — decision recorded and experimental scaffold shipped. `matten-data` proceeds as a scope-locked **experimental** companion; **not** beta. The beta / keep-experimental / freeze decision is deferred to v0.21+ and requires real implementation evidence (a future maturity evaluation, analogous to RFC-029). Table behavior is gated on RFC-034/RFC-035.  
 **Target Release:** v0.20.0 decision/design milestone  
 **Owner:** `matten` maintainers  
 **Related:** RFC-022, RFC-023, RFC-030, RFC-034, RFC-035, RFC-036, RFC-037, RFC-042  

@@ -1,0 +1,18 @@
+[package]
+name = "matten-data"
+description = "Experimental table-to-Tensor preparation companion for matten (small PoC datasets)."
+readme      = "README.md"
+categories  = ["science", "data-structures"]
+keywords    = ["tensor", "table", "csv", "data", "matten"]
+version.workspace       = true
+edition.workspace       = true
+rust-version.workspace  = true
+authors.workspace       = true
+license.workspace       = true
+repository.workspace    = true
+
+# Companion crate: depends on core `matten` only (no default features), one
+# direction (matten-data -> matten). No CSV/dataframe dependency yet — CSV
+# ingestion arrives with RFC-035. Scope is locked by RFC-033 / RFC-042.
+[dependencies]
+matten = { version = "0.20", path = "../matten", default-features = false }

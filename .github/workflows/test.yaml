@@ -13,7 +13,7 @@ jobs:
     name: fmt / clippy / test (workspace)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
@@ -38,7 +38,7 @@ jobs:
     name: core feature profiles
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: dtolnay/rust-toolchain@stable
       - run: cargo test -p matten --no-default-features
       - run: cargo test -p matten --no-default-features --features serde
@@ -54,7 +54,7 @@ jobs:
     name: matten-ndarray
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: dtolnay/rust-toolchain@stable
       - run: cargo test -p matten-ndarray
       - run: cargo test -p matten-ndarray --features dynamic
@@ -64,17 +64,27 @@ jobs:
     name: matten-mlprep
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: dtolnay/rust-toolchain@stable
       - run: cargo test -p matten-mlprep
       - run: cargo test -p matten-mlprep --features dynamic
       - run: cargo test -p matten-mlprep --doc
 
+  data:
+    name: matten-data
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo check -p matten-data
+      - run: cargo clippy -p matten-data --all-targets -- -D warnings
+      - run: cargo test -p matten-data --doc
+
   msrv:
     name: MSRV 1.85
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: dtolnay/rust-toolchain@1.85.0
       - run: cargo build --workspace
       - run: cargo test --workspace --all-features --quiet
@@ -83,7 +93,7 @@ jobs:
     name: example smoke runs
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: dtolnay/rust-toolchain@stable
       # core matten
       - run: cargo run -p matten --example 00_quickstart

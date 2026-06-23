@@ -1,6 +1,6 @@
 [package]
 name = "matten"
-description = "A family car multidimensional array (tensor) library for small numerical trials / PoCs."
+description = "A family-car multidimensional array (tensor) library for small numerical trials / PoCs."
 readme      = "README.md"
 categories  = ["science", "mathematics", "data-structures"]
 keywords    = ["tensor", "array", "ndarray", "numpy", "prototyping"]

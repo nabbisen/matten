@@ -2,7 +2,7 @@
 
 [![Crates.io](https://img.shields.io/crates/v/matten-mlprep.svg)](https://crates.io/crates/matten-mlprep)
 [![Docs.rs](https://docs.rs/matten-mlprep/badge.svg)](https://docs.rs/matten-mlprep)
-[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](../../LICENSE)
+[![license](https://img.shields.io/crates/l/matten-mlprep.svg)](../../LICENSE)
 
 > **Beta (`0.19.x` family release).** Small, transparent, deterministic preprocessing helpers for
 > [`matten::Tensor`](https://crates.io/crates/matten). Not an ML framework. The

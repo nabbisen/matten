@@ -8,6 +8,7 @@ FAIL=0
 CORE="crates/matten"
 NDARRAY="crates/matten-ndarray"
 MLPREP="crates/matten-mlprep"
+DATA="crates/matten-data"
 
 # ---------------------------------------------------------------------------
 # Core checks
@@ -95,7 +96,7 @@ fi
 echo "=== Checking companions do not re-export core matten (RFC-032 §3.2/§3.3) ==="
 # Matches `pub use matten;` and `pub use matten::<Item>;`. Whole-crate re-export
 # (§3.3) is deferred; introducing it requires amending RFC-032 and relaxing this check.
-if grep -rn "pub use matten\b" "$NDARRAY/src" "$MLPREP/src" 2>/dev/null; then
+if grep -rn "pub use matten\b" "$NDARRAY/src" "$MLPREP/src" "$DATA/src" 2>/dev/null; then
   echo "ERROR: companions must not re-export core matten types/crate (RFC-032)"
   FAIL=1
 fi

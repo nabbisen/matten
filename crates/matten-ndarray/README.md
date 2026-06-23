@@ -2,7 +2,7 @@
 
 [![Crates.io](https://img.shields.io/crates/v/matten-ndarray.svg)](https://crates.io/crates/matten-ndarray)
 [![Docs.rs](https://docs.rs/matten-ndarray/badge.svg)](https://docs.rs/matten-ndarray)
-[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](../../LICENSE)
+[![license](https://img.shields.io/crates/l/matten-ndarray.svg)](../../LICENSE)
 
 > **Production-ready candidate (`0.19.x` family release).** A small conversion bridge between
 > [`matten::Tensor`](https://crates.io/crates/matten) and

@@ -39,6 +39,7 @@ for RFC state; the Status field inside each file mirrors the folder.
 | 030 | [Workspace Versioning Model — Lock-step Family Versioning](./done/030-workspace-versioning-model-lockstep.md) | 0.19.0 |
 | 031 | [Feature-Robust Dynamic Rejection and Unconditional `Tensor::is_dynamic()`](./done/031-feature-robust-dynamic-rejection.md) | 0.19.1 |
 | 032 | [Companion Dependency and Import Convention](./done/032-companion-dependency-and-import-convention.md) | 0.19.2 |
+| 033 | [`matten-data` Beta-Decision and Scope Lock](./done/033-matten-data-beta-decision-and-scope-lock.md) | 0.20.0 (experimental scaffold; beta deferred to v0.21+) |
 
 ## Proposed
 
@@ -46,7 +47,6 @@ for RFC state; the Status field inside each file mirrors the folder.
 |---:|---|---|
 | 023 | [`matten-data` Scope and Non-goals](./proposed/023-matten-data-scope-and-non-goals.md) | experimental only before v0.20; beta decision no earlier than v0.20+ |
 | 026 | [Large CSV and Streaming Data Policy](./proposed/026-large-csv-and-streaming-data-policy.md) | design spike no earlier than v0.20+ |
-| 033 | [`matten-data` Beta-Decision and Scope Lock](./proposed/033-matten-data-beta-decision-and-scope-lock.md) | v0.20.0 decision/design |
 | 034 | [`matten-data` Table Model and Public API Boundary](./proposed/034-matten-data-table-model-and-public-api-boundary.md) | v0.20.0 design; v0.20.x impl |
 | 035 | [CSV Ingestion, Schema Summary, Missing Values, and Numeric Conversion](./proposed/035-csv-ingestion-schema-summary-missing-values-and-numeric-conversion.md) | v0.20.x if RFC-033 approves |
 | 036 | [`matten-data` Examples, Documentation, and Release Gate](./proposed/036-matten-data-examples-documentation-and-release-gate.md) | v0.20.0 |
