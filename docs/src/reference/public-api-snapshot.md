@@ -58,6 +58,10 @@ when called on a dynamic tensor. Call `try_numeric()` to convert first.
 | `from_vec(data)` | `Tensor` | shape `[n]` |
 | `arange(start, end, step)` | `Tensor` | panics on invalid / too large |
 | `try_arange(start, end, step)` | `Result<Tensor, MattenError>` | |
+| `linspace(start, end, count)` | `Tensor` | RFC-038; `count` evenly spaced, both endpoints; panics if `count == 0` |
+| `try_linspace(start, end, count)` | `Result<Tensor, MattenError>` | RFC-038; budget-checked |
+| `eye(n)` | `Tensor` | RFC-038; `n × n` identity; panics if `n == 0` |
+| `try_eye(n)` | `Result<Tensor, MattenError>` | RFC-038; budget-checked |
 | `try_from_rows(rows)` | `Result<Tensor, MattenError>` | ragged → error |
 | `try_zeros(shape)` | `Result<Tensor, MattenError>` | RFC-018; budget-checked |
 | `try_ones(shape)` | `Result<Tensor, MattenError>` | RFC-018; budget-checked |

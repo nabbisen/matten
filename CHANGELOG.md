@@ -18,6 +18,43 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.20.11] - 2026-06-23
+
+**Core numeric comfort APIs — creation band (RFC-038, third sub-band). Additive,
+non-breaking public API under lock-step family versioning.**
+
+Continues RFC-038 after the elementwise (v0.20.9) and selection (v0.20.10) bands. The
+shape band (`squeeze`/`expand_dims`) remains.
+
+### Added
+
+- **Creation comfort constructors on `Tensor`** (RFC-038 §4.1–4.2), in a new
+  top-level `creation.rs` module (per RFC-038 §5.3):
+  - `linspace(start, end, count)` / `try_linspace(...)` — `count` evenly spaced
+    values inclusive of both endpoints when `count >= 2`; `[start]` when
+    `count == 1`. Endpoints are pinned exactly to avoid floating-point drift.
+  - `eye(n)` / `try_eye(n)` — the `n × n` identity matrix.
+  - Both are budget-checked through `MattenLimits`: a zero-sized result
+    (`count == 0`, `n == 0`) is rejected with `MattenError::Shape`, and an oversized
+    result with `MattenError::Allocation`. Convenience forms panic on those; `try_*`
+    forms return them. Per the RFC's minimal-surface inclusion rule, only the two
+    forms each are exposed (no `_with_limits` variants).
+
+### Changed
+
+- Reference docs updated to match: `construction.md` (new section) and
+  `public-api-snapshot.md` (new rows).
+
+### Notes
+
+- With `linspace` available alongside the `sqrt` shipped in v0.20.9, the deferred
+  `39_finite_difference_derivative` and `40_trapezoidal_integration` examples are now
+  unblocked (a separate follow-up).
+- No new data flows, external integrations, or auth: pure in-memory construction with
+  existing budget enforcement. `#![forbid(unsafe_code)]`, the core→companion
+  dependency boundary, and the release-doc guards remain valid; the threat model is
+  unchanged.
+
 ## [0.20.10] - 2026-06-23
 
 **Core numeric comfort APIs — selection band (RFC-038, second sub-band). Additive,

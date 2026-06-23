@@ -84,6 +84,7 @@
 //   parse/      JSON/CSV boundary parsers
 //   dynamic/    feature-gated `Element` engine (Phase 2)
 mod convert;
+mod creation;
 #[cfg(feature = "dynamic")]
 mod dynamic;
 mod error;

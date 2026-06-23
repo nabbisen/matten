@@ -5,6 +5,7 @@
 //! code is separated from implementation when files grow large.
 
 mod convert;
+mod creation;
 mod dynamic;
 mod elementwise;
 mod error;

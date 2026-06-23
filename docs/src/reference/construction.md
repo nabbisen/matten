@@ -48,6 +48,26 @@ let r = Tensor::try_arange(start, end, step)?;
 `arange` rejects zero or non-finite step, non-finite bounds, and a computed
 element count above the allocation limit (`2²⁸`).
 
+## Evenly spaced values and identity (RFC-038)
+
+```rust
+// `count` evenly spaced values, inclusive of both endpoints:
+let xs = Tensor::linspace(0.0, 1.0, 5);   // [0.0, 0.25, 0.5, 0.75, 1.0]
+let one = Tensor::linspace(2.0, 9.0, 1);  // [2.0]
+
+// n × n identity matrix:
+let i3 = Tensor::eye(3);                   // 1.0 on the diagonal, 0.0 elsewhere
+
+// Result zone:
+let xs = Tensor::try_linspace(start, end, count)?;
+let i = Tensor::try_eye(n)?;
+```
+
+`linspace` includes both endpoints when `count >= 2`, returns `[start]` when
+`count == 1`, and rejects `count == 0`. `eye` produces shape `[n, n]` and rejects
+`n == 0`. Both are budget-checked like the fill constructors (oversized results
+yield `MattenError::Allocation`).
+
 ## Shape model
 
 Shapes are runtime `Vec<usize>`. There is no const-generic or type-level
