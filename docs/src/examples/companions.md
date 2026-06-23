@@ -12,8 +12,8 @@ not add duplicate or renamed companion examples.
 
 | Example | What it shows |
 |---|---|
-| `from_arrayd` | `ndarray::ArrayD<f64>` → `matten::Tensor`, including a transposed (non-contiguous) input |
-| `to_arrayd` | `matten::Tensor` → `ndarray::ArrayD<f64>` |
+| [`from_arrayd`](https://github.com/nabbisen/matten/blob/main/crates/matten-ndarray/examples/from_arrayd.rs) | `ndarray::ArrayD<f64>` → `matten::Tensor`, including a transposed (non-contiguous) input |
+| [`to_arrayd`](https://github.com/nabbisen/matten/blob/main/crates/matten-ndarray/examples/to_arrayd.rs) | `matten::Tensor` → `ndarray::ArrayD<f64>` |
 
 Both conversions **copy** data (no zero-copy claim) and preserve shape. Only numeric
 tensors convert to `ndarray`.
@@ -27,10 +27,10 @@ cargo run -p matten-ndarray --example to_arrayd
 
 | Example | What it shows |
 |---|---|
-| `mlprep_standardize_columns` | Per-column z-score (zero mean, unit std) |
-| `mlprep_minmax_scale` | Per-column scaling into `[0, 1]` |
-| `mlprep_add_bias_column` | Prepend a constant intercept column |
-| `mlprep_train_test_split` | Deterministic, ordered train/test split |
+| [`mlprep_standardize_columns`](https://github.com/nabbisen/matten/blob/main/crates/matten-mlprep/examples/standardize_columns.rs) | Per-column z-score (zero mean, unit std) |
+| [`mlprep_minmax_scale`](https://github.com/nabbisen/matten/blob/main/crates/matten-mlprep/examples/minmax_scale.rs) | Per-column scaling into `[0, 1]` |
+| [`mlprep_add_bias_column`](https://github.com/nabbisen/matten/blob/main/crates/matten-mlprep/examples/add_bias_column.rs) | Prepend a constant intercept column |
+| [`mlprep_train_test_split`](https://github.com/nabbisen/matten/blob/main/crates/matten-mlprep/examples/train_test_split.rs) | Deterministic, ordered train/test split |
 
 Convention throughout: rows are samples, columns are features; every transform is
 deterministic with no hidden randomness and no model training.
@@ -44,7 +44,7 @@ cargo run -p matten-mlprep --example mlprep_train_test_split
 
 | Example | What it shows |
 |---|---|
-| `csv_to_tensor` | CSV string → inspect → select columns → fill missing → numeric `Tensor` |
+| [`csv_to_tensor`](https://github.com/nabbisen/matten/blob/main/crates/matten-data/examples/csv_to_tensor.rs) | CSV string → inspect → select columns → fill missing → numeric `Tensor` |
 
 `matten-data` is **Experimental** and intentionally small. It is **not** a dataframe:
 no group-by, join, merge, pivot, or query. Missing values and numeric conversion are

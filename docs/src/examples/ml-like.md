@@ -2,7 +2,7 @@
 
 Two small algorithms often associated with machine learning, written with `matten`
 to show that a `Tensor` is enough for recognizable ML-shaped tasks. They use only the
-default Phase-1 numeric API, small hard-coded inputs, and deterministic output.
+default numeric Tensor API, small hard-coded inputs, and deterministic output.
 
 The boundary is deliberate: these are **algorithm demonstrations, not an ML
 framework**. There is no training loop abstraction, no model object, no autograd, and
@@ -22,6 +22,8 @@ converges to the two obvious clusters.
 cargo run --example 37_kmeans_small
 ```
 
+Source: [`37_kmeans_small.rs`](https://github.com/nabbisen/matten/blob/main/crates/matten/examples/37_kmeans_small.rs)
+
 ### `38_nearest_neighbor_classification.rs`
 
 *Difficulty: Beginner.* Classifies a query point by the label of its single nearest
@@ -31,6 +33,8 @@ step, no fitted parameters — just a nearest-point search.
 ```bash
 cargo run --example 38_nearest_neighbor_classification
 ```
+
+Source: [`38_nearest_neighbor_classification.rs`](https://github.com/nabbisen/matten/blob/main/crates/matten/examples/38_nearest_neighbor_classification.rs)
 
 ## What this is not
 

@@ -6,8 +6,13 @@ members = [
     "crates/matten-mlprep",
     "crates/matten-data",
 ]
-# Regression fixtures are standalone crates; exclude them from the workspace
-# so their non-workspace dependency declarations do not conflict.
+# The RFC-031 regression fixture is a standalone crate, intentionally kept OUT of
+# the workspace: it simulates a downstream consumer with a specific feature set
+# (core `matten/dynamic` ON, companion mirrors OFF) and must be isolated from
+# workspace feature unification for that scenario to reproduce. Because it is
+# excluded it has its own Cargo.lock; that lock is regenerated on demand and is
+# git-ignored (see .gitignore), so the repository still tracks a single workspace
+# Cargo.lock.
 exclude = [
     "tests/fixtures/dynamic_rejection_unification",
 ]
@@ -17,7 +22,7 @@ exclude = [
 # this version. Per-crate `keywords`/`categories`/`description` are NOT shared —
 # they differ per crate and aid crates.io discoverability.
 [workspace.package]
-version = "0.20.17"
+version = "0.20.18"
 edition = "2024"
 rust-version = "1.85"
 license = "Apache-2.0"

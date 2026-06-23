@@ -2,7 +2,7 @@
 
 A small set of recognizable math problems that show what a `matten::Tensor` can
 represent and how short vector/matrix algorithms look in `matten`. They use only
-the default Phase-1 numeric API — no extra features, no external crates, and small
+the default numeric Tensor API — no extra features, no external crates, and small
 hard-coded inputs with stable output.
 
 These examples are teaching examples, not a production algorithm package. They sit
@@ -21,6 +21,8 @@ square (magic constant 15).
 cargo run --example 30_magic_square_checker
 ```
 
+Source: [`30_magic_square_checker.rs`](https://github.com/nabbisen/matten/blob/main/crates/matten/examples/30_magic_square_checker.rs)
+
 ### `31_fibonacci_matrix_power.rs`
 
 *Difficulty: Beginner.* Computes Fibonacci numbers from the identity
@@ -33,6 +35,8 @@ big-integer routine.
 cargo run --example 31_fibonacci_matrix_power
 ```
 
+Source: [`31_fibonacci_matrix_power.rs`](https://github.com/nabbisen/matten/blob/main/crates/matten/examples/31_fibonacci_matrix_power.rs)
+
 ### `32_graph_path_counting.rs`
 
 *Difficulty: Beginner.* Counts walks in a directed graph using the fact that
@@ -44,6 +48,8 @@ via `matmul`. Note the distinction between a *walk* (may repeat nodes/edges) and
 ```bash
 cargo run --example 32_graph_path_counting
 ```
+
+Source: [`32_graph_path_counting.rs`](https://github.com/nabbisen/matten/blob/main/crates/matten/examples/32_graph_path_counting.rs)
 
 ## Already covered (cross-references)
 

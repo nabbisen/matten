@@ -181,7 +181,7 @@ More examples are [here](crates/matten-mlprep/examples/).
 
 ## More detail
 
-- Core docs: [`docs/`](./docs) (mdBook).
+- Documentation: [nabbisen.github.io/matten](https://nabbisen.github.io/matten/) (mdBook).
 - Roadmap: [`ROADMAP.md`](./ROADMAP.md) (canonical for v0.16+).
 - Design decisions: [`rfcs/`](./rfcs) — see RFC-022 (boundary policy), RFC-025
   (bridge policy), RFC-030 (family versioning).

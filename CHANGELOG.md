@@ -18,6 +18,50 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.20.18] - 2026-06-23
+
+**Build/repository hygiene and documentation fixes. No code, API, behavior, or
+dependency change to any crate.**
+
+The RFC-031 regression fixture (`tests/fixtures/dynamic_rejection_unification`) is a
+standalone crate, intentionally excluded from the workspace so it can simulate a
+downstream consumer's feature set (core `matten/dynamic` ON, companion mirrors OFF) in
+isolation from workspace feature unification. Being excluded, it generates its own
+`Cargo.lock`, which was appearing as a second tracked lock.
+
+### Changed
+
+- Added `/tests/fixtures/*/Cargo.lock` to `.gitignore`. The fixture's lock is regenerated
+  on demand and is no longer tracked, so the repository keeps a single workspace
+  `Cargo.lock`. The fixture remains excluded from the workspace (its isolation is
+  required for the RFC-031 regression to hold).
+- Clarified the root `Cargo.toml` exclusion comment to state the real reason for the
+  exclusion (feature-unification isolation) and how the fixture's lock is handled.
+- Release tarballs now also exclude the fixture's `Cargo.lock`.
+
+### Documentation
+
+- Root `README.md`: the documentation link now points to the published mdBook at
+  <https://nabbisen.github.io/matten/> instead of the local `docs/` path (GitHub Pages
+  is live).
+- Examples docs: each example now links to its source file on GitHub in addition to the
+  "how to run" command, so readers can see *what to write*, not just how to run it. The
+  `30_`–`40_` band pages add a per-example `Source:` link; the companion page links each
+  example identifier in its table to the corresponding source file.
+- Retired four hyphenated `Phase-1` references in the example band pages that the
+  v0.20.17 cleanup missed (it matched only the spaced form `Phase 1`). The
+  `check-release-docs.sh` Phase guard now matches both the spaced and hyphenated forms
+  (`Phase[ -]1` / `Phase[ -]2`).
+
+### Notes
+
+- No runtime behavior, data flows, integrations, or auth change — repository
+  configuration only. The workspace still loads with the same four members; the RFC-031
+  fixture still passes. Threat model unchanged.
+- The fixture's `Cargo.lock` is newly git-ignored but was previously tracked; in a git
+  checkout it must be untracked once with `git rm --cached
+  tests/fixtures/dynamic_rejection_unification/Cargo.lock`.
+
 ## [0.20.17] - 2026-06-23
 
 **Documentation / RFC-lifecycle housekeeping, applying the pre-v0.19.0 audit architect

@@ -4,7 +4,7 @@ Intermediate examples built on repeated matrix/vector multiplication. They show
 how an iterative process — a probability distribution evolving over time, or a
 ranking settling to a fixed point — is just `Tensor::matmul` applied in a loop.
 
-Like the rest of the applied band, these use only the default Phase-1 numeric API,
+Like the rest of the applied band, these use only the default numeric Tensor API,
 small hard-coded inputs, and deterministic output. They are teaching examples, not
 a graph or probability library.
 
@@ -21,6 +21,8 @@ vector × matrix `matmul`, and the distribution converges to the stationary
 cargo run --example 33_markov_chain_weather
 ```
 
+Source: [`33_markov_chain_weather.rs`](https://github.com/nabbisen/matten/blob/main/crates/matten/examples/33_markov_chain_weather.rs)
+
 ### `34_tiny_pagerank.rs`
 
 *Difficulty: Intermediate.* Ranks the nodes of a tiny directed graph with PageRank.
@@ -31,6 +33,8 @@ best-connected node wins, and the link-less node keeps only its teleport share.
 ```bash
 cargo run --example 34_tiny_pagerank
 ```
+
+Source: [`34_tiny_pagerank.rs`](https://github.com/nabbisen/matten/blob/main/crates/matten/examples/34_tiny_pagerank.rs)
 
 ## What this is not
 

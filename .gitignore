@@ -19,3 +19,9 @@ target
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
+
+# Standalone regression fixtures under tests/fixtures/ are intentionally kept out
+# of the workspace (feature-unification isolation; see the root Cargo.toml and
+# RFC-031). Their Cargo.lock is regenerated on demand and must not be tracked as a
+# second workspace lock.
+/tests/fixtures/*/Cargo.lock

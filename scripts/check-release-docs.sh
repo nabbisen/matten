@@ -149,7 +149,7 @@ echo "=== Checking for retired 'Phase 1 / Phase 2' wording in user-facing docs =
 # RFC-lifecycle ruling (pre-v0.19.0 audit, Q1): the Phase 1/Phase 2 vocabulary is
 # retired from current user-facing docs in favor of numeric-Tensor / dynamic-ingestion
 # terminology. Historical RFCs (rfcs/) and CHANGELOG.md may retain it.
-if grep -rIn 'Phase 1\|Phase 2' "${USER_DOCS[@]}" 2>/dev/null; then
+if grep -rIn 'Phase[ -]1\|Phase[ -]2' "${USER_DOCS[@]}" 2>/dev/null; then
   echo "ERROR: retired 'Phase 1 / Phase 2' wording in user-facing docs (use 'numeric Tensor' / 'dynamic ingestion' terminology)"
   FAIL=1
 fi

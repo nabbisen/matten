@@ -1,7 +1,7 @@
 # Numerical methods
 
 Small numerical-method examples that demonstrate how iterative and sampled-grid
-algorithms look in `matten`. They use only the default Phase-1 numeric API (plus the
+algorithms look in `matten`. They use only the default numeric Tensor API (plus the
 RFC-038 comfort APIs), small hard-coded inputs, and deterministic output.
 
 These are teaching examples, not a SciPy replacement.
@@ -19,6 +19,8 @@ each, with `transpose` forming `Xᵀ` once. Converges to the true line `y = 2x +
 cargo run --example 35_linear_regression_gradient_descent
 ```
 
+Source: [`35_linear_regression_gradient_descent.rs`](https://github.com/nabbisen/matten/blob/main/crates/matten/examples/35_linear_regression_gradient_descent.rs)
+
 ### `36_heat_equation_1d.rs`
 
 *Difficulty: Advanced-small.* Evolves the 1D heat equation on a rod with fixed-end
@@ -30,6 +32,8 @@ between the boundary temperatures.
 ```bash
 cargo run --example 36_heat_equation_1d
 ```
+
+Source: [`36_heat_equation_1d.rs`](https://github.com/nabbisen/matten/blob/main/crates/matten/examples/36_heat_equation_1d.rs)
 
 ### `39_finite_difference_derivative.rs`
 
@@ -43,6 +47,8 @@ quality directly. It is a numerical approximation, not symbolic differentiation.
 cargo run --example 39_finite_difference_derivative
 ```
 
+Source: [`39_finite_difference_derivative.rs`](https://github.com/nabbisen/matten/blob/main/crates/matten/examples/39_finite_difference_derivative.rs)
+
 ### `40_trapezoidal_integration.rs`
 
 *Difficulty: Intermediate.* Approximates `∫₀¹ x² dx` with the composite trapezoidal
@@ -53,6 +59,8 @@ reduction. It is a numerical approximation, not an integration library.
 ```bash
 cargo run --example 40_trapezoidal_integration
 ```
+
+Source: [`40_trapezoidal_integration.rs`](https://github.com/nabbisen/matten/blob/main/crates/matten/examples/40_trapezoidal_integration.rs)
 
 ## What this is not
 
