@@ -19,8 +19,7 @@ let f = &a / &b;  // [0.1,  0.2,  0.3,  0.4]
 let g = -&a;       // [-1.0, -2.0, -3.0, -4.0]
 ```
 
-**`*` is always element-wise.** Matrix multiplication is `matmul` (coming in
-a later milestone).
+**`*` is always element-wise.** Matrix multiplication is explicit via `matmul` / `dot`.
 
 ## Scalar operators
 

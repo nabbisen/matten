@@ -88,3 +88,15 @@ The following items were considered and explicitly deferred:
 | Dynamic slicing via builder | Deferred | `slice().build()` works on Phase 1 only. Use `get_element` column-by-column for dynamic. |
 | Batched matmul (rank > 2) | Deferred | RFC-010 scope: `[m,n]×[n,p]` maximum. |
 | Axis reductions on dynamic | Not needed yet | Convert with `try_numeric()` first. |
+
+## Phase status
+
+The **v0.20 family** completed the materialization phase: the core numeric comfort
+APIs (RFC-038 — elementwise, selection, creation, and shape helpers) and the
+`30_`–`40_` famous-problem examples program (RFC-043–048). The `matten-data`
+CSV→tensor ingestion API shipped as Experimental.
+
+The **v0.21 family** begins selective boundary implementation: shape composition
+(`concatenate` / `stack`), small statistics (`var` / `std`), linalg-lite helpers
+(`norm` / `trace` / `outer`), and the `matten-data` scope guard. These are additive
+under lock-step family versioning (RFC-030).

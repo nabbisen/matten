@@ -18,7 +18,7 @@
 //!
 //! # Status
 //!
-//! **Production-ready candidate.** The API is stable for the `0.19` family.
+//! **Production-ready candidate.** The API is stable within the lock-step family version (RFC-030).
 //! Supported `ndarray`: the `0.16` minor.
 //!
 //! # Behavior

@@ -111,6 +111,50 @@ if grep -rn "use matten_ndarray::[^;]*Tensor\|use matten_mlprep::[^;]*Tensor" \
 fi
 
 # ---------------------------------------------------------------------------
+# Documentation release-truth checks (codebase deep review, v0.20.15)
+# ---------------------------------------------------------------------------
+# Scope: user-facing docs only. CHANGELOG.md, ROADMAP.md, and rfcs/ are
+# intentionally excluded — they legitimately reference historical versions and
+# superseded wording (this is the curated historical-content allowlist).
+
+USER_DOCS=(
+  README.md
+  "$CORE/README.md" "$NDARRAY/README.md" "$MLPREP/README.md" "$DATA/README.md"
+  "$CORE/src/lib.rs" "$NDARRAY/src/lib.rs" "$MLPREP/src/lib.rs" "$DATA/src/lib.rs"
+  docs/src
+)
+
+echo "=== Checking for stale 0.15 / 0.19 version references in user-facing docs ==="
+# Reject prior-family minors in quoted install snippets ("0.15") and backtick
+# family labels (`0.19`). Maintained per family: when the family advances, add
+# the newly-previous minor to this pattern.
+if grep -rIn '"0\.15"\|"0\.19"\|`0\.15\|`0\.19' "${USER_DOCS[@]}" 2>/dev/null; then
+  echo "ERROR: stale 0.15/0.19 version reference in user-facing docs (install snippet or family label)"
+  FAIL=1
+fi
+
+echo "=== Checking for skeleton-era / pre-API wording in user-facing docs ==="
+if grep -rIn 'M0 skeleton\|when added\|When the public API lands\|coming in a later milestone' "${USER_DOCS[@]}" 2>/dev/null; then
+  echo "ERROR: skeleton-era / pre-API wording in user-facing docs (docs must describe the shipped state)"
+  FAIL=1
+fi
+
+echo "=== Checking public API snapshot lists the InvalidArgument variant ==="
+if ! grep -q 'InvalidArgument' docs/src/reference/public-api-snapshot.md; then
+  echo "ERROR: public-api-snapshot.md is missing InvalidArgument (snapshot drifted from the shipped MattenError enum)"
+  FAIL=1
+fi
+
+echo "=== Checking root README crate table uses family wording, not bare patch versions ==="
+# Crate-table rows look like: | [`name`](path) | VERSION | STATUS | desc |
+# A bare patch version (0.20.0) in the version cell drifts every release; require
+# "N.M.x family" instead.
+if grep -nE '^\| \[.*\]\(.*\) \| [0-9]+\.[0-9]+\.[0-9]+ ' README.md; then
+  echo "ERROR: root README crate table has a bare patch version; use 'N.M.x family'"
+  FAIL=1
+fi
+
+# ---------------------------------------------------------------------------
 # Result
 # ---------------------------------------------------------------------------
 

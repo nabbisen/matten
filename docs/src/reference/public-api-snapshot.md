@@ -1,6 +1,6 @@
 # Public API snapshot
 
-This page lists every public item in `matten` at v0.15.x. It serves as the
+This page lists every public item in `matten` at the current v0.20 family (0.20.14). It serves as the
 baseline for tracking breaking changes toward v1.0.0 and as the review gate
 required by RFC-015.
 
@@ -96,7 +96,7 @@ when called on a dynamic tensor. Call `try_numeric()` to convert first.
 | Method | Returns | Notes |
 |---|---|---|
 | `reshape(shape)` | `Tensor` | panics on mismatch or dynamic |
-| `try_reshape(shape)` | `Result<Tensor, MattenError>` | panics on dynamic |
+| `try_reshape(shape)` | `Result<Tensor, MattenError>` | returns `Unsupported` on dynamic |
 | `flatten()` | `Tensor` | panics on dynamic |
 | `transpose()` | `Tensor` | reverses axes; panics on dynamic |
 | `t()` | `Tensor` | alias for `transpose` |
@@ -235,6 +235,7 @@ pub enum MattenError {
     Parse      { format: DataFormat, message: String },
     Io         { path: PathBuf, source: std::io::Error },
     Unsupported { operation: &'static str, message: String },
+    InvalidArgument { operation: &'static str, argument: &'static str, message: String },
 }
 ```
 

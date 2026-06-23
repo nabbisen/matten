@@ -23,13 +23,14 @@ This repository is a Cargo workspace, where core `matten` stays small and depend
 
 | Crate | Version | Status | What it is |
 |---|---|---|---|
-| [`matten`](./crates/matten) | 0.20.0 | stable (v0.x) | The core `f64` tensor library: construction, shape ops, broadcasting, slicing, reductions, matmul, JSON/CSV boundary APIs, and an optional `dynamic` ingestion on-ramp. |
-| [`matten-ndarray`](./crates/matten-ndarray) | 0.20.0 | production-ready candidate | Conversion bridge between `matten::Tensor` and `ndarray::ArrayD<f64>`. |
-| [`matten-mlprep`](./crates/matten-mlprep) | 0.20.0 | beta | Transparent, deterministic preprocessing helpers (standardize, min-max scale, bias column, train/test split). |
+| [`matten`](./crates/matten) | 0.20.x family | stable (v0.x) | The core `f64` tensor library: construction, shape ops, broadcasting, slicing, reductions, matmul, JSON/CSV boundary APIs, and an optional `dynamic` ingestion on-ramp. |
+| [`matten-ndarray`](./crates/matten-ndarray) | 0.20.x family | production-ready candidate | Conversion bridge between `matten::Tensor` and `ndarray::ArrayD<f64>`. |
+| [`matten-mlprep`](./crates/matten-mlprep) | 0.20.x family | beta | Transparent, deterministic preprocessing helpers (standardize, min-max scale, bias column, train/test split). |
+| [`matten-data`](./crates/matten-data) | 0.20.x family | experimental | Small, honest CSV→tensor ingestion (`Table` with explicit missing-value handling and strict numeric conversion). Deliberately not a dataframe library. |
 
 All crates share one **family version** (RFC-030): matching numbers mean a
 matched, compatible set. A crate's **maturity is the Status column**, not its
-version number — a crate at `0.19.0` may still be `beta`.
+version number — a crate may sit at the shared family version and still be `beta`.
 
 ### matten
 

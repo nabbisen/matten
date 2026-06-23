@@ -10,4 +10,4 @@ This book is organized by reader:
 - **Reference** — the rules that shape the public API.
 - **Contributors** — project layout, milestones, and process.
 
-> This documentation tracks the M0 skeleton. Chapters expand as features land.
+> This documentation tracks the current 0.20 family and the v0.21 planning boundary.

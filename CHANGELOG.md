@@ -18,6 +18,71 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.20.15] - 2026-06-23
+
+**Documentation release-truth cleanup and release-doc guard hardening, applying the
+v0.20.14 codebase deep review. No runtime code, API, behavior, or dependency change to
+any crate.**
+
+The architect accepted the v0.20 series handoff (phase closed) and deep-reviewed the
+v0.20.14 source. No P0 runtime/design blocker was found. The review's P1 findings were
+documentation/release-truth drift (stale version strings and old-phase wording in
+user-facing docs) plus a request to harden the release-doc guard so the drift cannot
+recur. This release applies those findings before v0.21 work begins.
+
+### Fixed (documentation truth — Patch A)
+
+- Replaced stale `0.15` / `0.19` dependency-snippet versions with `0.20` across
+  user-facing docs: `crates/matten/README.md`, `crates/matten/src/lib.rs`,
+  `crates/matten-ndarray/README.md`, `crates/matten-mlprep/README.md`,
+  `docs/src/quick-start.md`, `docs/src/reference/boundary.md`,
+  `docs/src/reference/dynamic.md`, and `docs/src/contributing/architecture.md` (the
+  last not in the review's evidence list; found by re-verifying against source).
+- Updated companion maturity labels to the current family: `matten-ndarray`
+  "Production-ready candidate (`0.20.x` family)", `matten-mlprep` "Beta (`0.20.x`
+  family)"; made the `matten-ndarray` crate-doc family line version-neutral; corrected
+  two further stale `0.19` family references surfaced by the new guard.
+- **Root `README.md` crate table:** version cells now read `0.20.x family` (no
+  per-patch churn), and a **`matten-data` row was added** (it had badges but no table
+  entry).
+- **`docs/src/reference/public-api-snapshot.md`:** header now states the current v0.20
+  family instead of `v0.15.x`; the `MattenError` enum block now includes the shipped
+  `InvalidArgument` variant; the `try_reshape` row now states it returns `Unsupported`
+  on dynamic (it does not panic).
+- **`crates/matten-data/README.md`:** removed pre-API "(when added)" / "When the public
+  API lands" wording — the table/CSV→tensor API shipped in v0.20.1.
+- **`docs/src/introduction.md`:** replaced the "M0 skeleton" line with current
+  0.20-family / v0.21-boundary wording.
+- **`docs/src/reference/operators.md`** (P2): `matmul` is described as implemented
+  (`matmul` / `dot`), not "coming in a later milestone".
+- **`docs/src/reference/compatibility.md`** (P2): added a short phase-status note
+  (v0.20 materialization complete; v0.21 begins boundary implementation).
+
+### Changed (release-doc guard — Patch B)
+
+- Hardened `scripts/check-release-docs.sh` with documentation release-truth checks:
+  stale `0.15`/`0.19` version references in user-facing docs, skeleton-era / pre-API
+  wording, presence of `InvalidArgument` in the public-API snapshot, and bare
+  per-patch versions in the root README crate table. The checks are scoped to
+  user-facing docs; `CHANGELOG.md`, `ROADMAP.md`, and `rfcs/` are excluded as the
+  curated historical-content allowlist. (Verified to catch planted drift and to pass
+  on the cleaned tree.)
+
+### Deferred
+
+- **Patch C (P2) — RFC lifecycle clarification** for RFC-023 / RFC-026 / RFC-036 /
+  RFC-037 against the shipped RFC-033/034/035 and accepted RFC-042. The architect
+  marked this a non-blocker requiring per-RFC supersession judgment; it is deferred to
+  v0.21 planning rather than resolved with premature calls here. Tracked in the ROADMAP
+  history.
+
+### Notes
+
+- No runtime behavior, data flows, integrations, or auth change — documentation,
+  ROADMAP, and one CI guard script only. `#![forbid(unsafe_code)]`, the core→companion
+  boundary, and the dynamic-rejection guards are unchanged; the threat model is
+  unchanged.
+
 ## [0.20.14] - 2026-06-23
 
 **Planning/reconciliation: v0.21 boundary architect rulings ingested (RFC-039–042).

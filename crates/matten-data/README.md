@@ -56,7 +56,7 @@ expose a second computation engine.
 
 ## Status and scope
 
-- **Maturity:** experimental. The API (when added) may change; pin the version.
+- **Maturity:** experimental. The API is available but remains Experimental and may change before beta; pin the version.
 - **Scope lock:** table-to-Tensor preparation only (RFC-033, RFC-042).
 - **Dependency direction:** `matten-data` depends on core `matten`; core never
   depends on `matten-data` (enforced by the dependency-boundary CI check).
@@ -64,8 +64,7 @@ expose a second computation engine.
 
 ## Dependency style
 
-This crate depends on `matten`. When the public API lands, official examples will
-import `Tensor` from `matten` directly:
+This crate depends on `matten`. Official examples import `Tensor` from `matten` directly:
 
 ```rust
 use matten::Tensor;

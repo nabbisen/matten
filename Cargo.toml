@@ -17,7 +17,7 @@ exclude = [
 # this version. Per-crate `keywords`/`categories`/`description` are NOT shared —
 # they differ per crate and aid crates.io discoverability.
 [workspace.package]
-version = "0.20.14"
+version = "0.20.15"
 edition = "2024"
 rust-version = "1.85"
 license = "Apache-2.0"
