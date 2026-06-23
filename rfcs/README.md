@@ -56,7 +56,18 @@ for RFC state; the Status field inside each file mirrors the folder.
 | 040 | [Small Statistics Boundary — Core vs Companion](./proposed/040-small-statistics-boundary-core-vs-companion.md) | v0.21+ |
 | 041 | [Linear Algebra Boundary — Core Lite vs External Crates](./proposed/041-linear-algebra-boundary-core-lite-vs-external-crates.md) | v0.21+ |
 | 042 | [Pandas-Inspired Scope Guard for `matten-data`](./proposed/042-pandas-inspired-scope-guard-for-matten-data.md) | v0.20+ / v0.21+ |
+| 043 | [Example Program Structure, Quality Gate, and Documentation Policy](./proposed/043-example-program-structure-quality-gate-and-documentation-policy.md) | v0.20.x |
+| 044 | [Beginner Core Math Examples](./proposed/044-beginner-core-math-examples.md) | v0.20.x |
+| 045 | [Matrix Iteration and Graph/Probability Examples](./proposed/045-matrix-iteration-and-graph-probability-examples.md) | v0.20.x |
+| 046 | [Numerical Methods and Scientific Toy Examples](./proposed/046-numerical-methods-and-scientific-toy-examples.md) | v0.21+ / after RFC-038 |
+| 047 | [Small ML-Like Examples Without ML-Framework Scope](./proposed/047-small-ml-like-examples-without-ml-framework-scope.md) | v0.21+ |
+| 048 | [Companion-Crate Examples](./proposed/048-companion-crate-examples.md) | v0.20.x / v0.21+ |
 
-Implementation handoffs for the v0.20+ proposed set (RFC-033–042) live in
+Implementation handoffs for the v0.20+ proposed set (RFC-033–042) and the examples
+program (RFC-043–048) live in
 [`./handoffs/`](./handoffs/). They translate each RFC into PR boundaries, checks,
-and acceptance criteria; the RFC remains the design authority.
+and acceptance criteria; the RFC remains the design authority. The examples handoff
+([`043-048-examples-implementation-handoff.md`](./handoffs/043-048-examples-implementation-handoff.md))
+opens with a Phase 0 inventory of the existing example suite: new famous-problem
+examples use an additive 30+ band, and existing distance/cosine/companion examples
+are audited/improved rather than duplicated.

@@ -2,10 +2,10 @@
 
 **Project:** `matten`  
 **Document Kind:** Canonical Project Roadmap  
-**Document Version:** `1.2.0`  
-**Date:** 2026-06-22  
-**Status:** Canonical roadmap updated for v0.20+ materialization planning; RFC-032 is reserved/consumed by another issue, so the v0.20+ RFC sequence starts at RFC-033  
-**Planning Baseline:** core `matten` completed RFC-015 through RFC-021 (shipped through v0.15.3); RFC-022 boundary confirmation shipped in v0.16.0; v0.17.0 introduced the Cargo workspace and the `matten-ndarray` companion crate under the family version (RFC-025, RFC-027); v0.18.0 introduced the `matten-mlprep` companion crate under the family version (RFC-024, RFC-028); v0.19.0 promoted `matten-ndarray` to production-ready candidate status and `matten-mlprep` to beta status under lock-step family versioning (RFC-029); v0.19.1 shipped feature-robust dynamic rejection (RFC-031); v0.19.2 confirmed the companion dependency/import convention (RFC-032). Under lock-step family versioning (RFC-030), every crate shares the family version (e.g. `0.19.2`); maturity is expressed by per-crate Status labels, not by separate version numbers. Next: v0.20+ materialization phase. RFC-032 is consumed by the companion dependency/import convention; v0.20+ planning starts at RFC-033. The first v0.20+ branch is `matten-data` decision/materialization; the second is small NumPy-inspired core comfort APIs that preserve the `matten` philosophy.
+**Document Version:** `1.4.0`  
+**Date:** 2026-06-23  
+**Status:** Canonical roadmap updated for v0.20+ materialization planning and examples program. RFC-032 is consumed by the companion dependency/import convention; v0.20+ design starts at RFC-033, and the examples program is covered by RFC-043 through RFC-048.  
+**Planning Baseline:** core `matten` completed RFC-015 through RFC-021 (shipped through v0.15.3); RFC-022 boundary confirmation shipped in v0.16.0; v0.17.0 introduced the Cargo workspace and the `matten-ndarray` companion crate under the family version (RFC-025, RFC-027); v0.18.0 introduced the `matten-mlprep` companion crate under the family version (RFC-024, RFC-028); v0.19.0 promoted `matten-ndarray` to production-ready candidate status and `matten-mlprep` to beta status under lock-step family versioning (RFC-029); v0.19.1 shipped feature-robust dynamic rejection (RFC-031); v0.19.2 confirmed the companion dependency/import convention (RFC-032); v0.19.3 added the RFC-033-042 v0.20+ design set; v0.20.0 shipped the matten-data experimental scaffold (RFC-033); v0.20.1 shipped the matten-data table/CSV-to-Tensor API (RFC-034, RFC-035, Experimental). Under lock-step family versioning (RFC-030), every crate shares the family version (e.g. `0.19.2`); maturity is expressed by per-crate Status labels, not by separate version numbers. Next: v0.20+ materialization phase. RFC-032 is consumed by the companion dependency/import convention; v0.20+ planning starts at RFC-033. The first v0.20+ branch is `matten-data` decision/materialization; the second is small NumPy-inspired core comfort APIs that preserve the `matten` philosophy; the third is the examples program (RFC-043–048), which demonstrates famous small math/numerical problems and companion workflows without expanding product scope.
 
 ---
 
@@ -23,7 +23,7 @@ When documents disagree, resolve in this order:
 
 The v0.16+ prospect supersedes older schedule lines that placed `matten-data` at v0.17 and bundled all bridge crates at v0.19.
 
-**RFC numbering note:** RFC-032 is reserved/consumed by another issue. New v0.20+ roadmap RFCs therefore begin at **RFC-033**.
+**RFC numbering note:** RFC-032 is reserved/consumed by another issue. New v0.20+ roadmap RFCs therefore begin at **RFC-033**. The examples program follows the v0.20+ boundary/design RFCs and uses **RFC-043 through RFC-048**.
 
 ---
 
@@ -86,9 +86,11 @@ matten -> datafusion
 | **v0.19.1** | Companion hardening patch | RFC-031 feature-robust dynamic rejection; RFC lifecycle/doc cleanup | Patch / quality release |
 | **v0.19.2** | Companion dependency/import policy | RFC-032: explicit dependency style confirmed; companion `pub use matten;` deferred; release-doc guard added | Documentation/tooling patch |
 | **v0.19.3** | v0.20+ planning materialization | RFC-033–042 added as proposed design set; ROADMAP reconciled to lock-step + RFC-032; architect rulings applied | Documentation/planning patch |
-| **v0.20.0** | v0.20+ design/materialization start | RFC-033 through RFC-037 for `matten-data`; RFC-038 for core comfort APIs | Design + selective implementation approval |
-| **v0.20.x** | Minimal implementation phase | Small core comfort APIs; optional experimental `matten-data` if approved | Low-risk implementation only |
-| **v0.21+** | Selective production readiness | `matten-data` beta/experimental/freeze decision; companion maturity decisions | Per-crate decisions |
+| **v0.20.0** | v0.20+ design/materialization start | RFC-033 `matten-data` experimental scaffold (shell only); workspace member + dependency pins | Design + selective implementation approval |
+| **v0.20.1** | `matten-data` table API | RFC-034 + RFC-035 implemented: `Table`/CSV ingestion/schema/numeric → `Tensor` (Experimental); `examples/csv_to_tensor.rs` shipped | Low-risk implementation |
+| **v0.20.2** | Examples program planning | RFC-043–048 added as proposed examples RFC set + compact handoff; reconciled to the additive 30+ band, dedup against the existing suite, and shipped `matten-data` | Documentation/planning patch |
+| **v0.20.x** | Minimal implementation phase | Small core comfort APIs; new 30+ famous-problem examples; audit/improve existing companion examples | Low-risk implementation only |
+| **v0.21+** | Selective production readiness | `matten-data` beta/experimental/freeze decision; companion maturity decisions; harder numerical/ML-like examples as APIs mature | Per-crate decisions |
 | **Later** | Streaming / large CSV, `nalgebra`, `candle`, stats/linalg companions | Separate RFCs required | Design-only until reopened |
 
 ---
@@ -312,7 +314,7 @@ Finish the v0.19 maturity work before expanding scope.
 
 ### Goal
 
-v0.20+ has two parallel tracks:
+v0.20+ has three parallel tracks:
 
 ```text
 Track A: matten-data decision/materialization
@@ -320,6 +322,10 @@ Track A: matten-data decision/materialization
 
 Track B: core numeric comfort APIs
   Add small NumPy-inspired Tensor conveniences only if they preserve the Sedan-first philosophy.
+
+Track C: examples program
+  Demonstrate accepted APIs through famous small math / numerical-computing problems
+  without creating hidden dataframe, SciPy, or ML-framework scope.
 ```
 
 The release must not become a broad clone of NumPy, SciPy, or Pandas.
@@ -346,8 +352,14 @@ RFC-032 is already consumed by another issue. v0.20+ roadmap RFCs therefore star
 | RFC-040 | Small Statistics Boundary: Core vs Companion | v0.21+ |
 | RFC-041 | Linear Algebra Boundary: Core Lite vs External Crates | v0.21+ |
 | RFC-042 | Pandas-Inspired Scope Guard for `matten-data` | v0.21+ if needed |
+| RFC-043 | Example Program Structure, Quality Gate, and Documentation Policy | v0.20.x |
+| RFC-044 | Beginner Core Math Examples | v0.20.x |
+| RFC-045 | Matrix Iteration and Graph/Probability Examples | v0.20.x |
+| RFC-046 | Numerical Methods and Scientific Toy Examples | v0.21+ or after needed APIs |
+| RFC-047 | Small ML-Like Examples Without ML-Framework Scope | v0.21+ |
+| RFC-048 | Companion-Crate Examples | v0.20.x / v0.21+ |
 
-RFC-042 may be folded into RFC-033 if the scope guard is already strong enough.
+RFC-042 may be folded into RFC-033 if the scope guard is already strong enough. RFC-043 through RFC-048 are examples/documentation RFCs: they demonstrate accepted APIs and workflows, but do not authorize new product scope by themselves.
 
 ---
 
@@ -502,7 +514,138 @@ These are useful but have enough shape/statistics policy risk to need focused RF
 
 ---
 
-### 9.4 What v0.20+ must not do
+### 9.4 Track C: examples program
+
+#### Goal
+
+Increase `matten` examples using famous and recognizable small math / numerical-computing problems while preserving the project philosophy.
+
+The examples program should make users understand:
+
+```text
+what Tensor can represent
+how small vector/matrix algorithms look in matten
+where companion crates fit
+what matten intentionally does not do
+```
+
+The examples must not become hidden product commitments.
+
+#### RFCs
+
+| RFC | Theme | Implementation posture |
+|---:|---|---|
+| RFC-043 | Example Program Structure, Quality Gate, and Documentation Policy | Start first; docs/CI/policy foundation |
+| RFC-044 | Beginner Core Math Examples | Low-risk examples; can start early |
+| RFC-045 | Matrix Iteration and Graph/Probability Examples | Intermediate examples; can start after RFC-044 |
+| RFC-046 | Numerical Methods and Scientific Toy Examples | Add after APIs are available; some examples may wait for RFC-038 |
+| RFC-047 | Small ML-Like Examples Without ML-Framework Scope | Add cautiously; no ML framework implication |
+| RFC-048 | Companion-Crate Examples | All companions shipped (incl. `matten-data` v0.20.1); audit/improve existing examples, do not duplicate |
+
+#### Example groups
+
+New famous-problem examples use a fresh additive **30+ band**; the existing
+`00_`–`28_` core suite, the `dynamic_*` set, and the named examples are preserved
+and never renumbered (architect ruling, RFC-043–048 review Q1).
+
+Beginner core examples (new files):
+
+```text
+30_magic_square_checker.rs
+31_fibonacci_matrix_power.rs
+32_graph_path_counting.rs
+```
+
+Cross-reference / improve in place instead of duplicating (already shipped):
+
+```text
+existing 26_cosine_similarity.rs   (cosine similarity)
+existing pairwise_distance.rs      (vector distance)
+existing 25_normalize_vector.rs
+```
+
+Matrix iteration / graph / probability examples:
+
+```text
+33_markov_chain_weather.rs
+34_tiny_pagerank.rs
+XX_adjacency_walks_extended.rs   # optional, next free 30+ number, only if not redundant with 32_graph_path_counting
+```
+
+Numerical methods examples:
+
+```text
+35_linear_regression_gradient_descent.rs
+36_heat_equation_1d.rs
+39_finite_difference_derivative.rs   # deferred, after RFC-038 if needed
+40_trapezoidal_integration.rs        # deferred, after RFC-038 if needed
+```
+
+Small ML-like examples:
+
+```text
+37_kmeans_small.rs
+38_nearest_neighbor_classification.rs
+```
+
+Companion examples (all shipped; audit/improve existing files, do not duplicate):
+
+```text
+crates/matten-ndarray/examples/from_arrayd.rs, to_arrayd.rs
+crates/matten-mlprep/examples/standardize_columns.rs, train_test_split.rs
+crates/matten-data/examples/csv_to_tensor.rs   # shipped in v0.20.1; audit/improve as needed
+```
+
+#### Implementation order
+
+```text
+0. Inventory existing examples first (audit before adding anything)
+1. RFC-043: docs/src/examples/index.md, example structure, CI/example policy
+2. RFC-044: beginner examples (30+ band; cross-reference existing distance/cosine)
+3. RFC-045: matrix-iteration examples
+4. RFC-048: audit/improve existing companion examples
+5. RFC-046: numerical-method examples
+6. RFC-047: small ML-like examples
+```
+
+#### Acceptance gate
+
+```text
+[ ] existing examples inventoried before adding any new file (audit-first)
+[ ] new examples use the additive 30+ band; existing 00-28 suite not renumbered
+[ ] no example duplicates a concept the existing suite already teaches
+[ ] examples compile in CI
+[ ] examples run deterministically
+[ ] examples use small hard-coded data
+[ ] examples explain problem, math idea, Tensor representation, and expected output
+[ ] examples use only accepted APIs
+[ ] companion examples live in companion crates
+[ ] no example implies dataframe, SciPy, ML-framework, GPU, or large-data scope
+[ ] future-only examples are deferred until their required APIs exist
+[ ] the test.yaml smoke list is extended deliberately as runnable examples land
+```
+
+#### Non-goals
+
+The examples program must not add examples for:
+
+```text
+large CSV
+streaming CSV
+dataframe group-by
+join / merge / pivot
+SVD / PCA as core examples
+neural network training
+autograd
+GPU/device usage
+sparse matrices
+database ingestion
+web/network data loading
+```
+
+---
+
+### 9.5 What v0.20+ must not do
 
 v0.20+ must not become:
 
@@ -538,6 +681,10 @@ Design-only until batch lifecycle, schema drift, malformed-row policy, memory bu
 ### `matten-stats`
 
 Possible later companion or small-core extension area. Requires RFC-040 before implementation. Candidate topics include variance, standard deviation, covariance, correlation, quantile, and histogram. These APIs have policy traps (`ddof`, NaN behavior, interpolation), so they must not be rushed into core.
+
+### Examples program continuation
+
+The examples program may continue after RFC-043 through RFC-048, but only as demonstration work over accepted APIs. New examples that require new public API should cite or wait for the relevant RFC. Examples must not be used to smuggle in dataframe, SciPy, ML-framework, large-data, GPU, or serious-linalg scope.
 
 ### `matten-linalg-lite`
 
@@ -740,3 +887,5 @@ dependency gated by a non-default feature would not appear, producing a false pa
 | 1.0.0 | 2026-06-21 | First canonical v0.16+ roadmap after companion-crate reconciliation. |
 | 1.1.0 | 2026-06-22 | Updated v0.20+ materialization plan. RFC-032 is reserved/consumed elsewhere, so v0.20+ planning starts at RFC-033. Added v0.19.1 hardening milestone, `matten-data` RFC sequence RFC-033–037, core comfort RFC-038+, companion dependency/import style, and later stats/linalg boundary themes. |
 | 1.2.0 | 2026-06-22 | Reconciled to shipped reality and architect rulings (v0.19.3): §13 corrected so the companion `pub use matten;` convenience re-export is deferred per RFC-032 (release-doc guard forbids it); planning baseline corrected to lock-step family versions (no per-crate `0.1.x`); added v0.19.2 and v0.19.3 release-theme rows. |
+| 1.3.0 | 2026-06-23 | Added examples program planning for RFC-043–048 and compact examples implementation handoff. Added v0.19.4 release-theme row; expanded v0.20+ to Track C for examples; added RFC-043–048 table entries, example groups, implementation order, acceptance gates, and non-goals. |
+| 1.4.0 | 2026-06-23 | Reconciled the examples program to architect rulings (v0.20.2): new famous-problem examples use an additive 30+ band (existing 00-28 suite preserved); cosine/distance and companion examples are cross-referenced/audited, not duplicated; matten-data csv_to_tensor marked shipped in v0.20.1; docs path examples/index.md; CI smoke-list update requirement added. Fixed the v0.19.4 version regression: replaced with accurate v0.20.0/v0.20.1/v0.20.2 release-theme rows. |

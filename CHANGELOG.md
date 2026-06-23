@@ -7,7 +7,7 @@ follows [Semantic Versioning](https://semver.org/).
 Entries are ordered by release milestone (which is also the tarball version).
 The workspace uses **lock-step family versioning** (RFC-030): every crate shares
 one version, so each entry applies to the whole family — core `matten`,
-`matten-ndarray`, and `matten-mlprep`. Maturity differences between crates are
+`matten-ndarray`, `matten-mlprep`, and `matten-data`. Maturity differences between crates are
 expressed by per-crate status labels, not by separate version numbers. Through
 `0.16.0` the project was the single `matten` crate.
 
@@ -17,6 +17,55 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > `license` field, so no per-crate license file is required. Per-crate changelogs
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
+
+## [0.20.2] - 2026-06-23
+
+**Examples-program planning. Documentation/planning patch under lock-step family
+versioning — no source, API, or behavior changes to any crate.**
+
+### Added
+
+- **Examples program RFC set (RFC-043–048)** added to `rfcs/proposed/`:
+  - RFC-043 example program structure, quality gate, and documentation policy;
+  - RFC-044 beginner core math examples; RFC-045 matrix-iteration / graph /
+    probability examples; RFC-046 numerical-methods examples; RFC-047 small
+    ML-like examples; RFC-048 companion-crate examples.
+- **Compact examples implementation handoff** at
+  `rfcs/handoffs/043-048-examples-implementation-handoff.md`, opening with a
+  Phase 0 inventory of the existing example suite.
+
+### Changed
+
+- **Reconciled the examples program to architect rulings** (RFC-043–048 review)
+  and to shipped reality before any implementation:
+  - new famous-problem examples use an **additive 30+ band**
+    (`30_magic_square_checker` … `40_trapezoidal_integration`); the existing
+    `00_`–`28_` core suite, `dynamic_*` set, and named examples are **not**
+    renumbered;
+  - cosine similarity, vector/pairwise distance, and the companion examples are
+    **cross-referenced / audited in place**, not duplicated (the existing
+    `26_cosine_similarity`, `pairwise_distance`, `from_arrayd`/`to_arrayd`,
+    `standardize_columns`/`train_test_split`, and `csv_to_tensor` already cover
+    them);
+  - `matten-data` `csv_to_tensor` is recorded as **shipped in v0.20.1**, not
+    future-only;
+  - docs use the existing `docs/src/examples/index.md`, not a parallel
+    `examples.md`;
+  - the `test.yaml` smoke list is to be extended deliberately as runnable
+    examples land.
+- **ROADMAP** bumped to Document Version `1.4.0`: applied the 30+ band, dedup
+  cross-references, shipped-`matten-data` wording, and the CI smoke-list note;
+  **fixed a version regression** by replacing the erroneous `v0.19.4` planning
+  row with accurate `v0.20.0` / `v0.20.1` / `v0.20.2` release-theme rows.
+- **`rfcs/README.md`** index lists RFC-043–048 under Proposed and points to the
+  examples handoff.
+
+### Notes
+
+- No new data flows, external integrations, or auth logic; this release changes
+  only planning/design documents. Existing security controls
+  (`#![forbid(unsafe_code)]`, the core→companion dependency boundary, release-doc
+  guards) remain valid and unchanged.
 
 ## [0.20.1] - 2026-06-23
 
