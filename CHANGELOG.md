@@ -18,6 +18,36 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.20.4] - 2026-06-23
+
+**Examples program — matrix-iteration band (RFC-045). Additive examples and
+documentation under lock-step family versioning; no API, behavior, or breaking
+change to any crate.**
+
+### Added
+
+- **Matrix-iteration examples** (RFC-045), default Phase-1 numeric API, small
+  hard-coded inputs, deterministic self-checking output:
+  - `examples/33_markov_chain_weather.rs` — a two-state weather process whose
+    distribution evolves by vector × matrix `Tensor::matmul` and converges to the
+    stationary distribution `[5/6, 1/6]`;
+  - `examples/34_tiny_pagerank.rs` — PageRank by power iteration on a tiny directed
+    graph, using matrix × vector `Tensor::matmul` with damping/teleport in plain
+    Rust.
+- **Examples documentation**: new `docs/src/examples/matrix-iteration.md`, the two
+  examples added to the "Applied problems" table in `docs/src/examples/index.md`,
+  and a `SUMMARY.md` entry.
+- **CI smoke runs** for both new examples in `test.yaml`.
+
+### Notes
+
+- Examples continue in the additive `30+` band; the existing `00_`–`28_` suite,
+  the `dynamic_*` set, and the named examples are unchanged. The optional
+  `41_adjacency_walks_extended` remains a conditional candidate (not added).
+- No new data flows, external integrations, or auth: examples use only in-memory
+  hard-coded data. `#![forbid(unsafe_code)]`, the core→companion dependency
+  boundary, and the release-doc guards remain valid and unchanged.
+
 ## [0.20.3] - 2026-06-23
 
 **Examples program — structure + beginner applied-math band (RFC-043 + RFC-044).

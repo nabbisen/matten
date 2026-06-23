@@ -15,6 +15,7 @@
 
 - [Examples index](./examples/index.md)
 - [Beginner applied math](./examples/beginner-math.md)
+- [Matrix iteration](./examples/matrix-iteration.md)
 
 # Reference
 

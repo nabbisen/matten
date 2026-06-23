@@ -41,13 +41,16 @@ These examples demonstrate the default `matten` API. No extra features required.
 
 Recognizable small math / numerical-computing problems, used to show what a
 `Tensor` can represent. These live in a fresh `30+` band so the core suite above
-stays stable. See [Beginner applied math](./beginner-math.md) for the write-up.
+stays stable. Write-ups: [Beginner applied math](./beginner-math.md) and
+[Matrix iteration](./matrix-iteration.md).
 
 | File | What it shows |
 |---|---|
 | `30_magic_square_checker.rs` | Row/column/diagonal sums via `get` |
 | `31_fibonacci_matrix_power.rs` | Fibonacci via repeated `matmul` |
 | `32_graph_path_counting.rs` | Walk counting via adjacency-matrix powers |
+| `33_markov_chain_weather.rs` | Distribution over time via vector × matrix `matmul` |
+| `34_tiny_pagerank.rs` | PageRank power iteration via matrix × vector `matmul` |
 
 Vector distance and cosine similarity are already covered above — see
 `pairwise_distance.rs`, `25_normalize_vector.rs`, and `26_cosine_similarity.rs`
