@@ -92,6 +92,7 @@ mod math;
 mod ops;
 mod parse;
 mod reshape;
+mod selection;
 mod ser;
 mod shape;
 mod slice;

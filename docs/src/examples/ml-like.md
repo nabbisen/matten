@@ -7,8 +7,7 @@ default Phase-1 numeric API, small hard-coded inputs, and deterministic output.
 The boundary is deliberate: these are **algorithm demonstrations, not an ML
 framework**. There is no training loop abstraction, no model object, no autograd, and
 no randomness — `k`, initial centroids, labels, and iteration counts are all fixed and
-explicit. Both use a small local `argmin` helper, since core `matten` has no `argmin`
-yet (a future RFC-038 candidate).
+explicit. Both find the nearest point with `Tensor::argmin` (RFC-038).
 
 ## Examples
 

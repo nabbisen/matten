@@ -18,6 +18,43 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.20.10] - 2026-06-23
+
+**Core numeric comfort APIs — selection band (RFC-038, second sub-band). Additive,
+non-breaking public API under lock-step family versioning.**
+
+Continues RFC-038 after the elementwise band (v0.20.9). Remaining bands (shape
+`squeeze`/`expand_dims`, creation `linspace`/`eye`) follow as separate releases.
+
+### Added
+
+- **Index reductions on `Tensor`** (RFC-038 §4.4), in a new top-level `selection.rs`
+  module (placed beside the reductions in `math.rs`, which sits at the 300-ELOC
+  threshold, per RFC-038 §5.3):
+  - `argmin()` / `argmax()` — flat row-major index of the smallest/largest element,
+    first occurrence on ties;
+  - `try_argmin()` / `try_argmax()` — non-panicking `Result` forms.
+  - NaN policy (RFC-038 §5.1, selection branch): because an index is ill-defined when
+    any element is `NaN`, the `try_*` forms return `MattenError::InvalidArgument` and
+    the convenience forms panic — distinct from value reductions (`min`/`max`), which
+    propagate `NaN`. On a dynamic tensor the `try_*` forms return
+    `MattenError::Unsupported`; the convenience forms panic.
+
+### Changed
+
+- **Examples** `37_kmeans_small` and `38_nearest_neighbor_classification` now use
+  `Tensor::argmin` for nearest-point selection, retiring their hand-rolled local
+  argmin helpers. Output is unchanged.
+- Reference docs updated to match: `math.md` (index-reductions section + NaN-policy
+  row), `public-api-snapshot.md` (new rows), and `examples/ml-like.md`.
+
+### Notes
+
+- Reuses the `MattenError::InvalidArgument` variant introduced in v0.20.9.
+- No new data flows, external integrations, or auth: pure in-memory numeric selection.
+  `#![forbid(unsafe_code)]`, the core→companion dependency boundary, and the
+  release-doc guards remain valid; the threat model is unchanged.
+
 ## [0.20.9] - 2026-06-23
 
 **Core numeric comfort APIs — elementwise band (RFC-038, first sub-band). Additive,

@@ -12,6 +12,7 @@ mod math;
 mod ops;
 mod parse;
 mod reshape;
+mod selection;
 mod shape;
 mod slice;
 mod tensor;

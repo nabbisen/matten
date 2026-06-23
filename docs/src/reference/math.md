@@ -29,6 +29,7 @@ and documented (see below).
 | `mean` | propagates |
 | `min` | returns `NaN` if any element is `NaN` |
 | `max` | returns `NaN` if any element is `NaN` |
+| `argmin` / `argmax` | **error/panic** if any element is `NaN` (an index is ill-defined) |
 
 ```rust
 let t = Tensor::from_vec(vec![1.0, f64::NAN, 3.0]);
@@ -41,6 +42,24 @@ assert!(t.max().is_nan());
 **Implementation note:** `min`/`max` detect `NaN` explicitly and
 short-circuit. They do **not** use `f64::min`/`f64::max` (which silently
 ignore `NaN`).
+
+## Index reductions (argmin / argmax, RFC-038)
+
+`argmin`/`argmax` return the **flat, row-major** index of the smallest/largest
+element, with the **first occurrence** winning ties:
+
+```rust
+use matten::Tensor;
+let t = Tensor::new(vec![2.0, 9.0, 3.0, 1.0, 0.0, 4.0], &[2, 3]);
+assert_eq!(t.argmin(), 4); // the 0.0
+assert_eq!(t.argmax(), 1); // the 9.0
+```
+
+Unlike the value reductions above, an index is ill-defined when any element is
+`NaN`. These therefore follow the **selection** branch of the NaN policy:
+`try_argmin`/`try_argmax` return `MattenError::InvalidArgument`, and the convenience
+`argmin`/`argmax` panic with the same context. (On a dynamic tensor the `try_*` forms
+return `MattenError::Unsupported`; call `try_numeric()` first.)
 
 ## Axis reductions
 

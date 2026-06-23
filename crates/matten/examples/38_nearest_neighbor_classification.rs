@@ -17,7 +17,7 @@
 //!
 //! ## What this demonstrates
 //! - using a `Tensor` as a labeled `[samples, features]` data matrix;
-//! - a nearest-point search (a local argmin — `matten` has no `argmin` yet);
+//! - a nearest-point search via `Tensor::argmin` (RFC-038);
 //! - composing `Tensor` row access with plain Rust arithmetic.
 //!
 //! ## Expected output
@@ -36,21 +36,15 @@ fn sq_dist(a: &[f64], b: &[f64]) -> f64 {
     a.iter().zip(b).map(|(x, y)| (x - y) * (x - y)).sum()
 }
 
-/// Label of the single nearest training point (1-NN; a local argmin).
+/// Label of the single nearest training point (1-NN), via `Tensor::argmin` over
+/// the per-training-point distances.
 fn classify(query: &[f64], train: &Tensor, labels: &[u8]) -> u8 {
     let dim = train.shape()[1];
     let data = train.as_slice();
-    let mut best = 0;
-    let mut best_d = f64::INFINITY;
-    for i in 0..train.shape()[0] {
-        let row = &data[i * dim..(i + 1) * dim];
-        let d = sq_dist(query, row);
-        if d < best_d {
-            best_d = d;
-            best = i;
-        }
-    }
-    labels[best]
+    let dists: Vec<f64> = (0..train.shape()[0])
+        .map(|i| sq_dist(query, &data[i * dim..(i + 1) * dim]))
+        .collect();
+    labels[Tensor::from_vec(dists).argmin()]
 }
 
 fn main() {

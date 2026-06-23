@@ -148,6 +148,8 @@ All panic on dynamic tensors (except `try_clip`, which returns `Unsupported`).
 | `mean_axis(axis)` | `Tensor` | |
 | `min_axis(axis)` | `Tensor` | NaN propagated per slice |
 | `max_axis(axis)` | `Tensor` | NaN propagated per slice |
+| `argmin()` / `argmax()` | `usize` | flat row-major index; first tie; panics on NaN/dynamic |
+| `try_argmin()` / `try_argmax()` | `Result<usize>` | `InvalidArgument` on NaN; `Unsupported` on dynamic |
 | `dot(rhs)` | `Tensor` | 4 shape cases; panics on dynamic |
 | `matmul(rhs)` | `Tensor` | alias for `dot`; panics on dynamic |
 

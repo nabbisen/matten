@@ -19,7 +19,7 @@
 //!
 //! ## What this demonstrates
 //! - using a `Tensor` as a `[samples, features]` data matrix;
-//! - a nearest-centroid assignment (a local argmin — `matten` has no `argmin` yet);
+//! - a nearest-centroid assignment via `Tensor::argmin` (RFC-038);
 //! - composing `Tensor` row access with plain Rust arithmetic.
 //!
 //! ## Expected output
@@ -40,18 +40,11 @@ fn sq_dist(a: &[f64], b: &[f64]) -> f64 {
     a.iter().zip(b).map(|(x, y)| (x - y) * (x - y)).sum()
 }
 
-/// Index of the nearest centroid to `point` (a local argmin).
+/// Index of the nearest centroid to `point`, via `Tensor::argmin` over the
+/// per-centroid distances.
 fn nearest(point: &[f64], centroids: &[Vec<f64>]) -> usize {
-    let mut best = 0;
-    let mut best_d = f64::INFINITY;
-    for (i, c) in centroids.iter().enumerate() {
-        let d = sq_dist(point, c);
-        if d < best_d {
-            best_d = d;
-            best = i;
-        }
-    }
-    best
+    let dists: Vec<f64> = centroids.iter().map(|c| sq_dist(point, c)).collect();
+    Tensor::from_vec(dists).argmin()
 }
 
 fn main() {
