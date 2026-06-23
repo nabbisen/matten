@@ -2,9 +2,9 @@
 
 **Project:** `matten`  
 **Document Kind:** Canonical Project Roadmap  
-**Document Version:** `1.4.0`  
+**Document Version:** `1.5.0`  
 **Date:** 2026-06-23  
-**Status:** Canonical roadmap updated for v0.20+ materialization planning and examples program. RFC-032 is consumed by the companion dependency/import convention; v0.20+ design starts at RFC-033, and the examples program is covered by RFC-043 through RFC-048.  
+**Status:** Canonical roadmap updated for v0.20+ materialization planning, the examples program, and the benchmarking & positioning program. RFC-032 is consumed by the companion dependency/import convention; v0.20+ design starts at RFC-033; the examples program is RFC-043 through RFC-048; benchmarking & positioning is RFC-049 (Track D).  
 **Planning Baseline:** core `matten` completed RFC-015 through RFC-021 (shipped through v0.15.3); RFC-022 boundary confirmation shipped in v0.16.0; v0.17.0 introduced the Cargo workspace and the `matten-ndarray` companion crate under the family version (RFC-025, RFC-027); v0.18.0 introduced the `matten-mlprep` companion crate under the family version (RFC-024, RFC-028); v0.19.0 promoted `matten-ndarray` to production-ready candidate status and `matten-mlprep` to beta status under lock-step family versioning (RFC-029); v0.19.1 shipped feature-robust dynamic rejection (RFC-031); v0.19.2 confirmed the companion dependency/import convention (RFC-032); v0.19.3 added the RFC-033-042 v0.20+ design set; v0.20.0 shipped the matten-data experimental scaffold (RFC-033); v0.20.1 shipped the matten-data table/CSV-to-Tensor API (RFC-034, RFC-035, Experimental). Under lock-step family versioning (RFC-030), every crate shares the family version (e.g. `0.19.2`); maturity is expressed by per-crate Status labels, not by separate version numbers. Next: v0.20+ materialization phase. RFC-032 is consumed by the companion dependency/import convention; v0.20+ planning starts at RFC-033. The first v0.20+ branch is `matten-data` decision/materialization; the second is small NumPy-inspired core comfort APIs that preserve the `matten` philosophy; the third is the examples program (RFC-043–048), which demonstrates famous small math/numerical problems and companion workflows without expanding product scope.
 
 ---
@@ -89,8 +89,11 @@ matten -> datafusion
 | **v0.20.0** | v0.20+ design/materialization start | RFC-033 `matten-data` experimental scaffold (shell only); workspace member + dependency pins | Design + selective implementation approval |
 | **v0.20.1** | `matten-data` table API | RFC-034 + RFC-035 implemented: `Table`/CSV ingestion/schema/numeric → `Tensor` (Experimental); `examples/csv_to_tensor.rs` shipped | Low-risk implementation |
 | **v0.20.2** | Examples program planning | RFC-043–048 added as proposed examples RFC set + compact handoff; reconciled to the additive 30+ band, dedup against the existing suite, and shipped `matten-data` | Documentation/planning patch |
+| **v0.20.3** | Examples: structure + beginner band | RFC-043 example structure/policy + RFC-044 beginner examples (`30_`–`32_`: magic square, Fibonacci-by-matrix, graph path counting); docs + smoke runs | Additive examples/docs |
+| **v0.20.4** | Examples: matrix-iteration band | RFC-045 examples (`33_` Markov chain, `34_` tiny PageRank); docs + smoke runs | Additive examples/docs |
+| **v0.20.5** | Benchmarking program planning | RFC-049 added as proposed (benchmark harness, complexity metrics, positioning report); ROADMAP Track D added | Documentation/planning patch |
 | **v0.20.x** | Minimal implementation phase | Small core comfort APIs; new 30+ famous-problem examples; audit/improve existing companion examples | Low-risk implementation only |
-| **v0.21+** | Selective production readiness | `matten-data` beta/experimental/freeze decision; companion maturity decisions; harder numerical/ML-like examples as APIs mature | Per-crate decisions |
+| **v0.21+** | Selective production readiness | `matten-data` beta/experimental/freeze decision; companion maturity decisions; harder numerical/ML-like examples as APIs mature; benchmarking & positioning (RFC-049) maturity hardening | Per-crate decisions |
 | **Later** | Streaming / large CSV, `nalgebra`, `candle`, stats/linalg companions | Separate RFCs required | Design-only until reopened |
 
 ---
@@ -314,7 +317,7 @@ Finish the v0.19 maturity work before expanding scope.
 
 ### Goal
 
-v0.20+ has three parallel tracks:
+v0.20+ has four parallel tracks:
 
 ```text
 Track A: matten-data decision/materialization
@@ -326,6 +329,11 @@ Track B: core numeric comfort APIs
 Track C: examples program
   Demonstrate accepted APIs through famous small math / numerical-computing problems
   without creating hidden dataframe, SciPy, or ML-framework scope.
+
+Track D: benchmarking & positioning
+  Build a reproducible, honest evidence base (time, memory, ELOC, dependency
+  footprint, regression visibility). Measurement and positioning only — not a
+  performance contest, and not a reason to chase larger ecosystems.
 ```
 
 The release must not become a broad clone of NumPy, SciPy, or Pandas.
@@ -358,8 +366,9 @@ RFC-032 is already consumed by another issue. v0.20+ roadmap RFCs therefore star
 | RFC-046 | Numerical Methods and Scientific Toy Examples | v0.21+ or after needed APIs |
 | RFC-047 | Small ML-Like Examples Without ML-Framework Scope | v0.21+ |
 | RFC-048 | Companion-Crate Examples | v0.20.x / v0.21+ |
+| RFC-049 | Benchmarking, Complexity Metrics, and Positioning Report | v0.20.x planning / v0.21+ maturity hardening |
 
-RFC-042 may be folded into RFC-033 if the scope guard is already strong enough. RFC-043 through RFC-048 are examples/documentation RFCs: they demonstrate accepted APIs and workflows, but do not authorize new product scope by themselves.
+RFC-042 may be folded into RFC-033 if the scope guard is already strong enough. RFC-043 through RFC-048 are examples/documentation RFCs: they demonstrate accepted APIs and workflows, but do not authorize new product scope by themselves. RFC-049 is a non-API measurement/positioning RFC: it adds a benchmark harness and reports in an isolated, `publish = false` package and must not add runtime dependencies to core `matten` or any companion.
 
 ---
 
@@ -648,7 +657,64 @@ web/network data loading
 
 ---
 
-### 9.5 What v0.20+ must not do
+### 9.5 Track D: benchmarking & positioning (RFC-049)
+
+#### Goal
+
+Build a reproducible, honest evidence base for where `matten` sits, measured rather
+than asserted: execution time, memory behavior where practical, example-code ELOC,
+dependency footprint, and regression visibility. The deliverable is a positioning
+report, not a leaderboard.
+
+This is a non-API, measurement-only program. It does not add public runtime APIs and
+must not pull benchmark tooling into core `matten` or any companion.
+
+#### Posture and sequencing
+
+RFC-049 is **planning now / implementation v0.21+ maturity hardening**. Methodology
+docs and the harness skeleton may begin in v0.20.x; the bulk lands during v0.21+
+hardening, and peer/reference comparisons follow only after an internal baseline is
+stable. Scenario benchmarks track the examples program: they cover only shipped
+examples (today `pairwise_distance`, `26_cosine_similarity`, and `30_`–`34_`), and
+grow as RFC-046/047 bands land.
+
+#### Phases
+
+```text
+Phase 1: internal baseline (matten only) — core micro + scenario + companion workloads
+Phase 2: Rust peer comparison (ndarray, nalgebra) — "peer comparison" wording
+Phase 3: ecosystem reference (NumPy, Pandas table-to-Tensor only) — "reference comparison" wording
+Phase 4: regression tracking — record/trend first; soft warnings, then thresholds via a later RFC
+```
+
+SciPy and Candle are deferred references; they are out of scope until a separate,
+task-specific decision accepts them.
+
+#### Hard constraints (binding)
+
+```text
+[ ] benchmark code lives in an isolated `publish = false` package; never a core/companion dependency
+[ ] the core dependency-boundary script still passes (no criterion/ndarray/nalgebra in core)
+[ ] no Python required for ordinary Rust build/test/CI
+[ ] no network access and no external dataset downloads during benchmarks
+[ ] no hard CI speed-fail gate initially (harness/schema failures may fail; "slower" may not)
+[ ] reports use tradeoff language; never "matten beats / replaces X"
+```
+
+#### Acceptance gate (initial)
+
+```text
+[ ] methodology docs + non-goals documented (docs/src/benchmarks/*)
+[ ] internal baseline harness compiles and runs on one maintainer machine
+[ ] selected core + companion benchmarks compile under correct features
+[ ] ELOC methodology documented; report template exists with environment metadata
+[ ] no runtime dependency added to core matten; boundary check passes
+[ ] reports avoid replacement/marketing claims
+```
+
+---
+
+### 9.6 What v0.20+ must not do
 
 v0.20+ must not become:
 
@@ -892,3 +958,4 @@ dependency gated by a non-default feature would not appear, producing a false pa
 | 1.2.0 | 2026-06-22 | Reconciled to shipped reality and architect rulings (v0.19.3): §13 corrected so the companion `pub use matten;` convenience re-export is deferred per RFC-032 (release-doc guard forbids it); planning baseline corrected to lock-step family versions (no per-crate `0.1.x`); added v0.19.2 and v0.19.3 release-theme rows. |
 | 1.3.0 | 2026-06-23 | Added examples program planning for RFC-043–048 and compact examples implementation handoff. Added v0.19.4 release-theme row; expanded v0.20+ to Track C for examples; added RFC-043–048 table entries, example groups, implementation order, acceptance gates, and non-goals. |
 | 1.4.0 | 2026-06-23 | Reconciled the examples program to architect rulings (v0.20.2): new famous-problem examples use an additive 30+ band (existing 00-28 suite preserved); cosine/distance and companion examples are cross-referenced/audited, not duplicated; matten-data csv_to_tensor marked shipped in v0.20.1; docs path examples/index.md; CI smoke-list update requirement added. Fixed the v0.19.4 version regression: replaced with accurate v0.20.0/v0.20.1/v0.20.2 release-theme rows. |
+| 1.5.0 | 2026-06-23 | Added the benchmarking & positioning program (RFC-049) as Track D: goal, posture/sequencing, phases, hard constraints, and acceptance gate; added RFC-049 to the v0.20+ RFC table; recorded the shipped v0.20.3/v0.20.4 example bands and the v0.20.5 benchmarking-planning row in the release-theme table. RFC-049 is non-API and measurement-only. |

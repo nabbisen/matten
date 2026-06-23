@@ -18,6 +18,43 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.20.5] - 2026-06-23
+
+**Benchmarking & positioning program planning (RFC-049). Documentation/planning
+patch under lock-step family versioning — no source, API, or behavior change to any
+crate.**
+
+### Added
+
+- **RFC-049 — Benchmarking, Complexity Metrics, and Positioning Report** added to
+  `rfcs/proposed/`: a reproducible, anti-marketing measurement program (execution
+  time, memory where practical, example ELOC, dependency footprint, regression
+  visibility) with peer (`ndarray`/`nalgebra`) vs reference (NumPy/Pandas)
+  separation and SciPy/Candle deferred.
+- **Benchmarking developer handoff** at
+  `rfcs/handoffs/049-benchmarking-developer-handoff.md` (PR plan, QA checklist,
+  isolated `publish = false` benchmark package).
+
+### Changed
+
+- **ROADMAP** bumped to Document Version `1.5.0`: added **Track D — benchmarking &
+  positioning** (goal, posture/sequencing, four phases, binding hard constraints,
+  acceptance gate), added RFC-049 to the v0.20+ RFC table, and recorded the shipped
+  v0.20.3 / v0.20.4 example bands plus this v0.20.5 benchmarking-planning row in the
+  release-theme table.
+- **`rfcs/README.md`** index lists RFC-049 under Proposed and points to its handoff.
+
+### Notes
+
+- RFC-049 is a non-API, measurement-only RFC. Binding constraints recorded in the
+  ROADMAP: benchmark tooling stays in an isolated `publish = false` package (never a
+  core/companion dependency), no Python in ordinary Rust CI, no network or external
+  datasets, no hard speed-fail gate initially, and reports use tradeoff language —
+  never replacement/marketing claims.
+- No new data flows, external integrations, or auth in this release; it changes only
+  planning/design documents. `#![forbid(unsafe_code)]`, the core→companion
+  dependency boundary, and the release-doc guards remain valid and unchanged.
+
 ## [0.20.4] - 2026-06-23
 
 **Examples program — matrix-iteration band (RFC-045). Additive examples and

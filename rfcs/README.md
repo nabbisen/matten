@@ -62,12 +62,16 @@ for RFC state; the Status field inside each file mirrors the folder.
 | 046 | [Numerical Methods and Scientific Toy Examples](./proposed/046-numerical-methods-and-scientific-toy-examples.md) | v0.21+ / after RFC-038 |
 | 047 | [Small ML-Like Examples Without ML-Framework Scope](./proposed/047-small-ml-like-examples-without-ml-framework-scope.md) | v0.21+ |
 | 048 | [Companion-Crate Examples](./proposed/048-companion-crate-examples.md) | v0.20.x / v0.21+ |
+| 049 | [Benchmarking, Complexity Metrics, and Positioning Report](./proposed/049-benchmarking-complexity-metrics-and-positioning-report.md) | v0.20.x planning / v0.21+ maturity hardening |
 
-Implementation handoffs for the v0.20+ proposed set (RFC-033–042) and the examples
-program (RFC-043–048) live in
+Implementation handoffs for the v0.20+ proposed set (RFC-033–042), the examples
+program (RFC-043–048), and the benchmarking program (RFC-049) live in
 [`./handoffs/`](./handoffs/). They translate each RFC into PR boundaries, checks,
 and acceptance criteria; the RFC remains the design authority. The examples handoff
 ([`043-048-examples-implementation-handoff.md`](./handoffs/043-048-examples-implementation-handoff.md))
 opens with a Phase 0 inventory of the existing example suite: new famous-problem
 examples use an additive 30+ band, and existing distance/cosine/companion examples
-are audited/improved rather than duplicated.
+are audited/improved rather than duplicated. The benchmarking handoff
+([`049-benchmarking-developer-handoff.md`](./handoffs/049-benchmarking-developer-handoff.md))
+keeps all benchmark tooling in an isolated `publish = false` package so core
+`matten` gains no benchmark dependency.
