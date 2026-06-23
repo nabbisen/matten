@@ -41,8 +41,9 @@ These examples demonstrate the default `matten` API. No extra features required.
 
 Recognizable small math / numerical-computing problems, used to show what a
 `Tensor` can represent. These live in a fresh `30+` band so the core suite above
-stays stable. Write-ups: [Beginner applied math](./beginner-math.md) and
-[Matrix iteration](./matrix-iteration.md).
+stays stable. Write-ups: [Beginner applied math](./beginner-math.md),
+[Matrix iteration](./matrix-iteration.md), and
+[Numerical methods](./numerical-methods.md).
 
 | File | What it shows |
 |---|---|
@@ -51,6 +52,8 @@ stays stable. Write-ups: [Beginner applied math](./beginner-math.md) and
 | `32_graph_path_counting.rs` | Walk counting via adjacency-matrix powers |
 | `33_markov_chain_weather.rs` | Distribution over time via vector × matrix `matmul` |
 | `34_tiny_pagerank.rs` | PageRank power iteration via matrix × vector `matmul` |
+| `35_linear_regression_gradient_descent.rs` | Batch gradient descent via `matmul` + `transpose` |
+| `36_heat_equation_1d.rs` | Explicit finite-difference stencil as `matmul` iteration |
 
 Vector distance and cosine similarity are already covered above — see
 `pairwise_distance.rs`, `25_normalize_vector.rs`, and `26_cosine_similarity.rs`

@@ -18,6 +18,37 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.20.7] - 2026-06-23
+
+**Examples program — numerical-methods band (RFC-046). Additive examples and
+documentation under lock-step family versioning; no API, behavior, or breaking
+change to any crate.**
+
+### Added
+
+- **Numerical-methods examples** (RFC-046), default Phase-1 numeric API, small
+  hard-coded inputs, deterministic self-checking output:
+  - `examples/35_linear_regression_gradient_descent.rs` — fits `y = 2x + 1` by batch
+    gradient descent, using `Tensor::matmul` for predictions and `Tensor::transpose`
+    + `matmul` for the MSE gradient;
+  - `examples/36_heat_equation_1d.rs` — explicit finite-difference heat equation on a
+    rod, encoding the stencil as a tridiagonal matrix so each time step is one
+    `Tensor::matmul`; converges to the steady-state linear profile.
+- **Examples documentation**: new `docs/src/examples/numerical-methods.md`, the two
+  examples added to the "Applied problems" table in `docs/src/examples/index.md`, and
+  a `SUMMARY.md` entry.
+- **CI smoke runs** for both new examples in `test.yaml`.
+
+### Notes
+
+- Examples continue in the additive `30+` band; the existing `00_`–`28_` suite and
+  the named/`dynamic_*` examples are unchanged. The two further numerical examples
+  (`39_finite_difference_derivative`, `40_trapezoidal_integration`) remain deferred
+  until the RFC-038 comfort APIs land.
+- No new data flows, external integrations, or auth: examples use only in-memory
+  hard-coded data. `#![forbid(unsafe_code)]`, the core→companion dependency boundary,
+  and the release-doc guards remain valid and unchanged.
+
 ## [0.20.6] - 2026-06-23
 
 **Examples program — companion-crate examples audited and improved in place
