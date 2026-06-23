@@ -18,6 +18,30 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.20.16] - 2026-06-23
+
+**Audit fix: public-API snapshot completeness. No runtime code, API, behavior, or
+dependency change.**
+
+A four-dimension audit of the project since v0.19.0 (codebase↔RFCs, tests↔requirements/
+external-design, codebase↔tests, docs↔codebase) found the codebase, tests, and
+documentation consistent, with one documentation gap:
+
+### Fixed
+
+- **`docs/src/reference/public-api-snapshot.md`:** the `Element` (`dynamic`) section
+  listed "Key methods" with only three of its six public methods. It now lists all
+  public methods (`try_as_f64`, `is_numeric`, `is_none`, `as_text`, `as_bool`, and the
+  `text(s)` constructor), consistent with the page's "every public item" contract. The
+  `#[doc(hidden)]` slice plumbing (`SliceSpecRepr`, `IntoSliceRange`, `SliceConvert`)
+  remains correctly excluded as non-public API.
+
+### Notes
+
+- No runtime behavior, data flows, integrations, or auth change — one documentation
+  page only. Threat model unchanged. Full audit findings are recorded in the v0.20.16
+  audit report.
+
 ## [0.20.15] - 2026-06-23
 
 **Documentation release-truth cleanup and release-doc guard hardening, applying the

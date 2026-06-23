@@ -257,4 +257,6 @@ pub enum Element {
 }
 ```
 
-Key methods: `try_as_f64()`, `is_none()`, `text(s)` constructor.
+Methods: `try_as_f64() -> Option<f64>`, `is_numeric() -> bool`,
+`is_none() -> bool`, `as_text() -> Option<&str>`, `as_bool() -> Option<bool>`,
+and the `text(s)` constructor.
