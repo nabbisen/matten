@@ -1,4 +1,4 @@
-//! Phase 2 dynamic feature quickstart: mixed-type tensors with `Element`.
+//! Dynamic feature quickstart: mixed-type tensors with `Element`.
 //!
 //! Run: cargo run --example dynamic_00_quickstart --features dynamic
 //!

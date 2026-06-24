@@ -1,6 +1,6 @@
 //! Pairwise Euclidean distances between rows using broadcasting and matmul.
 //!
-//! Run: cargo run --example pairwise_distance
+//! Run: cargo run --example 54_pairwise_distance
 //!
 //! Uses the identity: ||a-b||² = ||a||² + ||b||² - 2·aᵀb
 

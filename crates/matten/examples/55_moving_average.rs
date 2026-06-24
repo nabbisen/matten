@@ -1,6 +1,6 @@
 //! Simple moving average using slice windows.
 //!
-//! Run: cargo run --example moving_average
+//! Run: cargo run --example 55_moving_average
 
 use matten::Tensor;
 

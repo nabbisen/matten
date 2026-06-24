@@ -163,6 +163,26 @@ if grep -nE '^\| \[.*\]\(.*\) \| [0-9]+\.[0-9]+\.[0-9]+ ' README.md; then
   FAIL=1
 fi
 
+echo "=== Checking core matten example naming convention ==="
+# Examples reorganization ruling (architect, 2026-06-24): core matten examples must
+# follow one of the two accepted naming patterns — a two-digit-prefixed band name or
+# the dynamic_ prefix.  Unnumbered stray files (fossils, ad-hoc snippets) are not
+# permitted; they must be placed in an appropriate numbered band.
+# Allowlist: no exceptions currently.
+EXAMPLES_DIR="crates/matten/examples"
+bad_examples=()
+for f in "$EXAMPLES_DIR"/*.rs; do
+  name=$(basename "$f" .rs)
+  if [[ ! "$name" =~ ^[0-9]{2}_ ]] && [[ ! "$name" =~ ^dynamic_[0-9]{2}_ ]]; then
+    bad_examples+=("$name")
+  fi
+done
+if [ ${#bad_examples[@]} -gt 0 ]; then
+  echo "ERROR: unnumbered example(s) in crates/matten/examples/ — place in an appropriate band:"
+  printf '  %s\n' "${bad_examples[@]}"
+  FAIL=1
+fi
+
 # ---------------------------------------------------------------------------
 # Result
 # ---------------------------------------------------------------------------

@@ -60,23 +60,23 @@ stays stable. Write-ups: [Beginner applied math](./beginner-math.md),
 | `40_trapezoidal_integration.rs` | Trapezoidal rule via `linspace` + elementwise + `sum` |
 
 Vector distance and cosine similarity are already covered above — see
-`pairwise_distance.rs`, `25_normalize_vector.rs`, and `26_cosine_similarity.rs`
+`54_pairwise_distance.rs`, `25_normalize_vector.rs`, and `26_cosine_similarity.rs`
 rather than a duplicate in this band.
 
-## Pattern examples
+## Practical numeric recipes (`50_`–`56_`)
 
-Small practical PoC patterns using the numeric Tensor APIs.
+Common data-processing patterns that combine multiple primitives.
+See [Practical numeric recipes](./practical-recipes.md) for the full write-up.
 
 | File | What it shows |
 |---|---|
-| `standardize_columns.rs` | Column standardisation (z-score) |
-| `minmax_scaling.rs` | Min-max feature scaling |
-| `rowwise_scoring.rs` | Row-wise scoring |
-| `column_summary.rs` | Column summary statistics |
-| `moving_average.rs` | Simple moving average |
-| `rolling_windows_basic.rs` | Rolling window extraction |
-| `pairwise_distance.rs` | Pairwise Euclidean distances |
-| `gram_matrix.rs` | Gram matrix (X × Xᵀ) |
+| [`50_rowwise_scoring.rs`](https://github.com/nabbisen/matten/blob/main/crates/matten/examples/50_rowwise_scoring.rs) | Row-wise weighted scoring |
+| [`51_standardize_columns.rs`](https://github.com/nabbisen/matten/blob/main/crates/matten/examples/51_standardize_columns.rs) | Column standardisation (z-score) |
+| [`52_minmax_scaling.rs`](https://github.com/nabbisen/matten/blob/main/crates/matten/examples/52_minmax_scaling.rs) | Min-max feature scaling |
+| [`53_gram_matrix.rs`](https://github.com/nabbisen/matten/blob/main/crates/matten/examples/53_gram_matrix.rs) | Gram matrix (X × Xᵀ) |
+| [`54_pairwise_distance.rs`](https://github.com/nabbisen/matten/blob/main/crates/matten/examples/54_pairwise_distance.rs) | Pairwise Euclidean distances |
+| [`55_moving_average.rs`](https://github.com/nabbisen/matten/blob/main/crates/matten/examples/55_moving_average.rs) | Simple moving average |
+| [`56_rolling_windows_basic.rs`](https://github.com/nabbisen/matten/blob/main/crates/matten/examples/56_rolling_windows_basic.rs) | Rolling window sum and max |
 
 ## Dynamic examples (`--features dynamic`)
 

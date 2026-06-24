@@ -1,6 +1,6 @@
 //! Standardise (z-score normalise) each column of a matrix.
 //!
-//! Run: cargo run --example standardize_columns
+//! Run: cargo run --example 51_standardize_columns
 //!
 //! Each column is transformed to zero mean, unit variance using only
 //! existing matten ops: mean_axis, broadcasting, and element-wise arithmetic.

@@ -56,7 +56,7 @@ Source: [`32_graph_path_counting.rs`](https://github.com/nabbisen/matten/blob/ma
 Two classic beginner problems already ship as examples, so this band does not add
 duplicates:
 
-- **Vector distance** — `pairwise_distance.rs` (and `25_normalize_vector.rs`).
+- **Vector distance** — `54_pairwise_distance.rs` (and `25_normalize_vector.rs`).
 - **Cosine similarity** — `26_cosine_similarity.rs`.
 
 ## What this is not

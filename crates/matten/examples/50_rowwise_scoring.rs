@@ -1,6 +1,6 @@
 //! Row-wise weighted scoring: multiply each row by a weight vector.
 //!
-//! Run: cargo run --example rowwise_scoring
+//! Run: cargo run --example 50_rowwise_scoring
 
 use matten::Tensor;
 

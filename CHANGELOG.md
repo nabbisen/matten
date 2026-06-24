@@ -18,6 +18,64 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.20.19] - 2026-06-24
+
+**Examples reorganization: new `50_`–`56_` practical-recipes band, two fossils
+retired, naming-band guard added. No public API, behavior, or dependency change.**
+
+Applied the architect's examples-reorganization ruling (flat layout, option C for
+the unnumbered skill-demos, retire two fossils).
+
+### Added
+
+- **`50_`–`56_` practical numeric recipes band:** the seven previously unnumbered
+  skill-demo examples are renamed into a coherent new band:
+
+  | New name | Old name |
+  |---|---|
+  | `50_rowwise_scoring.rs` | `rowwise_scoring.rs` |
+  | `51_standardize_columns.rs` | `standardize_columns.rs` |
+  | `52_minmax_scaling.rs` | `minmax_scaling.rs` |
+  | `53_gram_matrix.rs` | `gram_matrix.rs` |
+  | `54_pairwise_distance.rs` | `pairwise_distance.rs` |
+  | `55_moving_average.rs` | `moving_average.rs` |
+  | `56_rolling_windows_basic.rs` | `rolling_windows_basic.rs` |
+
+- **`docs/src/examples/practical-recipes.md`:** new docs page for the `50_`–`56_`
+  band with descriptions and source links for all seven examples.
+- **Naming-band guard** in `scripts/check-release-docs.sh`: fails if any
+  `crates/matten/examples/*.rs` file does not follow the `NN_` or `dynamic_NN_`
+  prefix convention; prevents future fossil accumulation.
+
+### Removed
+
+- **`hello_tensor.rs`** — skeleton-era fossil ("M0 skeleton" docstring); fully
+  superseded by `00_quickstart.rs`.
+- **`column_summary.rs`** — duplicated `28_column_statistics.rs` without adding
+  a distinct teaching goal; `28_` is the better-documented version.
+
+### Changed
+
+- `Run:` lines in the seven renamed files updated to match their new example names.
+- Stale `"Phase 2 dynamic feature quickstart"` doc-comment in
+  `dynamic_00_quickstart.rs` corrected to `"Dynamic feature quickstart"`.
+- CI smoke runs updated: old unnumbered names removed, `50_`–`56_` runs added.
+- `docs/src/examples/index.md`: "Pattern examples" section replaced with the
+  `50_`–`56_` band table (with source links); cross-reference to `pairwise_distance`
+  updated to `54_pairwise_distance`.
+- `docs/src/examples/beginner-math.md`: cross-reference updated to
+  `54_pairwise_distance.rs`.
+- `docs/src/SUMMARY.md`: "Practical numeric recipes" page added.
+
+### Notes
+
+- No subdirectories introduced (Cargo auto-discovery benefit preserved).
+- The `14_`–`19_` gap remains reserved for future core tutorial additions
+  (v0.21 API examples). The `41_`–`49_` gap remains for optional famous-problem
+  extensions. The `50_`–`56_` band has room to grow.
+- No public API, behavior, data flow, integration, or auth change. Threat model
+  unchanged.
+
 ## [0.20.18] - 2026-06-23
 
 **Build/repository hygiene and documentation fixes. No code, API, behavior, or

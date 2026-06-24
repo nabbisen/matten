@@ -1,6 +1,6 @@
 //! Min-max (0–1) scaling of each column.
 //!
-//! Run: cargo run --example minmax_scaling
+//! Run: cargo run --example 52_minmax_scaling
 
 use matten::Tensor;
 

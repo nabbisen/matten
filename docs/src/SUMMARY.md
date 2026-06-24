@@ -18,6 +18,7 @@
 - [Matrix iteration](./examples/matrix-iteration.md)
 - [Numerical methods](./examples/numerical-methods.md)
 - [ML-like](./examples/ml-like.md)
+- [Practical numeric recipes](./examples/practical-recipes.md)
 - [Companion crate examples](./examples/companions.md)
 
 # Reference

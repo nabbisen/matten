@@ -1,6 +1,6 @@
 //! Gram matrix: G = X · Xᵀ, used in kernel methods and feature covariance.
 //!
-//! Run: cargo run --example gram_matrix
+//! Run: cargo run --example 53_gram_matrix
 
 use matten::Tensor;
 

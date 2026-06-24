@@ -113,10 +113,15 @@ jobs:
       - run: cargo run -p matten --example 38_nearest_neighbor_classification
       - run: cargo run -p matten --example 39_finite_difference_derivative
       - run: cargo run -p matten --example 40_trapezoidal_integration
+      - run: cargo run -p matten --example 50_rowwise_scoring
+      - run: cargo run -p matten --example 51_standardize_columns
+      - run: cargo run -p matten --example 52_minmax_scaling
+      - run: cargo run -p matten --example 53_gram_matrix
+      - run: cargo run -p matten --example 54_pairwise_distance
+      - run: cargo run -p matten --example 55_moving_average
+      - run: cargo run -p matten --example 56_rolling_windows_basic
       - run: cargo run -p matten --example dynamic_00_quickstart --features dynamic,json,csv
       - run: cargo run -p matten --example dynamic_05_dirty_csv_cleanup --features dynamic,json,csv
-      - run: cargo run -p matten --example standardize_columns
-      - run: cargo run -p matten --example gram_matrix
       - run: cargo run -p matten --example 13_resource_limits
       - run: cargo run -p matten --example 27_axis_reductions
       - run: cargo run -p matten --example 28_column_statistics

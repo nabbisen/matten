@@ -1,6 +1,6 @@
 //! Rolling window operations: sum and max over overlapping slices.
 //!
-//! Run: cargo run --example rolling_windows_basic
+//! Run: cargo run --example 56_rolling_windows_basic
 
 use matten::Tensor;
 
