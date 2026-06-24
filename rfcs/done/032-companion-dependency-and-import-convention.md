@@ -174,6 +174,27 @@ Net-new work introduced by this RFC (small, doc/tooling only):
 2. A release-doc-script guardrail enforcing the convention.
 3. This RFC, recording the convention and the deferred-convenience decision.
 
+### 5.1 Scope clarification — workspace-excluded internal tooling (architect ruling, 2026-06-24)
+
+RFC-032 governs the **published, user-facing** `matten` crate family and the companion
+crates intended for users. **Workspace-excluded, `publish = false` internal tooling — such
+as regression fixtures (`tests/fixtures/dynamic_rejection_unification`) and the RFC-049
+benchmark harness (`benchmarks/`) — is outside this convention's packaging scope.** Such
+tooling may use path-only dependencies, a placeholder version (`0.0.0`), and a targeted
+core-feature passthrough (e.g. `dynamic = ["matten/dynamic"]`) without being treated as a
+published companion.
+
+Such tooling should still follow the **ownership-clarity spirit** where practical: do not
+re-export core `matten` types (`pub use matten::Tensor;`), and import core types from
+`matten` directly (`use matten::Tensor;`). Gratuitous forwarding of *every* core feature is
+still discouraged, but a single targeted passthrough used for benchmarking/testing is fine.
+
+The RFC-032 release-doc guard is intentionally **not** extended to scan `benchmarks/` or
+`tests/fixtures/`, to keep published-family policy and internal-tooling policy from blurring.
+Peer/benchmark dependency containment for those excluded crates is instead proven by the
+separate published-crate dependency isolation guard
+(`scripts/check-published-dependency-isolation.sh`, RFC-049 §B1).
+
 ---
 
 ## 6. Compatibility

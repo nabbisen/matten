@@ -18,7 +18,58 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
-## [0.22.2] - 2026-06-24
+## [0.22.3] - 2026-06-24
+
+**RFC-032 scope carve-out + published-crate dependency isolation guard** (benchmarking /
+positioning review follow-up). Documentation, guard, and CI only — no library code, public
+API, or runtime behavior change in any crate.
+
+The architect's review of the two benchmarking/positioning review requests ruled: (A)
+workspace-excluded `publish = false` internal tooling is outside RFC-032's published,
+user-facing scope (record the carve-out; change nothing in `benchmarks/` or the fixture);
+and (B) settle the RFC-049 Phase 2 design now but do **not** implement it — Phase 2 waits
+for a maintainer-run credible baseline report and separate authorization.
+
+### Added
+
+- **`scripts/check-published-dependency-isolation.sh`** (RFC-049 §B1): positively proves
+  every published crate is free of peer/benchmark dependencies, rather than relying only on
+  the harness being workspace-excluded. Per-crate matrix: core / `matten-data` /
+  `matten-mlprep` forbid `criterion`/`ndarray`/`nalgebra`; `matten-ndarray` forbids
+  `criterion`/`nalgebra` but is allowed `ndarray` (its bridge reason). Passes today; wired
+  into CI (after the RFC-022 core boundary check) and the release checklist. Inspected with
+  `--all-features --edges normal,build`, mirroring the core guard.
+- **`benchmarks/reports/BASELINE-READY-CHECKLIST.md`** (RFC-049 §B4): the "report ready"
+  checklist that must be satisfied by a maintainer-run baseline before Phase 2 is authorized.
+
+### Changed
+
+- **RFC-032** gains a §5.1 scope clarification: workspace-excluded, `publish = false`
+  internal tooling (the RFC-031 fixture, the RFC-049 harness) is outside the published-family
+  convention's packaging scope, while still following its ownership-clarity spirit (no
+  core-type re-export; import core types from `matten`). Records that the RFC-032 guard is
+  intentionally not extended to scan that tooling, and that isolation is proven by the new
+  per-crate guard instead.
+- **RFC-049** Phase 2 section annotated with the settled design rulings (B1 isolation guard,
+  B2 structural `peers`-feature/comparable-task enforcement, B3 opt-in/off-by-default build &
+  CI shape, B4 baseline-report entry precondition) — marked **designed, not yet authorized**.
+- **Benchmark methodology doc** and the **baseline report template** updated to record the
+  Phase 2 design (opt-in `peers`, task-scoped comparison, published-crate isolation) and to
+  point at the unlock checklist.
+
+### Not done (deferred by ruling)
+
+- RFC-049 Phase 2 implementation (the `peers` feature, peer `ndarray`/`nalgebra` workloads,
+  peer benches/CI) is **not** started. It remains unauthorized until a maintainer-run
+  credible internal baseline report is delivered and accepted.
+
+### Threat model
+
+No new runtime surface. The new guard strengthens published-crate dependency integrity (a
+defensive check that passes against the current clean tree and pre-positions the isolation
+proof before any peer dependency exists). No published crate gained or lost a dependency.
+
+
 
 **Lifecycle wording cleanup (v0.22.0 handoff-review P2 follow-up).** Documentation /
 RFC-lifecycle only — no library code, public API, runtime behavior, examples, guards, or

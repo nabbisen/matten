@@ -21,6 +21,8 @@ jobs:
         run: cargo fmt --all --check
       - name: Core dependency boundary (RFC-022)
         run: bash scripts/check-core-dependency-boundary.sh
+      - name: Published dependency isolation (RFC-049 §B1)
+        run: bash scripts/check-published-dependency-isolation.sh
       - name: Release documentation truth checks
         run: bash scripts/check-release-docs.sh
       - name: Clippy (workspace, all features)

@@ -8,6 +8,10 @@ itself, to establish a reference point and make future regressions visible. It d
 **not** compare against `ndarray`, `nalgebra`, NumPy, or Pandas — those are Phases 2–3
 and are not yet implemented.
 
+> When this report is completed on a representative machine (every item in
+> [`BASELINE-READY-CHECKLIST.md`](./BASELINE-READY-CHECKLIST.md) satisfied) and accepted,
+> it becomes the artifact that unlocks RFC-049 Phase 2 authorization.
+
 ## How to regenerate
 
 ```bash

@@ -10,6 +10,7 @@ It is the canonical gate referenced by RFC-015.
 ```bash
 cargo fmt --all --check
 bash scripts/check-core-dependency-boundary.sh   # RFC-022 core boundary gate
+bash scripts/check-published-dependency-isolation.sh  # RFC-049 §B1 per-crate peer-dep isolation
 bash scripts/check-matten-data-scope.sh          # RFC-042 matten-data anti-scope guard
 bash scripts/check-release-docs.sh               # doc-truth + examples naming-band guards
 cargo clippy --all-targets --all-features -- -D warnings

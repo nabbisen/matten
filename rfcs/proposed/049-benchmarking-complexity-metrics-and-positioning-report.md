@@ -382,6 +382,33 @@ Acceptance:
 
 ### Phase 2: Rust peer comparison
 
+> **Phase 2 design rulings (architect, 2026-06-24) — DESIGNED, NOT YET AUTHORIZED.**
+> Phase 2 implementation must not begin until a maintainer-run credible internal baseline
+> report (Phase 1) is produced and accepted; Phase 2 is then authorized separately. The
+> following design is settled so the eventual handoff is unambiguous:
+>
+> - **Peer-dependency isolation (B1).** Do not rely on workspace exclusion alone. Published
+>   crates must be *positively proven* free of peer deps via
+>   `scripts/check-published-dependency-isolation.sh` (shipped in v0.22.3): core/`matten-data`/
+>   `matten-mlprep` forbid `criterion`/`ndarray`/`nalgebra`; `matten-ndarray` forbids
+>   `criterion`/`nalgebra` but is allowed `ndarray` (its bridge reason). This guard is the
+>   "published dependency isolation acceptance criteria" for the Phase 2 handoff.
+> - **Comparable-tasks enforcement (B2).** Structural, not convention-only. Peer code lives
+>   behind an opt-in `peers` feature (`peers = ["dep:ndarray", "dep:nalgebra"]`) in fixed
+>   modules (`benchmarks/src/workloads/peers/{ndarray_tasks,nalgebra_tasks}.rs`,
+>   `benchmarks/benches/peers.rs`) with an enumerated task list. `nalgebra` is restricted to
+>   small vector/matrix/iterative tasks (never N-D, broadcasting, ingestion, or arbitrary-axis
+>   reductions); `ndarray` covers N-D-comparable tasks. Each peer task must document why it is
+>   comparable, which crate is a suitable peer, and what is intentionally not compared. Peer
+>   comparison is **task-scoped, not library-scoped.**
+> - **Build/CI shape (B3).** Peer deps are `optional = true` and off by default; the default
+>   harness build and the existing `--no-run` CI check stay peer-free. Peer compile-checks are
+>   manual/scheduled/separate-workflow only; peer benchmarks never run in ordinary CI and are
+>   never speed/memory gates. Record peer crate versions in reports.
+> - **Entry precondition (B4).** Phase 2 unlocks only after the maintainer-run baseline report
+>   is delivered and accepted — see `benchmarks/reports/BASELINE-READY-CHECKLIST.md`. A
+>   template or sandbox sample is not sufficient.
+
 Compare selected tasks with:
 
 ```text
