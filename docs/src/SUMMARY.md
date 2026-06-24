@@ -19,6 +19,7 @@
 - [Numerical methods](./examples/numerical-methods.md)
 - [ML-like](./examples/ml-like.md)
 - [Practical numeric recipes](./examples/practical-recipes.md)
+- [matten-data: table to Tensor](./examples/data.md)
 - [Companion crate examples](./examples/companions.md)
 
 # Reference

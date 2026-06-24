@@ -94,9 +94,14 @@ The following items were considered and explicitly deferred:
 The **v0.20 family** completed the materialization phase: the core numeric comfort
 APIs (RFC-038 — elementwise, selection, creation, and shape helpers) and the
 `30_`–`40_` famous-problem examples program (RFC-043–048). The `matten-data`
-CSV→tensor ingestion API shipped as Experimental.
+CSV→tensor ingestion API first shipped in this family (RFC-034, RFC-035).
 
 The **v0.21 family** delivered selective boundary implementation: shape composition
 (`concatenate` / `stack`), small statistics (`var` / `std`), linalg-lite helpers
 (`norm` / `trace` / `outer`), and the `matten-data` scope guard. These are additive
+under lock-step family versioning (RFC-030).
+
+The **v0.22 family** promotes `matten-data` to **Beta**: the RFC-036 example suite
+(`data_00`–`data_05`) plus an explicit malformed-CSV test complete the documented
+Beta gate (RFC-023 §9). Maturity is a per-crate Status label, not a separate version,
 under lock-step family versioning (RFC-030).

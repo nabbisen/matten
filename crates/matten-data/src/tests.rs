@@ -52,6 +52,27 @@ fn empty_header_is_rejected() {
 }
 
 #[test]
+fn malformed_csv_is_a_structured_error_never_a_panic() {
+    // RFC-035 §1: malformed input must return a `Result`, never panic and never
+    // silently produce a wrong `Table`. The `csv` crate is configured lenient +
+    // flexible, so an unterminated quoted field is not surfaced as a parser error;
+    // it swallows the line break and the resulting record has the wrong cell count,
+    // which `matten-data` reports as a precise `RaggedRow`. (Header-structure
+    // malformations such as a blank header column surface as `Csv` instead — see
+    // `empty_header_is_rejected`.) Either way the contract is the same: a structured
+    // error, not a panic. Assert that union so the test is robust to the parser's
+    // lenient quote handling.
+    let result = Table::from_csv_str("a,b\n\"1,2\n3,4");
+    assert!(
+        matches!(
+            result,
+            Err(MattenDataError::RaggedRow { .. }) | Err(MattenDataError::Csv { .. })
+        ),
+        "unterminated quote must be a structured RaggedRow/Csv error, got {result:?}"
+    );
+}
+
+#[test]
 fn ragged_row_too_long_is_rejected() {
     match Table::from_csv_str("a,b\n1,2,3") {
         Err(MattenDataError::RaggedRow {

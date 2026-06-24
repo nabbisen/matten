@@ -2,10 +2,11 @@
 
 [![license](https://img.shields.io/crates/l/matten-data.svg)](../../LICENSE)
 
-> **Experimental (`0.21.x` family).** A scope-locked companion crate (RFC-033).
+> **Beta (`0.22.x` family).** A scope-locked companion crate (RFC-033).
 > The table-to-Tensor API (CSV ingestion, schema summary, column selection,
-> missing-value handling, explicit numeric conversion) is available as of v0.20.1
-> (RFC-034, RFC-035). The API may change before beta; pin the minor version.
+> missing-value handling, explicit numeric conversion) shipped in v0.20.1
+> (RFC-034, RFC-035) and was promoted to Beta in v0.22.0 (RFC-036). The API is
+> mostly stable but pre-1.0; pin the minor version.
 
 Part of the [`matten` workspace](../../README.md) — see it for the full family.
 
@@ -56,7 +57,7 @@ expose a second computation engine.
 
 ## Status and scope
 
-- **Maturity:** experimental. The API is available but remains Experimental and may change before beta; pin the version.
+- **Maturity:** beta. The table-to-Tensor API is mostly stable but pre-1.0; pin the minor version.
 - **Scope lock:** table-to-Tensor preparation only (RFC-033, RFC-042).
 - **Dependency direction:** `matten-data` depends on core `matten`; core never
   depends on `matten-data` (enforced by the dependency-boundary CI check).

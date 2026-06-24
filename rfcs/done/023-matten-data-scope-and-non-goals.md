@@ -1,7 +1,8 @@
 # RFC-023: `matten-data` Scope and Non-goals
 
-**Status:** Proposed  
+**Status:** Resolved (v0.22.0)  
 **Target:** experimental only before v0.20; beta decision no earlier than v0.20+  
+**Resolution:** Outcome B (kept Experimental through the v0.21 family). The §9 Beta gate was met in v0.22.0 via the full RFC-036 example suite and an explicit malformed-CSV test, and `matten-data` was promoted to Beta (architect ruling, 2026-06-24).  
 **Theme:** Table-to-Tensor companion crate, strict scope control  
 **Depends on:** RFC-016, RFC-017, RFC-022  
 **Supersedes:** older target language that allowed `matten-data` PoC as the main v0.17 companion milestone

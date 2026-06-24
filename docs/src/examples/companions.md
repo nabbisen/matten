@@ -40,15 +40,21 @@ cargo run -p matten-mlprep --example mlprep_standardize_columns
 cargo run -p matten-mlprep --example mlprep_train_test_split
 ```
 
-## `matten-data` — table-to-Tensor (Experimental)
+## `matten-data` — table-to-Tensor (Beta)
 
 | Example | What it shows |
 |---|---|
-| [`csv_to_tensor`](https://github.com/nabbisen/matten/blob/main/crates/matten-data/examples/csv_to_tensor.rs) | CSV string → inspect → select columns → fill missing → numeric `Tensor` |
+| [`data_00_quickstart`](https://github.com/nabbisen/matten/blob/main/crates/matten-data/examples/data_00_quickstart.rs) | The full happy path in one place |
+| [`data_01_schema_summary`](https://github.com/nabbisen/matten/blob/main/crates/matten-data/examples/data_01_schema_summary.rs) | Inspect rows, columns, names, missing counts, kinds |
+| [`data_02_select_columns`](https://github.com/nabbisen/matten/blob/main/crates/matten-data/examples/data_02_select_columns.rs) | Select by name; output order matches the request |
+| [`data_03_missing_values`](https://github.com/nabbisen/matten/blob/main/crates/matten-data/examples/data_03_missing_values.rs) | Missing values never become zero silently |
+| [`data_04_to_tensor`](https://github.com/nabbisen/matten/blob/main/crates/matten-data/examples/data_04_to_tensor.rs) | Output shape, row-major order, core interop |
+| [`data_05_errors`](https://github.com/nabbisen/matten/blob/main/crates/matten-data/examples/data_05_errors.rs) | The common boundary errors |
+| [`csv_to_tensor`](https://github.com/nabbisen/matten/blob/main/crates/matten-data/examples/csv_to_tensor.rs) | Comprehensive overview of the whole workflow |
 
-`matten-data` is **Experimental** and intentionally small. It is **not** a dataframe:
+`matten-data` is **Beta** and intentionally small. It is **not** a dataframe:
 no group-by, join, merge, pivot, or query. Missing values and numeric conversion are
-explicit, never silent.
+explicit, never silent. See [matten-data: table to Tensor](./data.md) for the full guide.
 
 ```bash
 cargo run -p matten-data --example csv_to_tensor

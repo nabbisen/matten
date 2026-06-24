@@ -8,7 +8,7 @@
 //! `[rows, columns]` f64 `Tensor`.
 //!
 //! ## Teaching points
-//! - `matten-data` is **Experimental** and intentionally small;
+//! - `matten-data` is **Beta** and intentionally small;
 //! - it is **not** a dataframe: no group-by, join, merge, pivot, or query;
 //! - missing values and numeric conversion are **explicit** (`fill_missing` then
 //!   `try_numeric`), never silent;

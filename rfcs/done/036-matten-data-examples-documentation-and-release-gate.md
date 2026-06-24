@@ -1,7 +1,8 @@
 # RFC-036: `matten-data` Examples, Documentation, and Release Gate
 
-**Status:** Proposed  
-**Target Release:** v0.20.x  
+**Status:** Implemented (v0.22.0)  
+**Target Release:** v0.22.0  
+**Implemented:** The six-example suite (`data_00`–`data_05`) plus an explicit malformed-CSV test landed in v0.22.0, completing the RFC-023 §9 Beta gate and promoting `matten-data` to Beta (architect ruling, 2026-06-24).  
 **Related:** RFC-033, RFC-034, RFC-035, RFC-037, RFC-042  
 **Scope:** Example suite, documentation, CI, and release quality gates for `matten-data`
 

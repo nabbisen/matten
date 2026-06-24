@@ -78,8 +78,9 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: dtolnay/rust-toolchain@stable
-      - run: cargo check -p matten-data
+      - run: cargo check -p matten-data --examples
       - run: cargo clippy -p matten-data --all-targets -- -D warnings
+      - run: cargo test -p matten-data
       - run: cargo test -p matten-data --doc
       - name: matten-data anti-scope guard (RFC-042)
         run: bash scripts/check-matten-data-scope.sh
@@ -144,3 +145,9 @@ jobs:
       - run: cargo run -p matten-mlprep --example mlprep_train_test_split
       # matten-data
       - run: cargo run -p matten-data --example csv_to_tensor
+      - run: cargo run -p matten-data --example data_00_quickstart
+      - run: cargo run -p matten-data --example data_01_schema_summary
+      - run: cargo run -p matten-data --example data_02_select_columns
+      - run: cargo run -p matten-data --example data_03_missing_values
+      - run: cargo run -p matten-data --example data_04_to_tensor
+      - run: cargo run -p matten-data --example data_05_errors

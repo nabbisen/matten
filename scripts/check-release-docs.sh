@@ -79,6 +79,24 @@ if grep -in "Experimental (0\." "$MLPREP/src/lib.rs"; then
   FAIL=1
 fi
 
+echo "=== Checking matten-data declares Beta, not Experimental (RFC-036 / v0.22.0) ==="
+# matten-data was promoted to Beta in v0.22.0 once the RFC-036 example suite and the
+# malformed-CSV test cleared the RFC-023 §9 gate. Its own current docs (and the
+# matten-data rows/sections of shared docs) must not call it Experimental. Historical
+# references in rfcs/, CHANGELOG.md, and ROADMAP.md are allowed.
+if grep -rIni "experimental" "$DATA/README.md" "$DATA/src/lib.rs" docs/src/examples/data.md "$DATA/examples" 2>/dev/null; then
+  echo "ERROR: matten-data current docs still say Experimental (it is Beta as of v0.22.0)"
+  FAIL=1
+fi
+if ! grep -qi "beta" "$DATA/README.md"; then
+  echo "ERROR: matten-data README does not declare Beta status"
+  FAIL=1
+fi
+if grep -niE "matten-data.*experimental|table-to-Tensor \(Experimental\)" README.md docs/src/examples/companions.md docs/src/reference/compatibility.md; then
+  echo "ERROR: a shared doc still marks matten-data Experimental (should be Beta)"
+  FAIL=1
+fi
+
 # ---------------------------------------------------------------------------
 # Companion dynamic-rejection guard soundness (RFC-031)
 # ---------------------------------------------------------------------------
@@ -130,7 +148,7 @@ echo "=== Checking for stale prior-family version references in user-facing docs
 # minor is not the current one (so 0.15/0.19/0.20/... are all caught after a bump).
 # Full historical patch refs (e.g. "available as of v0.20.1" shipped-in notes) are
 # NOT matched, and rfcs/ + CHANGELOG.md + ROADMAP.md remain outside USER_DOCS.
-CURRENT_MINOR="21"
+CURRENT_MINOR="22"
 # (a) install-snippet version pins: `<crate> = "0.NN"` / `version = "0.NN"`
 if grep -rInE '(version|matten[a-z-]*) = "0\.[0-9]+"' "${USER_DOCS[@]}" 2>/dev/null \
    | grep -vE "= \"0\.${CURRENT_MINOR}\""; then

@@ -18,7 +18,60 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
-## [0.21.4] - 2026-06-24
+## [0.22.0] - 2026-06-24
+
+**`matten-data` promoted to Beta.** This release completes the documented Beta gate
+(RFC-023 §9) for `matten-data` and flips its status label from Experimental to Beta.
+It is an examples / documentation / tests / tooling release — there is **no change to
+any library code, public API, or runtime behavior** in any crate. Maturity is a
+per-crate status label under lock-step family versioning (RFC-030), so this is a new
+minor family purely to communicate the visible maturity milestone.
+
+### Added
+
+- **`matten-data` example suite (RFC-036 §3).** Six numbered tutorial examples that
+  teach the workflow one step at a time: `data_00_quickstart`, `data_01_schema_summary`,
+  `data_02_select_columns`, `data_03_missing_values`, `data_04_to_tensor`, and
+  `data_05_errors`. The existing `csv_to_tensor` is kept as the comprehensive overview
+  (architect ruling: example Option 1).
+- **Explicit malformed-CSV test** (`malformed_csv_is_a_structured_error_never_a_panic`),
+  completing the §9 error-case coverage. `matten-data` is now 34 tests.
+- **`docs/src/examples/data.md`** — a dedicated `matten-data` guide (purpose, install,
+  quickstart, output `Tensor` shape, missing-value policy, numeric-conversion policy,
+  limitations, status/maturity), wired into the mdBook summary.
+
+### Changed
+
+- **`matten-data` status: Experimental → Beta** across `crates/matten-data/README.md`,
+  `crates/matten-data/src/lib.rs`, the root `README.md` crate table,
+  `docs/src/examples/companions.md`, and `docs/src/reference/compatibility.md`.
+- **Family bump `0.21` → `0.22`** for current-family labels and install pins across the
+  user-facing docs (the internal `matten` path+version pin moved with it).
+- **Release-docs guard** (`scripts/check-release-docs.sh`): `CURRENT_MINOR` `21` → `22`,
+  plus a new check that current `matten-data` docs declare Beta and never Experimental
+  (historical `rfcs/`, `CHANGELOG.md`, `ROADMAP.md` references remain allowed).
+- **CI** (`.github/workflows/test.yaml`): the `matten-data` job now runs
+  `cargo check -p matten-data --examples` and `cargo test -p matten-data` (RFC-036 §7),
+  and the smoke job runs all six `data_*` examples.
+
+### RFC lifecycle
+
+- **RFC-036** (`matten-data` Examples, Documentation, and Release Gate) → Implemented (0.22.0).
+- **RFC-023** (`matten-data` Scope and Non-goals) → Resolved (0.22.0): Outcome B selected
+  (kept Experimental through the v0.21 family), then promoted to Beta once the gate was met.
+
+### Threat model
+
+No new runtime surface. The release adds examples, documentation, one test, and tooling/CI
+only; no library code path changed. Note (surfaced from implementation): with the lenient
+`csv` configuration (`flexible(true)`, `&str` input), the `csv` crate does **not** emit
+parser errors for malformed input such as unterminated quotes — those resolve to a precise
+structural `RaggedRow`, and header-structure problems surface as `Csv`. The new test
+therefore asserts the real contract (malformed input is always a structured error, never a
+panic or a silently-wrong table) rather than a parser-error variant that this configuration
+cannot produce.
+
+
 
 **Release-truth and CI-gate patch (v0.21.3 deep-review P1 fixes). Documentation,
 tooling, and examples only — no library code, API, or behavior change.**
