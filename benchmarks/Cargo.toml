@@ -1,0 +1,49 @@
+# Internal benchmark harness for the `matten` workspace (RFC-049 Phase 1).
+#
+# This crate is intentionally OUTSIDE the workspace (`workspace.exclude` in the
+# root Cargo.toml). Its benchmark-only dependencies (criterion) must never enter
+# the dependency graph of any published crate. It is invoked explicitly:
+#
+#     cargo bench --manifest-path benchmarks/Cargo.toml --no-run        # compile-check
+#     cargo bench --manifest-path benchmarks/Cargo.toml --bench core -- --noplot
+#
+# It is not published.
+[package]
+name = "matten-benchmarks"
+version = "0.0.0"
+edition = "2024"
+rust-version = "1.85"
+publish = false
+license = "Apache-2.0"
+description = "Internal, non-published benchmark harness for the matten workspace (RFC-049 Phase 1)."
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+# Path dependency on core matten only. No companion crates and no peer/reference
+# numeric crates in Phase 1.
+matten = { path = "../crates/matten", default-features = false }
+
+[dev-dependencies]
+# Benchmark-only. default-features = false drops plotters/rayon; keep just the
+# cargo-bench integration so the harness compiles light for CI's --no-run check.
+criterion = { version = "0.5", default-features = false, features = ["cargo_bench_support"] }
+
+# Optional passthrough so the dynamic `try_numeric` micro-workload can be measured
+# when explicitly requested. Off by default (Phase 1 stays minimal).
+[features]
+default = []
+dynamic = ["matten/dynamic"]
+
+[[bench]]
+name = "core"
+harness = false
+
+[[bench]]
+name = "scenarios"
+harness = false
+
+# Keep benchmark builds optimized so measurements are meaningful.
+[profile.bench]
+opt-level = 3

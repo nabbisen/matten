@@ -15,6 +15,12 @@ members = [
 # Cargo.lock.
 exclude = [
     "tests/fixtures/dynamic_rejection_unification",
+    # The RFC-049 benchmark harness is intentionally OUT of the workspace so its
+    # benchmark-only dependencies (criterion, and later peer crates) never enter
+    # the published crates' dependency graph or the core dependency-boundary check.
+    # It is invoked explicitly via `--manifest-path benchmarks/Cargo.toml`, has its
+    # own git-ignored Cargo.lock, and is publish = false.
+    "benchmarks",
 ]
 
 # Shared package metadata inherited by member crates via `field.workspace = true`.
@@ -22,7 +28,7 @@ exclude = [
 # this version. Per-crate `keywords`/`categories`/`description` are NOT shared —
 # they differ per crate and aid crates.io discoverability.
 [workspace.package]
-version = "0.22.0"
+version = "0.22.1"
 edition = "2024"
 rust-version = "1.85"
 license = "Apache-2.0"

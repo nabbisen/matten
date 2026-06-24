@@ -18,7 +18,55 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
-## [0.22.0] - 2026-06-24
+## [0.22.1] - 2026-06-24
+
+**RFC-049 Phase 1 — internal benchmark baseline.** The architect accepted RFC-049 with a
+staged mandate and authorized **Phase 1 only** (PR-049-1 + PR-049-2). This release adds a
+small, isolated benchmark harness and its methodology docs. It is tooling + documentation
+only — **no change to any published crate's code, public API, or runtime behavior**, and
+no new dependency enters any published crate.
+
+### Added
+
+- **Benchmark harness** under `benchmarks/` (PR-049-2): a `criterion` harness kept
+  **outside** the Cargo workspace (`workspace.exclude`), `publish = false`, invoked via an
+  explicit `--manifest-path`. Workloads live in a plain library (`src/workloads/{core,scenarios}.rs`,
+  `src/common.rs`) with no `criterion` dependency; only the bench targets
+  (`benches/{core,scenarios}.rs`) use it. Covers the core micro set (construction,
+  reshape/flatten, elementwise add/mul, broadcasting, `sum`/`mean`, `sum_axis`/`mean_axis`,
+  `matmul`, slice; optional dynamic `try_numeric` behind a `dynamic` feature) and the five
+  scenario workloads from examples 26/33/34/35/36 (cosine similarity, Markov step, PageRank
+  step, linear-regression GD step, heat-equation step).
+- **Benchmark methodology docs** (PR-049-1): `benchmarks/README.md`,
+  `docs/src/benchmarks/index.md`, and `docs/src/benchmarks/methodology.md` (purpose,
+  non-goals, metrics, environment recording, Linux peak-RSS memory policy, Phase-1-only
+  scope, required disclaimer), wired into the mdBook summary.
+- **Internal baseline report template** (`benchmarks/reports/internal-baseline-v0.1.md`) per
+  the §6 structure, plus `benchmarks/results/README.md` recording the commit policy (curated
+  reports and small sample schemas only — not bulky raw histories).
+
+### Changed
+
+- **Core dependency-boundary guard** now also forbids `criterion` in core `matten`'s tree
+  (RFC-049 §7), making the benchmark-dependency isolation enforced, not just structural.
+- **CI**: a dedicated `benchmarks` job compile-checks the harness
+  (`cargo bench --manifest-path benchmarks/Cargo.toml --no-run`). Full benchmarks are never
+  run in normal CI and there are **no speed/memory pass-fail gates** (§5).
+- `benchmarks/Cargo.lock` is git-ignored (workspace-excluded crate, regenerated on demand).
+
+### RFC lifecycle
+
+- **RFC-049** → **Accepted** (Phase 1 authorized and implemented in 0.22.1; Phases 2–4
+  deferred). Per the 4-folder lifecycle, it stays in `proposed/` until fully implemented.
+
+### Threat model
+
+No new runtime surface and no new dependency in any published crate. The benchmark harness is
+a workspace-excluded, unpublished dev tool; its `criterion` dependency is isolated from the
+published dependency graph and now guarded against regression. Supply-chain note: `criterion`
+and its transitive deps are confined to the excluded `benchmarks/` crate (§12, §18).
+
+
 
 **`matten-data` promoted to Beta.** This release completes the documented Beta gate
 (RFC-023 §9) for `matten-data` and flips its status label from Experimental to Beta.

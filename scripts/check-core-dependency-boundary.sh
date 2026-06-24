@@ -23,6 +23,7 @@ FORBIDDEN=(
   matten-ndarray
   matten-mlprep
   matten-data
+  criterion
 )
 
 if ! command -v cargo >/dev/null 2>&1; then

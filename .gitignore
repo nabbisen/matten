@@ -25,3 +25,7 @@ target
 # RFC-031). Their Cargo.lock is regenerated on demand and must not be tracked as a
 # second workspace lock.
 /tests/fixtures/*/Cargo.lock
+
+# The RFC-049 benchmark harness is a workspace-excluded crate (publish = false);
+# its Cargo.lock is regenerated on demand and must not be tracked (see RFC-049 Q2).
+/benchmarks/Cargo.lock

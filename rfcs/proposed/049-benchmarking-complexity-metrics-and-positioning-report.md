@@ -1,7 +1,13 @@
 # RFC-049: Benchmarking, Complexity Metrics, and Positioning Report
 
-**Status:** Proposed  
-**Target Release:** v0.20.x planning / v0.21+ maturity hardening  
+**Status:** Accepted (Phase 1 authorized; Phases 2–4 deferred)  
+**Target Release:** Phase 1 internal baseline in v0.22.1; later phases TBD  
+**Acceptance:** Approved by architect ruling (2026-06-24). Phase 1 (PR-049-1 methodology
+docs + PR-049-2 internal Rust baseline harness) is authorized and implemented in v0.22.1.
+Phase 2 (Rust peer comparison), Phase 3 (NumPy/Pandas reference comparison), and Phase 4
+(regression thresholds) remain designed but **not yet authorized for implementation** —
+they wait until Phase 1 produces one credible internal baseline report. Per the 4-folder
+RFC lifecycle, this RFC stays in `proposed/` until fully implemented.  
 **Owner:** `matten` maintainers  
 **Related:** RFC-030, RFC-033–048, RFC-038, RFC-040, RFC-041  
 **Scope:** Benchmark harness, reproducible measurement policy, complexity metrics, positioning report  

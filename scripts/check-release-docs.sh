@@ -185,8 +185,10 @@ echo "=== Checking for retired 'Phase 1 / Phase 2' wording in user-facing docs a
 # RFC-lifecycle ruling (pre-v0.19.0 audit, Q1) + v0.21.3 deep review: the Phase 1/
 # Phase 2 vocabulary is retired from current user-facing docs AND examples in favor
 # of numeric-Tensor / dynamic-ingestion terminology. Historical RFCs (rfcs/) and
-# CHANGELOG.md may retain it.
-if grep -rIn 'Phase[ -]1\|Phase[ -]2' "${USER_DOCS[@]}" "$CORE/examples" 2>/dev/null; then
+# CHANGELOG.md may retain it. The RFC-049 benchmark docs (docs/src/benchmarks/) are
+# excluded: their "Phase 1–4" is the benchmark program's staged-rollout vocabulary,
+# a distinct concept from the retired dynamic-feature phases.
+if grep -rIn --exclude-dir=benchmarks 'Phase[ -]1\|Phase[ -]2' "${USER_DOCS[@]}" "$CORE/examples" 2>/dev/null; then
   echo "ERROR: retired 'Phase 1 / Phase 2' wording in user-facing docs or examples (use 'numeric Tensor' / 'dynamic ingestion' terminology)"
   FAIL=1
 fi

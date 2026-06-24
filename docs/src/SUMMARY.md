@@ -39,6 +39,11 @@
 - [Compatibility and stability](./reference/compatibility.md)
 - [Public API snapshot](./reference/public-api-snapshot.md)
 
+# Benchmarks
+
+- [Benchmarks](./benchmarks/index.md)
+- [Methodology](./benchmarks/methodology.md)
+
 # Contributors
 
 - [Development process](./contributing/development-process.md)

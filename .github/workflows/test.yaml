@@ -94,6 +94,16 @@ jobs:
       - run: cargo build --workspace
       - run: cargo test --workspace --all-features --quiet
 
+  benchmarks:
+    name: benchmark harness (compile-check only)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: dtolnay/rust-toolchain@stable
+      # RFC-049 Phase 1 / §5: compile-check the harness only. Full benchmarks are
+      # never run in normal CI, and there are no speed/memory pass-fail gates.
+      - run: cargo bench --manifest-path benchmarks/Cargo.toml --no-run
+
   smoke:
     name: example smoke runs
     runs-on: ubuntu-latest
