@@ -156,6 +156,18 @@ Core `MattenError` must not grow table-specific variants.
 - no dataframe-like features enter the crate;
 - core `matten` has no dependency on `matten-data`.
 
+> **Clarification (v0.22.2, architect handoff review 2026-06-24).** The malformed-CSV
+> criterion above is satisfied by a **structured-error / no-panic malformed-input test**,
+> not by a low-level "parser-error" test. Under the public `&str` API and the lenient,
+> `flexible(true)` csv-reader configuration, some malformed-quote cases (for example an
+> unterminated quoted field) resolve to `matten-data`'s structural `RaggedRow` validation
+> rather than to a csv-crate parser error; a blank/empty header surfaces as `Csv`. The
+> tested contract is therefore: **malformed CSV-like input must return a structured
+> `matten-data` error (`Csv` or `RaggedRow`) and must never panic or silently produce an
+> incorrect `Table`.** A byte-level invalid-UTF-8 case is intentionally *not* added, since
+> the public API exposes no such path and it would test the dependency rather than
+> `matten-data`.
+
 ---
 
 ## 10. Examples

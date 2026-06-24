@@ -2,7 +2,12 @@
 
 **Status:** Implemented (v0.22.0)  
 **Target Release:** v0.22.0  
-**Implemented:** The six-example suite (`data_00`–`data_05`) plus an explicit malformed-CSV test landed in v0.22.0, completing the RFC-023 §9 Beta gate and promoting `matten-data` to Beta (architect ruling, 2026-06-24).  
+**Implemented:** The six-example suite (`data_00`–`data_05`) plus an explicit
+malformed-CSV test landed in v0.22.0, completing the RFC-023 §9 Beta gate and promoting
+`matten-data` to Beta (architect ruling, 2026-06-24). The malformed-CSV criterion is met
+by a structured-error / no-panic test (`Csv` or `RaggedRow`, never a panic or a
+silently-wrong `Table`), not a low-level csv parser-error test — see the clarification in
+RFC-023 §9 (wording reconciled in v0.22.2).  
 **Related:** RFC-033, RFC-034, RFC-035, RFC-037, RFC-042  
 **Scope:** Example suite, documentation, CI, and release quality gates for `matten-data`
 

@@ -18,7 +18,32 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
-## [0.22.1] - 2026-06-24
+## [0.22.2] - 2026-06-24
+
+**Lifecycle wording cleanup (v0.22.0 handoff-review P2 follow-up).** Documentation /
+RFC-lifecycle only — no library code, public API, runtime behavior, examples, guards, or
+CI change.
+
+The architect's v0.22.0 handoff review accepted the release, the `matten-data` Beta
+promotion, and the malformed-CSV test realization, with one P2 follow-up: reconcile the
+"malformed-CSV **parser-error** test" wording to the structured-error framing actually
+implemented.
+
+### Changed
+
+- **RFC-023 §9** (Beta gate) gains a clarification note: the malformed-CSV criterion is
+  satisfied by a **structured-error / no-panic** malformed-input test (`Csv` or
+  `RaggedRow`, never a panic or a silently-wrong `Table`), not a low-level parser-error
+  test, because under the public `&str` API and lenient `flexible(true)` csv reader some
+  malformed-quote cases resolve to structural `RaggedRow` validation. Records that a
+  byte-level invalid-UTF-8 test is intentionally not added (no public path; would test the
+  dependency, not `matten-data`).
+- **RFC-036** Implemented note updated to point at that clarification.
+
+Historical records in earlier `CHANGELOG.md`/`ROADMAP.md` entries are left unchanged
+(they describe the finding accurately as of v0.22.0).
+
+
 
 **RFC-049 Phase 1 — internal benchmark baseline.** The architect accepted RFC-049 with a
 staged mandate and authorized **Phase 1 only** (PR-049-1 + PR-049-2). This release adds a
