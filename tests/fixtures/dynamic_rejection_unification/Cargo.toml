@@ -4,6 +4,14 @@ version = "0.0.0"
 edition = "2024"
 publish = false
 
+# Self-rooted as its own (single-crate) workspace so it is never claimed by the
+# parent workspace, independent of how the parent's `exclude` is written. Cargo's
+# `exclude` key does not expand globs (unlike `members`), so a parent glob such as
+# `tests/fixtures/*` does not exclude this crate when Cargo resolves the workspace
+# from inside this directory; an empty `[workspace]` table here makes the exclusion
+# robust regardless. Any future fixture under `tests/fixtures/` should do the same.
+[workspace]
+
 # Regression fixture for RFC-031.
 #
 # Simulates a downstream crate that enables core `matten/dynamic` while leaving

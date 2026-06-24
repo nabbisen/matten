@@ -382,10 +382,11 @@ Acceptance:
 
 ### Phase 2: Rust peer comparison
 
-> **Phase 2 design rulings (architect, 2026-06-24) — DESIGNED, NOT YET AUTHORIZED.**
-> Phase 2 implementation must not begin until a maintainer-run credible internal baseline
-> report (Phase 1) is produced and accepted; Phase 2 is then authorized separately. The
-> following design is settled so the eventual handoff is unambiguous:
+> **Phase 2 design rulings (architect, 2026-06-24) — AUTHORIZED 2026-06-24; harness
+> IMPLEMENTED in v0.22.4.** Phase 2 was authorized once the maintainer-run internal
+> baseline (Phase 1) was accepted. The peer-comparison harness is implemented under the
+> settled design below; Phase 3 (NumPy/Pandas) and hard performance gates remain
+> unauthorized.
 >
 > - **Peer-dependency isolation (B1).** Do not rely on workspace exclusion alone. Published
 >   crates must be *positively proven* free of peer deps via

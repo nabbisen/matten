@@ -6,3 +6,8 @@
 
 pub mod core;
 pub mod scenarios;
+
+// RFC-049 Phase 2: Rust peer-comparison workloads (ndarray / nalgebra). Compiled
+// only under the opt-in `peers` feature, so the default build stays peer-free.
+#[cfg(feature = "peers")]
+pub mod peers;

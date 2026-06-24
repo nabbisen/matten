@@ -77,19 +77,22 @@ gates.
 > These results are workload-specific and environment-specific. They are for
 > positioning and regression visibility, not universal ranking.
 
-## Phase 2 — designed, not yet implemented
+## Phase 2 — Rust peer comparison (implemented)
 
-The Phase 2 (Rust peer comparison) design is settled but **not authorized for
-implementation** until a maintainer-run credible baseline report is accepted (see
-`benchmarks/reports/BASELINE-READY-CHECKLIST.md`). When it lands, peer comparison will be:
+Phase 2 was authorized once the maintainer-run internal baseline was accepted, and the
+peer-comparison harness is implemented. Peer comparison is:
 
 - **task-scoped, not library-scoped** — a task is included only if the compared
   implementations solve the same small mathematical problem with comparable data
-  representation and no hidden extra library capability;
-- **opt-in** — behind a `peers` feature (`ndarray`/`nalgebra` as optional deps), off by
-  default, so the default harness build and ordinary CI stay peer-free;
+  representation and no hidden extra library capability. It is a Rust peer comparison for
+  positioning, **never** a competitor ranking or a "faster than X" claim;
+- **opt-in** — behind the `peers` feature (`ndarray`/`nalgebra` as optional deps), off by
+  default, so the default harness build and ordinary CI stay peer-free. The peers bench is
+  compile-checked only in a separate, manually/scheduled workflow, never with speed gates;
 - **isolated** — published crates are positively proven free of peer dependencies by
   `scripts/check-published-dependency-isolation.sh` (the `matten-ndarray → ndarray` bridge
   is the one allowed exception).
 
-See RFC-049 §"Phase 2: Rust peer comparison" for the full settled design.
+Run it with `cargo bench --manifest-path benchmarks/Cargo.toml --features peers --bench
+peers -- --noplot`; results go in `benchmarks/reports/peer-comparison-v0.1.md`. Phase 3
+(NumPy/Pandas) and hard performance gates are **not** authorized.

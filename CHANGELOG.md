@@ -18,7 +18,65 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
-## [0.22.3] - 2026-06-24
+## [0.22.4] - 2026-06-24
+
+**RFC-049 Phase 2 — Rust peer comparison (opt-in)**, plus the accepted Phase 1 internal
+baseline report and a workspace-config fix. The published crates — core `matten`,
+`matten-ndarray`, `matten-mlprep`, `matten-data` — are unchanged: no library code, public
+API, or runtime behavior change. All new work lives in the workspace-excluded benchmark
+harness, docs, CI, and repo config.
+
+The architect accepted the maintainer-run internal baseline (Ubuntu 26.04, virtualized;
+Baseline ID `matten-rfc049-internal-baseline-v0.1`) and authorized RFC-049 Phase 2 under
+the previously settled constraints. Phase 3 (NumPy/Pandas) and hard performance gates
+remain unauthorized.
+
+### Added
+
+- **RFC-049 Phase 2 peer-comparison harness** (benchmark crate only). A `peers` feature
+  (`ndarray` + `nalgebra` as optional deps) that is **off by default**; peer task modules
+  (`workloads/peers/{ndarray_tasks,nalgebra_tasks}.rs`) implementing the fixed comparable
+  task set — cosine similarity, small `matmul`, Markov step, PageRank step, linear-
+  regression GD step, heat step — each documenting why it is comparable; and a
+  `required-features = ["peers"]` `peers` bench giving a three-way `matten`/`ndarray`/
+  `nalgebra` comparison per task from identical logical data. It is a *Rust peer comparison
+  for positioning*, never a ranking or "faster than X" claim.
+- **`benchmarks/reports/peer-comparison-v0.1.md`**: peer-comparison report template with the
+  comparable-task table, limitations, and the non-ranking disclaimer (to be filled by a
+  maintainer run on the same machine class as the baseline).
+- **`.github/workflows/benchmarks-peers.yml`**: a separate, manual/scheduled workflow that
+  only compile-checks `--features peers --bench peers --no-run` and re-asserts published
+  dependency isolation. Deliberately kept **out of ordinary CI** (no peer deps in the normal
+  flow, no speed gates).
+- Completed, accepted **Phase 1 internal baseline report** (`internal-baseline-v0.1.md`)
+  with the real Ubuntu 26.04 medians, peak RSS (44,728 kB), Baseline ID, and architect
+  acceptance marker.
+
+### Changed
+
+- `benchmarks/Cargo.toml`: optional `ndarray`/`nalgebra` deps, the `peers` feature, and the
+  gated `peers` bench. The default build and ordinary CI `--no-run` remain peer-free
+  (verified: zero peer crates compiled by default), and the published-isolation guard still
+  passes — peer deps never reach any published crate.
+- Methodology / RFC-049 / benchmark README: Phase 2 marked **implemented** (was
+  designed-not-authorized), retaining the comparable-task-only policy and peer-free defaults.
+- Workspace `Cargo.toml`: `exclude` now uses `tests/fixtures/*`. Because Cargo's `exclude`
+  does not expand globs (unlike `members`), the RFC-031 fixture is made self-excluding with
+  an empty `[workspace]` table so it still runs standalone; any future fixture should do the
+  same.
+- ROADMAP: recorded the `sum_mean_axis` axis-reduction cost (~1.31 ms; ~400× `sum_mean`,
+  ~17× a 64×64 `matmul`) as a **P2 performance-watch** / regression-visibility anchor — not
+  a fix-now item, and not a Phase 2 blocker (architect ruling).
+
+### Threat model
+
+No change to any published crate's code, API, dependency set, or runtime behavior. New
+dependencies (`ndarray`, `nalgebra`) are optional, benchmark-only, and off by default;
+isolation from published crates is positively proven by
+`scripts/check-published-dependency-isolation.sh`. The peer comparison makes no performance
+or ranking claim.
+
+
 
 **RFC-032 scope carve-out + published-crate dependency isolation guard** (benchmarking /
 positioning review follow-up). Documentation, guard, and CI only — no library code, public

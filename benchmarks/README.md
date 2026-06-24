@@ -6,12 +6,17 @@ example-code size, dependency footprint — **not** to claim `matten` is faster 
 larger ecosystems. See [the methodology](../docs/src/benchmarks/methodology.md) for
 the full policy.
 
-## Status: Phase 1 (internal baseline only)
+## Status: Phase 1 baseline + Phase 2 peer comparison (opt-in)
 
-This harness currently implements **Phase 1**: an internal Rust baseline. Peer
-comparisons (`ndarray`/`nalgebra`, Phase 2) and cross-language reference comparisons
-(NumPy/Pandas, Phase 3), and any regression thresholds (Phase 4), are designed in
-RFC-049 but **not yet implemented**.
+Phase 1 (internal Rust baseline) and **Phase 2** (Rust peer comparison vs `ndarray` /
+`nalgebra`) are implemented. Phase 2 is **opt-in** behind the `peers` feature and off by
+default. Cross-language reference comparisons (NumPy/Pandas, Phase 3) and any regression
+thresholds (Phase 4) are designed in RFC-049 but **not yet implemented/authorized**.
+
+```bash
+# Phase 2 peer comparison (pulls ndarray + nalgebra; never in the default build or CI)
+cargo bench --manifest-path benchmarks/Cargo.toml --features peers --bench peers -- --noplot
+```
 
 ## Isolation
 

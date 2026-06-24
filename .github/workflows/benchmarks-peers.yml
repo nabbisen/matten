@@ -1,0 +1,24 @@
+# RFC-049 Phase 2 peer-comparison compile-check.
+#
+# Kept OUT of ordinary CI (architect ruling §B3 / §5): peer dependencies
+# (ndarray, nalgebra) are heavy and must not slow the normal test flow, and peer
+# benchmarks never run with pass/fail speed semantics. This workflow only
+# compile-checks the opt-in `peers` bench, on manual dispatch and a weekly schedule.
+name: benchmarks-peers
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 6 * * 1" # Mondays 06:00 UTC
+
+jobs:
+  peers-compile-check:
+    name: peers harness compile-check (--features peers, --no-run)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: dtolnay/rust-toolchain@stable
+      # Compile-check only. No benchmarks are executed; there are no speed gates.
+      - run: cargo bench --manifest-path benchmarks/Cargo.toml --features peers --bench peers --no-run
+      # Re-assert peer deps never reach the published crates.
+      - run: bash scripts/check-published-dependency-isolation.sh

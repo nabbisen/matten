@@ -24,6 +24,12 @@ path = "src/lib.rs"
 # Path dependency on core matten only. No companion crates and no peer/reference
 # numeric crates in Phase 1.
 matten = { path = "../crates/matten", default-features = false }
+# Peer libraries for RFC-049 Phase 2 (Rust peer comparison). Optional and OFF by
+# default; pulled in only via `--features peers`, so the default harness build and
+# the ordinary CI `--no-run` check never touch them, and they never reach any
+# published crate (proven by scripts/check-published-dependency-isolation.sh).
+ndarray = { version = "0.16", optional = true }
+nalgebra = { version = "0.33", optional = true }
 
 [dev-dependencies]
 # Benchmark-only. default-features = false drops plotters/rayon; keep just the
@@ -35,6 +41,8 @@ criterion = { version = "0.5", default-features = false, features = ["cargo_benc
 [features]
 default = []
 dynamic = ["matten/dynamic"]
+# RFC-049 Phase 2: opt-in Rust peer comparison. Off by default.
+peers = ["dep:ndarray", "dep:nalgebra"]
 
 [[bench]]
 name = "core"
@@ -43,6 +51,11 @@ harness = false
 [[bench]]
 name = "scenarios"
 harness = false
+
+[[bench]]
+name = "peers"
+harness = false
+required-features = ["peers"]
 
 # Keep benchmark builds optimized so measurements are meaningful.
 [profile.bench]
