@@ -31,6 +31,7 @@
 - [Slicing](./reference/slicing.md)
 - [Boundary integration](./reference/boundary.md)
 - [Reductions and matrix multiplication](./reference/math.md)
+- [Linear algebra (core-lite)](./reference/linalg.md)
 - [Dynamic feature (Element model)](./reference/dynamic.md)
 - [Migration to specialised libraries](./reference/migration.md)
 - [Compatibility and stability](./reference/compatibility.md)

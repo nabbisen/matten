@@ -23,6 +23,7 @@ These examples demonstrate the default `matten` API. No extra features required.
 | `12_boundary_error_handling.rs` | Handling errors at data boundaries |
 | `13_resource_limits.rs` | `MattenLimits`, `try_zeros`/`try_ones`/`try_full` |
 | [`14_concatenate_stack.rs`](https://github.com/nabbisen/matten/blob/main/crates/matten/examples/14_concatenate_stack.rs) | Shape composition: `concatenate` and `stack` (RFC-039) |
+| [`15_norm_trace_outer.rs`](https://github.com/nabbisen/matten/blob/main/crates/matten/examples/15_norm_trace_outer.rs) | Linalg core-lite: `norm`, `trace`, `outer` (RFC-041) |
 
 ## Math examples
 

@@ -158,3 +158,9 @@ cache-optimised. For large matrices, migrate the flat data to `ndarray` or
 let flat: Vec<f64> = tensor.into_vec();
 // hand off to your preferred crate
 ```
+
+## See also
+
+For the three linalg-adjacent helpers `norm`, `trace`, and `outer` — and the list
+of advanced linear algebra that is intentionally out of core scope — see
+[Linear algebra (core-lite)](./linalg.md).

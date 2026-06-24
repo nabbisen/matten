@@ -1,6 +1,6 @@
 # RFC-041: Linear Algebra Boundary — Core Lite vs External Crates
 
-**Status:** Proposed (accepted for implementation — v0.21 boundary review, 2026-06-23; see Architect Rulings below). Target v0.21.1.
+**Status:** Implemented (v0.21.1) — `norm` + `trace` + `outer` shipped in core; advanced linalg/decomposition/BLAS/sparse rejected (§5).
 **Target Release:** v0.21+ decision  
 **Related:** RFC-010, RFC-025, RFC-038  
 **Scope:** Boundary for linear algebra APIs in core and companions

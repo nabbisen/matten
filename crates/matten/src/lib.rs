@@ -90,6 +90,7 @@ mod creation;
 mod dynamic;
 mod error;
 mod limits;
+mod linalg;
 mod math;
 mod ops;
 mod parse;

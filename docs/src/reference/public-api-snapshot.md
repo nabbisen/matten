@@ -174,6 +174,20 @@ All panic on dynamic tensors (except `try_clip`, which returns `Unsupported`).
 | `dot(rhs)` | `Tensor` | 4 shape cases; panics on dynamic |
 | `matmul(rhs)` | `Tensor` | alias for `dot`; panics on dynamic |
 
+## `Tensor` — linalg core-lite (numeric Tensor, RFC-041)
+
+Small linalg-adjacent helpers — not a linear algebra backend. `inverse`,
+`determinant`, `solve`, eigen-decomposition, SVD, QR, LU, Cholesky, sparse, and
+BLAS/LAPACK are out of scope for core (use `nalgebra` or `ndarray-linalg`).
+
+| Method | Returns | Notes |
+|---|---|---|
+| `norm()` | `f64` | L2 / Frobenius over all elements; NaN propagates; panics on dynamic (no `try_` form, like `sum`/`mean`) |
+| `trace()` | `f64` | rank-2 only; rectangular via `min(rows, cols)`; panics on non-rank-2 or dynamic |
+| `try_trace()` | `Result<f64, MattenError>` | `Shape` if not rank-2; `Unsupported` on dynamic |
+| `outer(other)` | `Tensor` | rank-1 × rank-1 → `[m, n]`; panics on non-rank-1, dynamic, or oversized |
+| `try_outer(other)` | `Result<Tensor, MattenError>` | `Shape` if not rank-1; `Unsupported` on dynamic; `Allocation` if oversized |
+
 ## `Tensor` — boundary / serde
 
 | Method | Returns | Notes |

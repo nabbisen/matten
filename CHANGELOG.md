@@ -18,6 +18,53 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.21.1] - 2026-06-24
+
+**Linalg core-lite (RFC-041): `norm`, `trace`, and `outer` added to core.
+Additive — no breaking change.**
+
+Second feature of the v0.21 boundary-work batch. These are small linalg-adjacent
+helpers; `matten` remains a family-car PoC library, not a linear algebra backend.
+
+### Added
+
+- **`Tensor::norm`** (RFC-041) — the L2 / Frobenius norm over **all** elements,
+  `sqrt(sum(x_i^2))`. Works at any rank (Frobenius for matrices). `NaN` propagates.
+  Panic-only on dynamic tensors, matching the other value reductions (`sum`,
+  `mean`); no `try_norm` form.
+- **`Tensor::trace` / `try_trace`** (RFC-041) — the diagonal sum of a **rank-2**
+  tensor. Rectangular matrices are allowed: sums `self[i, i]` for
+  `i in 0..min(rows, cols)`. `try_trace` returns `Shape` if not rank-2.
+- **`Tensor::outer` / `try_outer`** (RFC-041) — the **rank-1 × rank-1** outer
+  product, `out[i, j] = self[i] * other[j]`, shape `[m, n]`. The output is checked
+  against `MattenLimits` before allocation. `try_outer` returns `Shape` if either
+  input is not rank-1, or `Allocation` if oversized.
+- All in a new `linalg.rs` module; `math.rs` is left untouched (kept under the
+  300-ELOC split-consideration line).
+- **`15_norm_trace_outer.rs`** example (core-tutorial band); new reference page
+  `docs/src/reference/linalg.md` with the linalg-boundary statement; a linalg
+  section in the public-API snapshot; a cross-reference from the math reference.
+
+### Behavior
+
+- **`norm`** — panics on dynamic input (convert with `try_numeric()` first).
+- **`trace`** — non-rank-2 → `Shape` (`try_trace`) or panic (`trace`); dynamic →
+  `Unsupported` (`try_trace`) or panic.
+- **`outer`** — non-rank-1 → `Shape`; dynamic → `Unsupported`; oversized →
+  `Allocation` (all via `try_outer`; `outer` panics with the same message).
+
+### Notes
+
+- **Out of scope for core** (RFC-041 §5, unchanged): `inverse`, `determinant`,
+  `solve`, eigen-decomposition, SVD, QR, LU, Cholesky, sparse formats, and
+  BLAS/LAPACK backends. Use `nalgebra` or `ndarray-linalg`; a future bridge crate
+  would need its own RFC.
+- **Threat model:** unchanged. Pure in-memory numeric operations on owned `f64`
+  data — no I/O, no parsing, no new dependency, no `unsafe`. `outer`'s only new
+  resource consideration (output size) is bounded by the existing `MattenLimits`
+  check applied before allocation.
+- RFC-041 moved to `rfcs/done/` (Implemented, v0.21.1).
+
 ## [0.21.0] - 2026-06-24
 
 **Opens the v0.21 line. Shape composition (RFC-039): `concatenate` and `stack`

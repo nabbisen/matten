@@ -10,6 +10,7 @@ mod creation;
 mod dynamic;
 mod elementwise;
 mod error;
+mod linalg;
 mod math;
 mod ops;
 mod parse;
