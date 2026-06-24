@@ -50,14 +50,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     assert_eq!(weights.count_none(), 0);
     println!("fill_none OK");
 
-    // 5. Convert to numeric Phase 1 tensors
+    // 5. Convert to numeric Tensor values
     let s = scores.try_numeric()?;
     let w = weights.try_numeric()?;
     assert_eq!(s.as_slice(), &[85.0, 92.0, 0.0, 78.0]);
     assert_eq!(w.as_slice(), &[1.0, 2.0, 1.0, 1.0]);
     println!("try_numeric OK: scores={:?}", s.as_slice());
 
-    // 6. Phase 1 arithmetic: weighted average
+    // 6. numeric Tensor arithmetic: weighted average
     let weighted_sum = (&s * &w).sum();
     let weight_sum = w.sum();
     let weighted_avg = weighted_sum / weight_sum;

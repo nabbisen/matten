@@ -10,4 +10,4 @@ This book is organized by reader:
 - **Reference** — the rules that shape the public API.
 - **Contributors** — project layout, milestones, and process.
 
-> This documentation tracks the current 0.20 family and the v0.21 planning boundary.
+> This documentation tracks the current 0.21 family, which delivered the selective boundary-work batch (shape composition, statistics, linalg-lite, and the `matten-data` scope guard).

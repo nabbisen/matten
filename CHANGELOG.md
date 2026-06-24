@@ -18,6 +18,64 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.21.4] - 2026-06-24
+
+**Release-truth and CI-gate patch (v0.21.3 deep-review P1 fixes). Documentation,
+tooling, and examples only — no library code, API, or behavior change.**
+
+The v0.21.3 deep review accepted the v0.21 implementation (no P0 blockers; Q1–Q5
+developer choices confirmed, Q6 approved) and required a release-truth cleanup before
+presenting v0.21 as a polished phase: several public-facing docs still said `0.20`
+after the family bumped to `0.21`, the release-docs guard was not family-aware, and it
+was not wired into CI.
+
+### Fixed (P1 — release-truth)
+
+- **0.20 → 0.21 documentation drift.** Corrected stale current-family labels and
+  install snippets across `README.md`, all four crate READMEs, `crates/matten/src/lib.rs`,
+  `docs/src/quick-start.md`, and `docs/src/reference/{boundary,dynamic,compatibility}.md`,
+  `docs/src/introduction.md`, and `docs/src/contributing/architecture.md`
+  (`0.20.x family` → `0.21.x family`; `= "0.20"` pins → `= "0.21"`).
+- **Public-API snapshot** now reads "the current v0.21 family" — **family-only**, with
+  no pinned patch version, to prevent the exact `(0.20.14)`-style drift that went stale.
+- Reworded the introduction and compatibility "phase status" to state that the v0.21
+  boundary batch is **delivered** (it previously read "planning" / "begins").
+- Legitimate history was preserved (e.g. `matten-data` "available as of v0.20.1", and
+  "the v0.20 family completed the materialization phase").
+
+### Changed (P1/P2 — gates)
+
+- **`check-release-docs.sh` is now current-family-aware.** A single `CURRENT_MINOR`
+  value drives three checks that reject non-current install pins, `X.Y.x family`
+  labels, and "current vX.Y family" prose — so a future minor bump catches the
+  newly-previous family automatically. Full historical patch references (e.g.
+  `v0.20.1`) and generic notation examples (e.g. `(0.13.x)`) are intentionally not
+  matched.
+- The retired "Phase 1 / Phase 2" wording scan now also covers
+  `crates/matten/examples/`, and the four examples that still used it
+  (`11_csv_numeric_loading`, `dynamic_01_mixed_elements`, `dynamic_05_dirty_csv_cleanup`)
+  were updated to numeric-Tensor terminology.
+- **`check-release-docs.sh` is wired into CI** (the main check job, after the
+  dependency-boundary gate) per the Q6 ruling, so doc-truth, API-snapshot drift,
+  retired wording, and examples naming are enforced on every push, not only at release.
+- The release checklist now lists the matten-data scope guard and the release-docs
+  guard alongside the core dependency-boundary gate.
+
+### Notes
+
+- **Deep-review confirmations (no change needed):** `norm` stays panic-only (Q1);
+  `try_var_axis`/`try_std_axis` stay (Q2); the defensive empty-tensor guard stays (Q3);
+  the dedicated `check-matten-data-scope.sh` stays (Q4); `composition.rs`/`linalg.rs`/
+  `stats.rs` stay separate from `math.rs` (Q5).
+- **Tracked future-optional (pre-v1.0, not required for v0.21):** a small additive
+  "Result-form reduction consistency" RFC (`try_sum`/`try_mean`/`try_min`/`try_max`/
+  `try_norm`) and a `try_*_axis` consistency RFC, to make the reduction families
+  uniform if user demand appears.
+- **Threat model:** unchanged (documentation, a CI/dev tooling script, and example
+  comments; no runtime surface).
+- With this patch, the v0.21 boundary-work batch is considered polished for public
+  phase closure.
+
 ## [0.21.3] - 2026-06-24
 
 **`matten-data` anti-scope guard (RFC-042). Tooling/docs only — no library code,

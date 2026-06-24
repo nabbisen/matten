@@ -3,7 +3,7 @@
 //! Run: cargo run --example dynamic_01_mixed_elements --features dynamic
 //!
 //! `matten` is not a dataframe. Use the dynamic feature to ingest and inspect
-//! mixed data before converting to a numeric Phase 1 tensor.
+//! mixed data before converting to a numeric Tensor.
 
 #[cfg(not(feature = "dynamic"))]
 fn main() {

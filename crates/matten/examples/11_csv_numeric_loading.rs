@@ -2,7 +2,7 @@
 //!
 //! Run: cargo run --example 11_csv_numeric_loading
 //!
-//! Phase 1 accepts rectangular numeric-only CSV. Shape is inferred as
+//! Core numeric Tensor APIs accept rectangular numeric-only CSV. Shape is inferred as
 //! [rows, cols]. Each field must be a valid f64.
 
 use matten::Tensor;

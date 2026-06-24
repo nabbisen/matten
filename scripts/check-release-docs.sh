@@ -124,12 +124,30 @@ USER_DOCS=(
   docs/src
 )
 
-echo "=== Checking for stale 0.15 / 0.19 version references in user-facing docs ==="
-# Reject prior-family minors in quoted install snippets ("0.15") and backtick
-# family labels (`0.19`). Maintained per family: when the family advances, add
-# the newly-previous minor to this pattern.
-if grep -rIn '"0\.15"\|"0\.19"\|`0\.15\|`0\.19' "${USER_DOCS[@]}" 2>/dev/null; then
-  echo "ERROR: stale 0.15/0.19 version reference in user-facing docs (install snippet or family label)"
+echo "=== Checking for stale prior-family version references in user-facing docs ==="
+# Current family. Bump this single value on each minor release. The checks below
+# reject install pins, `X.Y.x` family labels, and "current vX.Y family" prose whose
+# minor is not the current one (so 0.15/0.19/0.20/... are all caught after a bump).
+# Full historical patch refs (e.g. "available as of v0.20.1" shipped-in notes) are
+# NOT matched, and rfcs/ + CHANGELOG.md + ROADMAP.md remain outside USER_DOCS.
+CURRENT_MINOR="21"
+# (a) install-snippet version pins: `<crate> = "0.NN"` / `version = "0.NN"`
+if grep -rInE '(version|matten[a-z-]*) = "0\.[0-9]+"' "${USER_DOCS[@]}" 2>/dev/null \
+   | grep -vE "= \"0\.${CURRENT_MINOR}\""; then
+  echo "ERROR: stale install-snippet version pin in user-facing docs (pin the current minor 0.${CURRENT_MINOR})"
+  FAIL=1
+fi
+# (b) `X.Y.x family` labels (with or without surrounding backticks). Requires the
+#     word "family" so generic patch-notation examples like "(0.13.x)" don't match.
+if grep -rInE '0\.[0-9]+\.x.{0,2}family' "${USER_DOCS[@]}" 2>/dev/null \
+   | grep -vE "0\.${CURRENT_MINOR}\.x"; then
+  echo "ERROR: stale 'X.Y.x family' label in user-facing docs (current family is 0.${CURRENT_MINOR}.x)"
+  FAIL=1
+fi
+# (c) "current vX.Y family" prose (e.g. the public-API snapshot header)
+if grep -rInE 'current v0\.[0-9]+ family' "${USER_DOCS[@]}" 2>/dev/null \
+   | grep -vE "current v0\.${CURRENT_MINOR} family"; then
+  echo "ERROR: stale 'current vX.Y family' reference in user-facing docs"
   FAIL=1
 fi
 
@@ -145,12 +163,13 @@ if ! grep -q 'InvalidArgument' docs/src/reference/public-api-snapshot.md; then
   FAIL=1
 fi
 
-echo "=== Checking for retired 'Phase 1 / Phase 2' wording in user-facing docs ==="
-# RFC-lifecycle ruling (pre-v0.19.0 audit, Q1): the Phase 1/Phase 2 vocabulary is
-# retired from current user-facing docs in favor of numeric-Tensor / dynamic-ingestion
-# terminology. Historical RFCs (rfcs/) and CHANGELOG.md may retain it.
-if grep -rIn 'Phase[ -]1\|Phase[ -]2' "${USER_DOCS[@]}" 2>/dev/null; then
-  echo "ERROR: retired 'Phase 1 / Phase 2' wording in user-facing docs (use 'numeric Tensor' / 'dynamic ingestion' terminology)"
+echo "=== Checking for retired 'Phase 1 / Phase 2' wording in user-facing docs and examples ==="
+# RFC-lifecycle ruling (pre-v0.19.0 audit, Q1) + v0.21.3 deep review: the Phase 1/
+# Phase 2 vocabulary is retired from current user-facing docs AND examples in favor
+# of numeric-Tensor / dynamic-ingestion terminology. Historical RFCs (rfcs/) and
+# CHANGELOG.md may retain it.
+if grep -rIn 'Phase[ -]1\|Phase[ -]2' "${USER_DOCS[@]}" "$CORE/examples" 2>/dev/null; then
+  echo "ERROR: retired 'Phase 1 / Phase 2' wording in user-facing docs or examples (use 'numeric Tensor' / 'dynamic ingestion' terminology)"
   FAIL=1
 fi
 

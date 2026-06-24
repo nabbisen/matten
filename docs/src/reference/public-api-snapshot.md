@@ -1,6 +1,6 @@
 # Public API snapshot
 
-This page lists every public item in `matten` at the current v0.20 family (0.20.14). It serves as the
+This page lists every public item in `matten` at the current v0.21 family. It serves as the
 baseline for tracking breaking changes toward v1.0.0 and as the review gate
 required by RFC-015.
 
