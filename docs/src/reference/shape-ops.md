@@ -127,3 +127,8 @@ Every method above clones or physically reorders data into a fresh contiguous
 buffer. This keeps the API lifetime-free and predictable, at the cost of
 higher allocation than a view-based library. When this matters for large data,
 migrate to `ndarray` or `nalgebra` using `tensor.into_vec()`.
+
+## See also
+
+To join several tensors into one — along an existing axis (`concatenate`) or a new
+axis (`stack`) — see [Shape composition](./shape-composition.md).

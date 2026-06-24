@@ -83,6 +83,7 @@
 //   ser         Serialize/Deserialize for Tensor
 //   parse/      JSON/CSV boundary parsers
 //   dynamic/    feature-gated `Element` engine (dynamic on-ramp)
+mod composition;
 mod convert;
 mod creation;
 #[cfg(feature = "dynamic")]

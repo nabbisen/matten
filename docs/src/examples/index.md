@@ -22,6 +22,7 @@ These examples demonstrate the default `matten` API. No extra features required.
 | `11_csv_numeric_loading.rs` | Numeric CSV loading |
 | `12_boundary_error_handling.rs` | Handling errors at data boundaries |
 | `13_resource_limits.rs` | `MattenLimits`, `try_zeros`/`try_ones`/`try_full` |
+| [`14_concatenate_stack.rs`](https://github.com/nabbisen/matten/blob/main/crates/matten/examples/14_concatenate_stack.rs) | Shape composition: `concatenate` and `stack` (RFC-039) |
 
 ## Math examples
 

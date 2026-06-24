@@ -27,6 +27,7 @@
 - [Construction and conversion](./reference/construction.md)
 - [Operators and broadcasting](./reference/operators.md)
 - [Shape operations](./reference/shape-ops.md)
+- [Shape composition](./reference/shape-composition.md)
 - [Slicing](./reference/slicing.md)
 - [Boundary integration](./reference/boundary.md)
 - [Reductions and matrix multiplication](./reference/math.md)

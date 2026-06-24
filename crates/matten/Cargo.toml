@@ -22,9 +22,9 @@ csv = ["dep:csv"]
 dynamic = []
 
 [dependencies]
-serde = { version = "1", features = ["derive"], optional = true }
-serde_json = { version = "1", optional = true }
-csv = { version = "1", optional = true }
+serde      = { workspace = true, optional = true }
+serde_json = { workspace = true, optional = true }
+csv        = { workspace = true, optional = true }
 
 [[example]]
 name = "10_json_roundtrip"

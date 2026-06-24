@@ -105,6 +105,20 @@ when called on a dynamic tensor. Call `try_numeric()` to convert first.
 | `expand_dims(axis)` | `Tensor` | RFC-038; inserts a length-1 axis; panics if `axis > ndim` or dynamic |
 | `try_expand_dims(axis)` | `Result<Tensor, MattenError>` | RFC-038; `InvalidArgument` if `axis > ndim`; `Unsupported` on dynamic |
 
+## `Tensor` — shape composition (numeric Tensor, RFC-039)
+
+Associated functions (called as `Tensor::concatenate(...)`), not methods. Both take
+a borrowed slice `&[&Tensor]` and reject dynamic inputs.
+
+| Function | Returns | Notes |
+|---|---|---|
+| `concatenate(tensors, axis)` | `Tensor` | joins an existing axis; panics on empty/shape/axis error or dynamic |
+| `try_concatenate(tensors, axis)` | `Result<Tensor, MattenError>` | `InvalidArgument` if empty; `Shape` on rank/dim/axis (`0..rank`); `Unsupported` on dynamic; `Allocation` if oversized |
+| `stack(tensors, axis)` | `Tensor` | joins a new axis (rank + 1); panics on empty/shape/axis error or dynamic |
+| `try_stack(tensors, axis)` | `Result<Tensor, MattenError>` | `InvalidArgument` if empty; `Shape` if shapes differ or `axis > rank`; `Unsupported` on dynamic; `Allocation` if oversized |
+
+`repeat`/`tile`/`meshgrid` are deferred (RFC-039 §8) and not part of the API.
+
 ## `Tensor` — slicing (numeric Tensor)
 
 | Method | Returns | Notes |

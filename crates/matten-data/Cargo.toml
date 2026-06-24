@@ -15,8 +15,8 @@ repository.workspace    = true
 # direction (matten-data -> matten). CSV ingestion (RFC-035) is behind the
 # default-on `csv` feature. Scope is locked by RFC-033 / RFC-042.
 [dependencies]
-matten = { version = "0.20", path = "../matten", default-features = false }
-csv = { version = "1.3", optional = true }
+matten = { workspace = true }
+csv    = { workspace = true, optional = true }
 
 [features]
 default = ["csv"]

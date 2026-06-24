@@ -12,7 +12,7 @@ license.workspace       = true
 repository.workspace    = true
 
 [dependencies]
-matten = { version = "0.20", path = "../matten", default-features = false }
+matten = { workspace = true }
 
 [features]
 # Forwarded so dynamic-tensor rejection compiles only when dynamic tensors exist.

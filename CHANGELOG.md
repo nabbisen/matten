@@ -18,6 +18,54 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.21.0] - 2026-06-24
+
+**Opens the v0.21 line. Shape composition (RFC-039): `concatenate` and `stack`
+added to core. Additive — no breaking change.**
+
+This is the first feature of the accepted v0.21 boundary-work batch (shape
+composition, statistics, linear-algebra lite, and the `matten-data` scope guard
+land across v0.21.0–v0.21.3). It opens a new minor line; subsequent additive
+features in the batch land as patches.
+
+### Added
+
+- **`Tensor::concatenate` / `try_concatenate`** (RFC-039) — join tensors along an
+  **existing** axis. All inputs must share the same rank and the same size on every
+  non-concatenation axis; the output axis size is the sum of the inputs'. Valid
+  axis range is `0..rank`.
+- **`Tensor::stack` / `try_stack`** (RFC-039) — join identically shaped tensors
+  along a **new** axis (output rank is input rank + 1; new axis size is the number
+  of inputs). Valid axis range is `0..=rank`.
+- All four are associated functions taking a borrowed slice `&[&Tensor]` (no
+  cloning to pass inputs). The `try_*` forms return `Result`; the convenience forms
+  panic with the same message.
+- **`14_concatenate_stack.rs`** example (core-tutorial band) and a runnable
+  walkthrough; new reference page `docs/src/reference/shape-composition.md`; a
+  shape-composition section in the public-API snapshot.
+
+### Behavior
+
+- **Empty input list** → `InvalidArgument { argument: "tensors" }`.
+- **Rank / dimension / shape mismatch, or out-of-range axis** → `Shape`.
+- **Dynamic input** → `Unsupported` (convert with `try_numeric()` first); the
+  `try_*` forms never panic on dynamic inputs.
+- **Oversized result** → `Allocation` (the output shape is checked against
+  `MattenLimits` before any data is copied), or `Shape` when the stacked rank would
+  exceed the dimension limit.
+- A single-input `concatenate` returns a clone; a single-input `stack` inserts a
+  length-1 axis. Validation (axis, dynamic, allocation) still runs for `n = 1`.
+
+### Notes
+
+- `repeat`, `tile`, and `meshgrid` remain **deferred** (RFC-039 §8): they need a
+  separate indexing/allocation policy and are not part of this release.
+- **Threat model:** unchanged. These are pure in-memory numeric operations on
+  owned `f64` data with no I/O, no parsing, no new dependency, and no `unsafe`.
+  The only new resource consideration — output allocation size — is bounded by the
+  existing `MattenLimits` check applied before allocation.
+- RFC-039 moved to `rfcs/done/` (Implemented, v0.21.0).
+
 ## [0.20.19] - 2026-06-24
 
 **Examples reorganization: new `50_`–`56_` practical-recipes band, two fossils

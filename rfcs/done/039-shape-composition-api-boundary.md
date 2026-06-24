@@ -1,6 +1,6 @@
 # RFC-039: Shape Composition API Boundary
 
-**Status:** Proposed (accepted for implementation — v0.21 boundary review, 2026-06-23; see Architect Rulings below). Target v0.21.0.
+**Status:** Implemented (v0.21.0) — `concatenate` + `stack` shipped in core; `repeat`/`tile`/`meshgrid` remain deferred (§8).
 **Target Release:** v0.21+  
 **Related:** RFC-038  
 **Scope:** Boundary for stack, concatenate, repeat, tile, meshgrid, and related shape APIs
