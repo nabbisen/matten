@@ -1,6 +1,6 @@
 # RFC-040: Small Statistics Boundary — Core vs Companion
 
-**Status:** Proposed (accepted for implementation — v0.21 boundary review, 2026-06-23; see Architect Rulings below). Target v0.21.2.
+**Status:** Implemented (v0.21.2) — `var`/`std` + `var_axis`/`std_axis` (population, ddof=0) shipped in core; quantile/histogram/cov/corr/z-score deferred, no `matten-stats` yet (§8/§9).
 **Target Release:** v0.21+ decision  
 **Related:** RFC-019, RFC-038  
 **Scope:** Decide where variance, standard deviation, covariance, correlation, quantile, and histogram belong

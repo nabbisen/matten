@@ -99,6 +99,7 @@ mod selection;
 mod ser;
 mod shape;
 mod slice;
+mod stats;
 mod tensor;
 
 #[cfg(feature = "dynamic")]

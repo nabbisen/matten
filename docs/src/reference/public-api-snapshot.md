@@ -188,6 +188,19 @@ BLAS/LAPACK are out of scope for core (use `nalgebra` or `ndarray-linalg`).
 | `outer(other)` | `Tensor` | rank-1 × rank-1 → `[m, n]`; panics on non-rank-1, dynamic, or oversized |
 | `try_outer(other)` | `Result<Tensor, MattenError>` | `Shape` if not rank-1; `Unsupported` on dynamic; `Allocation` if oversized |
 
+## `Tensor` — statistics (numeric Tensor, RFC-040)
+
+Population variance only (`ddof = 0`): `var = sum((x_i - mean)^2) / n`,
+`std = sqrt(var)`, two-pass, NaN-propagating. Sample variance, quantile,
+percentile, histogram, covariance, correlation, and z-score are out of core scope.
+
+| Method | Returns | Notes |
+|---|---|---|
+| `var()` / `std()` | `f64` | population (`ddof = 0`); NaN propagates; singleton → `0.0`; panics on dynamic |
+| `try_var()` / `try_std()` | `Result<f64, MattenError>` | `Unsupported` on dynamic; `InvalidArgument` on empty (not constructible) |
+| `var_axis(axis)` / `std_axis(axis)` | `Tensor` | reduces and drops the axis; panics if `axis >= rank` or dynamic |
+| `try_var_axis(axis)` / `try_std_axis(axis)` | `Result<Tensor, MattenError>` | `Shape` if `axis >= rank`; `Unsupported` on dynamic |
+
 ## `Tensor` — boundary / serde
 
 | Method | Returns | Notes |

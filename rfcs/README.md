@@ -44,6 +44,7 @@ for RFC state; the Status field inside each file mirrors the folder.
 | 035 | [CSV Ingestion, Schema Summary, Missing Values, and Numeric Conversion](./done/035-csv-ingestion-schema-summary-missing-values-and-numeric-conversion.md) | 0.20.1 |
 | 038 | [Core Numeric Comfort APIs](./done/038-core-numeric-comfort-apis.md) | 0.20.9 (elementwise); 0.20.10 (selection); 0.20.11 (creation); 0.20.12 (shape) |
 | 039 | [Shape Composition API Boundary](./done/039-shape-composition-api-boundary.md) | 0.21.0 (`concatenate` + `stack`; `repeat`/`tile`/`meshgrid` deferred) |
+| 040 | [Small Statistics Boundary — Core vs Companion](./done/040-small-statistics-boundary-core-vs-companion.md) | 0.21.2 (`var`/`std` + `var_axis`/`std_axis`, population; quantile/histogram/cov/corr deferred) |
 | 041 | [Linear Algebra Boundary — Core Lite vs External Crates](./done/041-linear-algebra-boundary-core-lite-vs-external-crates.md) | 0.21.1 (`norm` + `trace` + `outer`; decomposition/BLAS/sparse rejected) |
 | 043 | [Example Program Structure, Quality Gate, and Documentation Policy](./done/043-example-program-structure-quality-gate-and-documentation-policy.md) | 0.20.3 |
 | 044 | [Beginner Core Math Examples](./done/044-beginner-core-math-examples.md) | 0.20.3 (examples 30–32) |
@@ -60,7 +61,6 @@ for RFC state; the Status field inside each file mirrors the folder.
 | 026 | [Large CSV and Streaming Data Policy](./proposed/026-large-csv-and-streaming-data-policy.md) | design spike no earlier than v0.20+ |
 | 036 | [`matten-data` Examples, Documentation, and Release Gate](./proposed/036-matten-data-examples-documentation-and-release-gate.md) | v0.20.0 |
 | 037 | [Deferred Streaming and Large CSV Policy](./proposed/037-deferred-streaming-and-large-csv-policy.md) | v0.20.0 / later |
-| 040 | [Small Statistics Boundary — Core vs Companion](./proposed/040-small-statistics-boundary-core-vs-companion.md) | v0.21+ |
 | 042 | [Pandas-Inspired Scope Guard for `matten-data`](./proposed/042-pandas-inspired-scope-guard-for-matten-data.md) | v0.20+ / v0.21+ |
 | 049 | [Benchmarking, Complexity Metrics, and Positioning Report](./proposed/049-benchmarking-complexity-metrics-and-positioning-report.md) | v0.20.x planning / v0.21+ maturity hardening |
 

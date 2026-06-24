@@ -18,6 +18,50 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.21.2] - 2026-06-24
+
+**Statistics core (RFC-040): `var`/`std` + `var_axis`/`std_axis` added to core.
+Additive — no breaking change.**
+
+Third feature of the v0.21 boundary-work batch. Population variance only; `matten`
+remains a family-car PoC library, not a statistics package.
+
+### Added
+
+- **`Tensor::var` / `try_var`, `Tensor::std` / `try_std`** (RFC-040) — **population**
+  variance and standard deviation over all elements: `var = sum((x_i - mean)^2) / n`
+  (`ddof = 0`, not sample variance), `std = sqrt(var)`. Two-pass algorithm; `NaN`
+  propagates; a single-element tensor has variance `0.0`.
+- **`Tensor::var_axis` / `try_var_axis`, `Tensor::std_axis` / `try_std_axis`**
+  (RFC-040) — the same along one axis, removing it from the output shape (no
+  `keepdims`): `[2, 3]` axis 0 → `[3]`, axis 1 → `[2]`. `NaN` propagates per slice.
+- All in a new `stats.rs` module; `math.rs` is left untouched (kept under the
+  300-ELOC split-consideration line).
+- **`16_variance_std.rs`** example (core-tutorial band); new reference page
+  `docs/src/reference/stats.md` with the population-variance and deferred-stats
+  boundary; a statistics section in the public-API snapshot; a cross-reference from
+  the math reference.
+
+### Behavior
+
+- **`var` / `std`** — panic on dynamic; `try_var` / `try_std` return `Unsupported`
+  on dynamic. An empty-tensor guard returns `InvalidArgument`, but `matten` forbids
+  zero-sized dimensions, so an empty tensor is not constructible and that branch is
+  unreachable in practice (a test covers the construction rejection).
+- **`var_axis` / `std_axis`** — panic if `axis >= rank` or dynamic; `try_*` forms
+  return `Shape` on an out-of-range axis and `Unsupported` on dynamic.
+
+### Notes
+
+- **Out of scope for core** (RFC-040 §6/§8, unchanged): sample variance
+  (`ddof = 1`), quantile, percentile, histogram, covariance, correlation, z-score,
+  and `nanvar`/`nanstd`. These are deferred to a possible future `matten-stats`
+  companion, which is not scaffolded (RFC-040 §9: only after ≥3 well-scoped APIs).
+- **Threat model:** unchanged. Pure in-memory numeric reductions over owned `f64`
+  data — no I/O, no parsing, no new dependency, no `unsafe`, no new allocation
+  beyond the reduced-shape output.
+- RFC-040 moved to `rfcs/done/` (Implemented, v0.21.2).
+
 ## [0.21.1] - 2026-06-24
 
 **Linalg core-lite (RFC-041): `norm`, `trace`, and `outer` added to core.

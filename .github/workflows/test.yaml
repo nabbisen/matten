@@ -125,6 +125,7 @@ jobs:
       - run: cargo run -p matten --example 13_resource_limits
       - run: cargo run -p matten --example 14_concatenate_stack
       - run: cargo run -p matten --example 15_norm_trace_outer
+      - run: cargo run -p matten --example 16_variance_std
       - run: cargo run -p matten --example 27_axis_reductions
       - run: cargo run -p matten --example 28_column_statistics
       - run: cargo run -p matten --example dynamic_06_numeric_policy --features dynamic

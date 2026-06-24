@@ -19,4 +19,5 @@ mod selection;
 mod shape;
 mod shape_ops;
 mod slice;
+mod stats;
 mod tensor;

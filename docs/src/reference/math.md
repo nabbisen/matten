@@ -164,3 +164,6 @@ let flat: Vec<f64> = tensor.into_vec();
 For the three linalg-adjacent helpers `norm`, `trace`, and `outer` — and the list
 of advanced linear algebra that is intentionally out of core scope — see
 [Linear algebra (core-lite)](./linalg.md).
+
+For population variance and standard deviation — `var`, `std`, `var_axis`,
+`std_axis` — see [Statistics (core-lite)](./stats.md).
