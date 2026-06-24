@@ -46,6 +46,7 @@ for RFC state; the Status field inside each file mirrors the folder.
 | 039 | [Shape Composition API Boundary](./done/039-shape-composition-api-boundary.md) | 0.21.0 (`concatenate` + `stack`; `repeat`/`tile`/`meshgrid` deferred) |
 | 040 | [Small Statistics Boundary — Core vs Companion](./done/040-small-statistics-boundary-core-vs-companion.md) | 0.21.2 (`var`/`std` + `var_axis`/`std_axis`, population; quantile/histogram/cov/corr deferred) |
 | 041 | [Linear Algebra Boundary — Core Lite vs External Crates](./done/041-linear-algebra-boundary-core-lite-vs-external-crates.md) | 0.21.1 (`norm` + `trace` + `outer`; decomposition/BLAS/sparse rejected) |
+| 042 | [Pandas-Inspired Scope Guard for `matten-data`](./done/042-pandas-inspired-scope-guard-for-matten-data.md) | 0.21.3 (three-check anti-scope guard; CI-enforced) |
 | 043 | [Example Program Structure, Quality Gate, and Documentation Policy](./done/043-example-program-structure-quality-gate-and-documentation-policy.md) | 0.20.3 |
 | 044 | [Beginner Core Math Examples](./done/044-beginner-core-math-examples.md) | 0.20.3 (examples 30–32) |
 | 045 | [Matrix Iteration and Graph/Probability Examples](./done/045-matrix-iteration-and-graph-probability-examples.md) | 0.20.4 (examples 33–34) |
@@ -61,7 +62,6 @@ for RFC state; the Status field inside each file mirrors the folder.
 | 026 | [Large CSV and Streaming Data Policy](./proposed/026-large-csv-and-streaming-data-policy.md) | design spike no earlier than v0.20+ |
 | 036 | [`matten-data` Examples, Documentation, and Release Gate](./proposed/036-matten-data-examples-documentation-and-release-gate.md) | v0.20.0 |
 | 037 | [Deferred Streaming and Large CSV Policy](./proposed/037-deferred-streaming-and-large-csv-policy.md) | v0.20.0 / later |
-| 042 | [Pandas-Inspired Scope Guard for `matten-data`](./proposed/042-pandas-inspired-scope-guard-for-matten-data.md) | v0.20+ / v0.21+ |
 | 049 | [Benchmarking, Complexity Metrics, and Positioning Report](./proposed/049-benchmarking-complexity-metrics-and-positioning-report.md) | v0.20.x planning / v0.21+ maturity hardening |
 
 Implementation handoffs for the v0.20+ proposed set (RFC-033–042), the examples

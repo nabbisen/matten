@@ -1,6 +1,6 @@
 # RFC-042: Pandas-Inspired Scope Guard for `matten-data`
 
-**Status:** Proposed (accepted for implementation — v0.21 boundary review, 2026-06-23; see Architect Rulings below). Target v0.21.3 (or earlier).
+**Status:** Implemented (v0.21.3) — three-check anti-scope guard (example file names / public-API identifiers / README scope statement) shipped as scripts/check-matten-data-scope.sh, wired into CI.
 **Target Release:** v0.20+ / v0.21+  
 **Related:** RFC-033, RFC-034, RFC-035, RFC-036  
 **Scope:** Explicit anti-scope guard for Pandas/dataframe expectations

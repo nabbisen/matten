@@ -18,6 +18,49 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.21.3] - 2026-06-24
+
+**`matten-data` anti-scope guard (RFC-042). Tooling/docs only — no library code,
+API, or behavior change. Completes the v0.21 boundary-work batch.**
+
+`matten-data` may borrow named columns and table preparation, but it must not
+become a dataframe library. This release makes that boundary mechanically
+enforceable.
+
+### Added
+
+- **`scripts/check-matten-data-scope.sh`** — a three-check anti-scope guard
+  (RFC-042 §8), wired into the `matten-data` CI job and the release checklist:
+  1. **Example file-name guard** — rejects dataframe-story terms in
+     `crates/matten-data/examples/` file names (e.g. `join_customers_orders.rs`,
+     `pivot_monthly.rs`), matched as `_`-delimited tokens.
+  2. **Public-API identifier guard** — rejects dataframe-shaped public definitions
+     in `crates/matten-data/src` (`pub struct`/`enum`/`type DataFrame`/`Series`;
+     `pub fn groupby`/`group_by`/`join`/`merge`/`pivot`/`query`/`loc`/`iloc`),
+     matched as definitions, not arbitrary text.
+  3. **README scope statement** — requires the `matten-data` README to state it is
+     "not a dataframe library".
+
+  The guard is deliberately **precise**: it does not body-scan for broad terms
+  (`index`, `join`, `loc`, `query`), so `Path::join`, a loop variable named
+  `index`, functions named `joined`/`join_tables`, and words like `location` all
+  pass. Verified against every must-fail / must-not-fail case in RFC-042 §8.
+
+### Changed
+
+- `docs/src/contributing/release-checklist.md` now lists the matten-data scope
+  guard and the release-docs guard alongside the core dependency-boundary gate.
+
+### Notes
+
+- No new public API, no library code change. The existing `matten-data` surface
+  (`Table`, `SchemaSummary`, `select_columns`, `fill_missing`, `try_numeric`,
+  `to_tensor`, …) already complies, and its README already carried the non-goal
+  section — this release makes both enforceable.
+- **Threat model:** unchanged (a CI/dev tooling script; no runtime surface).
+- RFC-042 moved to `rfcs/done/` (Implemented, v0.21.3). With RFC-039/040/041/042 all
+  shipped, the accepted v0.21 boundary-work batch is complete.
+
 ## [0.21.2] - 2026-06-24
 
 **Statistics core (RFC-040): `var`/`std` + `var_axis`/`std_axis` added to core.

@@ -79,6 +79,8 @@ jobs:
       - run: cargo check -p matten-data
       - run: cargo clippy -p matten-data --all-targets -- -D warnings
       - run: cargo test -p matten-data --doc
+      - name: matten-data anti-scope guard (RFC-042)
+        run: bash scripts/check-matten-data-scope.sh
 
   msrv:
     name: MSRV 1.85
