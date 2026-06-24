@@ -63,6 +63,11 @@ for RFC state; the Status field inside each file mirrors the folder.
 | 026 | [Large CSV and Streaming Data Policy](./proposed/026-large-csv-and-streaming-data-policy.md) | design spike no earlier than v0.20+ |
 | 037 | [Deferred Streaming and Large CSV Policy](./proposed/037-deferred-streaming-and-large-csv-policy.md) | v0.20.0 / later |
 | 049 | [Benchmarking, Complexity Metrics, and Positioning Report](./proposed/049-benchmarking-complexity-metrics-and-positioning-report.md) | **Accepted** — Phase 1 internal baseline shipped in 0.22.1; Phases 2–4 deferred |
+| 050 | [Production Migration Guide and Bridge Strategy](./proposed/050-production-migration-guide-and-bridge-strategy.md) | **Accepted** (2026-06-24) — docs; planned v0.23.0 |
+| 051 | [Bridge Conversion Contracts and Companion-Crate Policy](./proposed/051-bridge-conversion-contracts-and-companion-crate-policy.md) | **Accepted** (2026-06-24) — docs/policy; planned v0.23.x |
+| 052 | [Production Target Playbooks](./proposed/052-production-target-playbooks.md) | **Accepted** (2026-06-24) — docs; planned v0.23.x |
+| 053 | [Migration Readiness Diagnostics and Report Format](./proposed/053-migration-readiness-diagnostics-and-report-format.md) | **Accepted** (2026-06-24) — docs/template; planned v0.23.x/v0.24 |
+| 054 | [`matten-migrate` Assisted Migration Tool](./proposed/054-matten-migrate-assisted-migration-tool.md) | **Accepted as future direction** (2026-06-24) — implementation deferred |
 
 Implementation handoffs for the v0.20+ proposed set (RFC-033–042), the examples
 program (RFC-043–048), and the benchmarking program (RFC-049) live in
@@ -75,3 +80,14 @@ are audited/improved rather than duplicated. The benchmarking handoff
 ([`049-benchmarking-developer-handoff.md`](./handoffs/049-benchmarking-developer-handoff.md))
 keeps all benchmark tooling in an isolated `publish = false` package so core
 `matten` gains no benchmark dependency.
+
+The production-migration set (RFC-050–054) ships its handoff bundle in
+[`./handoffs/`](./handoffs/): the
+[`050-053-production-migration-implementation-handoff.md`](./handoffs/050-053-production-migration-implementation-handoff.md)
+covers the documentation/policy/template work (RFC-050–053) for v0.23.x, with an
+[acceptance/QA checklist](./handoffs/050-053-acceptance-qa-checklist.md) and a
+[release-guard checklist](./handoffs/050-053-release-guard-checklist.md); RFC-054's
+[`054-deferred-implementation-note.md`](./handoffs/054-deferred-implementation-note.md)
+keeps the `matten-migrate` CLI explicitly deferred. These RFCs add no core dependency: all
+migration support lives in docs, bridge crates, and (later, if ever) workspace-excluded
+tooling.

@@ -18,7 +18,54 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
-## [0.22.5] - 2026-06-24
+## [0.22.6] - 2026-06-24
+
+**Production-migration RFC set (RFC-050–054) accepted and ingested** — planning/docs only.
+No library code, public API, runtime behavior, or dependency change in any crate; this
+release adds proposal documents and applies an architect ruling to them.
+
+The architect accepted the "family-car → super-car" production-migration direction (a
+documented, honest exit ramp from `matten` to heavier ecosystems — `ndarray`, `nalgebra`,
+Polars, Candle, NumPy, Pandas — with no heavy dependencies in core `matten`) and ruled on a
+peer code review of the bundle. The five RFCs and their handoff bundle are now tracked in
+`rfcs/`, with the ruling's edits applied.
+
+### Added
+
+- `rfcs/proposed/050`–`054`: Production Migration Guide & Bridge Strategy (050), Bridge
+  Conversion Contracts & Companion-Crate Policy (051), Production Target Playbooks (052),
+  Migration Readiness Diagnostics & Report Format (053), and the deferred `matten-migrate`
+  Assisted Migration Tool (054). All marked **Accepted** (054 as future direction).
+- `rfcs/handoffs/`: the production-migration implementation handoff
+  (`050-053-production-migration-implementation-handoff.md`), the RFC-054 deferred note, and
+  the acceptance/QA and release-guard checklists. Indexed in `rfcs/README.md`.
+
+### Changed (architect ruling, 2026-06-24)
+
+- **RFC number collision resolved.** The migration set keeps 050–054; the earlier
+  RFC-050 earmark for a future *Testing Strategy Refresh: Property Tests and Fuzz Boundary*
+  is renumbered to **RFC-055** (note updated in `rfcs/done/013-…`).
+- **RFC-051:** §9 clarifies its error categories are illustrative, not a required enum schema
+  (`matten-ndarray`'s existing `DynamicTensor`/`ZeroSizedAxis`/`NdarrayShape`/`Matten` is
+  compliant as-is); §15 marks the `matten-ndarray` audit **documentation-only** (no new error
+  variant); §17 resolves the open question — `to_<target>`/`from_<target>` is the default
+  bridge naming convention, following `to_arrayd`/`from_arrayd`.
+- **RFC-052:** softened the deprecated `ndarray` `.into_shape(...)` example to current
+  reshape APIs; added an acceptance rule (and matching handoff criterion) that playbook
+  performance/positioning sections stay **pending** with no numeric claims until official
+  RFC-049 Phase 2 peer numbers are accepted.
+- **RFC-054:** notes that, if ever approved, the tool starts as workspace-excluded,
+  `publish = false` tooling (like `benchmarks/`), not a published crate.
+- **Release-guard checklist:** made phrase-anchored only — no bare-word bans
+  (`always`/`never`/`automatic`/`replace`), which false-positive on legitimate text.
+
+### Threat model
+
+No change to any crate's code, API, dependency set, or runtime behavior. New files are
+planning documents; the only edits to existing files are RFC-index/earmark/ROADMAP text. No
+new data flow, integration, or auth surface.
+
+
 
 **v0.22.4 deep-review release-truth reconciliation.** Documentation, RFC status, and one
 guard only — no library code, public API, runtime behavior, or benchmark *logic* change in
