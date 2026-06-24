@@ -94,5 +94,10 @@ peer-comparison harness is implemented. Peer comparison is:
   is the one allowed exception).
 
 Run it with `cargo bench --manifest-path benchmarks/Cargo.toml --features peers --bench
-peers -- --noplot`; results go in `benchmarks/reports/peer-comparison-v0.1.md`. Phase 3
-(NumPy/Pandas) and hard performance gates are **not** authorized.
+peers -- --noplot`; results go in `benchmarks/reports/peer-comparison-v0.1.md`.
+
+The Phase 2 **harness and report template are implemented**, but the **official peer report
+is not complete** until maintainer-run medians fill the template on the same machine class as
+the accepted internal baseline; until then the report is a template and its sandbox appendix
+is illustrative-only, never cited as official. Phase 3 (NumPy/Pandas) and hard performance
+gates are **not** authorized.

@@ -1,5 +1,8 @@
 # Rust peer comparison — v0.1
 
+> **Report status:** Template only. Official maintainer-run peer numbers are pending.
+> Do not cite the appendix sandbox sample as official evidence.
+
 > **These results are workload-specific and environment-specific. They are a Rust peer
 > comparison for positioning, not a competitor ranking, and not a "faster than X" claim.**
 
@@ -61,12 +64,18 @@ why both peers cover all six.
 
 ## Interpretation
 
-Keep it modest and task-scoped. Expected shape of the story: `ndarray`/`nalgebra` are
-mature, optimized linear-algebra crates and will typically be faster on these dense
-matrix/vector kernels; `matten` trades some of that speed for a small, approachable,
-`Tensor`-centered API aimed at PoC/learning. State where the gap is small, where it is
-large (for example dense `matmul`), and where it is irrelevant at these sizes — without any
-ranking or superiority language.
+Keep it modest and task-scoped, in the "positioning, not ranking" register. The expected
+shape of the story: on these small dense vector/matrix kernels, `ndarray`/`nalgebra` are
+production-oriented numeric crates and will typically have less overhead than `matten`'s
+approachable `Tensor` API. Frame any gap as `matten` trading some performance for
+approachability and a small, `Tensor`-centered API aimed at PoC, learning, and small
+workflows — and as information that helps a user decide when to stay with `matten` and when
+to bridge/migrate intentionally. State where the gap is small, where it is large (for
+example dense `matmul`), and where it is irrelevant at these sizes.
+
+Use wording like "`matten` trades performance for approachability on these small dense
+kernels." Avoid "matten loses / is worse / too slow" or "ndarray/nalgebra are superior".
+This is the family-car-to-super-car migration framing, not a verdict.
 
 ## Limitations
 

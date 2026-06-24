@@ -222,6 +222,21 @@ if [ ${#bad_examples[@]} -gt 0 ]; then
   FAIL=1
 fi
 
+echo "=== Checking benchmark docs do not describe Phase 2 as unimplemented ==="
+# RFC-049 Phase 2 (Rust peer comparison harness/template) shipped in v0.22.4. Guard
+# against benchmark *status* docs drifting back to "only Phase 1 implemented" / "Phase 2
+# deferred / not implemented". Scoped to current benchmark docs only — NOT RFC history
+# (rfcs/) or CHANGELOG, where staged-rollout wording is legitimately preserved. Phase 3/4
+# deferral wording is allowed; only Phase 2-as-unimplemented is flagged.
+BENCH_DOCS_DIR="docs/src/benchmarks"
+if [ -d "$BENCH_DOCS_DIR" ]; then
+  if grep -RInE 'Only \*\*Phase 1.*implemented today' "$BENCH_DOCS_DIR" \
+     || grep -RInE 'Phase 2[^.]*(not yet implemented|not implemented|is deferred|remains deferred|still deferred|not yet authorized)' "$BENCH_DOCS_DIR"; then
+    echo "ERROR: benchmark docs still describe Phase 2 as unimplemented/deferred (it shipped in v0.22.4)"
+    FAIL=1
+  fi
+fi
+
 # ---------------------------------------------------------------------------
 # Result
 # ---------------------------------------------------------------------------

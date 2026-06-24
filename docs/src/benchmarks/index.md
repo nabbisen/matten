@@ -17,21 +17,23 @@ NumPy, SciPy, Pandas, or Candle. `matten` is a small, approachable, `Tensor`-cen
 Rust numeric crate for PoC, learning, and small workflows; the benchmarks exist to
 make that position legible.
 
-## Current status: Phase 1
+## Current status
 
-The benchmark program is staged. Only **Phase 1 — internal Rust baseline** is
-implemented today:
+The benchmark program is staged.
 
-- a benchmark harness (`benchmarks/`, kept outside the workspace and unpublished);
-- a core micro set and five scenario workloads drawn from the examples;
-- a peak-RSS memory note on Linux;
-- an internal baseline report.
+- **Phase 1 — internal Rust baseline: implemented and accepted.** A benchmark harness
+  (`benchmarks/`, kept outside the workspace and unpublished); a core micro set and five
+  scenario workloads drawn from the examples; a peak-RSS memory note on Linux; and an
+  accepted internal baseline report.
+- **Phase 2 — Rust peer comparison (`ndarray`/`nalgebra`): harness and report template
+  implemented; official maintainer-run numbers pending.** Peer tasks are opt-in behind the
+  `peers` feature (off by default) and the peer-comparison report is a template until it is
+  filled from a maintainer run on the same machine class as the internal baseline.
 
-Deferred (designed in RFC-049, not yet implemented):
+Still deferred (designed in RFC-049, not yet implemented/authorized):
 
-- **Phase 2** — Rust peer comparison (`ndarray`/`nalgebra`, small matrix/vector tasks);
 - **Phase 3** — ecosystem reference comparison (NumPy/Pandas), script-driven;
-- **Phase 4** — regression tracking policy and thresholds.
+- **Phase 4** — regression tracking policy and hard thresholds/gates.
 
 ## Read next
 

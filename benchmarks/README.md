@@ -1,4 +1,4 @@
-# `matten` benchmark harness (RFC-049, Phase 1)
+# `matten` benchmark harness (RFC-049) — Phase 1 baseline and Phase 2 peer comparison
 
 A small, reproducible benchmark harness for the `matten` workspace. Its purpose is
 to **clarify `matten`'s position with evidence** — execution time, memory behavior,
@@ -8,13 +8,18 @@ the full policy.
 
 ## Status: Phase 1 baseline + Phase 2 peer comparison (opt-in)
 
-Phase 1 (internal Rust baseline) and **Phase 2** (Rust peer comparison vs `ndarray` /
-`nalgebra`) are implemented. Phase 2 is **opt-in** behind the `peers` feature and off by
-default. Cross-language reference comparisons (NumPy/Pandas, Phase 3) and any regression
-thresholds (Phase 4) are designed in RFC-049 but **not yet implemented/authorized**.
+Phase 1 (internal Rust baseline) is implemented and **accepted**. **Phase 2** (Rust peer
+comparison vs `ndarray` / `nalgebra`) is implemented as a **harness + report template**;
+the *official* peer report is not complete until maintainer-run medians fill
+`reports/peer-comparison-v0.1.md` on the same machine class as the internal baseline. Phase 2
+is **opt-in** behind the `peers` feature and off by default. Cross-language reference
+comparisons (NumPy/Pandas, Phase 3) and any regression thresholds (Phase 4) are designed in
+RFC-049 but **not yet implemented/authorized**.
 
 ```bash
-# Phase 2 peer comparison (pulls ndarray + nalgebra; never in the default build or CI)
+# Phase 2 peer comparison.
+# Pulls ndarray + nalgebra; never in the default build or ordinary CI; compile-checked
+# only by the manual/scheduled peers workflow (.github/workflows/benchmarks-peers.yml).
 cargo bench --manifest-path benchmarks/Cargo.toml --features peers --bench peers -- --noplot
 ```
 

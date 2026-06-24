@@ -18,7 +18,54 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
-## [0.22.4] - 2026-06-24
+## [0.22.5] - 2026-06-24
+
+**v0.22.4 deep-review release-truth reconciliation.** Documentation, RFC status, and one
+guard only — no library code, public API, runtime behavior, or benchmark *logic* change in
+any crate. The architect's v0.22.4 codebase deep review accepted the Phase 2 harness/template
+implementation (no P0/P1 source blockers) and requested status-text fixes: several benchmark
+status docs still described Phase 2 as deferred after the harness/template shipped. The
+companion benchmarking/positioning review separately accepted the baseline (archival-ready)
+and the peer template, and confirmed nalgebra-on-all-six and official-numbers-pending — no
+change required from it.
+
+Throughout, the harness/template-implemented state is now consistently distinguished from the
+*official peer report complete* state (which still awaits a maintainer run).
+
+### Changed
+
+- **`docs/src/benchmarks/index.md` (P1):** status section rewritten — Phase 1 accepted;
+  Phase 2 harness/template implemented with official maintainer-run numbers pending; only
+  Phases 3–4 still deferred (was "Current status: Phase 1 / Phase 2 deferred").
+- **RFC-049 header (P1):** Status / Target Release / Acceptance reconciled with reality —
+  Phase 2 harness/template implemented in v0.22.4, official peer numbers pending, Phases 3–4
+  deferred; stays in `proposed/` per the 4-folder lifecycle. (The RFC body's Phase 2 section
+  was already updated in v0.22.4; this removes the header/body inconsistency.)
+- **`benchmarks/README.md` (P2):** title no longer says "Phase 1"; status distinguishes the
+  implemented harness/template from the pending official report; the peer command comment now
+  says "never in the default build or ordinary CI; compile-checked only by the
+  manual/scheduled peers workflow".
+- **`benchmarks/reports/peer-comparison-v0.1.md` (P2):** explicit top-level status marker
+  ("Template only; official maintainer-run peer numbers pending; do not cite the sandbox
+  appendix"); interpretation guidance aligned with the architect's positioning/migration tone
+  (trades performance for approachability; no "loses/worse/superior" language).
+- **`docs/src/benchmarks/methodology.md` (P2):** states the harness/template are implemented
+  but the official peer report is not complete until maintainer-run medians fill the template.
+
+### Added
+
+- **`scripts/check-release-docs.sh` benchmark-status-drift guard (P2):** fails if the current
+  benchmark docs (`docs/src/benchmarks/` only — not RFC history or CHANGELOG) describe Phase 2
+  as unimplemented/deferred. Phase 3/4 deferral wording remains allowed. Positive/negative
+  tested; rides the existing release-docs gate already in CI and the release checklist.
+
+### Threat model
+
+No change to any published crate's code, API, dependency set, or runtime behavior, and no
+change to benchmark logic or the peers isolation properties. Documentation/status text and one
+narrowly-scoped documentation guard only.
+
+
 
 **RFC-049 Phase 2 — Rust peer comparison (opt-in)**, plus the accepted Phase 1 internal
 baseline report and a workspace-config fix. The published crates — core `matten`,

@@ -1,13 +1,18 @@
 # RFC-049: Benchmarking, Complexity Metrics, and Positioning Report
 
-**Status:** Accepted (Phase 1 authorized; Phases 2–4 deferred)  
-**Target Release:** Phase 1 internal baseline in v0.22.1; later phases TBD  
+**Status:** Accepted. Phase 1 implemented; Phase 2 harness/template implemented (official
+peer numbers pending a maintainer run); Phases 3–4 deferred.  
+**Target Release:** Phase 1 internal baseline in v0.22.1; Phase 2 peer-comparison
+harness/template in v0.22.4; official Phase 2 numbers pending maintainer run; Phases 3–4 TBD.  
 **Acceptance:** Approved by architect ruling (2026-06-24). Phase 1 (PR-049-1 methodology
-docs + PR-049-2 internal Rust baseline harness) is authorized and implemented in v0.22.1.
-Phase 2 (Rust peer comparison), Phase 3 (NumPy/Pandas reference comparison), and Phase 4
-(regression thresholds) remain designed but **not yet authorized for implementation** —
-they wait until Phase 1 produces one credible internal baseline report. Per the 4-folder
-RFC lifecycle, this RFC stays in `proposed/` until fully implemented.  
+docs + PR-049-2 internal Rust baseline harness) is authorized and implemented in v0.22.1; its
+internal baseline was accepted (Baseline ID `matten-rfc049-internal-baseline-v0.1`). Phase 2
+(Rust peer comparison) was authorized once that baseline was accepted and its harness +
+report template are implemented in v0.22.4 under the `peers` feature — the *official* peer
+report is not complete until maintainer-run medians fill the template. Phase 3 (NumPy/Pandas
+reference comparison) and Phase 4 (regression thresholds / hard gates) remain designed but
+**not authorized**. Per the 4-folder RFC lifecycle, this RFC stays in `proposed/` until fully
+implemented or explicitly split/resolved.  
 **Owner:** `matten` maintainers  
 **Related:** RFC-030, RFC-033–048, RFC-038, RFC-040, RFC-041  
 **Scope:** Benchmark harness, reproducible measurement policy, complexity metrics, positioning report  
