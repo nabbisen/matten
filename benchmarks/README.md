@@ -9,12 +9,12 @@ the full policy.
 ## Status: Phase 1 baseline + Phase 2 peer comparison (opt-in)
 
 Phase 1 (internal Rust baseline) is implemented and **accepted**. **Phase 2** (Rust peer
-comparison vs `ndarray` / `nalgebra`) is implemented as a **harness + report template**;
-the *official* peer report is not complete until maintainer-run medians fill
-`reports/peer-comparison-v0.1.md` on the same machine class as the internal baseline. Phase 2
-is **opt-in** behind the `peers` feature and off by default. Cross-language reference
-comparisons (NumPy/Pandas, Phase 3) and any regression thresholds (Phase 4) are designed in
-RFC-049 but **not yet implemented/authorized**.
+comparison vs `ndarray` / `nalgebra`) is **complete and accepted** (architect ruling
+2026-06-25): the official report is filled from a maintainer run on the baseline's machine
+class (`reports/peer-comparison-v0.1.md`). Phase 2 remains **opt-in** behind the `peers`
+feature and off by default. Cross-language reference comparisons (NumPy/Pandas, Phase 3) and
+any regression thresholds (Phase 4) are designed in RFC-049 but **not yet
+implemented/authorized**.
 
 ```bash
 # Phase 2 peer comparison.

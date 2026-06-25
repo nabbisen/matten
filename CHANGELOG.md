@@ -18,7 +18,38 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
-## [0.22.6] - 2026-06-24
+## [0.22.7] - 2026-06-25
+
+**RFC-049 Phase 2 accepted — documentation reconciliation.** Docs/RFC/report wording only;
+no library code, public API, runtime behavior, or dependency change in any crate. The
+architect accepted the official maintainer-run Rust peer comparison (commit `007031c`,
+v0.22.6, baseline machine class) as the RFC-049 Phase 2 official report. Phase 2 is now
+complete; Phase 3 (NumPy/Pandas) and Phase 4 (hard gates) remain unauthorized, and no
+optimization work is required.
+
+### Changed
+
+- **`benchmarks/reports/peer-comparison-v0.1.md`:** added the architect acceptance marker and
+  Report ID (`matten-rfc049-rust-peer-comparison-v0.1`); status changed from "pending
+  acceptance" to accepted; added the "natural representation = task-level workflow cost, not
+  identical internal strategy" clarification; **corrected the nalgebra version note** — `0.33.3`
+  is pinned by the project's Rust 1.85 compatibility floor (Cargo's MSRV-aware resolver), and
+  `nalgebra 0.35.0` (needs Rust 1.89) would require an explicit MSRV-policy decision; it is not
+  a constraint of the maintainer's 1.93 toolchain.
+- **Benchmark docs (`docs/src/benchmarks/index.md`, `methodology.md`, `benchmarks/README.md`):**
+  Phase 2 wording flipped from "official numbers pending" to "complete and accepted (2026-06-25)".
+- **RFC-049 (header, Phase 2 annotation, index line):** Phase 2 marked implemented and
+  accepted; Phases 3–4 still deferred; remains in `proposed/` until those are resolved.
+- **RFC-052:** added a peer-evidence citation note — playbooks may now cite the accepted
+  task-scoped results under the prior constraints (no ranking, no "faster than X", no universal
+  migration mandate).
+
+### Threat model
+
+No change to any crate's code, API, dependency set, or runtime behavior. Documentation/report
+status text only; no new data flow, integration, or auth surface.
+
+
 
 **Production-migration RFC set (RFC-050–054) accepted and ingested** — planning/docs only.
 No library code, public API, runtime behavior, or dependency change in any crate; this

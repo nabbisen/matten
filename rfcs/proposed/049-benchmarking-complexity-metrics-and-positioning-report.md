@@ -1,18 +1,19 @@
 # RFC-049: Benchmarking, Complexity Metrics, and Positioning Report
 
-**Status:** Accepted. Phase 1 implemented; Phase 2 harness/template implemented (official
-peer numbers pending a maintainer run); Phases 3–4 deferred.  
+**Status:** Accepted. Phase 1 implemented and accepted; Phase 2 implemented and accepted
+(official Rust peer comparison accepted 2026-06-25); Phases 3–4 deferred.  
 **Target Release:** Phase 1 internal baseline in v0.22.1; Phase 2 peer-comparison
-harness/template in v0.22.4; official Phase 2 numbers pending maintainer run; Phases 3–4 TBD.  
+harness/template in v0.22.4; official Phase 2 peer comparison accepted in v0.22.7; Phases 3–4 TBD.  
 **Acceptance:** Approved by architect ruling (2026-06-24). Phase 1 (PR-049-1 methodology
 docs + PR-049-2 internal Rust baseline harness) is authorized and implemented in v0.22.1; its
 internal baseline was accepted (Baseline ID `matten-rfc049-internal-baseline-v0.1`). Phase 2
-(Rust peer comparison) was authorized once that baseline was accepted and its harness +
-report template are implemented in v0.22.4 under the `peers` feature — the *official* peer
-report is not complete until maintainer-run medians fill the template. Phase 3 (NumPy/Pandas
-reference comparison) and Phase 4 (regression thresholds / hard gates) remain designed but
-**not authorized**. Per the 4-folder RFC lifecycle, this RFC stays in `proposed/` until fully
-implemented or explicitly split/resolved.  
+(Rust peer comparison) was authorized once that baseline was accepted; its harness +
+report template shipped in v0.22.4 under the `peers` feature, and the **official peer
+comparison was filled from a maintainer run and accepted by architect ruling on 2026-06-25**
+(Report ID `matten-rfc049-rust-peer-comparison-v0.1`). Phase 3 (NumPy/Pandas reference
+comparison) and Phase 4 (regression thresholds / hard gates) remain designed but **not
+authorized**. Per the 4-folder RFC lifecycle, this RFC stays in `proposed/` until fully
+implemented or explicitly split/resolved (Phases 3–4 remain).  
 **Owner:** `matten` maintainers  
 **Related:** RFC-030, RFC-033–048, RFC-038, RFC-040, RFC-041  
 **Scope:** Benchmark harness, reproducible measurement policy, complexity metrics, positioning report  
@@ -388,10 +389,11 @@ Acceptance:
 ### Phase 2: Rust peer comparison
 
 > **Phase 2 design rulings (architect, 2026-06-24) — AUTHORIZED 2026-06-24; harness
-> IMPLEMENTED in v0.22.4.** Phase 2 was authorized once the maintainer-run internal
-> baseline (Phase 1) was accepted. The peer-comparison harness is implemented under the
-> settled design below; Phase 3 (NumPy/Pandas) and hard performance gates remain
-> unauthorized.
+> IMPLEMENTED in v0.22.4; official Rust peer comparison ACCEPTED 2026-06-25 (Report ID
+> `matten-rfc049-rust-peer-comparison-v0.1`).** Phase 2 was authorized once the maintainer-run
+> internal baseline (Phase 1) was accepted. The peer-comparison harness is implemented under
+> the settled design below, and the official peer comparison has been filled from a maintainer
+> run and accepted. Phase 3 (NumPy/Pandas) and hard performance gates remain unauthorized.
 >
 > - **Peer-dependency isolation (B1).** Do not rely on workspace exclusion alone. Published
 >   crates must be *positively proven* free of peer deps via

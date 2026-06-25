@@ -38,6 +38,16 @@ Pandas
 
 The first implementation should prioritize `ndarray` and `nalgebra`, because those align most directly with RFC-049 Phase 2 Rust peer comparison.
 
+> **Peer-evidence status (2026-06-25).** The official RFC-049 Phase 2 Rust peer comparison is
+> **accepted** (`benchmarks/reports/peer-comparison-v0.1.md`, Report ID
+> `matten-rfc049-rust-peer-comparison-v0.1`). Playbooks **may** cite its results, but only
+> task-scoped and with the same machine / small-fixed-size caveat — no ranking, no
+> "faster than X", no universal migration mandate. Allowed shape: "In the accepted RFC-049
+> Phase 2 peer comparison, dense `matmul` and matrix-vector tasks showed a larger gap than
+> lighter vector-style tasks; if those kernels become production hot paths, consider moving
+> that part of the workflow to `ndarray` or `nalgebra`." Forbidden: "ndarray/nalgebra are
+> better than matten", "matten is too slow for production", "replace matten after PoC".
+
 ---
 
 ## 2. Motivation

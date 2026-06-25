@@ -96,8 +96,9 @@ peer-comparison harness is implemented. Peer comparison is:
 Run it with `cargo bench --manifest-path benchmarks/Cargo.toml --features peers --bench
 peers -- --noplot`; results go in `benchmarks/reports/peer-comparison-v0.1.md`.
 
-The Phase 2 **harness and report template are implemented**, but the **official peer report
-is not complete** until maintainer-run medians fill the template on the same machine class as
-the accepted internal baseline; until then the report is a template and its sandbox appendix
-is illustrative-only, never cited as official. Phase 3 (NumPy/Pandas) and hard performance
-gates are **not** authorized.
+The Phase 2 **harness, report template, and official peer report are complete**: the
+official Rust peer comparison was filled from a maintainer run on the same machine class as
+the accepted internal baseline and **accepted by architect ruling on 2026-06-25**
+(`benchmarks/reports/peer-comparison-v0.1.md`, Report ID
+`matten-rfc049-rust-peer-comparison-v0.1`). Phase 3 (NumPy/Pandas) and hard performance
+gates remain **not** authorized.

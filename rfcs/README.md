@@ -62,7 +62,7 @@ for RFC state; the Status field inside each file mirrors the folder.
 |---:|---|---|
 | 026 | [Large CSV and Streaming Data Policy](./proposed/026-large-csv-and-streaming-data-policy.md) | design spike no earlier than v0.20+ |
 | 037 | [Deferred Streaming and Large CSV Policy](./proposed/037-deferred-streaming-and-large-csv-policy.md) | v0.20.0 / later |
-| 049 | [Benchmarking, Complexity Metrics, and Positioning Report](./proposed/049-benchmarking-complexity-metrics-and-positioning-report.md) | **Accepted** — Phase 1 internal baseline shipped in 0.22.1; Phases 2–4 deferred |
+| 049 | [Benchmarking, Complexity Metrics, and Positioning Report](./proposed/049-benchmarking-complexity-metrics-and-positioning-report.md) | **Accepted** — Phase 1 baseline (0.22.1) + Phase 2 Rust peer comparison (accepted 2026-06-25) complete; Phases 3–4 deferred |
 | 050 | [Production Migration Guide and Bridge Strategy](./proposed/050-production-migration-guide-and-bridge-strategy.md) | **Accepted** (2026-06-24) — docs; planned v0.23.0 |
 | 051 | [Bridge Conversion Contracts and Companion-Crate Policy](./proposed/051-bridge-conversion-contracts-and-companion-crate-policy.md) | **Accepted** (2026-06-24) — docs/policy; planned v0.23.x |
 | 052 | [Production Target Playbooks](./proposed/052-production-target-playbooks.md) | **Accepted** (2026-06-24) — docs; planned v0.23.x |

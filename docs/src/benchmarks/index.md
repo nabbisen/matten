@@ -25,10 +25,10 @@ The benchmark program is staged.
   (`benchmarks/`, kept outside the workspace and unpublished); a core micro set and five
   scenario workloads drawn from the examples; a peak-RSS memory note on Linux; and an
   accepted internal baseline report.
-- **Phase 2 — Rust peer comparison (`ndarray`/`nalgebra`): harness and report template
-  implemented; official maintainer-run numbers pending.** Peer tasks are opt-in behind the
-  `peers` feature (off by default) and the peer-comparison report is a template until it is
-  filled from a maintainer run on the same machine class as the internal baseline.
+- **Phase 2 — Rust peer comparison (`ndarray`/`nalgebra`): complete and accepted.** The
+  official peer comparison was filled from a maintainer run on the baseline's machine class
+  and accepted by architect ruling on 2026-06-25. Peer tasks are opt-in behind the `peers`
+  feature (off by default).
 
 Still deferred (designed in RFC-049, not yet implemented/authorized):
 
