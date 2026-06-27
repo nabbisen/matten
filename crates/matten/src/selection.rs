@@ -116,3 +116,6 @@ impl Tensor {
         arg_extreme(&self.data, "argmax", false)
     }
 }
+
+#[cfg(test)]
+mod tests;

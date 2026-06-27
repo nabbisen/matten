@@ -161,3 +161,6 @@ impl fmt::Display for DataFormat {
         }
     }
 }
+
+#[cfg(test)]
+mod tests;

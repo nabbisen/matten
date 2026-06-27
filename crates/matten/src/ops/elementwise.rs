@@ -135,3 +135,6 @@ impl Tensor {
         Ok(self.map_unchecked(|v| v.clamp(min, max)))
     }
 }
+
+#[cfg(test)]
+mod tests;

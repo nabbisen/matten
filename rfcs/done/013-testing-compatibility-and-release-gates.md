@@ -226,7 +226,8 @@ Property-based tests and a fuzz harness are **not** part of the current release 
 their absence is not a defect — they remain *future hardening candidates*, to be added
 selectively (shape/broadcast/reduction invariants for property tests; CSV/JSON/parser
 boundaries for fuzzing) rather than broadly. A future focused item ("Testing Strategy
-Refresh: Property Tests and Fuzz Boundary", candidate **RFC-055** unless already allocated
-when it lands — renumbered from the earlier RFC-050 earmark, which RFC-050–054 now use for
-the production-migration set) may formalize this if the team chooses. This note records that
+Refresh: Property Tests and Fuzz Boundary", candidate **RFC-057** unless already allocated
+when it lands — renumbered from the earlier RFC-055 earmark, which itself superseded an
+RFC-050 earmark: RFC-050–054 took the production-migration set and RFC-055/RFC-056 the v0.24
+fallible-reduction set) may formalize this if the team chooses. This note records that
 RFC-013's broad strategy is partially aspirational relative to the shipped discipline.

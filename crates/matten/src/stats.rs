@@ -240,3 +240,6 @@ impl Tensor {
         Ok(v)
     }
 }
+
+#[cfg(test)]
+mod tests;

@@ -373,3 +373,6 @@ fn parse_axis_spec(part: &str, full: &str) -> Result<SliceSpec, MattenError> {
     }
     Ok(SliceSpec::Range { start, end, step })
 }
+
+#[cfg(test)]
+mod tests;

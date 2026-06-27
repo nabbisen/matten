@@ -105,3 +105,6 @@ pub(crate) fn validate_axes(
     }
     Ok(())
 }
+
+#[cfg(test)]
+mod tests;

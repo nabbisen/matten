@@ -115,6 +115,3 @@ pub use crate::slice::{IntoSliceRange, SliceConvert, SliceSpecRepr};
 pub use crate::tensor::Tensor;
 
 // `Element` is the dynamic value type, exported under `dynamic`.
-
-#[cfg(test)]
-mod tests;

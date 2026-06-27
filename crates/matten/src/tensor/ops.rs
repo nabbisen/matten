@@ -357,3 +357,6 @@ impl Tensor {
         crate::parse::csv::from_csv_str(&content)
     }
 }
+
+#[cfg(test)]
+mod tests;

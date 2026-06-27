@@ -265,3 +265,6 @@ impl Tensor {
         })
     }
 }
+
+#[cfg(test)]
+mod tests;

@@ -113,3 +113,6 @@ pub(crate) fn flat_to_coord(flat: usize, shape: &[usize]) -> Vec<usize> {
     }
     coord
 }
+
+#[cfg(test)]
+mod tests;

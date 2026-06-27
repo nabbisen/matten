@@ -667,3 +667,6 @@ fn dim_check(left: usize, right: usize, left_name: &str, right_name: &str, op: &
         );
     }
 }
+
+#[cfg(test)]
+mod tests;

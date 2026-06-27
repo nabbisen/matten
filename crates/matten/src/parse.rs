@@ -7,3 +7,6 @@ pub(crate) mod json;
 
 #[cfg(feature = "csv")]
 pub(crate) mod csv;
+
+#[cfg(test)]
+mod tests;

@@ -153,3 +153,6 @@ pub(crate) fn flatten_rectangular(
     }
     Ok((flat, vec![row_count, col_count]))
 }
+
+#[cfg(test)]
+mod tests;

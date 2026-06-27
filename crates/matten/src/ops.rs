@@ -11,3 +11,6 @@ mod elementwise;
 mod scalar_ops;
 mod tensor_ops;
 mod unary_ops;
+
+#[cfg(test)]
+mod tests;

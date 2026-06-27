@@ -495,3 +495,6 @@ fn arange_impl(
 
 // Shape operations, slicing, and boundary integration (split per 300-ELOC rule).
 mod ops;
+
+#[cfg(test)]
+mod tests;

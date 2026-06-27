@@ -23,3 +23,6 @@ pub(crate) mod tensor_ext;
 pub use element::Element;
 
 pub use policy::NumericPolicy;
+
+#[cfg(test)]
+mod tests;

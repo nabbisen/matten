@@ -18,6 +18,38 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.24.2] - 2026-06-27
+
+**Test-organization refactor — co-locate unit tests with their modules.** Internal only; no
+library code, public API, runtime behaviour, or dependency change. No test was added, removed, or
+re-gated (test counts are identical to v0.24.1).
+
+### Changed
+
+- Migrated the centralized `src/tests/<module>.rs` tree to the co-located layout
+  `src/<module>/tests.rs`, each wired by a `#[cfg(test)] mod tests;` in its parent module. This
+  matches the project testing guideline and the pattern `src/ops/broadcast.rs` already used; the
+  central `src/tests.rs` declarer and `src/tests/` directory (and the central `mod tests;` in
+  `lib.rs`) are removed.
+- The two tests without an eponymous source file are co-located with the module they exercise:
+  shape-op tests → `src/tensor/ops/tests.rs`; element-wise tests → `src/ops/elementwise/tests.rs`.
+- Split the `math` test file (was ~478 lines) into themed groups under `src/math/tests/`:
+  `whole.rs`, `axis.rs`, `matmul.rs`, `dynamic.rs` — each well under the 300-line guideline.
+- The `dynamic` test sub-tree moved intact to `src/dynamic/tests/`, feature-gating preserved (the
+  dynamic tests remain skipped in lean builds).
+- RFC bookkeeping: corrected a stale earmark in `rfcs/done/013` — the future "Testing Strategy
+  Refresh" candidate was still listed as RFC-055, now taken by the v0.24 reductions; updated to
+  candidate RFC-057.
+
+Audit note: no inline `#[test]` / `mod tests { … }` blocks were found in any source module, so
+this was a relocation of already-externalized tests, not an extraction.
+
+### Threat model
+
+Test-only reorganization. No new data flow, external integration, auth surface, public API, or
+dependency; runtime and error contracts are unchanged. Existing controls verified to remain valid;
+no threat-model change.
+
 ## [0.24.1] - 2026-06-27
 
 **v0.24.0 deep-review response (P1 + P2 + optional P3).** Docs, release-tooling, and test-only;
