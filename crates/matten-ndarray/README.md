@@ -61,6 +61,25 @@ let back = from_arrayd(arr)?;     // ArrayD<f64> -> Tensor
   `Tensor::try_numeric()` first.
 - **Supported `ndarray`:** the `0.16` minor.
 
+## Conversion contract
+
+`matten-ndarray` follows the bridge [conversion-contract](../../docs/src/migration/bridge-contracts.md)
+template. The full contract:
+
+| Dimension | `matten-ndarray` |
+|---|---|
+| Source / target | `matten::Tensor` ↔ `ndarray::ArrayD<f64>` |
+| Direction | Bidirectional: `to_arrayd(&Tensor)`, `from_arrayd(ArrayD<f64>)` |
+| Copy / view | Copies both directions; no zero-copy |
+| Shape / rank | Shape preserved; rank bounded by core `matten` (over-rank → `Matten` error) |
+| Memory order | Row-major logical order both ways; `from_arrayd` honors non-standard layouts |
+| Dynamic tensors | Rejected → `DynamicTensor` (unconditional; not a panic) |
+| NaN | Passed through as ordinary `f64` |
+| Missing values | Not reachable (numeric-only; dynamic rejected first) |
+| Integer / text / bool | Not reachable (`f64`-only; dynamic element kinds rejected) |
+| Errors | `Result<_, MattenNdarrayError>`; variants `DynamicTensor`, `ZeroSizedAxis`, `NdarrayShape`, `Matten` |
+| Performance | Allocates and copies — convert once at the boundary, not in a hot loop |
+
 ## Compatibility
 
 - **SemVer:** pre-1.0 (`0.x`). A `0.x` minor bump may contain breaking changes;

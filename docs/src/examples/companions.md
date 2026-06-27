@@ -16,7 +16,10 @@ not add duplicate or renamed companion examples.
 | [`to_arrayd`](https://github.com/nabbisen/matten/blob/main/crates/matten-ndarray/examples/to_arrayd.rs) | `matten::Tensor` → `ndarray::ArrayD<f64>` |
 
 Both conversions **copy** data (no zero-copy claim) and preserve shape. Only numeric
-tensors convert to `ndarray`.
+tensors convert to `ndarray`. The full conversion rules are documented as a
+[bridge conversion contract](../migration/bridge-contracts.md); the
+[bridge-crate policy](../migration/bridge-crate-policy.md) covers how bridge crates are
+structured (own their target dependency, never re-export `Tensor`).
 
 ```bash
 cargo run -p matten-ndarray --example from_arrayd

@@ -18,7 +18,45 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
-## [0.23.1] - 2026-06-25
+## [0.23.2] - 2026-06-25
+
+**Production migration guide — RFC-051 bridge conversion contracts.** Documentation only; no
+library code, public API, runtime behavior, or dependency change in any crate. Formalizes the
+bridge conversion-contract template and the bridge-crate policy, and documents the reference
+`matten-ndarray` contract verified against its implementation.
+
+### Added
+
+- **`docs/src/migration/bridge-contracts.md`** — the conversion-contract template (13
+  dimensions: source/target, direction, copy/view, shape/rank, memory order, dynamic-tensor,
+  NaN, missing-value, integer/text/bool, error behavior, performance, examples) plus the
+  filled-in `matten-ndarray` reference contract. The `matten-ndarray` row was checked against
+  `convert.rs`/`error.rs`: copies both ways, numeric-only, rejects dynamic tensors
+  (`DynamicTensor`, unconditional, not a panic), preserves logical row-major order through
+  non-standard layouts, rejects zero-sized axes, `Result` never panics. Records that RFC-051's
+  generic error categories are illustrative, not a required enum schema.
+- **`docs/src/migration/bridge-crate-policy.md`** — bridge crates own their target dependency,
+  never re-export `Tensor` (confirmed: `matten-ndarray` exports only `to_arrayd`/`from_arrayd`/
+  `MattenNdarrayError`), use `to_<target>`/`from_<target>` naming, return `Result`, and publish
+  a contract; includes a future-bridge checklist and the rule that new bridge crates need
+  separate approval. Notes the CI-enforced published-dependency isolation guard.
+
+### Changed
+
+- `crates/matten-ndarray/README.md`: added the conversion-contract table.
+- `docs/src/examples/companions.md`: cross-links the bridge contract and policy pages.
+- `docs/src/SUMMARY.md`: lists the two new migration pages.
+
+### Still staged
+
+RFC-053 migration-readiness diagnostics (report template, checklist, worked example) — the
+last RFC in this migration batch. RFC-054 (`matten-migrate` CLI) remains deferred.
+
+### Threat model
+
+No change to any crate's code, API, dependency set, or runtime behavior. Documentation only.
+
+
 
 **Production migration guide — RFC-052 completed (remaining target playbooks).** New
 documentation only; no library code, public API, runtime behavior, or dependency change in

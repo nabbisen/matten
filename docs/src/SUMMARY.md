@@ -45,6 +45,8 @@
 - [When to migrate](./migration/when-to-migrate.md)
 - [Choosing a target](./migration/target-selection.md)
 - [Common pitfalls](./migration/common-pitfalls.md)
+- [Bridge conversion contracts](./migration/bridge-contracts.md)
+- [Bridge-crate policy](./migration/bridge-crate-policy.md)
 - [Target playbooks](./migration/playbooks/index.md)
   - [ndarray](./migration/playbooks/ndarray.md)
   - [nalgebra](./migration/playbooks/nalgebra.md)
