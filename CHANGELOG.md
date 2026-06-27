@@ -18,6 +18,32 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.24.3] - 2026-06-27
+
+**Fix an unused-import warning in the split `math` dynamic tests.** Test-only; no library code,
+public API, runtime behaviour, or dependency change.
+
+### Fixed
+
+- `crates/matten/src/math/tests/dynamic.rs` (introduced by the v0.24.2 test split) imported
+  `MattenError` and `Tensor` unconditionally, but every test in the file is
+  `#[cfg(feature = "dynamic")]`, so the import was unused in any build without the `dynamic`
+  feature (including the default `cargo test` / `cargo clippy`), which the release checklist's
+  `cargo clippy … -D warnings` step flags. The import is now feature-gated
+  (`#[cfg(feature = "dynamic")] use crate::{MattenError, Tensor};`) to match the tests that use it
+  — so it is neither unused without the feature nor missing with it. Clippy is now clean across
+  the default, lean, and `dynamic`/all-features configurations.
+
+Process note: v0.24.2 shipped with this warning because the local pre-tarball gate skipped the
+checklist's clippy `-D warnings` steps; those steps (which already existed and would have caught
+it) are now part of every release run.
+
+### Threat model
+
+Test-only change. No new data flow, external integration, auth surface, public API, or
+dependency; runtime and error contracts are unchanged. Existing controls verified to remain valid;
+no threat-model change.
+
 ## [0.24.2] - 2026-06-27
 
 **Test-organization refactor — co-locate unit tests with their modules.** Internal only; no

@@ -1,3 +1,6 @@
+#[cfg(feature = "dynamic")]
+use crate::{MattenError, Tensor};
+
 // ── dynamic rejection (RFC-055/056) ───────────────────────────────────────
 
 #[cfg(feature = "dynamic")]
