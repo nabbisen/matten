@@ -1,5 +1,10 @@
 # Migration to specialised libraries
 
+> For the full narrative guide — when to stay vs. migrate, a target-selection matrix, and
+> per-target playbooks — see the [Production migration guide](../migration/index.md). This
+> reference page is the quick, copy-paste companion: data-export snippets and minimal
+> conversions.
+
 `matten` is a **starting point**, not an endpoint. When a PoC graduates to
 production or numerical performance becomes critical, migrate the data to a
 specialised crate. This page shows how.

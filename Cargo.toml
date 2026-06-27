@@ -28,7 +28,7 @@ exclude = [
 # this version. Per-crate `keywords`/`categories`/`description` are NOT shared —
 # they differ per crate and aid crates.io discoverability.
 [workspace.package]
-version = "0.22.7"
+version = "0.23.0"
 edition         = "2024"
 rust-version    = "1.85"
 license         = "Apache-2.0"
@@ -38,7 +38,7 @@ repository      = "https://github.com/nabbisen/matten"
 # Core `matten` is path-published; companions depend on it by path + version so
 # they resolve locally in the workspace and by version on crates.io.
 [workspace.dependencies]
-matten              = { version = "0.22", path = "crates/matten", default-features = false }
+matten              = { version = "0.23", path = "crates/matten", default-features = false }
 ndarray             = "0.16"
 serde               = { version = "1", features = ["derive"] }
 serde_json          = "1"

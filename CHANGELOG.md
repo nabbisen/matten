@@ -18,7 +18,54 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
-## [0.22.7] - 2026-06-25
+## [0.23.0] - 2026-06-25
+
+**Production migration guide — first release (RFC-050 + RFC-052 Rust playbooks).** New
+documentation only; no library code, public API, runtime behavior, or dependency change in
+any crate. Core `matten` gains **no** new dependency. This is the first stage of the
+"family-car → super-car" migration program (RFC-050–054); the architect prioritized the
+Rust-target playbooks, which this release delivers.
+
+### Added
+
+- **`docs/src/migration/` guide (RFC-050 foundation):** `index.md` (the migration promise —
+  "outgrowing matten is a successful PoC outcome"; matten stays dependency-light; not an
+  automatic code rewriter), `when-to-migrate.md` (stay-vs-migrate pressure signals),
+  `target-selection.md` (workload → ecosystem matrix + decision path), and
+  `common-pitfalls.md` (row-major vs column-major, convert-once, `f64`/`f32`, dynamic →
+  numeric first).
+- **Target playbooks (RFC-052, Rust targets):** `playbooks/index.md` (decision tree),
+  `playbooks/ndarray.md`, and `playbooks/nalgebra.md` — each with the full section set
+  (choose / do not choose / concept mapping / example migrations / conversion path /
+  pitfalls / positioning notes / checklist). The `ndarray` playbook leads with the
+  contract-backed `matten-ndarray` bridge (`to_arrayd`/`from_arrayd`); `nalgebra` documents
+  the manual `from_row_slice` path and notes no `matten-nalgebra` bridge exists yet.
+  Positioning notes cite the **accepted** RFC-049 peer comparison task-scoped (no ranking,
+  no "faster than" claims).
+- **Migration release-doc guard:** `scripts/check-release-docs.sh` now fails on overclaim
+  phrases in `docs/src/migration/` (speed-superiority, "drop-in replacement",
+  auto-rewrite-your-code), phrase-anchored with a future/deferred exception for the one
+  phrase that legitimately appears in RFC-054 context. Positive/negative tested.
+
+### Changed
+
+- `docs/src/SUMMARY.md`: new top-level **Migration** section.
+- `docs/src/reference/migration.md`: now cross-links to the comprehensive guide and is
+  framed as its quick copy-paste companion (no duplication).
+
+### Not in this release (staged for v0.23.x)
+
+The remaining RFC-052 playbooks (Polars/Pandas, Candle, NumPy), RFC-051 bridge-contract
+pages + the `matten-ndarray` contract table, and RFC-053 migration-readiness diagnostics.
+RFC-054 (`matten-migrate` CLI) remains deferred.
+
+### Threat model
+
+No change to any crate's code, API, dependency set, or runtime behavior. New files are
+documentation; the only guard change is a scoped documentation check. No new data flow,
+integration, or auth surface.
+
+
 
 **RFC-049 Phase 2 accepted — documentation reconciliation.** Docs/RFC/report wording only;
 no library code, public API, runtime behavior, or dependency change in any crate. The

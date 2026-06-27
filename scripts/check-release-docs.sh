@@ -237,6 +237,25 @@ if [ -d "$BENCH_DOCS_DIR" ]; then
   fi
 fi
 
+echo "=== Checking migration docs avoid overclaim phrases ==="
+# RFC-050-052 migration docs (docs/src/migration/) must stay in the positioning register:
+# no speed-superiority claims, no "drop-in replacement", no claim that matten auto-rewrites
+# code. Phrase-anchored (multi-word) only, per architect ruling — no bare-word bans. Scoped
+# to docs/src/migration/ only (NOT rfcs/ history or CHANGELOG). The one phrase that may
+# legitimately appear in RFC-054 (matten-migrate) future/deferred context is allowed there.
+MIG_DOCS_DIR="docs/src/migration"
+if [ -d "$MIG_DOCS_DIR" ]; then
+  if grep -RInE 'faster than|drop-in replacement|automatically convert|replace matten with|matten is better than|production-ready replacement' "$MIG_DOCS_DIR"; then
+    echo "ERROR: migration docs contain an overclaim/ranking phrase (positioning, not ranking)"
+    FAIL=1
+  fi
+  # "automatic conversion" is allowed only in matten-migrate future/deferred context.
+  if grep -RInE 'automatic conversion' "$MIG_DOCS_DIR" | grep -viE 'matten-migrate|deferred|future'; then
+    echo "ERROR: migration docs claim 'automatic conversion' outside RFC-054 future/deferred context"
+    FAIL=1
+  fi
+fi
+
 # ---------------------------------------------------------------------------
 # Result
 # ---------------------------------------------------------------------------

@@ -39,6 +39,16 @@
 - [Compatibility and stability](./reference/compatibility.md)
 - [Public API snapshot](./reference/public-api-snapshot.md)
 
+# Migration
+
+- [Production migration guide](./migration/index.md)
+- [When to migrate](./migration/when-to-migrate.md)
+- [Choosing a target](./migration/target-selection.md)
+- [Common pitfalls](./migration/common-pitfalls.md)
+- [Target playbooks](./migration/playbooks/index.md)
+  - [ndarray](./migration/playbooks/ndarray.md)
+  - [nalgebra](./migration/playbooks/nalgebra.md)
+
 # Benchmarks
 
 - [Benchmarks](./benchmarks/index.md)
