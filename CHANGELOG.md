@@ -18,6 +18,37 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.24.1] - 2026-06-27
+
+**v0.24.0 deep-review response (P1 + P2 + optional P3).** Docs, release-tooling, and test-only;
+no library code, public API, runtime behaviour, or dependency change.
+
+### Fixed
+
+- **P1 (release-truth):** `docs/src/introduction.md` still described the "current 0.23 family".
+  Updated to the current 0.24 family and the RFC-055/RFC-056 reduction-surface completion (layered
+  on the v0.23 migration guide and v0.22 `matten-data` Beta). The stale line used the un-prefixed
+  `current 0.N family` spelling, which the release-docs guard did not catch (see below).
+
+### Changed
+
+- **P2 (guard hardening):** the `check-release-docs.sh` current-family-prose check now matches
+  `current 0.N family` with or without the `v` prefix (`current v?0\.N family`), so a stale
+  family reference can no longer slip through on a spelling difference. Verified it passes on the
+  corrected docs and flags both spellings of a non-current minor.
+
+### Added
+
+- **P3 (optional coverage):** `try_axis_reductions_on_vector_give_scalar` — a rank-1
+  `try_*_axis(0)` scalar-output test for all four axis `try_` forms, confirming they collapse to
+  a scalar identically to the panic forms.
+
+### Threat model
+
+Docs/tooling/test-only change. No new data flow, external integration, auth surface, public API,
+or dependency; the numeric/error contracts shipped in v0.24.0 are unchanged. Existing controls
+verified to remain valid; no threat-model change.
+
 ## [0.24.0] - 2026-06-27
 
 **Result-form reductions — complete the fallible reduction surface (RFC-055 + RFC-056).**

@@ -456,3 +456,23 @@ fn sum_axis_panics_on_numeric_bad_axis_after_delegation() {
     // numeric tensor, via the try_ delegation.
     let _ = Tensor::ones(&[2, 2]).max_axis(7);
 }
+
+// ── rank-1 axis reductions collapse to a scalar (RFC-056, deep-review P3) ──
+
+#[test]
+fn try_axis_reductions_on_vector_give_scalar() {
+    // A rank-1 reduce along axis 0 collapses to a scalar output, matching the
+    // panic form (both go through the same reduction path).
+    let v = Tensor::from_vec(vec![2.0, 7.0, 4.0]);
+    let cases = [
+        (v.try_sum_axis(0).unwrap(), v.sum_axis(0)),
+        (v.try_mean_axis(0).unwrap(), v.mean_axis(0)),
+        (v.try_min_axis(0).unwrap(), v.min_axis(0)),
+        (v.try_max_axis(0).unwrap(), v.max_axis(0)),
+    ];
+    for (got, want) in cases {
+        assert!(got.is_scalar());
+        assert_eq!(got.shape(), want.shape());
+        assert_eq!(got.as_slice(), want.as_slice());
+    }
+}
