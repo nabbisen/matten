@@ -46,6 +46,9 @@ own code — never inside core `matten`.
   the equally important signals that you should *stay*.
 - [Choosing a target](./target-selection.md) — a matrix from workload shape to ecosystem.
 - [Common pitfalls](./common-pitfalls.md) — mistakes to avoid when moving data out.
+- [Readiness checklist](./readiness-checklist.md) and
+  [report template](./readiness-report.md) — turn the signals into an explicit, advisory
+  decision you can record and review.
 - [Target playbooks](./playbooks/index.md) — step-by-step, per-target migration guides.
 
 For quick, copy-paste data-export snippets, the reference page

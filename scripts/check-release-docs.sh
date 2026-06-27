@@ -251,7 +251,9 @@ if [ -d "$MIG_DOCS_DIR" ]; then
     FAIL=1
   fi
   # "automatic conversion" is allowed only in matten-migrate future/deferred context.
-  if grep -RInE 'automatic conversion' "$MIG_DOCS_DIR" | grep -viE 'matten-migrate|deferred|future'; then
+  # "automatic conversion" is allowed in matten-migrate future/deferred context, and in the
+  # negated advisory disclaimer ("does not perform automatic conversion") required by RFC-053.
+  if grep -RInE 'automatic conversion' "$MIG_DOCS_DIR" | grep -viE 'matten-migrate|deferred|future|does not perform automatic'; then
     echo "ERROR: migration docs claim 'automatic conversion' outside RFC-054 future/deferred context"
     FAIL=1
   fi

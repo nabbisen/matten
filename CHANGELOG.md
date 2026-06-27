@@ -18,7 +18,51 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
-## [0.23.3] - 2026-06-26
+## [0.23.4] - 2026-06-26
+
+**Production migration guide — RFC-053 migration-readiness diagnostics (completes the
+migration batch).** Documentation only; no library code, public API, runtime behavior, or
+dependency change. This is the last RFC of the RFC-050–053 migration program; RFC-054
+(`matten-migrate` CLI) remains deferred.
+
+### Added
+
+- **`docs/src/migration/readiness-checklist.md`** — turns "should I leave `matten`?" into ten
+  concrete pressure signals (data-size, runtime, axis-reduction, linear-algebra, dataframe,
+  ML/device, dynamic-ingestion, dependency policy, ecosystem preference, team language), each
+  mapped to a target playbook, with explicit "stay with `matten`" outcomes. Advisory
+  self-assessment — no source-scanning tool.
+- **`docs/src/migration/readiness-report.md`** — a manual, fillable report template with the
+  nine required sections (Summary, Current matten usage, Production pressure signals,
+  Recommended target(s), Direct conversion candidates, Manual redesign areas, Bridge
+  crates/tools, Risks, Next steps) and the required advisory disclaimer (the report does not
+  prove production readiness, does not guarantee a target is better, and does not perform
+  automatic conversion).
+- **`docs/src/migration/examples/linear-regression-gd-readiness.md`** — the template filled in
+  for `35_linear_regression_gradient_descent`, written against the example's actual structure
+  (two `Tensor::matmul` per step, a reused transpose, an iterative loop): recommends moving the
+  per-step matrix products to `ndarray` via the `matten-ndarray` bridge at real data sizes,
+  with a `nalgebra` closed-form solve as an optional redesign, and "stay with `matten`" at toy
+  size.
+
+### Changed
+
+- `docs/src/SUMMARY.md` and `migration/index.md` link the readiness pages.
+- `scripts/check-release-docs.sh`: the migration overclaim guard now allows the negated
+  advisory disclaimer ("does not perform automatic conversion") while still flagging positive
+  "automatic conversion" claims (verified both directions).
+
+### Migration program status
+
+RFC-050 (foundation), RFC-051 (bridge contracts), RFC-052 (all target playbooks), and RFC-053
+(readiness diagnostics) are **complete**. RFC-054 (`matten-migrate` CLI) is deferred.
+
+### Threat model
+
+No change to any crate's code, API, dependency set, or runtime behavior. Documentation and a
+guard refinement only; no new data flow, integration, or auth surface.
+
+
 
 **Version-string hygiene + self-updating drift guard.** Documentation and release-tooling
 only; no library code, public API, runtime behavior, or dependency change in any crate. Fixes
