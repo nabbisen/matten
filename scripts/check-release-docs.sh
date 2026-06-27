@@ -143,12 +143,13 @@ USER_DOCS=(
 )
 
 echo "=== Checking for stale prior-family version references in user-facing docs ==="
-# Current family. Bump this single value on each minor release. The checks below
-# reject install pins, `X.Y.x` family labels, and "current vX.Y family" prose whose
-# minor is not the current one (so 0.15/0.19/0.20/... are all caught after a bump).
-# Full historical patch refs (e.g. "available as of v0.20.1" shipped-in notes) are
-# NOT matched, and rfcs/ + CHANGELOG.md + ROADMAP.md remain outside USER_DOCS.
-CURRENT_MINOR="22"
+# Current family minor, derived dynamically from the workspace version so it can
+# never go stale on a bump (the previous hardcoded value was missed at the 0.23.0
+# bump, which is exactly how stale 0.22 pins shipped). The checks below reject
+# install pins, `X.Y.x` family labels, and "current vX.Y family" prose whose minor
+# is not the current one. Full historical patch refs (e.g. "as of v0.20.1" shipped-in
+# notes) are NOT matched, and rfcs/ + CHANGELOG.md + ROADMAP.md remain outside USER_DOCS.
+CURRENT_MINOR="$(grep -m1 '^version' Cargo.toml | sed -E 's/.*"[0-9]+\.([0-9]+)\.[0-9]+".*/\1/')"
 # (a) install-snippet version pins: `<crate> = "0.NN"` / `version = "0.NN"`
 if grep -rInE '(version|matten[a-z-]*) = "0\.[0-9]+"' "${USER_DOCS[@]}" 2>/dev/null \
    | grep -vE "= \"0\.${CURRENT_MINOR}\""; then

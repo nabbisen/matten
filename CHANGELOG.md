@@ -18,7 +18,42 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
-## [0.23.2] - 2026-06-25
+## [0.23.3] - 2026-06-26
+
+**Version-string hygiene + self-updating drift guard.** Documentation and release-tooling
+only; no library code, public API, runtime behavior, or dependency change in any crate. Fixes
+stale version strings left by the v0.23.0 family bump and makes the guard that should have
+caught them self-updating.
+
+### Fixed
+
+- **Stale `0.22` version strings corrected to `0.23`** across all four crate READMEs, the root
+  README, the core crate's `lib.rs` rustdoc, and ~10 doc pages (quick-start, examples/data,
+  reference/boundary, reference/dynamic, contributing/architecture, public-api-snapshot, and
+  the `0.22.x`/`current 0.22 family` labels). The install pins were not merely cosmetic: a
+  caret requirement like `matten = "0.22"` resolves to `>=0.22.0, <0.23.0`, so anyone copying
+  a pin was silently held on the old family and missed the entire 0.23 migration guide.
+  Genuinely historical references (`promoted to Beta in v0.22.0`, the per-family
+  compatibility history) are preserved. Added a `v0.23 family` entry to
+  `reference/compatibility.md`.
+
+### Changed
+
+- **`scripts/check-release-docs.sh`: the version-string guard now derives the current minor
+  dynamically from `Cargo.toml`** instead of a hardcoded `CURRENT_MINOR="22"`. That hardcoded
+  value — which required a manual bump each release — was missed at v0.23.0, which is exactly
+  why the stale `0.22` pins shipped and went unflagged. The guard now cannot go stale on a
+  bump; it checks install pins, `X.Y.x family` labels, and `current vX.Y family` prose (still
+  requiring "family" adjacency, so generic patch-notation like `(0.13.x)` is not flagged).
+  Verified: passes on the corrected docs, and a simulated `0.24.0` bump immediately flags the
+  now-stale `0.23` strings.
+
+### Threat model
+
+No change to any crate's code, API, dependency set, or runtime behavior. Documentation and a
+release-tooling guard only; no new data flow, integration, or auth surface.
+
+
 
 **Production migration guide — RFC-051 bridge conversion contracts.** Documentation only; no
 library code, public API, runtime behavior, or dependency change in any crate. Formalizes the

@@ -10,4 +10,4 @@ This book is organized by reader:
 - **Reference** — the rules that shape the public API.
 - **Contributors** — project layout, milestones, and process.
 
-> This documentation tracks the current 0.22 family, which promotes `matten-data` to Beta (the RFC-036 example suite plus an explicit malformed-CSV test) on top of the v0.21 boundary-work batch.
+> This documentation tracks the current 0.23 family, which adds the production migration guide (RFC-050–052: when to migrate, target playbooks, and bridge conversion contracts) on top of the v0.22 `matten-data` Beta promotion.

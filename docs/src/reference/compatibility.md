@@ -105,3 +105,10 @@ The **v0.22 family** promotes `matten-data` to **Beta**: the RFC-036 example sui
 (`data_00`–`data_05`) plus an explicit malformed-CSV test complete the documented
 Beta gate (RFC-023 §9). Maturity is a per-crate Status label, not a separate version,
 under lock-step family versioning (RFC-030).
+
+The **v0.23 family** adds the production migration guide (RFC-050–052): when to stay vs.
+migrate, per-target playbooks (`ndarray`, `nalgebra`, Polars/Pandas, Candle, NumPy), and the
+bridge conversion-contract template with the `matten-ndarray` reference contract. This is
+documentation only — no public API, runtime, or dependency change, and core `matten` gains
+no dependency.
+
