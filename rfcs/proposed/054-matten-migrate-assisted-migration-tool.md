@@ -2,7 +2,7 @@
 
 **Project:** `matten`  
 **Milestone:** Future / post-guide / post-bridge stabilization  
-**Status:** Accepted as future direction (architect ruling 2026-06-24); implementation deferred (see handoff deferred note)  
+**Status:** Accepted as future direction (architect ruling 2026-06-24; deferral confirmed in deep review 2026-06-27); implementation deferred (see handoff deferred note)  
 **Document type:** RFC  
 **Primary audience:** tool authors, maintainers, advanced users  
 **Depends on:** RFC-050 Production Migration Guide, RFC-051 Bridge Conversion Contracts, RFC-052 Production Target Playbooks, RFC-053 Migration Readiness Diagnostics  

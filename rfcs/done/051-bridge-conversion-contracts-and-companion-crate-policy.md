@@ -2,7 +2,7 @@
 
 **Project:** `matten`  
 **Milestone:** v0.23+ planning  
-**Status:** Accepted (architect ruling 2026-06-24); implementation planned for v0.23.x  
+**Status:** Implemented (v0.23.2); architect-accepted (deep review 2026-06-27)  
 **Document type:** RFC  
 **Primary audience:** bridge-crate maintainers, library users, API reviewers  
 **Depends on:** RFC-025 Bridge Crate Policy, RFC-032 Companion Dependency and Import Convention, RFC-050 Production Migration Guide  

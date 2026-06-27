@@ -150,6 +150,10 @@ echo "=== Checking for stale prior-family version references in user-facing docs
 # is not the current one. Full historical patch refs (e.g. "as of v0.20.1" shipped-in
 # notes) are NOT matched, and rfcs/ + CHANGELOG.md + ROADMAP.md remain outside USER_DOCS.
 CURRENT_MINOR="$(grep -m1 '^version' Cargo.toml | sed -E 's/.*"[0-9]+\.([0-9]+)\.[0-9]+".*/\1/')"
+if [ -z "$CURRENT_MINOR" ] || ! echo "$CURRENT_MINOR" | grep -Eq '^[0-9]+$'; then
+  echo "ERROR: failed to derive current minor from Cargo.toml"
+  exit 1
+fi
 # (a) install-snippet version pins: `<crate> = "0.NN"` / `version = "0.NN"`
 if grep -rInE '(version|matten[a-z-]*) = "0\.[0-9]+"' "${USER_DOCS[@]}" 2>/dev/null \
    | grep -vE "= \"0\.${CURRENT_MINOR}\""; then
@@ -257,6 +261,27 @@ if [ -d "$MIG_DOCS_DIR" ]; then
     echo "ERROR: migration docs claim 'automatic conversion' outside RFC-054 future/deferred context"
     FAIL=1
   fi
+fi
+
+echo "=== Checking CHANGELOG release headings are well-formed ==="
+# (1) The current workspace version must be the top-most release heading, so a release never
+#     ships without its own heading. (2) No single release block may contain more than one
+#     "### Threat model" section — that is the signature of a release block that lost its
+#     "## [x.y.z]" heading and got nested under the previous release (the v0.23.4 regression).
+CL_VERSION="$(grep -m1 '^version' Cargo.toml | sed -E 's/.*"([0-9]+\.[0-9]+\.[0-9]+)".*/\1/')"
+CL_TOP="$(grep -m1 -oE '^## \[[0-9]+\.[0-9]+\.[0-9]+\]' CHANGELOG.md | tr -d '#[] ')"
+if [ "$CL_TOP" != "$CL_VERSION" ]; then
+  echo "ERROR: top CHANGELOG heading ($CL_TOP) does not match workspace version ($CL_VERSION)"
+  FAIL=1
+fi
+if ! awk '
+  /^## \[/            { if (tm > 1) { print hdr; bad=1 } hdr=$0; tm=0; next }
+  /^### Threat model/ { tm++ }
+  END                 { if (tm > 1) { print hdr; bad=1 } exit bad }
+' CHANGELOG.md > /tmp/cl_nest 2>/dev/null; then
+  echo "ERROR: a CHANGELOG release block has multiple '### Threat model' sections (missing heading?):"
+  cat /tmp/cl_nest
+  FAIL=1
 fi
 
 # ---------------------------------------------------------------------------

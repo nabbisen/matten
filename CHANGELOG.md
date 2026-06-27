@@ -18,6 +18,51 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.23.5] - 2026-06-27
+
+**RFC-050–054 deep-review response (P1 + P2 fixes) and migration-batch lifecycle close.**
+Documentation, release-tooling, and RFC bookkeeping only; no library code, public API, runtime
+behavior, or dependency change in any crate. Applies the architect's v0.23.4 deep-review
+findings.
+
+### Fixed (P1)
+
+- **CHANGELOG release headings restored.** A heading-eating regression in successive release
+  edits had nested every block from v0.23.3 back to v0.21.4 under the single `## [0.23.4]`
+  heading. Restored the 13 missing `## [x.y.z] - date` headings (v0.23.3, v0.23.2, v0.23.1,
+  v0.23.0, v0.22.7–v0.22.0, v0.21.4) with authoritative versions/dates from the ROADMAP
+  history; block content was intact, only the headings were lost.
+- **Candle snippet `f64` fix** in `docs/src/reference/migration.md`: the example constructed a
+  `Tensor` from `vec![1.0f32, …]`, but `matten::Tensor` is `f64`. Now builds with `f64` data
+  and casts to `f32` only at the Candle boundary.
+
+### Changed (P2)
+
+- `docs/src/reference/migration.md`: softened "Migration is always one line" to "The simplest
+  data-export path is"; made the `ndarray` section **bridge-first** (`matten_ndarray::to_arrayd`)
+  with the manual `ArrayD::from_shape_vec` path kept as a "without the bridge crate" fallback;
+  replaced the brittle "four exports" compatibility wording with a statement that points to the
+  public API snapshot and CHANGELOG for the exact current surface.
+- `scripts/check-release-docs.sh`: added a `CURRENT_MINOR` extraction sanity check (fails fast
+  if the minor cannot be derived from `Cargo.toml`), and a CHANGELOG-heading guard that requires
+  the top heading to match the workspace version and flags any release block containing more
+  than one `### Threat model` section (the signature of a lost heading). Both verified
+  positive/negative.
+
+### RFC lifecycle
+
+- **RFC-050, RFC-051, RFC-052, RFC-053 → Implemented** and moved from `rfcs/proposed/` to
+  `rfcs/done/` (shipped in v0.23.0, v0.23.2, v0.23.0–v0.23.1, v0.23.4 respectively); status
+  headers updated and the `rfcs/README.md` index Done/Proposed tables reconciled.
+- **RFC-054** remains in `rfcs/proposed/` as accepted-future-direction with deferral confirmed
+  by the deep review; no `matten-migrate` tool exists.
+
+### Threat model
+
+No change to any crate's code, API, dependency set, or runtime behavior. Documentation,
+release-tooling guards, and RFC status/location bookkeeping only; no new data flow,
+integration, or auth surface.
+
 ## [0.23.4] - 2026-06-26
 
 **Production migration guide — RFC-053 migration-readiness diagnostics (completes the
@@ -64,6 +109,8 @@ guard refinement only; no new data flow, integration, or auth surface.
 
 
 
+## [0.23.3] - 2026-06-26
+
 **Version-string hygiene + self-updating drift guard.** Documentation and release-tooling
 only; no library code, public API, runtime behavior, or dependency change in any crate. Fixes
 stale version strings left by the v0.23.0 family bump and makes the guard that should have
@@ -98,6 +145,8 @@ No change to any crate's code, API, dependency set, or runtime behavior. Documen
 release-tooling guard only; no new data flow, integration, or auth surface.
 
 
+
+## [0.23.2] - 2026-06-25
 
 **Production migration guide — RFC-051 bridge conversion contracts.** Documentation only; no
 library code, public API, runtime behavior, or dependency change in any crate. Formalizes the
@@ -137,6 +186,8 @@ No change to any crate's code, API, dependency set, or runtime behavior. Documen
 
 
 
+## [0.23.1] - 2026-06-25
+
 **Production migration guide — RFC-052 completed (remaining target playbooks).** New
 documentation only; no library code, public API, runtime behavior, or dependency change in
 any crate. Adds the cross-paradigm/cross-language playbooks, completing RFC-052's target set.
@@ -175,6 +226,8 @@ No change to any crate's code, API, dependency set, or runtime behavior. Documen
 no new data flow, integration, or auth surface.
 
 
+
+## [0.23.0] - 2026-06-25
 
 **Production migration guide — first release (RFC-050 + RFC-052 Rust playbooks).** New
 documentation only; no library code, public API, runtime behavior, or dependency change in
@@ -223,6 +276,8 @@ integration, or auth surface.
 
 
 
+## [0.22.7] - 2026-06-25
+
 **RFC-049 Phase 2 accepted — documentation reconciliation.** Docs/RFC/report wording only;
 no library code, public API, runtime behavior, or dependency change in any crate. The
 architect accepted the official maintainer-run Rust peer comparison (commit `007031c`,
@@ -253,6 +308,8 @@ No change to any crate's code, API, dependency set, or runtime behavior. Documen
 status text only; no new data flow, integration, or auth surface.
 
 
+
+## [0.22.6] - 2026-06-24
 
 **Production-migration RFC set (RFC-050–054) accepted and ingested** — planning/docs only.
 No library code, public API, runtime behavior, or dependency change in any crate; this
@@ -301,6 +358,8 @@ new data flow, integration, or auth surface.
 
 
 
+## [0.22.5] - 2026-06-24
+
 **v0.22.4 deep-review release-truth reconciliation.** Documentation, RFC status, and one
 guard only — no library code, public API, runtime behavior, or benchmark *logic* change in
 any crate. The architect's v0.22.4 codebase deep review accepted the Phase 2 harness/template
@@ -347,6 +406,8 @@ change to benchmark logic or the peers isolation properties. Documentation/statu
 narrowly-scoped documentation guard only.
 
 
+
+## [0.22.4] - 2026-06-24
 
 **RFC-049 Phase 2 — Rust peer comparison (opt-in)**, plus the accepted Phase 1 internal
 baseline report and a workspace-config fix. The published crates — core `matten`,
@@ -406,6 +467,8 @@ or ranking claim.
 
 
 
+## [0.22.3] - 2026-06-24
+
 **RFC-032 scope carve-out + published-crate dependency isolation guard** (benchmarking /
 positioning review follow-up). Documentation, guard, and CI only — no library code, public
 API, or runtime behavior change in any crate.
@@ -457,6 +520,8 @@ proof before any peer dependency exists). No published crate gained or lost a de
 
 
 
+## [0.22.2] - 2026-06-24
+
 **Lifecycle wording cleanup (v0.22.0 handoff-review P2 follow-up).** Documentation /
 RFC-lifecycle only — no library code, public API, runtime behavior, examples, guards, or
 CI change.
@@ -481,6 +546,8 @@ Historical records in earlier `CHANGELOG.md`/`ROADMAP.md` entries are left uncha
 (they describe the finding accurately as of v0.22.0).
 
 
+
+## [0.22.1] - 2026-06-24
 
 **RFC-049 Phase 1 — internal benchmark baseline.** The architect accepted RFC-049 with a
 staged mandate and authorized **Phase 1 only** (PR-049-1 + PR-049-2). This release adds a
@@ -529,6 +596,8 @@ published dependency graph and now guarded against regression. Supply-chain note
 and its transitive deps are confined to the excluded `benchmarks/` crate (§12, §18).
 
 
+
+## [0.22.0] - 2026-06-24
 
 **`matten-data` promoted to Beta.** This release completes the documented Beta gate
 (RFC-023 §9) for `matten-data` and flips its status label from Experimental to Beta.
@@ -582,6 +651,8 @@ panic or a silently-wrong table) rather than a parser-error variant that this co
 cannot produce.
 
 
+
+## [0.21.4] - 2026-06-24
 
 **Release-truth and CI-gate patch (v0.21.3 deep-review P1 fixes). Documentation,
 tooling, and examples only — no library code, API, or behavior change.**

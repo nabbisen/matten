@@ -2,7 +2,7 @@
 
 **Project:** `matten`  
 **Milestone:** v0.24+ planning  
-**Status:** Accepted (architect ruling 2026-06-24); implementation planned for v0.23.x/v0.24  
+**Status:** Implemented (v0.23.4); architect-accepted (deep review 2026-06-27)  
 **Document type:** RFC  
 **Primary audience:** maintainers, tool authors, advanced users  
 **Depends on:** RFC-049 Benchmarking and Positioning, RFC-050 Production Migration Guide, RFC-052 Production Target Playbooks  

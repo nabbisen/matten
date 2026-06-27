@@ -2,7 +2,7 @@
 
 **Project:** `matten`  
 **Milestone:** v0.23+ planning  
-**Status:** Accepted (architect ruling 2026-06-24); implementation planned for v0.23.x  
+**Status:** Implemented (v0.23.0–v0.23.1); architect-accepted (deep review 2026-06-27)  
 **Document type:** RFC  
 **Primary audience:** users migrating from PoC to production  
 **Depends on:** RFC-049 Benchmarking and Positioning, RFC-050 Production Migration Guide  

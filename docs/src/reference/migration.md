@@ -21,8 +21,8 @@ specialised crate. This page shows how.
 
 ## Exporting data from `matten`
 
-Every `matten` tensor exposes its flat row-major data. Migration is always
-one line:
+Every `matten` tensor exposes its flat row-major data. The simplest data-export
+path is:
 
 ```rust
 let flat: Vec<f64> = tensor.into_vec();  // consuming, no copy
@@ -38,6 +38,21 @@ let shape: &[usize] = tensor.shape();
 
 ## To `ndarray`
 
+The bridge-first path uses the `matten-ndarray` crate (copies, numeric-only, rejects
+dynamic tensors, preserves logical row-major order — see the
+[bridge contract](../migration/bridge-contracts.md)):
+
+```rust
+use matten::Tensor;
+use matten_ndarray::to_arrayd;
+
+let t = Tensor::new(vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0], &[2, 3]);
+let arr = to_arrayd(&t)?;   // ArrayD<f64>, logical row-major
+println!("{arr}");
+```
+
+Without the bridge crate, convert manually from the flat `Vec<f64>` plus shape:
+
 ```rust
 use matten::Tensor;
 use ndarray::ArrayD;
@@ -45,8 +60,6 @@ use ndarray::ArrayD;
 let t = Tensor::new(vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0], &[2, 3]);
 let shape: Vec<usize> = t.shape().to_vec();
 let flat: Vec<f64>    = t.into_vec();
-
-// ndarray from flat Vec<f64> + shape
 let arr = ArrayD::from_shape_vec(shape, flat).unwrap();
 println!("{arr}");
 ```
@@ -77,8 +90,8 @@ and linear algebra operations.
 use matten::Tensor;
 // candle_core = { version = "0.x", features = ["..."] }
 
-let t = Tensor::new(vec![1.0f32, 2.0, 3.0, 4.0], &[2, 2]);
-// matten uses f64; convert to f32 if needed
+let t = Tensor::new(vec![1.0, 2.0, 3.0, 4.0], &[2, 2]);
+// matten uses f64; convert to f32 if the Candle workflow wants f32.
 let flat_f32: Vec<f32> = t.as_slice().iter().map(|&v| v as f32).collect();
 let shape = t.shape().to_vec();
 // let candle_t = candle_core::Tensor::from_vec(flat_f32, shape, &device)?;
@@ -115,10 +128,11 @@ let flat   = result.into_vec();
 
 ## Compatibility promise (v0.x)
 
-During `v0.x`, API changes are allowed but minimised after a release. The
-core `Tensor` type name, the four exports (`Tensor`, `MattenError`,
-`DataFormat`, `Element`), and the panic-vs-Result split are stable design
-decisions that will not change without a documented breaking change.
+During `v0.x`, API changes are allowed but minimised after a release. The core
+`Tensor` type, the public error model, and the panic-vs-Result split are stable
+design decisions and will not change without a documented breaking change. See the
+[public API snapshot](./public-api-snapshot.md) and the CHANGELOG for the exact
+current export surface.
 
 `v1.0.0` requires explicit maintainer confirmation and a full public API
 review. See the project CHANGELOG for migration notes on any breaking changes.
