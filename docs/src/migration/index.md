@@ -16,8 +16,8 @@ This guide helps you migrate *intentionally*. It is:
 
 - a way to decide **when to stay** with `matten` and **when to migrate**;
 - a **target-selection** matrix from your workload to the right ecosystem;
-- a set of **playbooks** for specific targets (`ndarray`, `nalgebra`, and — in later
-  revisions — Polars/Pandas, Candle, NumPy);
+- a set of **playbooks** for specific targets (`ndarray`, `nalgebra`, Polars/Pandas, Candle,
+  and NumPy);
 - guidance on the **bridge crates** that own dependency-specific conversion.
 
 It is explicitly **not**:

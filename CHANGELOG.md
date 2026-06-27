@@ -18,7 +18,46 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
-## [0.23.0] - 2026-06-25
+## [0.23.1] - 2026-06-25
+
+**Production migration guide — RFC-052 completed (remaining target playbooks).** New
+documentation only; no library code, public API, runtime behavior, or dependency change in
+any crate. Adds the cross-paradigm/cross-language playbooks, completing RFC-052's target set.
+
+### Added
+
+- **`docs/src/migration/playbooks/polars-and-pandas.md`** — the dataframe path. States
+  plainly that `matten-data` is an ingestion on-ramp and will **not** grow
+  group-by/join/pivot/query, and that the usual pattern is to enter the dataframe library at
+  the data source rather than round-trip a `Tensor`.
+- **`docs/src/migration/playbooks/candle.md`** — the ML path, careful **not** to imply
+  `matten` is an ML framework (no autograd/layers/optimizers/device); notes the `f64`→`f32`
+  precision boundary.
+- **`docs/src/migration/playbooks/python-numpy.md`** — the Python scientific path, framed as
+  a manual/conceptual serialization hand-off with no in-process Rust↔Python bridge.
+
+Each follows the standard playbook section set. Their positioning notes state honestly that
+**no benchmark exists** for these targets (a cross-paradigm/cross-language comparison would
+be RFC-049 Phase 3, which is not authorized), so target choice is by capability/ecosystem
+fit, not measured speed.
+
+### Changed
+
+- `docs/src/migration/playbooks/index.md`, `target-selection.md`, `index.md`: the three
+  targets moved from "later revision" to available, with links; `SUMMARY.md` lists all five
+  playbooks.
+
+### Still staged for v0.23.x
+
+RFC-051 bridge-contract pages + the `matten-ndarray` contract table, and RFC-053
+migration-readiness diagnostics. RFC-054 (`matten-migrate` CLI) remains deferred.
+
+### Threat model
+
+No change to any crate's code, API, dependency set, or runtime behavior. Documentation only;
+no new data flow, integration, or auth surface.
+
+
 
 **Production migration guide — first release (RFC-050 + RFC-052 Rust playbooks).** New
 documentation only; no library code, public API, runtime behavior, or dependency change in

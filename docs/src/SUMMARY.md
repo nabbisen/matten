@@ -48,6 +48,9 @@
 - [Target playbooks](./migration/playbooks/index.md)
   - [ndarray](./migration/playbooks/ndarray.md)
   - [nalgebra](./migration/playbooks/nalgebra.md)
+  - [Polars / Pandas](./migration/playbooks/polars-and-pandas.md)
+  - [Candle](./migration/playbooks/candle.md)
+  - [NumPy](./migration/playbooks/python-numpy.md)
 
 # Benchmarks
 

@@ -12,15 +12,11 @@ notes, and a minimal checklist.
   workloads at scale, with a contract-backed bridge crate (`matten-ndarray`).
 - [`nalgebra`](./nalgebra.md) — dense linear algebra: vectors, matrices, decompositions,
   and solvers.
-
-## Arriving in a later revision
-
-- **Polars / Pandas** — dataframe analytics (group-by, joins, pivots, query). The page will
-  also state plainly that `matten-data` will not grow these features.
-- **Candle** — ML tensors, training, and device execution, with care not to imply `matten`
-  is an ML framework.
-- **NumPy** — the Python scientific path, as a manual/conceptual hand-off unless a future
-  bridge is designed.
+- [Polars / Pandas](./polars-and-pandas.md) — dataframe analytics (group-by, joins, pivots,
+  query). `matten-data` is an on-ramp and will not grow these.
+- [Candle](./candle.md) — ML tensors, training, and device execution — without implying
+  `matten` is an ML framework.
+- [NumPy](./python-numpy.md) — the Python scientific path, as a manual/conceptual hand-off.
 
 ## Decision tree
 

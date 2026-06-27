@@ -10,9 +10,9 @@ the matching [playbook](./playbooks/index.md).
 |---|---|---|
 | General N-D numeric arrays, dense `matmul`, axis reductions at scale | **`ndarray`** | The general Rust N-D array production path; BLAS-backed matmul available. |
 | Small/mid dense vectors & matrices, decompositions, solvers (LU/QR/SVD), eigenvalues | **`nalgebra`** | The dense linear-algebra path. |
-| Group-by, joins, pivots, query-style dataframe analytics | **Polars** (Rust) / **Pandas** (Python) | `matten-data` is an ingestion on-ramp only; it will **not** grow these. *(Playbook in a later revision.)* |
-| Autodiff, training loops, GPU/device execution | **Candle** (Rust) / framework of choice | `matten` is not an ML framework. *(Playbook in a later revision.)* |
-| Existing Python scientific stack, NumPy interop | **NumPy** (Python) | Manual/conceptual hand-off unless a future bridge is designed. *(Playbook in a later revision.)* |
+| Group-by, joins, pivots, query-style dataframe analytics | **[Polars](./playbooks/polars-and-pandas.md)** (Rust) / **Pandas** (Python) | `matten-data` is an ingestion on-ramp only; it will **not** grow these. |
+| Autodiff, training loops, GPU/device execution | **[Candle](./playbooks/candle.md)** (Rust) / framework of choice | `matten` is not an ML framework. |
+| Existing Python scientific stack, NumPy interop | **[NumPy](./playbooks/python-numpy.md)** (Python) | Manual/conceptual hand-off; no automatic bridge. |
 | Small numeric work, ingestion, glue, learning/PoC | **stay with `matten`** | Migrating here would add dependencies for no real gain. |
 
 ## A quick decision path
@@ -30,13 +30,11 @@ the matching [playbook](./playbooks/index.md).
    Rust producer if useful.
 6. **None of the above, or the work is small?** → **stay with `matten`.**
 
-## Two Rust targets are covered now
+## Playbooks
 
-This revision ships full playbooks for the two Rust numeric targets the project's
-benchmarking program directly compares against:
-
-- [`ndarray`](./playbooks/ndarray.md) — general N-D arrays.
-- [`nalgebra`](./playbooks/nalgebra.md) — dense linear algebra.
-
-The Polars/Pandas, Candle, and NumPy playbooks arrive in a later revision; this page already
-points you at the right ecosystem in the meantime.
+Full per-target playbooks are available for every destination above:
+[`ndarray`](./playbooks/ndarray.md), [`nalgebra`](./playbooks/nalgebra.md),
+[Polars/Pandas](./playbooks/polars-and-pandas.md), [Candle](./playbooks/candle.md), and
+[NumPy](./playbooks/python-numpy.md). The two Rust array/linalg targets carry task-scoped
+positioning notes from the accepted RFC-049 peer comparison; the dataframe, ML, and
+Python targets are different paradigms with no such benchmark (see each playbook).
