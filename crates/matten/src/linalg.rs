@@ -25,10 +25,12 @@ impl Tensor {
     /// overflow-avoidance scaling is applied, so extreme magnitudes may overflow to
     /// infinity (use a specialized crate if that matters).
     ///
+    /// For a non-panicking form, see [`Tensor::try_norm`].
+    ///
     /// # Panics
     /// Panics if called on a dynamic tensor; call
-    /// [`try_numeric`](crate::Tensor::try_numeric) first. This matches the other
-    /// value reductions (`sum`, `mean`), which have no `try_*` form.
+    /// [`try_numeric`](crate::Tensor::try_numeric) first. Use [`Tensor::try_norm`]
+    /// for the non-panicking form.
     ///
     /// ```
     /// use matten::Tensor;
@@ -37,14 +39,25 @@ impl Tensor {
     /// ```
     #[must_use]
     pub fn norm(&self) -> f64 {
-        #[cfg(feature = "dynamic")]
-        if self.is_dynamic() {
-            panic!(
-                "matten unsupported error in norm: not supported on dynamic tensors; \
-                 call try_numeric() first to convert"
-            );
-        }
-        self.data.iter().map(|x| x * x).sum::<f64>().sqrt()
+        self.try_norm().unwrap_or_else(|e| panic!("{e}"))
+    }
+
+    /// Non-panicking [`Tensor::norm`].
+    ///
+    /// Use `try_norm` when handling a tensor that may be dynamic; `norm` is the
+    /// panic-on-error convenience form.
+    ///
+    /// # Errors
+    /// Returns [`MattenError::Unsupported`] on a dynamic tensor. `NaN` is treated
+    /// as a value and propagates according to the underlying operation.
+    ///
+    /// ```
+    /// use matten::Tensor;
+    /// assert_eq!(Tensor::from_vec(vec![3.0, 4.0]).try_norm().unwrap(), 5.0);
+    /// ```
+    pub fn try_norm(&self) -> Result<f64, MattenError> {
+        crate::math::reject_dynamic(self, "norm")?;
+        Ok(self.data.iter().map(|x| x * x).sum::<f64>().sqrt())
     }
 
     /// Sum of the diagonal of a rank-2 tensor (the matrix trace).

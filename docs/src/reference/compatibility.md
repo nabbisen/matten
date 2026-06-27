@@ -112,3 +112,11 @@ bridge conversion-contract template with the `matten-ndarray` reference contract
 documentation only — no public API, runtime, or dependency change, and core `matten` gains
 no dependency.
 
+The **v0.24 family** completes the reduction surface (RFC-055 / RFC-056): every scalar value
+reduction (`try_sum` / `try_mean` / `try_min` / `try_max` / `try_norm`) and every axis reduction
+(`try_sum_axis` / `try_mean_axis` / `try_min_axis` / `try_max_axis`) now has a non-panicking
+`Result` form, joining `try_var` / `try_std` and their axis variants. The panic forms are
+unchanged in behaviour and remain convenience wrappers. These are additive under lock-step
+family versioning (RFC-030); no existing signature, numeric result, output shape, NaN policy,
+or dependency changes, and core `matten` gains no dependency.
+

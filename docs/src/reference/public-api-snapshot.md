@@ -1,6 +1,6 @@
 # Public API snapshot
 
-This page lists every public item in `matten` at the current v0.23 family. It serves as the
+This page lists every public item in `matten` at the current v0.24 family. It serves as the
 baseline for tracking breaking changes toward v1.0.0 and as the review gate
 required by RFC-015.
 
@@ -39,7 +39,7 @@ when called on a dynamic tensor. Call `try_numeric()` to convert first.
 | `reshape`, `flatten`, `transpose`, `swap_axes`, `squeeze`, `expand_dims` | panic |
 | `slice()` builder, `slice_str()` | returns `MattenError::Unsupported` |
 | Arithmetic operators, scalar operators | panic |
-| Reductions (`sum`, `mean`, `min`, `max`, `*_axis`) | panic |
+| Reductions (`sum`, `mean`, `min`, `max`, `norm`, `*_axis`) | panic; non-panicking `try_*` forms return `Unsupported` (and `Shape` for axis) |
 | `dot` / `matmul` | panic |
 | `as_slice`, `to_vec`, `into_vec`, `get`, `get_flat` | panic |
 | `From<Tensor> for Vec<f64>`, `From<&Tensor>`, `TryFrom` | panic / `Err` |
@@ -165,10 +165,12 @@ All panic on dynamic tensors (except `try_clip`, which returns `Unsupported`).
 | `mean()` | `f64` | |
 | `min()` | `f64` | NaN if any element is NaN |
 | `max()` | `f64` | NaN if any element is NaN |
+| `try_sum()` / `try_mean()` / `try_min()` / `try_max()` | `Result<f64, MattenError>` | `Unsupported` on dynamic; NaN propagates as a value (RFC-055) |
 | `sum_axis(axis)` | `Tensor` | |
 | `mean_axis(axis)` | `Tensor` | |
 | `min_axis(axis)` | `Tensor` | NaN propagated per slice |
 | `max_axis(axis)` | `Tensor` | NaN propagated per slice |
+| `try_sum_axis(axis)` / `try_mean_axis(axis)` / `try_min_axis(axis)` / `try_max_axis(axis)` | `Result<Tensor, MattenError>` | `Shape` if `axis >= rank`; `Unsupported` on dynamic (RFC-056) |
 | `argmin()` / `argmax()` | `usize` | flat row-major index; first tie; panics on NaN/dynamic |
 | `try_argmin()` / `try_argmax()` | `Result<usize>` | `InvalidArgument` on NaN; `Unsupported` on dynamic |
 | `dot(rhs)` | `Tensor` | 4 shape cases; panics on dynamic |
@@ -182,7 +184,8 @@ BLAS/LAPACK are out of scope for core (use `nalgebra` or `ndarray-linalg`).
 
 | Method | Returns | Notes |
 |---|---|---|
-| `norm()` | `f64` | L2 / Frobenius over all elements; NaN propagates; panics on dynamic (no `try_` form, like `sum`/`mean`) |
+| `norm()` | `f64` | L2 / Frobenius over all elements; NaN propagates; panics on dynamic |
+| `try_norm()` | `Result<f64, MattenError>` | `Unsupported` on dynamic; NaN propagates as a value (RFC-055) |
 | `trace()` | `f64` | rank-2 only; rectangular via `min(rows, cols)`; panics on non-rank-2 or dynamic |
 | `try_trace()` | `Result<f64, MattenError>` | `Shape` if not rank-2; `Unsupported` on dynamic |
 | `outer(other)` | `Tensor` | rank-1 × rank-1 → `[m, n]`; panics on non-rank-1, dynamic, or oversized |

@@ -183,3 +183,36 @@ fn norm_panics_on_dynamic() {
     let dynamic = Tensor::from_elements(vec![Element::Float(3.0), Element::Float(4.0)], &[2]);
     let _ = dynamic.norm();
 }
+
+// ── Result-form norm (RFC-055) ────────────────────────────────────────────
+
+#[test]
+fn try_norm_matches_panic_form() {
+    let t = Tensor::from_vec(vec![3.0, 4.0]);
+    assert_eq!(t.try_norm().unwrap(), t.norm());
+    assert_eq!(t.try_norm().unwrap(), 5.0);
+}
+
+#[test]
+fn try_norm_propagates_nan() {
+    assert!(
+        Tensor::from_vec(vec![1.0, f64::NAN])
+            .try_norm()
+            .unwrap()
+            .is_nan()
+    );
+}
+
+#[cfg(feature = "dynamic")]
+#[test]
+fn try_norm_rejects_dynamic() {
+    use crate::dynamic::Element;
+    let d = Tensor::from_elements(vec![Element::Float(3.0), Element::Float(4.0)], &[2]);
+    assert!(matches!(
+        d.try_norm().unwrap_err(),
+        MattenError::Unsupported {
+            operation: "norm",
+            ..
+        }
+    ));
+}

@@ -30,23 +30,6 @@ fn population_variance(data: &[f64]) -> f64 {
         / n
 }
 
-/// Rejects a dynamic tensor with [`MattenError::Unsupported`]. No-op when the
-/// `dynamic` feature is disabled.
-fn reject_dynamic_stat(t: &Tensor, operation: &'static str) -> Result<(), MattenError> {
-    #[cfg(feature = "dynamic")]
-    if t.is_dynamic() {
-        return Err(MattenError::Unsupported {
-            operation,
-            message: format!(
-                "{operation} is not supported on dynamic tensors; call try_numeric() first"
-            ),
-        });
-    }
-    #[cfg(not(feature = "dynamic"))]
-    let _ = (t, operation);
-    Ok(())
-}
-
 /// Population variance reduced along `axis`, removing that axis (two-pass per
 /// slice). Shared by [`Tensor::try_var_axis`] and [`Tensor::try_std_axis`].
 fn variance_axis_impl(
@@ -54,7 +37,7 @@ fn variance_axis_impl(
     axis: usize,
     operation: &'static str,
 ) -> Result<Tensor, MattenError> {
-    reject_dynamic_stat(t, operation)?;
+    crate::math::reject_dynamic(t, operation)?;
     let rank = t.shape.len();
     if axis >= rank {
         return Err(MattenError::Shape {
@@ -133,7 +116,7 @@ impl Tensor {
     /// assert_eq!(Tensor::from_vec(vec![1.0, 2.0, 3.0, 4.0]).try_var().unwrap(), 1.25);
     /// ```
     pub fn try_var(&self) -> Result<f64, MattenError> {
-        reject_dynamic_stat(self, "var")?;
+        crate::math::reject_dynamic(self, "var")?;
         if self.data.is_empty() {
             return Err(MattenError::InvalidArgument {
                 operation: "var",
@@ -174,7 +157,7 @@ impl Tensor {
     /// assert!(Tensor::from_vec(vec![5.0]).try_std().unwrap() == 0.0);
     /// ```
     pub fn try_std(&self) -> Result<f64, MattenError> {
-        reject_dynamic_stat(self, "std")?;
+        crate::math::reject_dynamic(self, "std")?;
         if self.data.is_empty() {
             return Err(MattenError::InvalidArgument {
                 operation: "std",

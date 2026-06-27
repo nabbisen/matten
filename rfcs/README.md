@@ -59,6 +59,8 @@ for RFC state; the Status field inside each file mirrors the folder.
 | 051 | [Bridge Conversion Contracts and Companion-Crate Policy](./done/051-bridge-conversion-contracts-and-companion-crate-policy.md) | 0.23.2 |
 | 052 | [Production Target Playbooks](./done/052-production-target-playbooks.md) | 0.23.0–0.23.1 |
 | 053 | [Migration Readiness Diagnostics and Report Format](./done/053-migration-readiness-diagnostics-and-report-format.md) | 0.23.4 |
+| 055 | [Result-Form Scalar Reductions (`try_sum`/`try_mean`/`try_min`/`try_max`/`try_norm`)](./done/055-result-form-scalar-reductions.md) | 0.24.0 |
+| 056 | [Result-Form Axis Reductions (`try_sum_axis`/`try_mean_axis`/`try_min_axis`/`try_max_axis`)](./done/056-result-form-axis-reductions.md) | 0.24.0 |
 
 ## Proposed
 

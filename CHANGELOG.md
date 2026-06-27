@@ -18,6 +18,54 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.24.0] - 2026-06-27
+
+**Result-form reductions — complete the fallible reduction surface (RFC-055 + RFC-056).**
+Additive public API in core `matten`; no new dependency, no breaking change, f64-only core.
+Every reduction that can fail now has a non-panicking `try_` form alongside its panic form,
+joining the existing `try_var` / `try_std` family.
+
+### Added
+
+- **Scalar value reductions (RFC-055):** `try_sum`, `try_mean`, `try_min`, `try_max`, `try_norm`
+  → `Result<f64, MattenError>`. Each returns `MattenError::Unsupported` on a dynamic tensor and
+  is otherwise total; `NaN` is treated as a value and propagates as before.
+- **Axis reductions (RFC-056):** `try_sum_axis`, `try_mean_axis`, `try_min_axis`, `try_max_axis`
+  → `Result<Tensor, MattenError>`. Each returns `MattenError::Shape` for an out-of-range axis
+  and `MattenError::Unsupported` on a dynamic tensor (dynamic checked first, matching
+  `try_var_axis` / `try_std_axis`). The reduced axis is removed from the output shape, matching
+  the panic form.
+
+### Changed
+
+- The panic forms (`sum`/`mean`/`min`/`max`/`norm` and the `*_axis` forms) now delegate to their
+  `try_` engines via `unwrap_or_else(|e| panic!())`, the same pattern `var`/`std` already use, so
+  the two forms can never diverge. Behaviour is unchanged: they still panic on a dynamic tensor
+  and on an out-of-range axis. Panic **message text** for these forms is now sourced from the
+  `MattenError` `Display` (consistent with `var`/`std`); message text is not part of the API
+  contract. No new `MattenError` variant.
+- **`norm` ruling reversed:** the prior v0.21 "norm panic-only" decision is reversed (architect
+  deep review 2026-06-27). `norm` gains `try_norm`; its rustdoc no longer implies the value
+  reductions will never have `try_` forms.
+- Internal: the dynamic-rejection guard is now a single shared `reject_dynamic` helper reused by
+  the core and statistics reductions; an axis-bounds `check_axis` helper centralises the
+  out-of-range check.
+- Docs: `public-api-snapshot.md` lists the nine new methods; `compatibility.md` gains a v0.24
+  family entry; reduction rustdoc cross-links panic and `try_` forms.
+
+### Version
+
+- Family bump `0.23.5` → `0.24.0` (additive public API → minor). User-facing install pins and
+  family labels retargeted `0.23` → `0.24` across READMEs, `lib.rs` rustdoc, and doc pages
+  (flagged by the self-updating version-drift guard).
+
+### Threat model
+
+Additive numeric API over existing in-memory `f64` tensors. No new data flow, external
+integration, or auth surface; the only failure paths reuse the existing dynamic-tensor
+(`Unsupported`) and axis-bounds (`Shape`) controls, now also reachable as recoverable `Result`s
+instead of only panics. Existing controls verified to remain valid; no threat-model change.
+
 ## [0.23.5] - 2026-06-27
 
 **RFC-050–054 deep-review response (P1 + P2 fixes) and migration-batch lifecycle close.**

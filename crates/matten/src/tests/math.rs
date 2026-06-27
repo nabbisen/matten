@@ -1,4 +1,4 @@
-use crate::Tensor;
+use crate::{MattenError, Tensor};
 
 // ── whole reductions ──────────────────────────────────────────────────────
 
@@ -270,4 +270,189 @@ fn max_axis_on_vector_gives_scalar() {
 fn min_axis_out_of_range_panics() {
     let t = Tensor::ones(&[3]);
     let _ = t.min_axis(5);
+}
+
+// ── Result-form scalar reductions (RFC-055) ───────────────────────────────
+
+#[test]
+fn try_scalar_reductions_match_panic_forms() {
+    let t = Tensor::new(vec![3.0, 1.0, 2.0, 4.0], &[2, 2]);
+    assert_eq!(t.try_sum().unwrap(), t.sum());
+    assert_eq!(t.try_mean().unwrap(), t.mean());
+    assert_eq!(t.try_min().unwrap(), t.min());
+    assert_eq!(t.try_max().unwrap(), t.max());
+}
+
+#[test]
+fn try_scalar_reductions_propagate_nan() {
+    let t = Tensor::from_vec(vec![1.0, f64::NAN, 3.0]);
+    assert!(t.try_sum().unwrap().is_nan());
+    assert!(t.try_mean().unwrap().is_nan());
+    assert!(t.try_min().unwrap().is_nan());
+    assert!(t.try_max().unwrap().is_nan());
+}
+
+// ── Result-form axis reductions (RFC-056) ─────────────────────────────────
+
+#[test]
+fn try_axis_reductions_match_panic_forms() {
+    let m = Tensor::new(vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0], &[2, 3]);
+    for axis in 0..2 {
+        let s = m.try_sum_axis(axis).unwrap();
+        assert_eq!(s.shape(), m.sum_axis(axis).shape());
+        assert_eq!(s.as_slice(), m.sum_axis(axis).as_slice());
+        assert_eq!(
+            m.try_mean_axis(axis).unwrap().as_slice(),
+            m.mean_axis(axis).as_slice()
+        );
+        assert_eq!(
+            m.try_min_axis(axis).unwrap().as_slice(),
+            m.min_axis(axis).as_slice()
+        );
+        assert_eq!(
+            m.try_max_axis(axis).unwrap().as_slice(),
+            m.max_axis(axis).as_slice()
+        );
+    }
+}
+
+#[test]
+fn try_axis_reductions_reject_out_of_range_axis() {
+    let m = Tensor::new(vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0], &[2, 3]);
+    // axis == rank and axis > rank both error; operation is the conceptual op.
+    assert!(matches!(
+        m.try_sum_axis(2).unwrap_err(),
+        MattenError::Shape {
+            operation: "sum_axis",
+            ..
+        }
+    ));
+    assert!(matches!(
+        m.try_mean_axis(9).unwrap_err(),
+        MattenError::Shape {
+            operation: "mean_axis",
+            ..
+        }
+    ));
+    assert!(matches!(
+        m.try_min_axis(2).unwrap_err(),
+        MattenError::Shape {
+            operation: "min_axis",
+            ..
+        }
+    ));
+    assert!(matches!(
+        m.try_max_axis(5).unwrap_err(),
+        MattenError::Shape {
+            operation: "max_axis",
+            ..
+        }
+    ));
+}
+
+#[test]
+#[should_panic(expected = "out of range")]
+fn sum_axis_out_of_range_still_panics() {
+    let _ = Tensor::ones(&[3]).sum_axis(5);
+}
+
+// ── dynamic rejection (RFC-055/056) ───────────────────────────────────────
+
+#[cfg(feature = "dynamic")]
+#[test]
+fn reductions_reject_dynamic_with_unsupported() {
+    use crate::dynamic::Element;
+    let d = Tensor::from_elements(
+        vec![
+            Element::Float(1.0),
+            Element::Float(2.0),
+            Element::Float(3.0),
+            Element::Float(4.0),
+        ],
+        &[2, 2],
+    );
+    assert!(d.is_dynamic());
+    assert!(matches!(
+        d.try_sum().unwrap_err(),
+        MattenError::Unsupported {
+            operation: "sum",
+            ..
+        }
+    ));
+    assert!(matches!(
+        d.try_mean().unwrap_err(),
+        MattenError::Unsupported {
+            operation: "mean",
+            ..
+        }
+    ));
+    assert!(matches!(
+        d.try_min().unwrap_err(),
+        MattenError::Unsupported {
+            operation: "min",
+            ..
+        }
+    ));
+    assert!(matches!(
+        d.try_max().unwrap_err(),
+        MattenError::Unsupported {
+            operation: "max",
+            ..
+        }
+    ));
+    assert!(matches!(
+        d.try_sum_axis(0).unwrap_err(),
+        MattenError::Unsupported {
+            operation: "sum_axis",
+            ..
+        }
+    ));
+    assert!(matches!(
+        d.try_mean_axis(0).unwrap_err(),
+        MattenError::Unsupported {
+            operation: "mean_axis",
+            ..
+        }
+    ));
+    assert!(matches!(
+        d.try_min_axis(0).unwrap_err(),
+        MattenError::Unsupported {
+            operation: "min_axis",
+            ..
+        }
+    ));
+    assert!(matches!(
+        d.try_max_axis(0).unwrap_err(),
+        MattenError::Unsupported {
+            operation: "max_axis",
+            ..
+        }
+    ));
+    // Precedence: a dynamic tensor with an out-of-range axis still reports the
+    // dynamic error first (mirrors try_var_axis / try_std_axis).
+    assert!(matches!(
+        d.try_sum_axis(99).unwrap_err(),
+        MattenError::Unsupported {
+            operation: "sum_axis",
+            ..
+        }
+    ));
+}
+
+#[cfg(feature = "dynamic")]
+#[test]
+#[should_panic(expected = "dynamic")]
+fn sum_panics_on_dynamic() {
+    use crate::dynamic::Element;
+    let d = Tensor::from_elements(vec![Element::Float(1.0), Element::Float(2.0)], &[2]);
+    let _ = d.sum();
+}
+
+#[cfg(feature = "dynamic")]
+#[test]
+#[should_panic(expected = "out of range")]
+fn sum_axis_panics_on_numeric_bad_axis_after_delegation() {
+    // Sanity: panic form of an axis reduction still panics on a bad axis for a
+    // numeric tensor, via the try_ delegation.
+    let _ = Tensor::ones(&[2, 2]).max_axis(7);
 }
