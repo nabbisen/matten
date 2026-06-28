@@ -135,3 +135,12 @@ acceptable; full production-ready is deferred (RFC-058 §5.1). This does **not**
 `matten-ndarray` remains **production-ready**; `matten-data` remains **Beta** pending its own
 maturity decision.
 
+The **v0.27 family** completes the companion-maturity line by promoting `matten-data` from
+**Beta** to **production-ready candidate** (RFC-059), with two promotion-blocking hygiene fixes
+first (a maturity-neutral package description; `required-features = ["csv"]` on the `data_0X`
+examples). Label/docs/packaging only — no API, runtime, error-variant, or dependency change, and
+**no scope expansion**: the RFC-042 lock holds (still a CSV→tensor on-ramp, not a dataframe
+engine). Full production-ready is deferred to a separate future review. This does **not** imply
+v1.0. The ladder now reads `matten-ndarray` production-ready, `matten-mlprep` and `matten-data`
+production-ready candidates.
+

@@ -18,6 +18,61 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.27.0] - 2026-06-27
+
+**Companion-maturity line completes: promote `matten-data` to production-ready candidate
+(RFC-059).** Label, docs, and packaging only — no API, runtime, error-variant, or dependency
+change, and **no scope expansion** (the RFC-042 on-ramp scope lock is preserved). Core `matten` is
+unchanged.
+
+### Fixed (promotion-blocking hygiene, architect-required)
+
+- **Stale package description.** `crates/matten-data/Cargo.toml` still advertised *"Experimental…"*
+  on crates.io even though the crate had been Beta since v0.22.0. Replaced with a maturity-neutral
+  description (no `Experimental`/`Beta`/`candidate` wording, so it stays stable across rung changes).
+- **Example feature wiring.** The six `data_0X` examples call the CSV constructors
+  (`from_csv_str`/`from_csv_path`, gated behind the default-on `csv` feature) but lacked
+  `required-features = ["csv"]`, so `cargo build -p matten-data --examples --no-default-features`
+  failed to compile. Added `[[example]]` entries with `required-features = ["csv"]` for
+  `data_00`–`data_05` (mirroring `csv_to_tensor`); that build now succeeds by skipping the gated
+  examples, and all seven still execute under default features in the `smoke` job.
+
+### Changed
+
+- **`matten-data` is now a production-ready candidate** (was *Beta*), per RFC-059 and the architect
+  ruling (2026-06-27). It is the most-tested companion (34 tests), runs all seven examples in CI,
+  has an 11-variant `#[non_exhaustive]` `MattenDataError` (`Display` + `source()`), a documented
+  compatibility/MSRV policy, and a CI-enforced RFC-042 anti-scope guard. Status label updated across
+  the crate README, `lib.rs`, the workspace README table, `docs/src/examples/{companions,data,index}.md`,
+  the docs maturity progression, the compatibility page, and the ROADMAP Track-A decision.
+- **Full production-ready is deferred** to a separate future review: `matten-data` is the newest
+  companion, CSV/table ingestion has a wide edge-case surface, and large/streaming CSV stays
+  deferred. The candidate rung — "usable seriously if the documented limits are acceptable" — fits a
+  scope-locked CSV→tensor on-ramp.
+- **This is a Status label, not v1.0.** Under lock-step family versioning (RFC-030) the crate stays
+  on the shared family version; v1.0 still requires explicit maintainer confirmation.
+
+### Changed (tooling)
+
+- The v0.22.0 "matten-data must declare Beta" release-docs check is updated to enforce
+  **production-ready candidate** (context-aware: the historical "promoted to Beta in v0.22.0"
+  narrative and per-family compatibility entries remain allowed; the current lead label, lib.rs
+  Status line, and Cargo.toml description must not say Beta/Experimental).
+
+### Version
+
+- Family bump `0.26.0` → `0.27.0` (minor, completing the companion-maturity line). User-facing
+  install pins and `0.26.x` family labels retargeted to `0.27`; `introduction.md` and the
+  compatibility page describe the v0.27 family.
+
+### Threat model
+
+Label/docs/packaging change. The two fixes are packaging hygiene (a crates.io description string and
+example feature-gating) with no new data flow, external integration, or auth surface. No public API,
+error variant, runtime behavior, or dependency change; no scope expansion (RFC-042 guard still
+passes); `matten-data` stays `matten` + optional `csv`. Published-dependency-isolation unaffected.
+Existing controls verified to remain valid; no threat-model change.
+
 ## [0.26.0] - 2026-06-27
 
 **Companion-maturity continues: promote `matten-mlprep` to production-ready candidate (RFC-058).**

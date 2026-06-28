@@ -43,7 +43,7 @@ cargo run -p matten-mlprep --example mlprep_standardize_columns
 cargo run -p matten-mlprep --example mlprep_train_test_split
 ```
 
-## `matten-data` — table-to-Tensor (Beta)
+## `matten-data` — table-to-Tensor (production-ready candidate)
 
 | Example | What it shows |
 |---|---|
@@ -55,7 +55,7 @@ cargo run -p matten-mlprep --example mlprep_train_test_split
 | [`data_05_errors`](https://github.com/nabbisen/matten/blob/main/crates/matten-data/examples/data_05_errors.rs) | The common boundary errors |
 | [`csv_to_tensor`](https://github.com/nabbisen/matten/blob/main/crates/matten-data/examples/csv_to_tensor.rs) | Comprehensive overview of the whole workflow |
 
-`matten-data` is **Beta** and intentionally small. It is **not** a dataframe:
+`matten-data` is a **production-ready candidate** and intentionally small. It is **not** a dataframe:
 no group-by, join, merge, pivot, or query. Missing values and numeric conversion are
 explicit, never silent. See [matten-data: table to Tensor](./data.md) for the full guide.
 

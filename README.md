@@ -23,10 +23,10 @@ This repository is a Cargo workspace, where core `matten` stays small and depend
 
 | Crate | Version | Status | What it is |
 |---|---|---|---|
-| [`matten`](./crates/matten) | 0.26.x family | stable (v0.x) | The core `f64` tensor library: construction, shape ops, broadcasting, slicing, reductions, matmul, JSON/CSV boundary APIs, and an optional `dynamic` ingestion on-ramp. |
-| [`matten-ndarray`](./crates/matten-ndarray) | 0.26.x family | production-ready | Conversion bridge between `matten::Tensor` and `ndarray::ArrayD<f64>`. |
-| [`matten-mlprep`](./crates/matten-mlprep) | 0.26.x family | production-ready candidate | Transparent, deterministic preprocessing helpers (standardize, min-max scale, bias column, train/test split). |
-| [`matten-data`](./crates/matten-data) | 0.26.x family | beta | Small, honest CSV→tensor ingestion (`Table` with explicit missing-value handling and strict numeric conversion). Deliberately not a dataframe library. |
+| [`matten`](./crates/matten) | 0.27.x family | stable (v0.x) | The core `f64` tensor library: construction, shape ops, broadcasting, slicing, reductions, matmul, JSON/CSV boundary APIs, and an optional `dynamic` ingestion on-ramp. |
+| [`matten-ndarray`](./crates/matten-ndarray) | 0.27.x family | production-ready | Conversion bridge between `matten::Tensor` and `ndarray::ArrayD<f64>`. |
+| [`matten-mlprep`](./crates/matten-mlprep) | 0.27.x family | production-ready candidate | Transparent, deterministic preprocessing helpers (standardize, min-max scale, bias column, train/test split). |
+| [`matten-data`](./crates/matten-data) | 0.27.x family | production-ready candidate | Small, honest CSV→tensor ingestion (`Table` with explicit missing-value handling and strict numeric conversion). Deliberately not a dataframe library. |
 
 All crates share one **family version** (RFC-030): matching numbers mean a
 matched, compatible set. A crate's **maturity is the Status column**, not its
@@ -75,7 +75,7 @@ ecosystem. Core stays a family car; companions are the trailer hitch.
 
 ```toml
 [dependencies]
-matten = "0.26"
+matten = "0.27"
 ```
 
 ```rust
@@ -97,8 +97,8 @@ More examples are [here](crates/matten/examples/).
 
 ```toml
 [dependencies]
-matten = "0.26"
-matten-ndarray = "0.26"
+matten = "0.27"
+matten-ndarray = "0.27"
 ```
 
 ```rust
@@ -118,8 +118,8 @@ More examples are [here](crates/matten-ndarray/examples/).
 
 ```toml
 [dependencies]
-matten = "0.26"
-matten-mlprep = "0.26"
+matten = "0.27"
+matten-mlprep = "0.27"
 ```
 
 ```rust

@@ -105,7 +105,7 @@ These live in each companion crate's own `examples/` directory, not in core
 |---|---|---|
 | `matten-ndarray` | `from_arrayd`, `to_arrayd` | `ArrayD` ↔ `Tensor` interop (copies, shape-preserving) |
 | `matten-mlprep` | `mlprep_standardize_columns`, `mlprep_minmax_scale`, `mlprep_add_bias_column`, `mlprep_train_test_split` | Small deterministic preprocessing |
-| `matten-data` | `csv_to_tensor` | CSV → clean → numeric `Tensor` (Experimental) |
+| `matten-data` | `csv_to_tensor` | CSV → clean → numeric `Tensor` (production-ready candidate) |
 
 ## Running examples
 

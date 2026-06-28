@@ -1,6 +1,6 @@
 # `matten-data` — table to `Tensor`
 
-`matten-data` is a small, **Beta** companion crate for the boring step between a
+`matten-data` is a small, **production-ready candidate** companion crate for the boring step between a
 small table-like input (such as a CSV) and a numeric [`matten::Tensor`]. It is a
 conversion helper, **not** a dataframe library or query engine.
 
@@ -12,8 +12,8 @@ For joins, group-by, lazy queries, datetime handling, or large/streaming data, u
 
 ```toml
 [dependencies]
-matten = "0.26"
-matten-data = "0.26"
+matten = "0.27"
+matten-data = "0.27"
 ```
 
 Both crates share one lock-step family version (RFC-030); maturity is a per-crate
@@ -90,6 +90,6 @@ data. When you need those capabilities, reach for a dataframe/query engine
 
 ## Status and maturity
 
-**Beta** (`0.26.x` family). The table-to-Tensor API is mostly stable but pre-1.0;
+**Production-ready candidate** (`0.27.x` family). The table-to-Tensor API is mostly stable but pre-1.0;
 pin the minor version. The crate's scope is locked and enforced in CI (RFC-042), and
 core `matten` never depends on it (RFC-022).

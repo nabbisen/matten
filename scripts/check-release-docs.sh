@@ -79,21 +79,33 @@ if grep -in "Experimental (0\." "$MLPREP/src/lib.rs"; then
   FAIL=1
 fi
 
-echo "=== Checking matten-data declares Beta, not Experimental (RFC-036 / v0.22.0) ==="
-# matten-data was promoted to Beta in v0.22.0 once the RFC-036 example suite and the
-# malformed-CSV test cleared the RFC-023 §9 gate. Its own current docs (and the
-# matten-data rows/sections of shared docs) must not call it Experimental. Historical
-# references in rfcs/, CHANGELOG.md, and ROADMAP.md are allowed.
+echo "=== Checking matten-data declares production-ready candidate, not Experimental/Beta (RFC-059 / v0.27.0) ==="
+# matten-data: Experimental -> Beta (v0.22.0, RFC-036) -> production-ready candidate (v0.27.0,
+# RFC-059). Its own current-status LABEL and the matten-data rows/sections of current-status
+# shared docs must reflect the current rung. Context-aware: the historical "promoted to Beta in
+# v0.22.0" narrative in the README body is allowed, as are per-family entries in compatibility.md
+# and references in rfcs/, CHANGELOG.md, ROADMAP.md.
 if grep -rIni "experimental" "$DATA/README.md" "$DATA/src/lib.rs" docs/src/examples/data.md "$DATA/examples" 2>/dev/null; then
-  echo "ERROR: matten-data current docs still say Experimental (it is Beta as of v0.22.0)"
+  echo "ERROR: matten-data current docs still say Experimental (now production-ready candidate as of v0.27.0)"
   FAIL=1
 fi
-if ! grep -qi "beta" "$DATA/README.md"; then
-  echo "ERROR: matten-data README does not declare Beta status"
+# Current LABEL must not be Beta/Experimental: the lead README badge, the lib.rs Status line, or
+# the Cargo.toml description. The historical Beta mention in the README body is NOT a lead label.
+if grep -nE '^> \*\*(Beta|Experimental) \(' "$DATA/README.md" 2>/dev/null \
+   || grep -nE '^//! \*\*(Beta|Experimental)\.' "$DATA/src/lib.rs" 2>/dev/null \
+   || grep -niE 'experimental|beta' "$DATA/Cargo.toml" 2>/dev/null; then
+  echo "ERROR: stale Beta/Experimental maturity LABEL in matten-data status files (now production-ready candidate)"
   FAIL=1
 fi
-if grep -niE "matten-data.*experimental|table-to-Tensor \(Experimental\)" README.md docs/src/examples/companions.md docs/src/reference/compatibility.md; then
-  echo "ERROR: a shared doc still marks matten-data Experimental (should be Beta)"
+if ! grep -qi "production-ready candidate" "$DATA/README.md"; then
+  echo "ERROR: matten-data README does not declare production-ready candidate status"
+  FAIL=1
+fi
+# Current-status shared docs (NOT compatibility.md — it carries allowed per-family history).
+if grep -niE 'matten-data.*\((Experimental|Beta)\)' docs/src/examples/companions.md docs/src/examples/index.md 2>/dev/null \
+   || grep -niE 'matten-data.*\| (experimental|beta) \|' README.md 2>/dev/null \
+   || grep -niE 'matten-data` is (a )?\*\*(Experimental|Beta)\*\*' docs/src/examples/companions.md docs/src/examples/data.md 2>/dev/null; then
+  echo "ERROR: a current-status shared doc still marks matten-data Experimental/Beta (should be production-ready candidate)"
   FAIL=1
 fi
 

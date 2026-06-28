@@ -1,6 +1,6 @@
 [package]
 name = "matten-data"
-description = "Experimental table-to-Tensor preparation companion for matten (small PoC datasets)."
+description = "CSV/table-to-Tensor preparation companion for matten (small PoC datasets)."
 readme      = "README.md"
 categories  = ["science", "data-structures"]
 keywords    = ["tensor", "table", "csv", "data", "matten"]
@@ -26,4 +26,31 @@ csv = ["dep:csv"]
 # The example uses the CSV constructors, so it only builds when `csv` is enabled.
 [[example]]
 name = "csv_to_tensor"
+required-features = ["csv"]
+
+# data_00–data_05 also call the CSV constructors (`from_csv_str` / `from_csv_path`),
+# which are gated behind the default-on `csv` feature; gate the example targets so a
+# `--no-default-features` build skips them instead of failing to compile (RFC-059 §5).
+[[example]]
+name = "data_00_quickstart"
+required-features = ["csv"]
+
+[[example]]
+name = "data_01_schema_summary"
+required-features = ["csv"]
+
+[[example]]
+name = "data_02_select_columns"
+required-features = ["csv"]
+
+[[example]]
+name = "data_03_missing_values"
+required-features = ["csv"]
+
+[[example]]
+name = "data_04_to_tensor"
+required-features = ["csv"]
+
+[[example]]
+name = "data_05_errors"
 required-features = ["csv"]

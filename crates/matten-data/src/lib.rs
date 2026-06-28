@@ -3,7 +3,7 @@
 //!
 //! # Status
 //!
-//! **Beta.** This is a scope-locked companion (RFC-033) for the boring
+//! **Production-ready candidate.** This is a scope-locked companion (RFC-033) for the boring
 //! step between table-like input and a numeric [`matten::Tensor`]. The API is
 //! mostly stable but pre-1.0; pin the minor version. Under lock-step family versioning
 //! (RFC-030) the crate shares the workspace family version; maturity is the Status
