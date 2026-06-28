@@ -49,11 +49,13 @@ Same machine class as the internal baseline refresh. Not comparable across machi
 | ndarray version | 0.16.1 |
 | nalgebra version | 0.33.3 |
 
-The peer harness keeps its own (git-ignored) lockfile and still resolves `ndarray 0.16.1`,
-independent of the workspace's `ndarray` requirement (which moved to `0.17` in v0.28.x). The peer
-comparison is therefore still "vs `ndarray 0.16.1`"; re-pinning the peer harness to `ndarray 0.17`
-is a separate task and not part of this refresh. `nalgebra 0.33.3` is the latest version compatible
-with the project's Rust 1.85 floor (`nalgebra 0.35.0` requires Rust 1.89).
+The peer harness keeps its own (git-ignored) lockfile. **These v0.2 numbers were measured at
+`ndarray 0.16.1`.** The harness peer pin has since been bumped to `ndarray 0.17` (v0.28.3) to track
+the bridge (which moved to `0.17` in v0.28.x), and the peers bench compiles cleanly against
+`0.17.2`; the next peers run will produce `0.17` figures. Until then these numbers predate the pin
+bump and remain a `0.16.1` snapshot — `ndarray 0.16 → 0.17` is backwards-compatible and these small
+dense kernels are not expected to shift meaningfully between the two. `nalgebra 0.33.3` is the
+latest version compatible with the project's Rust 1.85 floor (`nalgebra 0.35.0` requires Rust 1.89).
 
 ## Comparable tasks
 

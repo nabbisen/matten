@@ -18,9 +18,34 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
-## [0.28.2] - 2026-06-28
+## [0.28.3] - 2026-06-28
 
-Benchmark documentation and reports only — no code, public API, runtime, or dependency change.
+Benchmark harness configuration only — no change to any published crate's code, public API, runtime,
+or dependencies.
+
+### Changed
+
+- **Benchmark harness peer pin `ndarray` `0.16` → `0.17`** (`benchmarks/Cargo.toml`), to track the
+  bridge's move to `ndarray 0.17` in v0.28.x rather than leave the peer comparison a version behind.
+  The peers bench was verified to compile cleanly against `ndarray 0.17.2`. This affects only the
+  out-of-workspace, unpublished benchmark harness — no published crate, no workspace dependency, and
+  no public API is touched. The v0.2 peer numbers were measured at `0.16.1` and predate the bump;
+  they refresh to `0.17` on the next maintainer peers run (the bench must run on the maintainer's
+  machine class for environment consistency, not generated elsewhere). The peer-comparison report
+  and the results page note this.
+
+### Version
+
+- Patch bump `0.28.2` → `0.28.3` (benchmark-harness config only; minor unchanged, no family-label
+  retarget).
+
+### Threat model
+
+Out-of-workspace, unpublished benchmark-harness peer-dependency pin only. No new data flow, external
+integration, auth surface, published dependency, or public API; `criterion` and the peer deps remain
+outside every published crate's graph. Existing controls remain valid; no threat-model change.
+
+## [0.28.2] - 2026-06-28
 
 ### Added
 

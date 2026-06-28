@@ -58,8 +58,9 @@ The same small problems placed next to two established Rust numeric crates, `nda
   (reference: `…-v0.1`, accepted 2026-06-25).
 - **Environment:** same machine class as the baseline; git `ef06369`, workspace `0.28.1`,
   `ndarray` 0.16.1, `nalgebra` 0.33.3. Peer tasks are opt-in behind the `peers` feature (off by
-  default). The peer harness still resolves `ndarray 0.16.1` from its own lockfile, independent of
-  the workspace's move to `ndarray 0.17`. Not comparable across machines.
+  default). **These numbers were measured at `ndarray 0.16.1`;** the harness peer pin was bumped to
+  `ndarray 0.17` in v0.28.3 to match the bridge, and will produce `0.17` figures on the next peers
+  run. Not comparable across machines.
 
 Representative Criterion medians (full six-task table in the report):
 

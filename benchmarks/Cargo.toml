@@ -28,7 +28,7 @@ matten = { path = "../crates/matten", default-features = false }
 # default; pulled in only via `--features peers`, so the default harness build and
 # the ordinary CI `--no-run` check never touch them, and they never reach any
 # published crate (proven by scripts/check-published-dependency-isolation.sh).
-ndarray = { version = "0.16", optional = true }
+ndarray = { version = "0.17", optional = true }
 nalgebra = { version = "0.33", optional = true }
 
 [dev-dependencies]
