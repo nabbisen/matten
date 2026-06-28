@@ -2,7 +2,7 @@
 
 [![license](https://img.shields.io/crates/l/matten-data.svg)](../../LICENSE)
 
-> **Beta (`0.25.x` family).** A scope-locked companion crate (RFC-033).
+> **Beta (`0.26.x` family).** A scope-locked companion crate (RFC-033).
 > The table-to-Tensor API (CSV ingestion, schema summary, column selection,
 > missing-value handling, explicit numeric conversion) shipped in v0.20.1
 > (RFC-034, RFC-035) and was promoted to Beta in v0.22.0 (RFC-036). The API is

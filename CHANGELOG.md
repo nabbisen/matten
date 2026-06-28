@@ -18,6 +18,51 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.26.0] - 2026-06-27
+
+**Companion-maturity continues: promote `matten-mlprep` to production-ready candidate (RFC-058).**
+Label and docs only — no API, runtime, error-variant, or dependency change to any crate. Core
+`matten` is unchanged.
+
+### Changed
+
+- **`matten-mlprep` is now a production-ready candidate** (was *Beta*), per RFC-058 and the
+  architect ruling (2026-06-27). The crate meets every candidate signal: a strong 17-test suite
+  (determinism, zero-variance errors, NaN propagation, shape and split edge cases), all four
+  examples executed in the `smoke` CI job, a clear `#[non_exhaustive]` `MattenMlprepError`
+  (`Display` + `source()`), and a documented SemVer/MSRV/family compatibility policy. Status label
+  updated in the crate README, `lib.rs`, the workspace README crate table, the docs maturity
+  progression, the compatibility page, and the ROADMAP gate.
+- **Full production-ready is deferred.** `train_test_split` is ordered-only (no shuffle), which is
+  acceptable for a candidate ("usable seriously if the documented limits are acceptable") but not
+  yet for a broad production-ready recommendation. The candidate → production-ready exit criteria
+  (keep ordered-only and justify it, *or* add a seeded/shuffled split via a separate feature RFC)
+  are recorded in RFC-058 §5.1.
+- **This is a Status label, not v1.0.** Under lock-step family versioning (RFC-030) the crate stays
+  on the shared family version; v1.0 still requires explicit maintainer confirmation.
+
+### Added
+
+- **Maturity-label freshness guard for `matten-mlprep`** (`check-release-docs.sh`, P2): a
+  context-aware check that fails if the crate's own current-status files still carry a "Beta"
+  label, while leaving historical references (CHANGELOG, RFCs, maturity-progression narrative)
+  intact — mirroring the `matten-ndarray` guard added in v0.25.0.
+
+### Version
+
+- Family bump `0.25.0` → `0.26.0` (minor, continuing the companion-maturity line). User-facing
+  install pins and `0.25.x` family labels retargeted to `0.26` across READMEs, `lib.rs` rustdoc,
+  and doc pages (flagged by the version-drift guard); `introduction.md` and the compatibility page
+  describe the v0.26 family.
+
+### Threat model
+
+Label/docs change. No new data flow, external integration, auth surface, public API, error variant,
+or dependency; no `matten-mlprep` runtime behavior change; `train_test_split` remains ordered-only.
+The published-dependency-isolation guard still confirms core `matten` carries no companion
+dependency, and `matten-mlprep` remains `matten`-only. Existing controls verified to remain valid;
+no threat-model change.
+
 ## [0.25.0] - 2026-06-27
 
 **Companion-maturity line opens: promote `matten-ndarray` to production-ready (RFC-057).** Label,

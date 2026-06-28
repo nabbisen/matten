@@ -10,4 +10,4 @@ This book is organized by reader:
 - **Reference** — the rules that shape the public API.
 - **Contributors** — project layout, milestones, and process.
 
-> This documentation tracks the current 0.25 family, which opens the companion-maturity line by promoting `matten-ndarray` to production-ready (RFC-057), on top of the v0.24 fallible-reduction surface (RFC-055/RFC-056) and the v0.23 production migration guide (RFC-050–053).
+> This documentation tracks the current 0.26 family, which continues the companion-maturity line by promoting `matten-mlprep` to production-ready candidate (RFC-058), after `matten-ndarray` reached production-ready in v0.25 (RFC-057).

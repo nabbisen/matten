@@ -1556,6 +1556,9 @@ v0.20+
 v0.25.0
   matten-ndarray production-ready
 
+v0.26.0
+  matten-mlprep production-ready candidate
+
 later
   nalgebra / candle / streaming only after separate RFCs
 ```

@@ -127,3 +127,11 @@ and it does **not** imply v1.0, which still requires explicit maintainer confirm
 lock-step family versioning (RFC-030) the crate stays on the shared family version. `matten-mlprep`
 and `matten-data` remain at **Beta** pending their own maturity decisions.
 
+The **v0.26 family** continues the companion-maturity line by promoting `matten-mlprep` from
+**Beta** to **production-ready candidate** (RFC-058). Label/docs only — no API, runtime,
+error-variant, or dependency change. The candidate rung reflects an honest limitation:
+`train_test_split` is ordered-only (no shuffle), acceptable if that documented limit is
+acceptable; full production-ready is deferred (RFC-058 §5.1). This does **not** imply v1.0.
+`matten-ndarray` remains **production-ready**; `matten-data` remains **Beta** pending its own
+maturity decision.
+

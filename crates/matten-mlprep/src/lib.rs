@@ -34,11 +34,13 @@
 //!
 //! # Status
 //!
-//! **Beta.** The API may still change. Constant (zero-variance) columns are
-//! rejected explicitly by the scalers rather than silently producing a zero
-//! column — see [`MattenMlprepError::ZeroVariance`]. Dynamic tensors are
-//! rejected at every public entry point unconditionally — the guard does not
-//! depend on the companion `dynamic` feature (RFC-031).
+//! **Production-ready candidate.** The small surface is stable; usable seriously
+//! if the documented limits are acceptable. Note that [`train_test_split`] is
+//! ordered-only (no shuffle). Constant (zero-variance) columns are rejected
+//! explicitly by the scalers rather than silently producing a zero column — see
+//! [`MattenMlprepError::ZeroVariance`]. Dynamic tensors are rejected at every
+//! public entry point unconditionally — the guard does not depend on the
+//! companion `dynamic` feature (RFC-031).
 //!
 //! # Feature flags
 //!

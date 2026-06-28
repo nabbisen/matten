@@ -303,6 +303,20 @@ if grep -rInE 'production-ready candidate' \
 fi
 
 # ---------------------------------------------------------------------------
+# matten-mlprep maturity-label freshness (RFC-058)
+# ---------------------------------------------------------------------------
+# matten-mlprep is production-ready candidate as of v0.26.0. Its own current-status
+# files must not still carry a "Beta" maturity label. Historical contexts
+# (CHANGELOG, rfcs/, maturity-progression narrative) are intentionally NOT scanned.
+if grep -rInE '\bBeta\b' \
+     crates/matten-mlprep/README.md \
+     crates/matten-mlprep/src/lib.rs \
+     crates/matten-mlprep/Cargo.toml 2>/dev/null; then
+  echo "ERROR: stale 'Beta' label in matten-mlprep status files (now production-ready candidate)"
+  FAIL=1
+fi
+
+# ---------------------------------------------------------------------------
 # Result
 # ---------------------------------------------------------------------------
 

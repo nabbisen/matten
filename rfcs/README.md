@@ -62,6 +62,7 @@ for RFC state; the Status field inside each file mirrors the folder.
 | 055 | [Result-Form Scalar Reductions (`try_sum`/`try_mean`/`try_min`/`try_max`/`try_norm`)](./done/055-result-form-scalar-reductions.md) | 0.24.0 |
 | 056 | [Result-Form Axis Reductions (`try_sum_axis`/`try_mean_axis`/`try_min_axis`/`try_max_axis`)](./done/056-result-form-axis-reductions.md) | 0.24.0 |
 | 057 | [Promote `matten-ndarray` — Production-Ready Candidate → Production-Ready](./done/057-promote-matten-ndarray-production-ready.md) | 0.25.0 |
+| 058 | [Promote `matten-mlprep` — Beta → Production-Ready Candidate](./done/058-promote-matten-mlprep-production-ready-candidate.md) | 0.26.0 |
 
 ## Proposed
 
