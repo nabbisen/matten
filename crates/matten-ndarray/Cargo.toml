@@ -1,6 +1,6 @@
 [package]
 name = "matten-ndarray"
-description = "Production-ready conversion bridge between matten::Tensor and ndarray::ArrayD<f64>."
+description = "Conversion bridge between matten::Tensor and ndarray::ArrayD<f64>."
 readme      = "README.md"
 categories  = ["science", "mathematics"]
 keywords    = ["tensor", "ndarray", "conversion", "bridge", "matten"]

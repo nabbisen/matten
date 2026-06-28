@@ -64,6 +64,8 @@ for RFC state; the Status field inside each file mirrors the folder.
 | 057 | [Promote `matten-ndarray` — Production-Ready Candidate → Production-Ready](./done/057-promote-matten-ndarray-production-ready.md) | 0.25.0 |
 | 058 | [Promote `matten-mlprep` — Beta → Production-Ready Candidate](./done/058-promote-matten-mlprep-production-ready-candidate.md) | 0.26.0 |
 | 059 | [`matten-data` Maturity Decision — Beta → Production-Ready Candidate](./done/059-promote-matten-data-production-ready-candidate.md) | 0.27.0 |
+| 060 | [Surface Benchmark Evidence in the Rendered Documentation](./done/060-surface-benchmark-evidence-in-docs.md) | 0.27.1 |
+| 061 | [Maturity-Label Clarity — Keep "Production-Ready", Add an Entrance Note](./done/061-maturity-label-clarity-entrance-note.md) | 0.27.1 |
 
 ## Proposed
 
@@ -73,8 +75,6 @@ for RFC state; the Status field inside each file mirrors the folder.
 | 037 | [Deferred Streaming and Large CSV Policy](./proposed/037-deferred-streaming-and-large-csv-policy.md) | v0.20.0 / later |
 | 049 | [Benchmarking, Complexity Metrics, and Positioning Report](./proposed/049-benchmarking-complexity-metrics-and-positioning-report.md) | **Accepted** — Phase 1 baseline (0.22.1) + Phase 2 Rust peer comparison (accepted 2026-06-25) complete; Phases 3–4 deferred |
 | 054 | [`matten-migrate` Assisted Migration Tool](./proposed/054-matten-migrate-assisted-migration-tool.md) | **Accepted as future direction** (2026-06-24; deferral confirmed in deep review 2026-06-27) — implementation deferred |
-| 060 | [Surface Benchmark Evidence in the Rendered Documentation](./proposed/060-surface-benchmark-evidence-in-docs.md) | docs-only release (deferred; awaiting review) |
-| 061 | [Maturity-Label Clarity — Keep "Production-Ready", Add an Entrance Note](./proposed/061-maturity-label-clarity-entrance-note.md) | docs-only release (deferred; awaiting review) |
 
 Implementation handoffs for the v0.20+ proposed set (RFC-033–042), the examples
 program (RFC-043–048), and the benchmarking program (RFC-049) live in

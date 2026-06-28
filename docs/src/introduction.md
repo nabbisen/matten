@@ -4,6 +4,10 @@
 for Rust — the *family car* for small numerical and data-exploration
 proof-of-concept work.
 
+> Maturity labels in this book — such as *production-ready* — describe stability
+> **within that scope**, not performance or scale. `matten` optimizes for time to
+> a runnable PoC, not benchmark leadership.
+
 This book is organized by reader:
 
 - **New users** — philosophy and a quick start.

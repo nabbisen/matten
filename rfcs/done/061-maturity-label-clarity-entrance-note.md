@@ -1,6 +1,6 @@
 # RFC-061: Maturity-Label Clarity — Keep "Production-Ready", Add an Entrance Note
 
-**Status:** Proposed (drafted 2026-06-27; awaiting architect review)
+**Status:** Implemented (v0.27.1); maintainer-authorized (docs-only — not an architect-ruling cycle)
 **Target Release:** a future docs-only release (deferred per maintainer; may bundle with RFC-060)
 **Related:** RFC-029 (maturity labels), RFC-057 / RFC-058 / RFC-059 (companion-maturity decisions), ROADMAP §12 (maturity ladder), `docs/src/philosophy.md` (positioning)
 **Scope:** Reduce the risk that the maturity label "production-ready" is misread as a performance/scale claim — **without** renaming any rung and **without** qualifying the term at every occurrence. Documentation only.

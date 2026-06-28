@@ -1,6 +1,6 @@
 # RFC-060: Surface Benchmark Evidence in the Rendered Documentation
 
-**Status:** Proposed (drafted 2026-06-27; awaiting architect review)
+**Status:** Implemented (v0.27.1); maintainer-authorized (docs-only — not an architect-ruling cycle)
 **Target Release:** a future docs-only release (deferred per maintainer; sequence after the companion-maturity line, RFC-057–059)
 **Related:** RFC-049 (benchmarking, complexity metrics & positioning), `docs/src/benchmarks/` (index + methodology), `benchmarks/reports/` (accepted reports)
 **Scope:** Make the *accepted* benchmark results readable from inside the rendered mdbook. Documentation only — no new benchmarks, no harness or dependency change, no change to the RFC-049 program or its honesty rules.

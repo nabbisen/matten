@@ -329,6 +329,26 @@ if grep -rInE '\bBeta\b' \
 fi
 
 # ---------------------------------------------------------------------------
+# Benchmark results page freshness (RFC-060)
+# ---------------------------------------------------------------------------
+# The curated results page (docs/src/benchmarks/results.md) cites the accepted
+# Baseline/Report IDs. Those IDs must still exist in the corresponding report
+# files, so the book summary cannot outlive the reports it cites. (Checks ID
+# presence, not the numeric values — humans curate those.)
+RESULTS_PAGE="docs/src/benchmarks/results.md"
+if [ -f "$RESULTS_PAGE" ]; then
+  for pair in \
+    "matten-rfc049-internal-baseline-v0.1:benchmarks/reports/internal-baseline-v0.1.md" \
+    "matten-rfc049-rust-peer-comparison-v0.1:benchmarks/reports/peer-comparison-v0.1.md"; do
+    id="${pair%%:*}"; report="${pair##*:}"
+    if grep -q "$id" "$RESULTS_PAGE" 2>/dev/null && ! grep -q "$id" "$report" 2>/dev/null; then
+      echo "ERROR: results page cites '$id' but it is not in $report (stale benchmark citation)"
+      FAIL=1
+    fi
+  done
+fi
+
+# ---------------------------------------------------------------------------
 # Result
 # ---------------------------------------------------------------------------
 

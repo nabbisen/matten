@@ -32,6 +32,12 @@ All crates share one **family version** (RFC-030): matching numbers mean a
 matched, compatible set. A crate's **maturity is the Status column**, not its
 version number — a crate may sit at the shared family version and still be `beta`.
 
+These labels describe **stability within `matten`'s documented scope** (PoC,
+learning, and small workflows): *production-ready* means dependable **for that
+scope**, not a performance or scale claim — `matten` optimizes for time to a
+runnable PoC, not benchmark leadership. Full rung definitions are in the
+[maturity ladder](./ROADMAP.md).
+
 ### matten
 
 `matten` is a developer-experience-first multidimensional array (tensor) library

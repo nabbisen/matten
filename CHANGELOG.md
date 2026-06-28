@@ -18,6 +18,44 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.27.1] - 2026-06-27
+
+**Documentation and packaging legibility (RFC-060, RFC-061).** Docs and metadata only — no code,
+API, runtime, or dependency change to any crate. Maintainer-authorized (docs-only); no maturity or
+behavior change.
+
+### Added
+
+- **Benchmark results in the book (RFC-060).** New `docs/src/benchmarks/results.md` surfaces a
+  curated summary of the accepted Phase 1 internal baseline and Phase 2 Rust peer comparison —
+  representative medians with every RFC-049 caveat (workload/environment-specific, machine class +
+  commit, the accepted Baseline/Report IDs, and the explicit "not a ranking / not a faster-than
+  claim" framing) — so a book reader can confirm the results without leaving the book. The full
+  reports in `benchmarks/reports/` remain the single source of truth. A release-docs freshness guard
+  ties the page's cited Baseline/Report IDs to the report files.
+- **Maturity-label clarity note (RFC-061).** A short note at the two documentation entrances — the
+  root README (by the crate table) and the mdbook introduction — clarifies that maturity labels,
+  including *production-ready*, describe stability **within `matten`'s documented PoC/small-data
+  scope**, not performance or scale. Per the maintainer's chosen approach, the note is added only at
+  the entrances (the purpose is already declared there); no rung is renamed and no per-occurrence
+  qualifier is added.
+
+### Changed
+
+- **`matten-ndarray` package description** is now maturity-neutral ("Conversion bridge between
+  `matten::Tensor` and `ndarray::ArrayD<f64>`."), dropping the embedded *Production-ready* wording.
+  This applies the same description-neutrality principle used for `matten-data` in v0.27.0, so all
+  four crate descriptions are now maturity-neutral (a description should stay stable across rung
+  changes). The crate's maturity is unchanged — `matten-ndarray` is still production-ready, stated
+  in its README lead, `lib.rs`, and the workspace table.
+
+### Threat model
+
+Documentation and package-metadata change. No new data flow, external integration, auth surface,
+public API, error variant, runtime behavior, or dependency; the benchmark harness stays isolated
+(no `criterion`/`nalgebra` in the book build, workspace, or any published crate's graph). Existing
+controls verified to remain valid; no threat-model change.
+
 ## [0.27.0] - 2026-06-27
 
 **Companion-maturity line completes: promote `matten-data` to production-ready candidate

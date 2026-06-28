@@ -61,6 +61,7 @@
 
 - [Benchmarks](./benchmarks/index.md)
 - [Methodology](./benchmarks/methodology.md)
+- [Results](./benchmarks/results.md)
 
 # Contributors
 
