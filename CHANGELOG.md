@@ -18,6 +18,38 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.28.5] - 2026-06-28
+
+A documentation/examples release: a dedicated dynamic-JSON ingestion example so JSON and CSV read as
+equal on-ramps. No change to any published crate's code, public API, runtime, or dependencies.
+
+### Added
+
+- **`crates/matten/examples/dynamic_08_json_ingestion.rs`.** The JSON counterpart to the CSV on-ramp
+  examples (`dynamic_02_missing_values`, `dynamic_05_dirty_csv_cleanup`): it parses heterogeneous JSON
+  (ints, floats, `null`) via `from_json_dynamic`, detects the missing cell with `none_mask` /
+  `count_none`, shows strict `try_numeric` failing, and coerces to a clean `f64` tensor with
+  `try_numeric_with(NumericPolicy::default().none_as(0.0))`. Like its siblings it compiles without the
+  `dynamic`/`json` features (cfg-gated fallbacks) and is run in the CI smoke job with
+  `--features dynamic,json`.
+
+### Changed
+
+- **Dynamic-examples framing tightened so JSON and CSV read as equal on-ramps.** The examples index
+  now states that `from_json_dynamic` and `from_csv_dynamic` differ only in input format and feed the
+  same inspect → clean → convert workflow, and lists the new example. `dynamic_07_on_ramp_summary`'s
+  Step 1 comment is now format-neutral (it previously framed the input as specifically a CSV row).
+
+### Version
+
+- Patch bump `0.28.4` → `0.28.5` (examples + docs; minor unchanged, no family-label retarget).
+
+### Threat model
+
+Adds one example and refreshes documentation framing. No new data flow, external integration, auth
+surface, published dependency, or public API; the example exercises only already-public dynamic APIs.
+No threat-model change.
+
 ## [0.28.4] - 2026-06-28
 
 Benchmark results refresh and a new dependency-sync guard — no change to any published crate's code,

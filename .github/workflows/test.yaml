@@ -149,6 +149,7 @@ jobs:
       - run: cargo run -p matten --example 28_column_statistics
       - run: cargo run -p matten --example dynamic_06_numeric_policy --features dynamic
       - run: cargo run -p matten --example dynamic_07_on_ramp_summary --features dynamic
+      - run: cargo run -p matten --example dynamic_08_json_ingestion --features dynamic,json
       # matten-ndarray
       - run: cargo run -p matten-ndarray --example to_arrayd
       - run: cargo run -p matten-ndarray --example from_arrayd

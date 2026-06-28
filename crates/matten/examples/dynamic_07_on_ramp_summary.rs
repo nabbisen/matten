@@ -21,7 +21,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     use matten::{Element, NumericPolicy, Tensor};
 
     // ── Step 1: Ingest messy data ─────────────────────────────────────────
-    // Simulate a CSV row that came in with some missing values
+    // Simulate a row that arrived from a messy source (CSV or JSON) with some
+    // missing values. The on-ramp is the same whichever format it came from.
     let raw = Tensor::from_elements(
         vec![
             Element::Float(1.0),

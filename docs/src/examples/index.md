@@ -83,7 +83,10 @@ See [Practical numeric recipes](./practical-recipes.md) for the full write-up.
 
 ## Dynamic examples (`--features dynamic`)
 
-These require the `dynamic` feature for heterogeneous data ingestion.
+These require the `dynamic` feature for heterogeneous data ingestion. JSON and CSV are
+equal on-ramps here: `from_json_dynamic` and `from_csv_dynamic` differ only in the input
+format — both land messy data in a dynamic tensor that the same inspect → clean → convert
+workflow turns into a numeric `Tensor`.
 
 | File | Features | What it shows |
 |---|---|---|
@@ -95,6 +98,7 @@ These require the `dynamic` feature for heterogeneous data ingestion.
 | `dynamic_05_dirty_csv_cleanup.rs` | `dynamic,csv` | Real-world CSV cleanup |
 | `dynamic_06_numeric_policy.rs` | `dynamic` | `NumericPolicy` API |
 | `dynamic_07_on_ramp_summary.rs` | `dynamic` | Complete on-ramp workflow |
+| `dynamic_08_json_ingestion.rs` | `dynamic,json` | JSON ingestion (mixed/missing → clean `f64`) |
 
 ## Companion crate examples
 
@@ -117,6 +121,7 @@ cargo run --example 27_axis_reductions
 # Dynamic:
 cargo run --example dynamic_06_numeric_policy --features dynamic
 cargo run --example dynamic_07_on_ramp_summary --features dynamic,csv
+cargo run --example dynamic_08_json_ingestion --features dynamic,json
 ```
 
 ## Scope rule
