@@ -4,7 +4,7 @@
 [![Docs.rs](https://docs.rs/matten-ndarray/badge.svg)](https://docs.rs/matten-ndarray)
 [![license](https://img.shields.io/crates/l/matten-ndarray.svg)](../../LICENSE)
 
-> **Production-ready candidate (`0.24.x` family).** A small conversion bridge between
+> **Production-ready (`0.25.x` family).** A small conversion bridge between
 > [`matten::Tensor`](https://crates.io/crates/matten) and
 > `ndarray::ArrayD<f64>`. The scope is closed and the API is stable; still
 > pre-1.0, so pin the minor version.
@@ -71,7 +71,7 @@ template. The full contract:
 | Source / target | `matten::Tensor` ↔ `ndarray::ArrayD<f64>` |
 | Direction | Bidirectional: `to_arrayd(&Tensor)`, `from_arrayd(ArrayD<f64>)` |
 | Copy / view | Copies both directions; no zero-copy |
-| Shape / rank | Shape preserved; rank bounded by core `matten` (over-rank → `Matten` error) |
+| Shape / rank | Shape preserved; rank bounded by core `matten` (over-rank → `Matten` error); a zero-length axis is rejected (→ `ZeroSizedAxis`) |
 | Memory order | Row-major logical order both ways; `from_arrayd` honors non-standard layouts |
 | Dynamic tensors | Rejected → `DynamicTensor` (unconditional; not a panic) |
 | NaN | Passed through as ordinary `f64` |
@@ -83,9 +83,9 @@ template. The full contract:
 ## Compatibility
 
 - **SemVer:** pre-1.0 (`0.x`). A `0.x` minor bump may contain breaking changes;
-  patch releases are additive only. Pin the minor (`matten-ndarray = "0.24"`).
+  patch releases are additive only. Pin the minor (`matten-ndarray = "0.25"`).
 - **MSRV:** Rust 1.85 (edition 2024).
-- **`matten`:** shares the `0.24.x` family version (RFC-030).
+- **`matten`:** shares the `0.25.x` family version (RFC-030).
 - **`ndarray`:** supports the `0.16` minor. An `ndarray` minor bump is treated as
   a compatibility event and handled by a `matten-ndarray` minor bump (RFC-025 §6);
   broad `ndarray` version compatibility is not promised until CI tests it.

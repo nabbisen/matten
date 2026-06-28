@@ -1553,6 +1553,9 @@ v0.19.0
 v0.20+
   matten-data beta decision phase
 
+v0.25.0
+  matten-ndarray production-ready
+
 later
   nalgebra / candle / streaming only after separate RFCs
 ```

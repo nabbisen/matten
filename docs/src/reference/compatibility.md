@@ -120,3 +120,10 @@ unchanged in behaviour and remain convenience wrappers. These are additive under
 family versioning (RFC-030); no existing signature, numeric result, output shape, NaN policy,
 or dependency changes, and core `matten` gains no dependency.
 
+The **v0.25 family** opens the companion-maturity line by promoting `matten-ndarray` from
+*production-ready candidate* to **production-ready** (RFC-057). This is a maturity Status label
+only — no API, runtime, error-variant, dependency, copy-semantics, or `ndarray`-version change —
+and it does **not** imply v1.0, which still requires explicit maintainer confirmation. Under
+lock-step family versioning (RFC-030) the crate stays on the shared family version. `matten-mlprep`
+and `matten-data` remain at **Beta** pending their own maturity decisions.
+

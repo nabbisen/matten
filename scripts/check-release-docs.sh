@@ -288,6 +288,21 @@ if ! awk '
 fi
 
 # ---------------------------------------------------------------------------
+# matten-ndarray maturity-label freshness (RFC-057)
+# ---------------------------------------------------------------------------
+# matten-ndarray is production-ready as of v0.25.0. Its own current-status files
+# (crate README, lib.rs, Cargo.toml description) must not still call it a
+# "candidate". Historical contexts (CHANGELOG, rfcs/, migration narrative) are
+# intentionally NOT scanned here, so prior-status references remain intact.
+if grep -rInE 'production-ready candidate' \
+     crates/matten-ndarray/README.md \
+     crates/matten-ndarray/src/lib.rs \
+     crates/matten-ndarray/Cargo.toml 2>/dev/null; then
+  echo "ERROR: stale 'production-ready candidate' label in matten-ndarray status files (now production-ready)"
+  FAIL=1
+fi
+
+# ---------------------------------------------------------------------------
 # Result
 # ---------------------------------------------------------------------------
 

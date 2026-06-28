@@ -18,6 +18,52 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.25.0] - 2026-06-27
+
+**Companion-maturity line opens: promote `matten-ndarray` to production-ready (RFC-057).** Label,
+docs, and CI only — no API, runtime, error-variant, or dependency change to any crate. Core
+`matten` is unchanged.
+
+### Changed
+
+- **`matten-ndarray` is now production-ready** (was *production-ready candidate*), per RFC-057 and
+  the architect ruling (2026-06-27). The promotion reflects its strong test suite, stable
+  two-function API, clear `#[non_exhaustive]` error type, mature docs, and explicit
+  compatibility/MSRV/`ndarray`-minor policy. Status label updated in the crate README, `lib.rs`,
+  `Cargo.toml` description, the workspace README crate table, the docs maturity progression, and
+  the ROADMAP gate.
+- **This is a Status label, not v1.0.** Under lock-step family versioning (RFC-030) the crate
+  stays on the shared family version; a v1.0 release still requires explicit maintainer
+  confirmation and a separate readiness review.
+
+### Added
+
+- **Maturity-label freshness guard** (`check-release-docs.sh`, P2): a context-aware check that
+  fails if `matten-ndarray`'s own current-status files still call it a "candidate", while leaving
+  historical references (CHANGELOG, RFCs, migration narrative) intact.
+
+### Notes
+
+- The architect's P1 condition — bridge examples **executed** in CI — was already satisfied by the
+  pre-existing `smoke` job, which runs every workspace example via `cargo run --example` (including
+  `to_arrayd` / `from_arrayd`) on every push/PR. RFC-057's initial audit examined only the
+  `bridge`/`check` jobs and missed `smoke`; it is corrected. No CI change was needed for the
+  promotion.
+
+### Version
+
+- Family bump `0.24.3` → `0.25.0` (minor, opening the companion-maturity line). User-facing install
+  pins and `0.24.x` family labels retargeted to `0.25` across READMEs, `lib.rs` rustdoc, and doc
+  pages (flagged by the version-drift guard); `introduction.md` and the compatibility page describe
+  the v0.25 family.
+
+### Threat model
+
+Label/docs/CI change. No new data flow, external integration, auth surface, public API, error
+variant, or dependency; no `matten-ndarray` behavior, `ndarray`-version support, copy semantics, or
+dynamic-rejection change. The published-dependency-isolation guard still confirms core `matten`
+carries no `ndarray` dependency. Existing controls verified to remain valid; no threat-model change.
+
 ## [0.24.3] - 2026-06-27
 
 **Fix an unused-import warning in the split `math` dynamic tests.** Test-only; no library code,
