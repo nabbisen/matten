@@ -18,6 +18,43 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.28.4] - 2026-06-28
+
+Benchmark results refresh and a new dependency-sync guard — no change to any published crate's code,
+public API, runtime, or dependencies.
+
+### Added
+
+- **Drift guard `scripts/check-benchmark-dependency-sync.sh`.** Fails if the workspace-excluded
+  benchmark harness's `ndarray` peer pin (`benchmarks/Cargo.toml`) diverges from the workspace's
+  `ndarray` requirement. Because the harness is outside the workspace it cannot inherit
+  `{ workspace = true }`, so the pin is synced by hand; this guard makes a forgotten sync impossible
+  to miss (the situation that prompted the manual bump in v0.28.3). Wired into the CI `check` job and
+  the release checklist's source-verification step, and referenced from the RFC-062 P2
+  "public-dependency-minor changes" item.
+
+### Changed
+
+- **Benchmark v0.2 reports and the reader results page refreshed to a v0.28.3 run** (commit
+  `5953c9f`). The peer comparison now runs at **`ndarray 0.17.2`**, matching the shipped
+  `matten-ndarray` bridge — this resolves the "measured at 0.16.1, pending 0.17 refresh" caveat
+  carried since v0.28.3. Internal-baseline numbers remain within run-to-run VM variance of v0.1, and
+  the relative peer positioning is unchanged (markov competitive/ahead of both peers; `matmul`,
+  `pagerank`, `heat` ~7.5–9×). Peak RSS was again not captured (no GNU `time` on the VM). These are
+  maintainer-run numbers, not separately architect-reviewed; v0.1 remains the accepted reference.
+
+### Version
+
+- Patch bump `0.28.3` → `0.28.4` (benchmark reports + tooling; minor unchanged, no family-label
+  retarget).
+
+### Threat model
+
+Adds a CI guard script and refreshes benchmark-report content. No new data flow, external
+integration, auth surface, published dependency, or public API; the benchmark harness stays outside
+the workspace, and `criterion`/peer deps remain out of every published crate's graph. Existing
+controls remain valid; no threat-model change.
+
 ## [0.28.3] - 2026-06-28
 
 Benchmark harness configuration only — no change to any published crate's code, public API, runtime,

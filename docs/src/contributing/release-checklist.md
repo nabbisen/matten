@@ -12,6 +12,7 @@ cargo fmt --all --check
 bash scripts/check-core-dependency-boundary.sh   # RFC-022 core boundary gate
 bash scripts/check-published-dependency-isolation.sh  # RFC-049 §B1 per-crate peer-dep isolation
 bash scripts/check-matten-data-scope.sh          # RFC-042 matten-data anti-scope guard
+bash scripts/check-benchmark-dependency-sync.sh  # benchmark harness ndarray pin == workspace requirement
 bash scripts/check-release-docs.sh               # doc-truth + examples naming-band guards
 cargo clippy --all-targets --all-features -- -D warnings
 cargo clippy --all-targets --no-default-features -- -D warnings
@@ -141,6 +142,9 @@ change:
   `rust-version` is not sufficient — its transitive dependencies can raise the floor independently.
 - Core `matten` dependency isolation is re-confirmed (the published-dependency-isolation guard still
   passes; the change must not leak a peer dependency into the core graph).
+- If the dependency is also used by the workspace-excluded benchmark harness (e.g. a peer pin in
+  `benchmarks/Cargo.toml`), its pin is synced by hand and `check-benchmark-dependency-sync.sh`
+  passes — the harness cannot inherit `{ workspace = true }`, so this guard catches a forgotten sync.
 
 ---
 

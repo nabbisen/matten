@@ -11,31 +11,32 @@ complete numbers, environment details, and regeneration steps live in the report
 > regression-visibility reference — **not a ranking, and not a "faster than X" claim.** `matten`
 > optimizes for time to a runnable PoC, not benchmark leadership.
 
-The numbers below are the **v0.2 maintainer refresh at workspace `0.28.1`**, produced under the
+The numbers below are the **v0.2 maintainer refresh at workspace `0.28.3`**, produced under the
 unchanged RFC-049 methodology. The architect-accepted reference baseline is v0.1 (see the reports);
-the figures match v0.1 within run-to-run VM variance.
+the relative positioning matches v0.1. Absolute timings drift run-to-run with VM load — all
+libraries move together — so the *shape* of the results is the signal, not the exact microseconds.
 
 ## Phase 1 — internal baseline
 
 `matten` measured against itself, to establish a reference point and make future regressions
 visible (RFC-049 Phase 1).
 
-- **Baseline ID:** `matten-rfc049-internal-baseline-v0.2` — maintainer refresh at v0.28.1
+- **Baseline ID:** `matten-rfc049-internal-baseline-v0.2` — maintainer refresh at v0.28.3
   (reference: `…-v0.1`, accepted 2026-06-24).
 - **Environment:** Ubuntu 26.04, 8 vCPU AMD (virtualized), rustc 1.93.1, profile `bench`
-  (opt-level 3), Criterion defaults; git `ef06369`, workspace `0.28.1`. Not comparable across
+  (opt-level 3), Criterion defaults; git `5953c9f`, workspace `0.28.3`. Not comparable across
   machines.
 
 Representative medians (full table in the report):
 
 | Workload | Time (median) |
 |---|---|
-| construction (4096-element vector) | ~0.99 µs |
-| elementwise add (4096 elements) | ~10.5 µs |
+| construction (4096-element vector) | ~1.0 µs |
+| elementwise add (4096 elements) | ~10.3 µs |
 | `matmul` (64×64) | ~78 µs |
-| `sum_axis` + `mean_axis` (64×64, combined) | ~1.31 ms |
-| cosine similarity (len 512) | ~882 ns |
-| linear-regression GD step (m=256) | ~1.80 µs |
+| `sum_axis` + `mean_axis` (64×64, combined) | ~1.30 ms |
+| cosine similarity (len 512) | ~803 ns |
+| linear-regression GD step (m=256) | ~2.23 µs |
 
 Peak RSS was **not captured** in this refresh (the VM lacked GNU `/usr/bin/time`); it is
 informative-only and never a gate. The accepted v0.1 baseline recorded ~44 MiB for the full
@@ -43,7 +44,7 @@ scenario run under the same methodology, dominated by Criterion's own footprint 
 small tensors.
 
 The clearest signal is that **axis reductions are currently `matten`'s most expensive core path** —
-the combined `sum_axis`/`mean_axis` workload (~1.31 ms) is roughly 400× the whole-tensor
+the combined `sum_axis`/`mean_axis` workload (~1.30 ms) is roughly 400× the whole-tensor
 `sum`/`mean` (~3.23 µs) and ~17× a 64×64 `matmul`. This is recorded as positioning /
 regression-visibility information, not a defect: it is the natural first place to look if
 axis-reduction cost ever matters for your workload.
@@ -54,28 +55,27 @@ The same small problems placed next to two established Rust numeric crates, `nda
 `nalgebra`, each in its native type (RFC-049 Phase 2). This shows *where* `matten`'s approachable
 `Tensor` API sits — including where it is slower but acceptable — **not** a ranking of libraries.
 
-- **Report ID:** `matten-rfc049-rust-peer-comparison-v0.2` — maintainer refresh at v0.28.1
+- **Report ID:** `matten-rfc049-rust-peer-comparison-v0.2` — maintainer refresh at v0.28.3
   (reference: `…-v0.1`, accepted 2026-06-25).
-- **Environment:** same machine class as the baseline; git `ef06369`, workspace `0.28.1`,
-  `ndarray` 0.16.1, `nalgebra` 0.33.3. Peer tasks are opt-in behind the `peers` feature (off by
-  default). **These numbers were measured at `ndarray 0.16.1`;** the harness peer pin was bumped to
-  `ndarray 0.17` in v0.28.3 to match the bridge, and will produce `0.17` figures on the next peers
-  run. Not comparable across machines.
+- **Environment:** same machine class as the baseline; git `5953c9f`, workspace `0.28.3`,
+  **`ndarray` 0.17.2**, `nalgebra` 0.33.3. Peer tasks are opt-in behind the `peers` feature (off by
+  default). This run was taken at `ndarray 0.17.2`, so the harness now matches the `matten-ndarray`
+  bridge's supported `ndarray` version. Not comparable across machines.
 
 Representative Criterion medians (full six-task table in the report):
 
 | Task | matten | ndarray | nalgebra |
 |---|---|---|---|
-| markov step (v·P, n=64) | ~1.61 µs | ~1.82 µs | ~3.51 µs |
-| cosine similarity (len 512) | ~1.18 µs | ~356 ns | ~282 ns |
-| `matmul` (64×64) | ~155.3 µs | ~18.3 µs | ~20.5 µs |
-| heat step (operator·u, n=64) | ~8.77 µs | ~882 ns | ~831 ns |
+| markov step (v·P, n=64) | ~924 ns | ~1.16 µs | ~2.15 µs |
+| cosine similarity (len 512) | ~626 ns | ~175 ns | ~138 ns |
+| `matmul` (64×64) | ~80.8 µs | ~10.8 µs | ~10.7 µs |
+| heat step (operator·u, n=64) | ~6.77 µs | ~752 ns | ~741 ns |
 
 On these small dense kernels the production-oriented peers generally carry less overhead than
 `matten`'s `Tensor` API — expected, and consistent with `matten`'s DX-first role. The size of the
 gap is the useful part, and it is not uniform: a vector×matrix step (markov) is competitive here —
 ahead of both peers at this size — while dense `matmul` and matrix×vector steps (heat, pagerank)
-show the widest gaps (~8–11×). A consistent internal pattern is that `matten`'s matrix×vector path
+show the widest gaps (~7.5–9×). A consistent internal pattern is that `matten`'s matrix×vector path
 is its widest gap while its vector×matrix path is competitive — echoing the axis-reduction signal
 from Phase 1.
 

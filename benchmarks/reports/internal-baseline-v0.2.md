@@ -4,7 +4,7 @@
 > positioning and regression visibility, not universal ranking.**
 
 **Baseline ID:** `matten-rfc049-internal-baseline-v0.2`
-**Status:** Maintainer-run refresh at workspace `0.28.1`, under the **unchanged** RFC-049 Phase 1
+**Status:** Maintainer-run refresh at workspace `0.28.3`, under the **unchanged** RFC-049 Phase 1
 methodology. The methodology and the Phase 1 program are architect-accepted (see v0.1); these
 refreshed numbers are a maintainer run and are **not** separately architect-reviewed. The accepted
 reference baseline remains [`internal-baseline-v0.1.md`](./internal-baseline-v0.1.md).
@@ -38,14 +38,14 @@ Numbers below are specific to this machine and not comparable across machines.
 | OS | Ubuntu 26.04 LTS |
 | Kernel | 7.0.0-22-generic |
 | CPU | 8 vCPU, AMD Ryzen-based (**virtualized**) |
-| RAM | 7,600,940 kB (~7.25 GiB) |
+| RAM | 7,600,936 kB (~7.25 GiB) |
 | rustc | 1.93.1 (01f6ddf75 2026-02-11) |
 | cargo | 1.93.1 (083ac5135 2025-12-15) |
 | target | x86_64-unknown-linux-gnu |
 | profile | bench (opt-level 3) |
 | Criterion settings | defaults (100 samples), `--noplot` |
-| git commit | ef06369 |
-| workspace version | 0.28.1 |
+| git commit | 5953c9f |
+| workspace version | 0.28.3 |
 | peak RSS tool | not available this run (no GNU `/usr/bin/time`) |
 
 ## What was measured
@@ -68,26 +68,26 @@ Medians from the default-feature run; `dynamic_try_numeric` from a `--features d
 
 | Workload | Time (median) | Notes |
 |---|---|---|
-| core/construction | 988 ns | 4096-element vector |
-| core/reshape_flatten | 995 ns | |
-| core/elementwise_add | 10.53 µs | 4096 elements |
-| core/elementwise_mul | 10.33 µs | 4096 elements |
-| core/broadcasting | 19.65 µs | [64,64] + [64] |
+| core/construction | 996 ns | 4096-element vector |
+| core/reshape_flatten | 938 ns | |
+| core/elementwise_add | 10.28 µs | 4096 elements |
+| core/elementwise_mul | 10.34 µs | 4096 elements |
+| core/broadcasting | 20.27 µs | [64,64] + [64] |
 | core/sum_mean | 3.23 µs | 4096-element vector |
-| core/sum_mean_axis | 1.313 ms | 64×64; **combined** cost of `sum_axis(0)` and `mean_axis(0)` in one workload body; slowest core op (Criterion flagged the 5 s window as tight) |
-| core/matmul | 78.07 µs | 64×64 |
-| core/slice_rows | 84.11 µs | first 8 rows of 64×64 |
-| core/dynamic_try_numeric | 35.59 µs | 4096 elements; requires `--features dynamic` |
+| core/sum_mean_axis | 1.303 ms | 64×64; **combined** cost of `sum_axis(0)` and `mean_axis(0)` in one workload body; slowest core op (Criterion flagged the 5 s window as tight) |
+| core/matmul | 77.76 µs | 64×64 |
+| core/slice_rows | 83.89 µs | first 8 rows of 64×64 |
+| core/dynamic_try_numeric | 36.07 µs | 4096 elements; requires `--features dynamic` |
 
 ## Scenario baseline
 
 | Workload | Time (median) | Notes |
 |---|---|---|
-| scenario/cosine_similarity | 882 ns | length 512 |
-| scenario/markov_step | 1.03 µs | n = 64 |
-| scenario/pagerank_step | 5.38 µs | n = 64 |
-| scenario/linreg_gd_step | 1.80 µs | m = 256 |
-| scenario/heat_step | 5.21 µs | n = 64 |
+| scenario/cosine_similarity | 803 ns | length 512 |
+| scenario/markov_step | 892 ns | n = 64 |
+| scenario/pagerank_step | 6.65 µs | n = 64 |
+| scenario/linreg_gd_step | 2.23 µs | m = 256 |
+| scenario/heat_step | 6.49 µs | n = 64 |
 
 ## Peak RSS
 
@@ -103,24 +103,26 @@ Criterion's own footprint rather than the small tensors.
 Consistent with the accepted v0.1 baseline; tied strictly to these workloads on this machine:
 
 - The cheapest operations remain construction (~1 µs) and the small scenario steps — cosine
-  similarity (~880 ns) and a Markov step (~1.03 µs).
+  similarity (~800 ns) and a Markov step (~890 ns).
 - Elementwise add/mul over 4096 elements sit around ~10 µs; broadcasting a row over a 64×64
   matrix ~20 µs; a 64×64 `matmul` ~78 µs and an 8-row slice ~84 µs.
-- The clearest signal is again **`sum_mean_axis` at ~1.31 ms** — roughly **~400× the whole-tensor
+- The clearest signal is again **`sum_mean_axis` at ~1.30 ms** — roughly **~400× the whole-tensor
   `sum_mean`** (~3.23 µs) and **~17× a 64×64 `matmul`**. Axis reductions remain `matten`'s most
   expensive core path by a wide margin, and the natural first place to look if axis-reduction cost
   ever matters. Positioning / regression-visibility information, not a defect: `matten` is a DX-first
   crate, not a performance crate.
-- `dynamic_try_numeric` (~35.6 µs for 4096 elements) costs roughly 3.4× an elementwise op —
+- `dynamic_try_numeric` (~36 µs for 4096 elements) costs roughly 3.5× an elementwise op —
   reasonable for the dynamic ingestion-and-conversion path.
 
 These figures match the v0.1 baseline within run-to-run VM variance; no internal regression is
-visible from v0.22.3 to v0.28.1. No cross-library or "faster than X" claim is made or implied.
+visible from v0.22.3 to v0.28.3. Absolute timings drift a little run-to-run with VM load (the small
+scenario steps in particular); the shape of the results, not the exact microseconds, is the signal.
+No cross-library or "faster than X" claim is made or implied.
 
 ## Limitations
 
 Single **virtualized** machine (8 vCPU VM), small inputs, microbenchmark methodology. Outlier rates
-were moderate (≈5–14% per workload), consistent with a VM; medians are used throughout. Peak RSS was
+were moderate (≈4–13% per workload), consistent with a VM; medians are used throughout. Peak RSS was
 not captured this run. These numbers describe `matten`'s own behavior on these workloads on this
 machine; they are not a cross-library ranking and are not comparable to figures from a different
 machine or OS.
