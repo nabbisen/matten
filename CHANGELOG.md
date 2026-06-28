@@ -18,6 +18,53 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.28.0] - 2026-06-27
+
+**`matten-ndarray` now supports `ndarray` 0.16 and 0.17 (RFC-062).** A public-dependency
+compatibility event: the supported `ndarray` range widens from the `0.16` minor to
+`>=0.16.1, <0.18`. No bridge API, signature, behavior, copy-semantics, dynamic-rejection, or
+error change; no zero-copy work; core `matten` still carries no `ndarray` dependency.
+
+### Changed
+
+- **`matten-ndarray` `ndarray` requirement: `0.16` → `>=0.16.1, <0.18`** (RFC-062, architect-ruled
+  Option B). The bridge is an ecosystem adapter, so it now serves consumers on either `ndarray`
+  minor rather than forcing a migration for no functional gain. Cargo resolves `ndarray` to the
+  consumer's version; a project with no other `ndarray` dependency gets the latest in range
+  (`0.17.2`). The unchanged bridge source was verified to compile and pass its 17 conversion tests,
+  3 doctests, and both examples against **both** `0.16.1` and `0.17.2` — with **no
+  version-conditional code** (the hard line from the ruling).
+- Because `to_arrayd`/`from_arrayd` expose `ndarray::ArrayD<f64>`, **the resolved `ndarray` minor is
+  part of the bridge's public type identity**: a consumer on `ndarray 0.16` receives `0.16`'s
+  `ArrayD`, one on `0.17` receives `0.17`'s. `ndarray 0.17.0` is yanked and is **not** a tested
+  target; use a non-yanked patch in the supported minor. docs.rs renders one resolved minor (usually
+  `0.17`) even though CI verifies both. MSRV is unchanged (Rust 1.85; `ndarray 0.17.2` declares
+  `rust-version = 1.64`, well under the floor).
+
+### Added
+
+- **CI compatibility matrix** `bridge-ndarray-compat` runs the `matten-ndarray` tests, doctests, and
+  both examples against each pinned minor (`0.16.1`, `0.17.2`) via `cargo update -p ndarray
+  --precise` in a fresh checkout — making the wider range a CI-backed promise, not a loose
+  constraint.
+
+### Version
+
+- Family bump `0.27.1` → `0.28.0` (minor — the bridge's public dependency surface changed). Under
+  lock-step versioning (RFC-030) the bump applies to the whole family even though only
+  `matten-ndarray` is materially affected. User-facing pins and `0.27.x` family labels retargeted to
+  `0.28`. The RFC-049 peer benchmark (a snapshot at `ndarray 0.16.1`) is intentionally **not**
+  re-run here — a future, separate task.
+
+### Threat model
+
+Public-dependency compatibility change to the `matten-ndarray` bridge. No new data flow, external
+integration, or auth surface; no public bridge API, behavior, error, or copy-semantics change; no
+new dependency (the `ndarray` requirement is widened, not added elsewhere). The
+published-dependency-isolation guard still confirms core `matten` carries no `ndarray` dependency,
+and the bridge was verified against both supported minors. Existing controls verified to remain
+valid; no threat-model change.
+
 ## [0.27.1] - 2026-06-27
 
 **Documentation and packaging legibility (RFC-060, RFC-061).** Docs and metadata only — no code,

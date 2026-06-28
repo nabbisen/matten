@@ -66,6 +66,7 @@ for RFC state; the Status field inside each file mirrors the folder.
 | 059 | [`matten-data` Maturity Decision — Beta → Production-Ready Candidate](./done/059-promote-matten-data-production-ready-candidate.md) | 0.27.0 |
 | 060 | [Surface Benchmark Evidence in the Rendered Documentation](./done/060-surface-benchmark-evidence-in-docs.md) | 0.27.1 |
 | 061 | [Maturity-Label Clarity — Keep "Production-Ready", Add an Entrance Note](./done/061-maturity-label-clarity-entrance-note.md) | 0.27.1 |
+| 062 | [`matten-ndarray` Supported `ndarray` Version — 0.16 → 0.17](./done/062-matten-ndarray-supported-ndarray-version.md) | 0.28.0 |
 
 ## Proposed
 

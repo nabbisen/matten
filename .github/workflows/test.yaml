@@ -64,6 +64,25 @@ jobs:
       - run: cargo test -p matten-ndarray --features dynamic
       - run: cargo test -p matten-ndarray --doc
 
+  bridge-ndarray-compat:
+    # RFC-062: matten-ndarray supports a range of ndarray minors (`>=0.16.1, <0.18`).
+    # Because the bridge exposes ndarray::ArrayD<f64> publicly, the supported minors are a
+    # compatibility promise — verify the unchanged bridge against each pinned minor. The
+    # per-job `cargo update --precise` only touches this job's checkout/lockfile.
+    name: matten-ndarray (ndarray ${{ matrix.ndarray }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ndarray: ["0.16.1", "0.17.2"]
+    steps:
+      - uses: actions/checkout@v6
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo update -p ndarray --precise ${{ matrix.ndarray }}
+      - run: cargo test -p matten-ndarray
+      - run: cargo test -p matten-ndarray --doc
+      - run: cargo run -p matten-ndarray --example to_arrayd
+      - run: cargo run -p matten-ndarray --example from_arrayd
+
   mlprep:
     name: matten-mlprep
     runs-on: ubuntu-latest

@@ -14,4 +14,4 @@ This book is organized by reader:
 - **Reference** — the rules that shape the public API.
 - **Contributors** — project layout, milestones, and process.
 
-> This documentation tracks the current 0.27 family, which completes the companion-maturity line by promoting `matten-data` to production-ready candidate (RFC-059); `matten-ndarray` is production-ready and `matten-mlprep` is a production-ready candidate.
+> This documentation tracks the current 0.28 family, which broadens the `matten-ndarray` bridge to support `ndarray` 0.16 and 0.17 (RFC-062), on top of the completed companion-maturity line: `matten-ndarray` is production-ready and `matten-mlprep` and `matten-data` are production-ready candidates.

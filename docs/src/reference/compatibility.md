@@ -144,3 +144,13 @@ engine). Full production-ready is deferred to a separate future review. This doe
 v1.0. The ladder now reads `matten-ndarray` production-ready, `matten-mlprep` and `matten-data`
 production-ready candidates.
 
+The **v0.28 family** broadens the `matten-ndarray` bridge to support **`ndarray` 0.16 and 0.17**
+(RFC-062): the supported requirement widens from the `0.16` minor to `>=0.16.1, <0.18`,
+CI-verified against `0.16.1` and `0.17.2`. Because `to_arrayd`/`from_arrayd` expose
+`ndarray::ArrayD<f64>`, the resolved `ndarray` minor is part of the bridge's public type identity —
+a consumer on `ndarray 0.16` receives `0.16`'s `ArrayD`, one on `0.17` receives `0.17`'s.
+`ndarray 0.17.0` is yanked and is not a tested target. No bridge API, behavior, copy-semantics,
+error, or zero-copy change, and core `matten` still carries no `ndarray` dependency. This is a
+public-dependency compatibility event handled as a lock-step family minor (RFC-030); it does **not**
+imply v1.0.
+

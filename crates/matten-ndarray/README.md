@@ -4,7 +4,7 @@
 [![Docs.rs](https://docs.rs/matten-ndarray/badge.svg)](https://docs.rs/matten-ndarray)
 [![license](https://img.shields.io/crates/l/matten-ndarray.svg)](../../LICENSE)
 
-> **Production-ready (`0.27.x` family).** A small conversion bridge between
+> **Production-ready (`0.28.x` family).** A small conversion bridge between
 > [`matten::Tensor`](https://crates.io/crates/matten) and
 > `ndarray::ArrayD<f64>`. The scope is closed and the API is stable; still
 > pre-1.0, so pin the minor version.
@@ -59,7 +59,7 @@ let back = from_arrayd(arr)?;     // ArrayD<f64> -> Tensor
   tensor returns `MattenNdarrayError::DynamicTensor` regardless of whether the
   companion `dynamic` feature is enabled (RFC-031); convert it with
   `Tensor::try_numeric()` first.
-- **Supported `ndarray`:** the `0.16` minor.
+- **Supported `ndarray`:** the `0.16` and `0.17` minors (`>=0.16.1, <0.18`; CI-verified at `0.16.1` / `0.17.2`).
 
 ## Conversion contract
 
@@ -83,12 +83,17 @@ template. The full contract:
 ## Compatibility
 
 - **SemVer:** pre-1.0 (`0.x`). A `0.x` minor bump may contain breaking changes;
-  patch releases are additive only. Pin the minor (`matten-ndarray = "0.27"`).
+  patch releases are additive only. Pin the minor (`matten-ndarray = "0.28"`).
 - **MSRV:** Rust 1.85 (edition 2024).
-- **`matten`:** shares the `0.27.x` family version (RFC-030).
-- **`ndarray`:** supports the `0.16` minor. An `ndarray` minor bump is treated as
-  a compatibility event and handled by a `matten-ndarray` minor bump (RFC-025 §6);
-  broad `ndarray` version compatibility is not promised until CI tests it.
+- **`matten`:** shares the `0.28.x` family version (RFC-030).
+- **`ndarray`:** supports the `0.16` and `0.17` minors — requirement `>=0.16.1, <0.18`,
+  CI-verified against `0.16.1` and `0.17.2` (RFC-062). Because `to_arrayd`/`from_arrayd` use
+  `ndarray::ArrayD<f64>`, **the resolved `ndarray` minor is part of the public type identity**:
+  a consumer on `ndarray 0.16` receives `0.16`'s `ArrayD`, one on `0.17` receives `0.17`'s.
+  `ndarray 0.17.0` is yanked and is **not** a tested target — use a non-yanked patch in the
+  supported minor. (docs.rs renders one resolved minor, usually `0.17`, even though CI verifies
+  both.) An `ndarray` minor *outside* this range is a compatibility event handled by a
+  `matten-ndarray` minor bump (RFC-025 §6).
 - A `1.0` release requires explicit maintainer confirmation.
 
 ## More detail
