@@ -1,7 +1,11 @@
 # RFC-062: `matten-ndarray` Supported `ndarray` Version — 0.16 → 0.17
 
-**Status:** Implemented in v0.28.0 (architect-accepted Option B, review 2026-06-27): `ndarray = ">=0.16.1, <0.18"`, compatibility-matrix CI verifying `0.16.1` and `0.17.2`; unchanged bridge confirmed against both minors with no version-conditional code.
-**Target Release:** v0.28.0 (family minor — a supported-dependency change to the bridge's public surface)
+**Status:** Implemented — **Option A** (`ndarray = "0.17"`) as of v0.28.1. The architect accepted
+Option B (range `>=0.16.1, <0.18`) on 2026-06-27 and it shipped in v0.28.0 (unpublished); before
+publication the maintainer chose **Option A** instead — the single-version requirement that keeps
+`Cargo.toml` simple and readable — held at v0.28.1. The architect ruling listed Option A as an
+acceptable alternative (§3.1, §13), so no re-review was required. See the Addendum.
+**Target Release:** v0.28.0 (range, unpublished) → **v0.28.1 (final: `ndarray = "0.17"`)**
 **Related:** RFC-025 §6 (`ndarray` version policy — minor bump is a compatibility event), RFC-027 (`matten-ndarray`), RFC-030 (lock-step family versioning), RFC-057 (`matten-ndarray` production-ready), `crates/matten-ndarray/README.md` (Compatibility + conversion contract)
 **Scope:** Decide which `ndarray` minor(s) `matten-ndarray` supports, now that `ndarray 0.17` is available. Dependency/compatibility and docs only — **no bridge API, signature, behavior, or zero-copy change**, and core `matten` still carries no `ndarray` dependency.
 
@@ -128,3 +132,30 @@ range and fall back to Option A** (`ndarray = "0.17"`, CI targeting `0.17.2`) ra
 Whichever option, this is a **family minor** (proposed **v0.28.0**) because the bridge's public
 dependency surface changes. Under lock-step versioning the bump applies to the whole family even
 though only `matten-ndarray` is materially affected — an accepted trade-off of RFC-030.
+
+---
+
+## Addendum — maintainer selection of Option A (v0.28.1)
+
+After Option B shipped in the (unpublished) v0.28.0 tarball, the maintainer reconsidered the
+trade-off and chose **Option A** — `ndarray = "0.17"`, the single-version requirement — to keep
+`Cargo.toml` simple and readable rather than carry a range whose only benefit was sparing existing
+`ndarray 0.16` users a (small, backwards-compatible) upgrade. This is a maintainer judgment call,
+not a CI-forced fallback: the bridge compiled cleanly against both minors, so Option B was viable;
+Option A was preferred for legibility. The architect ruling explicitly listed Option A as
+technically acceptable and as the recommended wording's alternative (§3.1, §13), so the change was
+applied directly without a new review cycle.
+
+**Final state (v0.28.1):**
+
+- Requirement `ndarray = "0.17"` (Cargo resolves to `0.17.2`, the latest non-yanked `0.17` patch).
+- The `bridge-ndarray-compat` CI matrix added in v0.28.0 is **removed** — with one supported minor,
+  the standard `bridge` job (which builds against the resolved `0.17.2`) is sufficient.
+- Docs simplified: the bridge supports the `0.17` minor; the resolved minor is still part of the
+  public type identity; `0.17.0` is yanked (use a non-yanked `0.17` patch). The range-specific
+  public-type-identity and docs.rs caveats are dropped as no longer applicable.
+- Unchanged from v0.28.0: no bridge API/behavior/error/copy-semantics/zero-copy change; core
+  `matten` carries no `ndarray` dependency; MSRV 1.85 holds with `ndarray 0.17.2` in the graph.
+
+The v0.28.0 CHANGELOG entry (Option B / range) is preserved as the historical record of that
+delivered tarball; v0.28.1 records the narrowing to Option A.

@@ -59,7 +59,7 @@ let back = from_arrayd(arr)?;     // ArrayD<f64> -> Tensor
   tensor returns `MattenNdarrayError::DynamicTensor` regardless of whether the
   companion `dynamic` feature is enabled (RFC-031); convert it with
   `Tensor::try_numeric()` first.
-- **Supported `ndarray`:** the `0.16` and `0.17` minors (`>=0.16.1, <0.18`; CI-verified at `0.16.1` / `0.17.2`).
+- **Supported `ndarray`:** the `0.17` minor (CI targets `0.17.2`).
 
 ## Conversion contract
 
@@ -86,13 +86,10 @@ template. The full contract:
   patch releases are additive only. Pin the minor (`matten-ndarray = "0.28"`).
 - **MSRV:** Rust 1.85 (edition 2024).
 - **`matten`:** shares the `0.28.x` family version (RFC-030).
-- **`ndarray`:** supports the `0.16` and `0.17` minors — requirement `>=0.16.1, <0.18`,
-  CI-verified against `0.16.1` and `0.17.2` (RFC-062). Because `to_arrayd`/`from_arrayd` use
-  `ndarray::ArrayD<f64>`, **the resolved `ndarray` minor is part of the public type identity**:
-  a consumer on `ndarray 0.16` receives `0.16`'s `ArrayD`, one on `0.17` receives `0.17`'s.
-  `ndarray 0.17.0` is yanked and is **not** a tested target — use a non-yanked patch in the
-  supported minor. (docs.rs renders one resolved minor, usually `0.17`, even though CI verifies
-  both.) An `ndarray` minor *outside* this range is a compatibility event handled by a
+- **`ndarray`:** supports the `0.17` minor (requirement `"0.17"`; CI targets `0.17.2`). Because
+  `to_arrayd`/`from_arrayd` use `ndarray::ArrayD<f64>`, the supported `ndarray` minor is part of the
+  bridge's public type identity — build against `ndarray 0.17`. `ndarray 0.17.0` is yanked; use a
+  non-yanked `0.17` patch. An `ndarray` minor bump is a compatibility event handled by a
   `matten-ndarray` minor bump (RFC-025 §6).
 - A `1.0` release requires explicit maintainer confirmation.
 

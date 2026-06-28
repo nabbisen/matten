@@ -18,6 +18,56 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.28.1] - 2026-06-28
+
+Narrows the `matten-ndarray` `ndarray` support introduced in v0.28.0 to a single version, and
+closes the last RFC-062 follow-up.
+
+### Changed
+
+- **`matten-ndarray` `ndarray` requirement: `>=0.16.1, <0.18` → `"0.17"`** (RFC-062, maintainer
+  selection of Option A). v0.28.0 broadened support to `0.16` and `0.17` via a range; before
+  publication the maintainer chose the single-version requirement to keep `Cargo.toml` simple and
+  readable, since `ndarray 0.17` is a small backwards-compatible upgrade for the `0.16` users the
+  range was sparing. The architect ruling listed Option A as an acceptable alternative, so no
+  re-review was needed. Cargo resolves `ndarray` to `0.17.2` (the latest non-yanked `0.17` patch).
+  No bridge API, behavior, copy-semantics, error, or zero-copy change; core `matten` still carries
+  no `ndarray` dependency; MSRV 1.85 holds with `ndarray 0.17.2` in the graph.
+- **Removed the `bridge-ndarray-compat` CI matrix** added in v0.28.0. With one supported `ndarray`
+  minor, the standard `bridge` job (building against the resolved `0.17.2`) is sufficient.
+- Docs simplified accordingly (README compatibility, the Supported-`ndarray` summary lines, the
+  mdBook compatibility entry and introduction): the bridge supports the `0.17` minor; the resolved
+  minor remains part of the public type identity; `0.17.0` is yanked (use a non-yanked `0.17`
+  patch). The range-specific docs.rs / multi-minor caveats are dropped as no longer applicable.
+
+### Added
+
+- **Release checklist: a "Public-dependency-minor changes" gate** (RFC-062 P2). Codifies the
+  decision process for any future change to a supported minor of a publicly re-exposed third-party
+  dependency: an accepted RFC recording the supported version(s) and whether a single version or a
+  range is supported; per-minor CI for a range (no version-conditional code — narrow rather than
+  branch) or the normal job against the resolved patch for a single version; docs stating the
+  resolved minor is part of the public type identity and naming any excluded yanked patch; MSRV
+  re-verified with the new dependency in the graph (transitive deps can raise the floor); and core
+  dependency isolation re-confirmed.
+- **Entrance README: a small `dynamic` on-ramp example.** The Quick start now shows the optional
+  `dynamic` feature — building a heterogeneous `Element` tensor and landing in a clean `f64` tensor
+  under an explicit `NumericPolicy` — so the ingestion story is visible at the entrance, with a link
+  to the dynamic guide. Off-by-default framing preserved.
+
+### Version
+
+- Held at `0.28.1` (v0.28.0 and this revision are unpublished). Minor unchanged; no family-label
+  retarget.
+
+### Threat model
+
+Narrows a public dependency requirement and removes a CI job; adds documentation. No new data flow,
+external integration, auth surface, or added dependency; no public bridge API, behavior, error, or
+copy-semantics change. The published-dependency-isolation guard still confirms core `matten` carries
+no `ndarray` dependency, and the bridge builds against the resolved `0.17.2`. Existing controls
+verified to remain valid; no threat-model change.
+
 ## [0.28.0] - 2026-06-27
 
 **`matten-ndarray` now supports `ndarray` 0.16 and 0.17 (RFC-062).** A public-dependency

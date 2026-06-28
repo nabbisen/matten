@@ -99,6 +99,29 @@ assert!(matches!(bad, Err(MattenError::Shape { .. })));
 
 More examples are [here](crates/matten/examples/).
 
+**Optional `dynamic` on-ramp** — ingest heterogeneous, possibly-messy values, then land in a
+clean `f64` tensor under an explicit policy (off by default; see [the dynamic
+guide](docs/src/reference/dynamic.md)):
+
+```toml
+[dependencies]
+matten = { version = "0.28", features = ["dynamic"] }
+```
+
+```rust
+use matten::{Element, NumericPolicy, Tensor};
+
+// Heterogeneous, possibly-messy inputs — ints, floats, and a missing value:
+let raw = vec![Element::Int(1), Element::Float(2.5), Element::None, Element::Int(4)];
+let dynamic = Tensor::from_elements(raw, &[2, 2]);
+assert!(dynamic.is_dynamic());
+
+// Land in a clean f64 tensor under an explicit policy (here: missing -> 0.0):
+let numeric = dynamic.try_numeric_with(NumericPolicy::default().none_as(0.0))?;
+assert_eq!(numeric.as_slice(), &[1.0, 2.5, 0.0, 4.0]);
+# Ok::<(), matten::MattenError>(())
+```
+
 ### matten-ndarray
 
 ```toml
@@ -168,7 +191,7 @@ More examples are [here](crates/matten-mlprep/examples/).
 - **Dynamic tensors are rejected, not panicked.** With the `dynamic` feature,
   passing a dynamic (`Element`) tensor returns `MattenNdarrayError::DynamicTensor`;
   convert it with `Tensor::try_numeric()` first.
-- **Supported `ndarray`:** the `0.16` minor.
+- **Supported `ndarray`:** the `0.17` minor (CI targets `0.17.2`).
 
 ### matten-mlprep
 

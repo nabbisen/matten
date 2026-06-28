@@ -19,7 +19,7 @@
 //! # Status
 //!
 //! **Production-ready.** The API is stable within the lock-step family version (RFC-030).
-//! Supported `ndarray`: the `0.16` and `0.17` minors (`>=0.16.1, <0.18`).
+//! Supported `ndarray`: the `0.17` minor (CI targets `0.17.2`).
 //!
 //! # Behavior
 //!
