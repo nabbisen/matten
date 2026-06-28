@@ -3,6 +3,10 @@
 **Report ID:** `matten-rfc049-rust-peer-comparison-v0.1`
 **Architect status:** Accepted as RFC-049 Phase 2 official Rust peer comparison v0.1 (2026-06-25).
 
+> **For current numbers see [`peer-comparison-v0.2.md`](./peer-comparison-v0.2.md)** (a
+> maintainer-run refresh at v0.28.1). This v0.1 report is retained as the **architect-accepted**
+> reference report; the methodology is unchanged between the two.
+
 > **Report status:** Official maintainer-run numbers (commit `007031c`, workspace v0.22.6,
 > same machine class as the accepted internal baseline), accepted by architect ruling
 > 2026-06-25.

@@ -37,6 +37,16 @@ Still deferred (designed in RFC-049, not yet implemented/authorized):
 
 ## Read next
 
-- [Methodology](./methodology.md) — what is measured, what is not, and the rules that
-  keep the program honest.
-- The harness itself lives in `benchmarks/` with its own `README.md`.
+Two paths, depending on what you need:
+
+- **Just want the results?** → [Results](./results.md) — a curated, readable summary of the latest
+  numbers (Phase 1 internal baseline and Phase 2 peer comparison), with the "positioning, not
+  ranking" framing. This is the reader's page.
+- **Need to regenerate or extend the benchmarks?** → [Methodology](./methodology.md) for what is
+  measured and the rules that keep the program honest, then the harness `README.md` in
+  `benchmarks/` for the maintainer path: the environment-capture snippet and the exact
+  `cargo bench …` commands under [How to regenerate (with environment
+  capture)](../../../benchmarks/README.md#how-to-regenerate-with-environment-capture).
+
+The full reports (complete tables, environment, regeneration commands) live in
+`benchmarks/reports/`.

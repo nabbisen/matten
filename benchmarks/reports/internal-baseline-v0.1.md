@@ -6,6 +6,10 @@
 **Baseline ID:** `matten-rfc049-internal-baseline-v0.1`
 **Architect status:** Accepted as RFC-049 Phase 1 internal baseline v0.1 (2026-06-24).
 
+> **For current numbers see [`internal-baseline-v0.2.md`](./internal-baseline-v0.2.md)** (a
+> maintainer-run refresh at v0.28.1). This v0.1 report is retained as the **architect-accepted**
+> reference baseline; the methodology is unchanged between the two.
+
 This is the Phase 1 internal Rust baseline (RFC-049). It measures `matten` against
 itself, to establish a reference point and make future regressions visible. It does
 **not** compare against `ndarray`, `nalgebra`, NumPy, or Pandas — those are Phases 2–3

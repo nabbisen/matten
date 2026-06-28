@@ -18,6 +18,46 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.28.2] - 2026-06-28
+
+Benchmark documentation and reports only — no code, public API, runtime, or dependency change.
+
+### Added
+
+- **`benchmarks/` v0.2 reports** (`internal-baseline-v0.2.md`, `peer-comparison-v0.2.md`) — a
+  maintainer-run refresh at workspace `0.28.1` under the unchanged RFC-049 methodology. New IDs
+  `…-v0.2`. The architect-accepted v0.1 reports are retained as the reference baseline (the
+  versioned `v0.x` report naming was designed for exactly this kind of refresh). Numbers match v0.1
+  within VM variance; no internal regression from v0.22.x to v0.28.1 is visible. Peak RSS was not
+  captured this run (the VM lacked GNU `time`); it is informative-only and never a gate. **These
+  refreshed numbers are a maintainer run and are not separately architect-reviewed.**
+- **Runnable environment-capture snippet** in the harness `README.md` (the gap noted previously:
+  the docs said *what* to record but provided no command to emit it). A new "How to regenerate (with
+  environment capture)" section consolidates env capture + compile-check + the timing/memory/peer
+  commands into one maintainer path; `methodology.md` now points to it.
+
+### Changed
+
+- **Benchmark docs rearranged around two audiences.** The book's benchmarks index now routes
+  readers and maintainers to the right page: **reader →** `results.md` (curated, readable summary,
+  now showing the v0.2 numbers); **maintainer →** `methodology.md` plus the harness `README.md`
+  regenerate section. The harness `README.md`'s duplicated "Running" and "Memory" sections were
+  folded into the single regenerate section.
+- **`results.md` refreshed to the v0.2 numbers** and reframed as the reader's view, noting v0.1 as
+  the accepted reference. The RFC-060 freshness guard now also maps the v0.2 report IDs.
+
+### Version
+
+- Patch bump `0.28.1` → `0.28.2` (benchmark docs/reports only; minor unchanged, no family-label
+  retarget).
+
+### Threat model
+
+Documentation and benchmark-report content only. No new data flow, external integration, auth
+surface, dependency, or public API; the benchmark harness remains outside the workspace and
+unpublished, and `criterion`/peer deps stay out of every published crate's graph. Existing controls
+remain valid; no threat-model change.
+
 ## [0.28.1] - 2026-06-28
 
 Narrows the `matten-ndarray` `ndarray` support introduced in v0.28.0 to a single version, and

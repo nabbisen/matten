@@ -64,6 +64,10 @@ Every report records: OS, kernel, CPU, RAM, `rustc` version, target, build profi
 the exact command, and the peak-RSS tool. Benchmarks are workload- and
 environment-specific; numbers from different machines are not directly comparable.
 
+A runnable capture snippet for these fields, plus the full regenerate steps, lives in the harness
+README under [How to regenerate (with environment
+capture)](../../../benchmarks/README.md#how-to-regenerate-with-environment-capture).
+
 ## CI policy
 
 CI compile-checks the harness (`cargo bench --manifest-path benchmarks/Cargo.toml

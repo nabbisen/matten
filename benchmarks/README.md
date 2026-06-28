@@ -16,12 +16,58 @@ feature and off by default. Cross-language reference comparisons (NumPy/Pandas, 
 any regression thresholds (Phase 4) are designed in RFC-049 but **not yet
 implemented/authorized**.
 
+## How to regenerate (with environment capture)
+
+This is the maintainer path: capture the environment, compile-check, then run the sets. Record the
+captured fields in the report's Environment table — benchmarks are environment-specific and numbers
+from different machines are not comparable.
+
+**1. Capture the environment** (Linux; record each value in the report):
+
 ```bash
-# Phase 2 peer comparison.
-# Pulls ndarray + nalgebra; never in the default build or ordinary CI; compile-checked
-# only by the manual/scheduled peers workflow (.github/workflows/benchmarks-peers.yml).
+cat /etc/os-release | grep PRETTY_NAME      # OS
+uname -r                                     # kernel
+lscpu | grep 'Model name'                    # CPU
+grep MemTotal /proc/meminfo                  # RAM
+rustc -V && cargo -V                         # toolchain
+rustc -vV | grep host                        # target triple
+git rev-parse --short HEAD                   # commit
+grep '^version' Cargo.toml                   # workspace version
+```
+
+**2. Compile-check the harness** (this is also what CI runs):
+
+```bash
+cargo bench --manifest-path benchmarks/Cargo.toml --no-run
+```
+
+**3. Run the internal baseline sets** (default Criterion settings: 100 samples):
+
+```bash
+cargo bench --manifest-path benchmarks/Cargo.toml --bench core      -- --noplot
+cargo bench --manifest-path benchmarks/Cargo.toml --bench scenarios -- --noplot
+# optional dynamic micro-workload (off by default)
+cargo bench --manifest-path benchmarks/Cargo.toml --bench core --features dynamic -- --noplot
+```
+
+**4. Peak RSS** (Linux; informative, **not** a gate). Requires GNU `time` (`/usr/bin/time`); the
+shell builtin will not accept `-v`. Install with `apt-get install time` if missing:
+
+```bash
+/usr/bin/time -v cargo bench --manifest-path benchmarks/Cargo.toml --bench scenarios -- --noplot
+# read "Maximum resident set size"
+```
+
+**5. Phase 2 peer comparison** (opt-in; pulls `ndarray` + `nalgebra`; never in the default build or
+ordinary CI — compile-checked only by the manual/scheduled peers workflow,
+`.github/workflows/benchmarks-peers.yml`):
+
+```bash
 cargo bench --manifest-path benchmarks/Cargo.toml --features peers --bench peers -- --noplot
 ```
+
+macOS (`/usr/bin/time -l`) and Windows are deferred. Curated reports live in `reports/`; the
+in-book reader summary is [`docs/src/benchmarks/results.md`](../docs/src/benchmarks/results.md).
 
 ## Isolation
 
@@ -47,39 +93,6 @@ benchmarks/
   reports/              # committed: curated reports
   results/              # committed: small sample schemas only (not bulky histories)
 ```
-
-## Running
-
-Compile-check only (what CI runs):
-
-```bash
-cargo bench --manifest-path benchmarks/Cargo.toml --no-run
-```
-
-Run a set locally:
-
-```bash
-cargo bench --manifest-path benchmarks/Cargo.toml --bench core -- --noplot
-cargo bench --manifest-path benchmarks/Cargo.toml --bench scenarios -- --noplot
-```
-
-Optional dynamic micro-workload (off by default):
-
-```bash
-cargo bench --manifest-path benchmarks/Cargo.toml --bench core --features dynamic -- --noplot
-```
-
-## Memory (peak RSS, Phase 1)
-
-Memory is **informative, not a gate**. On Linux, measure peak resident set size:
-
-```bash
-/usr/bin/time -v cargo bench --manifest-path benchmarks/Cargo.toml --bench scenarios -- --noplot
-# read "Maximum resident set size"
-```
-
-Record the environment (OS, kernel, CPU, RAM, rustc, target, profile, command) in
-every report. macOS (`/usr/bin/time -l`) and Windows are deferred.
 
 ## What this is not
 
