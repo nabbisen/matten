@@ -11,6 +11,33 @@ matten = { version = "0.28", features = ["dynamic"] }
 and cleaning messy PoC data before converting to numeric tensors or handing off
 to a specialised crate.
 
+The lifecycle is deliberately staged:
+
+```text
+messy JSON / CSV / Elements
+        |
+        v
+dynamic Tensor<Element>
+        |
+        | inspect: schema_summary, count_none, none_mask, numeric_mask
+        v
+dynamic Tensor<Element> with known issues
+        |
+        | clean: fill_none, forward_fill_none
+        v
+dynamic Tensor<Element> ready for policy
+        |
+        | convert: try_numeric / try_numeric_with
+        v
+numeric Tensor<f64>
+        |
+        v
+ordinary matten computation
+```
+
+The important boundary is the conversion step. Arithmetic, slicing, reshape, and
+reductions belong after `try_numeric()`, not before it.
+
 ## `Element` variants
 
 ```rust
@@ -110,6 +137,19 @@ let fwd = t2.forward_fill_none(Element::Float(-1.0));
 t.sum_skip_none()  // 4.0  (1.0 + 3.0, None values skipped)
 ```
 
+Masks make readiness visible without changing the data:
+
+```text
+dynamic values:     [ Float(1.0), None, Text("x"), Int(4) ]
+
+none_mask():        [    0.0,     1.0,     0.0,    0.0 ]
+numeric_mask():     [    1.0,     0.0,     0.0,    1.0 ]
+
+meaning:
+  none_mask    = where missing values are
+  numeric_mask = which values strict try_numeric() can accept
+```
+
 ## Parsing mixed data
 
 ```rust
@@ -166,6 +206,23 @@ fn process_messy_csv(input: &str) -> Result<Tensor, Box<dyn std::error::Error>> 
     // 4. Use numeric arithmetic, reductions, matmul...
     Ok(numeric)
 }
+```
+
+For a dirty row, the same workflow looks like this:
+
+```text
+input row:       1.0, "", "active", 4
+
+dynamic parse:   Float(1.0)  None  Text("active")  Int(4)
+
+inspect:         none_mask    -> [0, 1, 0, 0]
+                 numeric_mask -> [1, 0, 0, 1]
+
+clean:           fill_none(0.0)
+                 Float(1.0)  Float(0.0)  Text("active")  Int(4)
+
+convert:         strict try_numeric() still rejects Text("active")
+                 allow_text_parse() only helps text that actually parses as f64
 ```
 
 ## Limitations

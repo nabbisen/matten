@@ -53,6 +53,18 @@ satisfies one of:
 | `[3, 1]` | `[1, 4]` | `[3, 4]` — outer product pattern |
 | `[2, 3]` | `[2]` | **incompatible** — panics |
 
+Read broadcasting from the trailing axis leftward:
+
+```text
+matrix:  [2, 3]
+bias:       [3]
+          -----
+result:  [2, 3]
+
+axis -1: 3 matches 3
+axis -2: bias has no axis, so it behaves like 1 and repeats over 2 rows
+```
+
 ```rust
 // bias addition: add a [3] bias vector to every row of a [2, 3] matrix
 let matrix = Tensor::new(vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0], &[2, 3]);
@@ -60,6 +72,26 @@ let bias   = Tensor::new(vec![10.0, 20.0, 30.0], &[3]);
 let result = &matrix + &bias;
 // [[11.0, 22.0, 33.0],
 //  [14.0, 25.0, 36.0]]
+```
+
+The data meaning is "repeat the smaller shape where it has a missing axis or a
+dimension of `1`":
+
+```text
+matrix [2, 3]       bias [3]         result [2, 3]
+
+[ 1  2  3 ]       [10 20 30]       [11 22 33]
+[ 4  5  6 ]   +   [10 20 30]   =   [14 25 36]
+```
+
+Two one-length axes can expand in different directions:
+
+```text
+left [3, 1]        right [1, 4]       result [3, 4]
+
+[1]                [10 20 30 40]      [11 21 31 41]
+[2]          +                         [12 22 32 42]
+[3]                                    [13 23 33 43]
 ```
 
 ## Incompatible shapes

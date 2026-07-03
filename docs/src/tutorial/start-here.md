@@ -49,6 +49,36 @@ Never call arithmetic, reductions, or slicing on a dynamic tensor directly —
 those APIs reject dynamic tensors with a clear message directing you to
 `try_numeric()` first.
 
+Read the two main learning paths like this:
+
+```text
+clean numeric values
+        |
+        v
+Tensor<f64>
+        |
+        v
+shape ops, broadcasting, matmul, reductions
+
+messy values
+        |
+        v
+dynamic Tensor<Element>
+        |
+        v
+inspect -> clean -> try_numeric
+        |
+        v
+Tensor<f64>
+        |
+        v
+shape ops, broadcasting, matmul, reductions
+```
+
+If an operation feels confusing, first ask which shape is being kept and which
+axis is being collapsed. For example, `mean_axis(0)` on a `[rows, columns]`
+matrix collapses rows and leaves one value per column.
+
 ## When to graduate from `matten`
 
 `matten` is the family car: easy to start, honest about its limits. When you

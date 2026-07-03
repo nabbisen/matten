@@ -39,6 +39,39 @@ assert_eq!(tensor.shape(), &[3, 2]);
 # }
 ```
 
+The data path is intentionally explicit:
+
+```text
+CSV text
+  |
+  v
+Table
+  headers: region, sales, cost
+  rows:    3
+  |
+  | select_columns(["sales", "cost"])
+  v
+Table
+  headers: sales, cost
+  rows:    3
+  |
+  | fill_missing(0.0)
+  v
+Table
+  missing cost cell is now an explicit numeric value
+  |
+  | try_numeric()
+  v
+NumericTable
+  all selected cells are f64-compatible
+  |
+  | to_tensor()
+  v
+Tensor shape [3, 2]
+  rows    = CSV data rows
+  columns = selected columns, in requested order
+```
+
 ## The example suite
 
 The numbered tutorial suite teaches one step at a time; `csv_to_tensor` is a single
@@ -66,12 +99,60 @@ requested them. The data is **row-major**: row 0's values come first, then row 1
 and so on. Once converted, the result is an ordinary `matten::Tensor` — every core
 operation applies.
 
+For the quickstart input, selecting `sales` and `cost` gives:
+
+```text
+source rows
+
+row 0: region=north
+row 1: region=south
+row 2: region=east
+
+selected columns: sales, cost
+
+selected table
+
+row 0: sales=100  cost=40
+row 1: sales=150  cost=0      (filled explicitly)
+row 2: sales=120  cost=55
+
+Tensor shape [3, 2]
+
+[ 100   40 ]
+[ 150    0 ]
+[ 120   55 ]
+
+flat row-major data:
+
+[100, 40, 150, 0, 120, 55]
+```
+
 ## Missing-value policy
 
 Missing cells are never silently turned into `0`. A missing value that reaches
 numeric conversion is a precise `MissingValue { column, row }` error (the row is the
 1-based CSV line number). You decide what a missing value means by calling
 `fill_missing` with an explicit value before converting.
+
+The policy is visible in the workflow:
+
+```text
+missing cell present
+        |
+        | try_numeric()
+        v
+MissingValue error
+
+missing cell present
+        |
+        | fill_missing(value)
+        v
+explicit value present
+        |
+        | try_numeric()
+        v
+NumericTable
+```
 
 ## Numeric conversion policy
 

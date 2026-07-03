@@ -65,6 +65,26 @@ existing axis reductions (`mean_axis`, `sum_axis`):
 [[1, 2, 3], [4, 5, 6]]  var_axis(1)  ->  [2/3, 2/3]            // shape [2], per row
 ```
 
+The shape behavior is the same for `var_axis` and `std_axis`; `std_axis` just
+takes the square root of each variance:
+
+```text
+input shape [2, 3]
+axes         0  1
+
+var_axis(0): collapse rows, keep columns
+
+[ 1  2  3 ]
+[ 4  5  6 ]  ->  [ var([1,4])  var([2,5])  var([3,6]) ]
+             ->  [    2.25        2.25        2.25    ]   shape [3]
+
+var_axis(1): collapse columns, keep rows
+
+[ 1  2  3 ]
+[ 4  5  6 ]  ->  [ var([1,2,3])  var([4,5,6]) ]
+             ->  [     2/3            2/3     ]           shape [2]
+```
+
 The `try_*` forms return `MattenError::Shape` if `axis >= rank`, or
 `MattenError::Unsupported` on a dynamic tensor.
 

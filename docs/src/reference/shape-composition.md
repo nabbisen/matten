@@ -29,6 +29,22 @@ axes are unchanged. `axis` must be in `0..rank`.
 [2, 3] ++ [2, 5]  along axis 1  ->  [2, 8]
 ```
 
+`concatenate` extends an axis that already exists:
+
+```text
+axis 0 concatenate: add more rows
+
+[ a a a ]      [ b b b ]      [ a a a ]
+[ a a a ]  ++  [ b b b ]  ->  [ a a a ]   shape [4, 3]
+                              [ b b b ]
+                              [ b b b ]
+
+axis 1 concatenate: add more columns
+
+[ a a a ]      [ b b ]      [ a a a b b ]
+[ a a a ]  ++  [ b b ]  ->  [ a a a b b ]   shape [2, 5]
+```
+
 A single-element list returns a clone of that tensor (after validating the axis and
 dynamic status).
 
@@ -47,6 +63,33 @@ one. `axis` may be `0..=rank`.
 three [2, 4] tensors stacked at axis 0  ->  [3, 2, 4]
 three [2, 4] tensors stacked at axis 1  ->  [2, 3, 4]
 three [2, 4] tensors stacked at axis 2  ->  [2, 4, 3]
+```
+
+`stack` creates a new axis whose size is the number of inputs:
+
+```text
+two vectors shape [3]
+
+a = [1 2 3]
+b = [4 5 6]
+
+stack([a, b], axis 0) -> shape [2, 3]
+
+[ 1 2 3 ]
+[ 4 5 6 ]
+
+stack([a, b], axis 1) -> shape [3, 2]
+
+[ 1 4 ]
+[ 2 5 ]
+[ 3 6 ]
+```
+
+The short rule:
+
+```text
+concatenate: existing axis gets longer
+stack:       new axis appears
 ```
 
 A single-element list inserts a length-1 axis (the analogue of `expand_dims`).

@@ -18,6 +18,24 @@ let r = t.try_reshape(&[3, 2])?; // MattenError::Shape on mismatch
 Only the element count matters — reshape never fails because of memory layout.
 Flat data order (row-major) is preserved unchanged.
 
+The easiest way to read reshape is: keep the flat row-major tape, then place
+cuts in different positions.
+
+```text
+shape [2, 3]
+
+[ 1  2  3 ]
+[ 4  5  6 ]
+
+flat tape: 1  2  3  4  5  6
+
+reshape [3, 2]
+
+[ 1  2 ]
+[ 3  4 ]
+[ 5  6 ]
+```
+
 ```rust
 // Any compatible shape works
 let flat  = t.reshape(&[6]);        // [6]
@@ -42,6 +60,13 @@ let f = t.flatten();   // shape [4]
 let s = Tensor::scalar(7.0).flatten();  // shape [1]
 ```
 
+Flatten is the same row-major tape without any row/column grouping:
+
+```text
+[ 1  2 ]
+[ 3  4 ]  ->  [1 2 3 4]
+```
+
 ## Transpose
 
 `transpose()` reverses the axis order. `t()` is an alias.
@@ -58,6 +83,23 @@ let t3  = Tensor::new((1..=24).map(|x| x as f64).collect(), &[2, 3, 4]);
 let t3t = t3.transpose();  // shape [4, 3, 2]
 ```
 
+For a matrix, transpose swaps the coordinate meaning:
+
+```text
+input shape [2, 3]          transpose shape [3, 2]
+
+coord [0,0] = 1             coord [0,0] = 1
+coord [0,1] = 2             coord [1,0] = 2
+coord [0,2] = 3             coord [2,0] = 3
+coord [1,0] = 4             coord [0,1] = 4
+coord [1,1] = 5             coord [1,1] = 5
+coord [1,2] = 6             coord [2,1] = 6
+
+[ 1  2  3 ]                 [ 1  4 ]
+[ 4  5  6 ]       ->        [ 2  5 ]
+                             [ 3  6 ]
+```
+
 Transposing twice is the identity:
 
 ```rust
@@ -71,6 +113,19 @@ Transposing a scalar panics — there are no axes to reverse.
 ```rust
 let t = Tensor::new((1..=24).map(|x| x as f64).collect(), &[2, 3, 4]);
 let s = t.swap_axes(0, 2);  // shape [4, 3, 2]
+```
+
+`transpose()` reverses every axis; `swap_axes(a, b)` swaps only the two axes you
+name:
+
+```text
+shape [2, 3, 4]
+axes    0  1  2
+
+transpose()       -> shape [4, 3, 2]   axes 2 1 0
+swap_axes(0, 2)   -> shape [4, 3, 2]   axes 2 1 0
+swap_axes(0, 1)   -> shape [3, 2, 4]   axes 1 0 2
+swap_axes(1, 2)   -> shape [2, 4, 3]   axes 0 2 1
 ```
 
 Swapping an axis with itself is a no-op. Out-of-range axes panic:

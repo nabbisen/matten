@@ -78,6 +78,33 @@ only axis gives a scalar-shaped tensor.
 
 Both panic with an actionable message if `axis >= ndim`.
 
+Read an axis reduction as "collapse that axis and keep the others":
+
+```text
+input shape [2, 3]
+axes         0  1
+
+axis 0 = rows      axis 1 remains, output shape [3]
+axis 1 = columns   axis 0 remains, output shape [2]
+```
+
+For a `[2, 3]` matrix:
+
+```text
+            columns / axis 1
+             0   1   2
+rows 0     [ 1   2   3 ]
+axis 0     [ 4   5   6 ]
+
+mean_axis(0): collapse rows, keep columns
+             [ (1+4)/2  (2+5)/2  (3+6)/2 ]
+          -> [   2.5      3.5      4.5   ]   shape [3]
+
+mean_axis(1): collapse columns, keep rows
+             [ (1+2+3)/3  (4+5+6)/3 ]
+          -> [     2.0        5.0   ]         shape [2]
+```
+
 ## Vector dot product
 
 ```rust
@@ -101,6 +128,26 @@ assert_eq!(d.as_slice(), &[32.0]); // 1*4 + 2*5 + 3*6
 | `[m, n]` | `[n]` | `[m]` |
 | `[n]` | `[n, p]` | `[p]` |
 | `[m, n]` | `[n, p]` | `[m, p]` |
+
+Shape flow for the common matrix-matrix case:
+
+```text
+left shape       right shape       result shape
+[m, n]       x   [n, p]        ->  [m, p]
+    ^             ^
+    |             |
+    shared inner dimension must match
+```
+
+Each output cell is one row from the left dotted with one column from the right:
+
+```text
+left [2, 3]          right [3, 2]           result [2, 2]
+
+[ a b c ]            [ x y ]                [ ax+bz+cu   ay+bw+cv ]
+[ d e f ]       x    [ z w ]          ->    [ dx+ez+fu   dy+ew+fv ]
+                     [ u v ]
+```
 
 ```rust
 let a = Tensor::new(vec![1.0,2.0,3.0,4.0], &[2,2]);
