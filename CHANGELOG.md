@@ -18,6 +18,50 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.29.0-pre.1] - 2026-07-03
+
+RFC-063 Phase 1 visual-understanding documentation prerelease. This release adds Markdown / ASCII
+visual explanations to the rendered documentation so users can see how shapes, reductions, dynamic
+readiness, and table-to-Tensor conversion behave. No public API, runtime behavior, dependency, MSRV,
+or maturity-label change.
+
+### Added
+
+- **RFC-063 Visual Understanding and Reporting** as an accepted planning RFC with scope
+  clarifications: Phase 1 is Markdown / ASCII docs only; Phase 2 examples require a compact handoff;
+  local tooling and public companion crates require later approval.
+- **RFC-063 Phase 1 visual-docs handoff** as the implementation record for the docs-only phase.
+- **Visual documentation diagrams** for:
+  - broadcasting shape alignment and repeated values;
+  - reshape / flatten as row-major tape;
+  - transpose and `swap_axes` axis meaning;
+  - `mean_axis(0)` vs `mean_axis(1)`;
+  - matrix multiplication shape flow;
+  - `concatenate` vs `stack`;
+  - `var_axis` / `std_axis` shape behavior;
+  - dynamic ingestion inspect-clean-convert lifecycle and masks;
+  - `matten-data` CSV/Table → selected columns → `NumericTable` → `Tensor`.
+
+### Changed
+
+- Current-family documentation and install snippets retargeted from `0.28` to the prerelease
+  `0.29.0-pre.1`. Prerelease snippets use the exact prerelease requirement, not a bare minor.
+- The RFC index now records RFC-063 as Phase 1 implemented while later visualization/reporting phases
+  remain pending.
+- The release-documentation guard now accepts SemVer prerelease workspace versions and exact
+  prerelease install pins when checking current-family docs.
+
+### Version
+
+- Prerelease minor bump `0.28.5` → `0.29.0-pre.1` for a docs-only visual-understanding milestone.
+  Lock-step family versioning still applies to all workspace crates.
+
+### Threat model
+
+Documentation and RFC/handoff updates only. No new data flow, parser, external integration, auth
+surface, published dependency, public API, code generation, local tool, or runtime behavior. Core
+`matten` remains rendering-free and dependency-light; no threat-model change.
+
 ## [0.28.5] - 2026-06-28
 
 A documentation/examples release: a dedicated dynamic-JSON ingestion example so JSON and CSV read as

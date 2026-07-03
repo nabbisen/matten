@@ -3,7 +3,7 @@
 **Project:** `matten`  
 **Related RFC:** RFC-063: Visual Understanding and Reporting  
 **Document kind:** Compact docs implementation handoff  
-**Status:** Implemented for Phase 1; retained as implementation record  
+**Status:** Implemented for Phase 1 in `0.29.0-pre.1`; retained as implementation record  
 **Scope:** Markdown / ASCII documentation only  
 
 ---

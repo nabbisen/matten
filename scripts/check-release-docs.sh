@@ -161,14 +161,15 @@ echo "=== Checking for stale prior-family version references in user-facing docs
 # install pins, `X.Y.x` family labels, and "current vX.Y family" prose whose minor
 # is not the current one. Full historical patch refs (e.g. "as of v0.20.1" shipped-in
 # notes) are NOT matched, and rfcs/ + CHANGELOG.md + ROADMAP.md remain outside USER_DOCS.
-CURRENT_MINOR="$(grep -m1 '^version' Cargo.toml | sed -E 's/.*"[0-9]+\.([0-9]+)\.[0-9]+".*/\1/')"
+CURRENT_MINOR="$(grep -m1 '^version' Cargo.toml | sed -E 's/.*"[0-9]+\.([0-9]+)\.[0-9]+(-[A-Za-z0-9.+-]+)?".*/\1/')"
 if [ -z "$CURRENT_MINOR" ] || ! echo "$CURRENT_MINOR" | grep -Eq '^[0-9]+$'; then
   echo "ERROR: failed to derive current minor from Cargo.toml"
   exit 1
 fi
 # (a) install-snippet version pins: `<crate> = "0.NN"` / `version = "0.NN"`
-if grep -rInE '(version|matten[a-z-]*) = "0\.[0-9]+"' "${USER_DOCS[@]}" 2>/dev/null \
-   | grep -vE "= \"0\.${CURRENT_MINOR}\""; then
+#     / exact prerelease pins such as `0.NN.0-pre.1`.
+if grep -rInE '(version|matten[a-z-]*) = "0\.[0-9]+([^"]*)?"' "${USER_DOCS[@]}" 2>/dev/null \
+   | grep -vE "= \"0\.${CURRENT_MINOR}([.\"-]|$)"; then
   echo "ERROR: stale install-snippet version pin in user-facing docs (pin the current minor 0.${CURRENT_MINOR})"
   FAIL=1
 fi
@@ -283,8 +284,8 @@ echo "=== Checking CHANGELOG release headings are well-formed ==="
 #     ships without its own heading. (2) No single release block may contain more than one
 #     "### Threat model" section — that is the signature of a release block that lost its
 #     "## [x.y.z]" heading and got nested under the previous release (the v0.23.4 regression).
-CL_VERSION="$(grep -m1 '^version' Cargo.toml | sed -E 's/.*"([0-9]+\.[0-9]+\.[0-9]+)".*/\1/')"
-CL_TOP="$(grep -m1 -oE '^## \[[0-9]+\.[0-9]+\.[0-9]+\]' CHANGELOG.md | tr -d '#[] ')"
+CL_VERSION="$(grep -m1 '^version' Cargo.toml | sed -E 's/.*"([0-9]+\.[0-9]+\.[0-9]+(-[A-Za-z0-9.+-]+)?)".*/\1/')"
+CL_TOP="$(grep -m1 -oE '^## \[[0-9]+\.[0-9]+\.[0-9]+(-[A-Za-z0-9.+-]+)?\]' CHANGELOG.md | tr -d '#[] ')"
 if [ "$CL_TOP" != "$CL_VERSION" ]; then
   echo "ERROR: top CHANGELOG heading ($CL_TOP) does not match workspace version ($CL_VERSION)"
   FAIL=1
