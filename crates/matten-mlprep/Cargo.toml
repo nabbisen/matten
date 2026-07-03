@@ -36,3 +36,7 @@ path = "examples/add_bias_column.rs"
 [[example]]
 name = "mlprep_train_test_split"
 path = "examples/train_test_split.rs"
+
+[[example]]
+name = "mlprep_visual_standardize_summary"
+path = "examples/visual_standardize_summary.rs"

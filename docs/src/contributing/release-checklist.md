@@ -51,6 +51,7 @@ cargo run --example dynamic_05_dirty_csv_cleanup --features dynamic,json,csv
 cargo check -p matten --example dynamic_09_visual_readiness_summary
 cargo run -p matten --example dynamic_09_visual_readiness_summary --features dynamic
 cargo run -p matten-data --example data_06_visual_readiness_summary
+cargo run -p matten-mlprep --example mlprep_visual_standardize_summary
 ```
 
 ### 4. MSRV

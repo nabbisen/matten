@@ -18,6 +18,40 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.29.0-pre.3] - 2026-07-03
+
+RFC-063 optional `matten-mlprep` visual-standardization summary prerelease. This release adds one
+standardization-only companion example after Phase 2 was accepted, and applies the accepted Phase 2
+wording polish. No public API, runtime behavior, dependency, MSRV, or maturity-label change.
+
+### Added
+
+- **`crates/matten-mlprep/examples/visual_standardize_summary.rs`** as
+  `mlprep_visual_standardize_summary`: a compact terminal summary for `standardize_columns`,
+  showing before/after per-column mean, before/after per-column standard deviation, and unchanged
+  shape.
+
+### Changed
+
+- Wired `mlprep_visual_standardize_summary` into CI smoke coverage, the release checklist, and the
+  companion examples page.
+- Updated `dynamic_09_visual_readiness_summary` output wording from "clean shape/values" to
+  "converted shape/values" to keep visual reports descriptive rather than judgmental.
+- Current-family documentation and install snippets retargeted from `0.29.0-pre.2` to
+  `0.29.0-pre.3`.
+
+### Version
+
+- Prerelease bump `0.29.0-pre.2` -> `0.29.0-pre.3` for the optional `matten-mlprep`
+  visual-summary milestone. Lock-step family versioning still applies to all workspace crates.
+
+### Threat model
+
+Example, docs, CI, and release-metadata updates only. No public API, published dependency, parser
+behavior, data flow beyond hard-coded example inputs, code generation, local tool, image asset,
+generated artifact, plotting, notebook, GUI, telemetry, network, or runtime behavior change. Phase
+3 tooling remains deferred.
+
 ## [0.29.0-pre.2] - 2026-07-03
 
 RFC-063 Phase 2 canonical visual-summary examples prerelease. This release adds small,

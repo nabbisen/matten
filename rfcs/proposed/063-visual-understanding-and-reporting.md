@@ -1,6 +1,6 @@
 # RFC-063: Visual Understanding and Reporting
 
-**Status:** Accepted for planning with scope clarifications; Phase 1 visual docs implemented in `0.29.0-pre.1`; Phase 2 canonical example reports implemented in `0.29.0-pre.2`; Phase 3+ require separate handoffs or RFC approval
+**Status:** Accepted for planning with scope clarifications; Phase 1 visual docs implemented in `0.29.0-pre.1`; Phase 2 canonical example reports implemented in `0.29.0-pre.2`; optional `matten-mlprep` visual-standardization example implemented in `0.29.0-pre.3`; Phase 3+ require separate handoffs or RFC approval
 **Target:** v0.29+ design/docs phase, with implementation split by later handoffs  
 **Theme:** Visual understanding, explanatory reporting, and optional visualization tooling  
 **Depends on:** RFC-014, RFC-021, RFC-022, RFC-043, RFC-048, RFC-050, RFC-053  

@@ -11,5 +11,5 @@ assert_eq!(a.ndim(), 2);
 Install the lean core only:
 
 ```toml
-matten = { version = "0.29.0-pre.2", default-features = false }
+matten = { version = "0.29.0-pre.3", default-features = false }
 ```

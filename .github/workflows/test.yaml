@@ -161,6 +161,7 @@ jobs:
       - run: cargo run -p matten-mlprep --example mlprep_minmax_scale
       - run: cargo run -p matten-mlprep --example mlprep_add_bias_column
       - run: cargo run -p matten-mlprep --example mlprep_train_test_split
+      - run: cargo run -p matten-mlprep --example mlprep_visual_standardize_summary
       # matten-data
       - run: cargo run -p matten-data --example csv_to_tensor
       - run: cargo run -p matten-data --example data_00_quickstart

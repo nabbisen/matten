@@ -53,13 +53,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         Ok(_) => panic!("strict conversion should reject Text and None"),
     }
 
-    let clean = t.try_numeric_with(NumericPolicy::default().none_as(0.0).allow_text_parse())?;
+    let converted = t.try_numeric_with(NumericPolicy::default().none_as(0.0).allow_text_parse())?;
     println!("explicit policy none_as(0.0) + allow_text_parse()");
-    println!("clean shape     {:?}", clean.shape());
-    println!("clean values    {:?}", clean.as_slice());
-    assert!(!clean.is_dynamic());
-    assert_eq!(clean.shape(), &[2, 3]);
-    assert_eq!(clean.as_slice(), &[1.0, 2.5, 0.0, 4.0, 6.0, 8.0]);
+    println!("converted shape {:?}", converted.shape());
+    println!("converted values {:?}", converted.as_slice());
+    assert!(!converted.is_dynamic());
+    assert_eq!(converted.shape(), &[2, 3]);
+    assert_eq!(converted.as_slice(), &[1.0, 2.5, 0.0, 4.0, 6.0, 8.0]);
 
     println!();
     println!("dynamic_09_visual_readiness_summary: OK");

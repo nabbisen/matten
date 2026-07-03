@@ -34,6 +34,7 @@ cargo run -p matten-ndarray --example to_arrayd
 | [`mlprep_minmax_scale`](https://github.com/nabbisen/matten/blob/main/crates/matten-mlprep/examples/minmax_scale.rs) | Per-column scaling into `[0, 1]` |
 | [`mlprep_add_bias_column`](https://github.com/nabbisen/matten/blob/main/crates/matten-mlprep/examples/add_bias_column.rs) | Prepend a constant intercept column |
 | [`mlprep_train_test_split`](https://github.com/nabbisen/matten/blob/main/crates/matten-mlprep/examples/train_test_split.rs) | Deterministic, ordered train/test split |
+| [`mlprep_visual_standardize_summary`](https://github.com/nabbisen/matten/blob/main/crates/matten-mlprep/examples/visual_standardize_summary.rs) | Readability summary for standardization mean/std and unchanged shape |
 
 Convention throughout: rows are samples, columns are features; every transform is
 deterministic with no hidden randomness and no model training.
@@ -41,6 +42,7 @@ deterministic with no hidden randomness and no model training.
 ```bash
 cargo run -p matten-mlprep --example mlprep_standardize_columns
 cargo run -p matten-mlprep --example mlprep_train_test_split
+cargo run -p matten-mlprep --example mlprep_visual_standardize_summary
 ```
 
 ## `matten-data` — table-to-Tensor (production-ready candidate)
