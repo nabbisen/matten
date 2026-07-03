@@ -81,7 +81,7 @@ ecosystem. Core stays a family car; companions are the trailer hitch.
 
 ```toml
 [dependencies]
-matten = "0.29.0-pre.1"
+matten = "0.29.0-pre.2"
 ```
 
 ```rust
@@ -105,7 +105,7 @@ guide](docs/src/reference/dynamic.md)):
 
 ```toml
 [dependencies]
-matten = { version = "0.29.0-pre.1", features = ["dynamic"] }
+matten = { version = "0.29.0-pre.2", features = ["dynamic"] }
 ```
 
 ```rust
@@ -126,8 +126,8 @@ assert_eq!(numeric.as_slice(), &[1.0, 2.5, 0.0, 4.0]);
 
 ```toml
 [dependencies]
-matten = "0.29.0-pre.1"
-matten-ndarray = "0.29.0-pre.1"
+matten = "0.29.0-pre.2"
+matten-ndarray = "0.29.0-pre.2"
 ```
 
 ```rust
@@ -147,8 +147,8 @@ More examples are [here](crates/matten-ndarray/examples/).
 
 ```toml
 [dependencies]
-matten = "0.29.0-pre.1"
-matten-mlprep = "0.29.0-pre.1"
+matten = "0.29.0-pre.2"
+matten-mlprep = "0.29.0-pre.2"
 ```
 
 ```rust

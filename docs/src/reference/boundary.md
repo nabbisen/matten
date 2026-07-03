@@ -91,7 +91,7 @@ let t = Tensor::load_csv("examples/data/numeric_2x3.csv")?;
 Lean install (no I/O dependencies):
 
 ```toml
-matten = { version = "0.29.0-pre.1", default-features = false }
+matten = { version = "0.29.0-pre.2", default-features = false }
 ```
 
 ## Error mapping

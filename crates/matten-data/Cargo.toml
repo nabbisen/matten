@@ -54,3 +54,7 @@ required-features = ["csv"]
 [[example]]
 name = "data_05_errors"
 required-features = ["csv"]
+
+[[example]]
+name = "data_06_visual_readiness_summary"
+required-features = ["csv"]

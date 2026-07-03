@@ -18,6 +18,46 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.29.0-pre.2] - 2026-07-03
+
+RFC-063 Phase 2 canonical visual-summary examples prerelease. This release adds small,
+deterministic terminal summaries so users can run examples that show how shapes, axes,
+dynamic readiness, and table-to-Tensor readiness behave. No public API, runtime behavior,
+dependency, MSRV, or maturity-label change.
+
+### Added
+
+- **`57_visual_shape_axis_summary.rs`.** A core example that prints compact summaries for
+  broadcasting, reshape, `mean_axis(0)`, `mean_axis(1)`, and matrix multiplication.
+- **`dynamic_09_visual_readiness_summary.rs`.** A dynamic-ingestion example that prints dynamic
+  values, missing masks, numeric-convertible masks, strict conversion failure, and explicit
+  `NumericPolicy` conversion.
+- **`data_06_visual_readiness_summary.rs`.** A `matten-data` example that prints source columns,
+  selected columns, intentionally left-out columns, missing counts, explicit cleanup, Tensor shape,
+  and row-major output values.
+- **RFC-063 Phase 2 example-reports handoff** as the implementation record for the canonical
+  example set.
+
+### Changed
+
+- Wired the three canonical visual-summary examples into CI smoke coverage and the release
+  checklist.
+- Updated example indexes and the tutorial path with user-facing readability wording.
+- Current-family documentation and install snippets retargeted from `0.29.0-pre.1` to
+  `0.29.0-pre.2`.
+
+### Version
+
+- Prerelease bump `0.29.0-pre.1` -> `0.29.0-pre.2` for the Phase 2 example-summary milestone.
+  Lock-step family versioning still applies to all workspace crates.
+
+### Threat model
+
+Examples, docs, RFC/handoff, CI, and release-checklist updates only. No public API, published
+dependency, parser behavior, data flow beyond hard-coded example inputs, code generation, local
+tool, image asset, generated artifact, plotting, notebook, GUI, telemetry, network, or runtime
+behavior change.
+
 ## [0.29.0-pre.1] - 2026-07-03
 
 RFC-063 Phase 1 visual-understanding documentation prerelease. This release adds Markdown / ASCII

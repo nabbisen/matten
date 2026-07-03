@@ -1,6 +1,6 @@
 # RFC-063: Visual Understanding and Reporting
 
-**Status:** Accepted for planning with scope clarifications; Phase 1 visual docs implemented in `0.29.0-pre.1`; Phase 2+ require separate handoffs or RFC approval  
+**Status:** Accepted for planning with scope clarifications; Phase 1 visual docs implemented in `0.29.0-pre.1`; Phase 2 canonical example reports implemented in `0.29.0-pre.2`; Phase 3+ require separate handoffs or RFC approval
 **Target:** v0.29+ design/docs phase, with implementation split by later handoffs  
 **Theme:** Visual understanding, explanatory reporting, and optional visualization tooling  
 **Depends on:** RFC-014, RFC-021, RFC-022, RFC-043, RFC-048, RFC-050, RFC-053  
@@ -446,10 +446,12 @@ The initial review answered the first five open questions:
    examples, local helper functions inside examples, or possibly a future
    `publish = false` tool.
 
-Remaining open question:
+Phase 2 example set answered by the compact handoff:
 
 ```text
-What exact Phase 2 example set should be canonical after Phase 1 docs are reviewed?
+crates/matten/examples/57_visual_shape_axis_summary.rs
+crates/matten/examples/dynamic_09_visual_readiness_summary.rs
+crates/matten-data/examples/data_06_visual_readiness_summary.rs
 ```
 
 ---

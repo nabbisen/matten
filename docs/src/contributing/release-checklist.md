@@ -45,8 +45,12 @@ cargo run --example 00_quickstart
 cargo run --example 06_broadcasting
 cargo run --example 08_slicing_builder
 cargo run --example 12_boundary_error_handling
+cargo run --example 57_visual_shape_axis_summary
 cargo run --example dynamic_00_quickstart --features dynamic,json,csv
 cargo run --example dynamic_05_dirty_csv_cleanup --features dynamic,json,csv
+cargo check -p matten --example dynamic_09_visual_readiness_summary
+cargo run -p matten --example dynamic_09_visual_readiness_summary --features dynamic
+cargo run -p matten-data --example data_06_visual_readiness_summary
 ```
 
 ### 4. MSRV

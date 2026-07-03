@@ -16,9 +16,10 @@ If your data is already clean numeric values, follow these examples in order:
 | 6 | `cargo run --example 08_slicing_builder` | Slice builder API |
 | 7 | `cargo run --example 22_matrix_multiplication` | `dot` / `matmul` |
 | 8 | `cargo run --example 27_axis_reductions` | Row/column reductions |
-| 9 | `cargo run --example 12_boundary_error_handling` | Safe error handling |
+| 9 | `cargo run --example 57_visual_shape_axis_summary` | Shape and axis readability |
+| 10 | `cargo run --example 12_boundary_error_handling` | Safe error handling |
 
-After these nine examples you understand the numeric core.
+After these ten examples you understand the numeric core.
 
 ## Dynamic ingestion: messy data with `dynamic`
 
@@ -31,6 +32,7 @@ If your input has missing values, mixed types, or dirty CSV/JSON:
 | 3 | `cargo run --example dynamic_05_dirty_csv_cleanup --features dynamic,csv` | Dirty CSV |
 | 4 | `cargo run --example dynamic_07_on_ramp_summary --features dynamic` | Full on-ramp |
 | 5 | `cargo run --example dynamic_06_numeric_policy --features dynamic` | Conversion policy |
+| 6 | `cargo run --example dynamic_09_visual_readiness_summary --features dynamic` | Readiness summary |
 
 ## The lifecycle rule
 

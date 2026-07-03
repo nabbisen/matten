@@ -139,6 +139,7 @@ jobs:
       - run: cargo run -p matten --example 54_pairwise_distance
       - run: cargo run -p matten --example 55_moving_average
       - run: cargo run -p matten --example 56_rolling_windows_basic
+      - run: cargo run -p matten --example 57_visual_shape_axis_summary
       - run: cargo run -p matten --example dynamic_00_quickstart --features dynamic,json,csv
       - run: cargo run -p matten --example dynamic_05_dirty_csv_cleanup --features dynamic,json,csv
       - run: cargo run -p matten --example 13_resource_limits
@@ -150,6 +151,8 @@ jobs:
       - run: cargo run -p matten --example dynamic_06_numeric_policy --features dynamic
       - run: cargo run -p matten --example dynamic_07_on_ramp_summary --features dynamic
       - run: cargo run -p matten --example dynamic_08_json_ingestion --features dynamic,json
+      - run: cargo check -p matten --example dynamic_09_visual_readiness_summary
+      - run: cargo run -p matten --example dynamic_09_visual_readiness_summary --features dynamic
       # matten-ndarray
       - run: cargo run -p matten-ndarray --example to_arrayd
       - run: cargo run -p matten-ndarray --example from_arrayd
@@ -166,3 +169,4 @@ jobs:
       - run: cargo run -p matten-data --example data_03_missing_values
       - run: cargo run -p matten-data --example data_04_to_tensor
       - run: cargo run -p matten-data --example data_05_errors
+      - run: cargo run -p matten-data --example data_06_visual_readiness_summary

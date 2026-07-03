@@ -53,6 +53,7 @@ cargo run -p matten-mlprep --example mlprep_train_test_split
 | [`data_03_missing_values`](https://github.com/nabbisen/matten/blob/main/crates/matten-data/examples/data_03_missing_values.rs) | Missing values never become zero silently |
 | [`data_04_to_tensor`](https://github.com/nabbisen/matten/blob/main/crates/matten-data/examples/data_04_to_tensor.rs) | Output shape, row-major order, core interop |
 | [`data_05_errors`](https://github.com/nabbisen/matten/blob/main/crates/matten-data/examples/data_05_errors.rs) | The common boundary errors |
+| [`data_06_visual_readiness_summary`](https://github.com/nabbisen/matten/blob/main/crates/matten-data/examples/data_06_visual_readiness_summary.rs) | Readability summary for table-to-Tensor readiness |
 | [`csv_to_tensor`](https://github.com/nabbisen/matten/blob/main/crates/matten-data/examples/csv_to_tensor.rs) | Comprehensive overview of the whole workflow |
 
 `matten-data` is a **production-ready candidate** and intentionally small. It is **not** a dataframe:

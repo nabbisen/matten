@@ -22,6 +22,7 @@ working documents for the implementation team and may be revised as work proceed
 | `041-implementation-handoff.md` | RFC-041 Linear Algebra Boundary — Core Lite vs External Crates |
 | `042-implementation-handoff.md` | RFC-042 Pandas-Inspired Scope Guard for `matten-data` |
 | `063-phase-1-visual-docs-handoff.md` | RFC-063 Visual Understanding and Reporting — Phase 1 docs only |
+| `063-phase-2-example-reports-handoff.md` | RFC-063 Visual Understanding and Reporting — Phase 2 example reports |
 
 These RFCs are **proposed** (design only). No implementation is authorized by their
 presence here; each requires per-RFC acceptance before coding begins.

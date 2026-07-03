@@ -12,8 +12,8 @@ For joins, group-by, lazy queries, datetime handling, or large/streaming data, u
 
 ```toml
 [dependencies]
-matten = "0.29.0-pre.1"
-matten-data = "0.29.0-pre.1"
+matten = "0.29.0-pre.2"
+matten-data = "0.29.0-pre.2"
 ```
 
 Both crates share one lock-step family version (RFC-030); maturity is a per-crate
@@ -85,10 +85,12 @@ comprehensive overview.
 | [`data_03_missing_values`](https://github.com/nabbisen/matten/blob/main/crates/matten-data/examples/data_03_missing_values.rs) | Missing values never become zero silently; explicit fill |
 | [`data_04_to_tensor`](https://github.com/nabbisen/matten/blob/main/crates/matten-data/examples/data_04_to_tensor.rs) | Output shape, row-major order, core `matten` interop |
 | [`data_05_errors`](https://github.com/nabbisen/matten/blob/main/crates/matten-data/examples/data_05_errors.rs) | Duplicate header, ragged row, non-numeric, missing-at-conversion |
+| [`data_06_visual_readiness_summary`](https://github.com/nabbisen/matten/blob/main/crates/matten-data/examples/data_06_visual_readiness_summary.rs) | Readability summary for selected columns, missing counts, conversion, and Tensor shape |
 | [`csv_to_tensor`](https://github.com/nabbisen/matten/blob/main/crates/matten-data/examples/csv_to_tensor.rs) | Comprehensive overview of the whole workflow |
 
 ```bash
 cargo run -p matten-data --example data_00_quickstart
+cargo run -p matten-data --example data_06_visual_readiness_summary
 ```
 
 ## Output `Tensor` shape

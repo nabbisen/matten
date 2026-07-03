@@ -81,6 +81,14 @@ See [Practical numeric recipes](./practical-recipes.md) for the full write-up.
 | [`55_moving_average.rs`](https://github.com/nabbisen/matten/blob/main/crates/matten/examples/55_moving_average.rs) | Simple moving average |
 | [`56_rolling_windows_basic.rs`](https://github.com/nabbisen/matten/blob/main/crates/matten/examples/56_rolling_windows_basic.rs) | Rolling window sum and max |
 
+## Readability examples
+
+Small terminal summaries that make shapes, axes, and data readiness easier to scan.
+
+| File | What it shows |
+|---|---|
+| [`57_visual_shape_axis_summary.rs`](https://github.com/nabbisen/matten/blob/main/crates/matten/examples/57_visual_shape_axis_summary.rs) | Readability summary for broadcasting, reshape, reductions, and matmul |
+
 ## Dynamic examples (`--features dynamic`)
 
 These require the `dynamic` feature for heterogeneous data ingestion. JSON and CSV are
@@ -99,6 +107,7 @@ workflow turns into a numeric `Tensor`.
 | `dynamic_06_numeric_policy.rs` | `dynamic` | `NumericPolicy` API |
 | `dynamic_07_on_ramp_summary.rs` | `dynamic` | Complete on-ramp workflow |
 | `dynamic_08_json_ingestion.rs` | `dynamic,json` | JSON ingestion (mixed/missing → clean `f64`) |
+| `dynamic_09_visual_readiness_summary.rs` | `dynamic` | Readability summary for masks and explicit conversion |
 
 ## Companion crate examples
 
@@ -122,6 +131,7 @@ cargo run --example 27_axis_reductions
 cargo run --example dynamic_06_numeric_policy --features dynamic
 cargo run --example dynamic_07_on_ramp_summary --features dynamic,csv
 cargo run --example dynamic_08_json_ingestion --features dynamic,json
+cargo run --example dynamic_09_visual_readiness_summary --features dynamic
 ```
 
 ## Scope rule
