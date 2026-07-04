@@ -18,6 +18,45 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.29.0-pre.4] - 2026-07-04
+
+RFC-063 Phase 3 first local-tool prerelease. This release adds a workspace-excluded,
+`publish = false` local reporting tool for `matten-data` readiness, plus deterministic hardening
+tests. No public API, published crate, core dependency, runtime behavior, MSRV, or maturity-label
+change.
+
+### Added
+
+- **`tools/matten-report`** as a local-only Markdown/plain-text reporting tool. The first report
+  family is limited to `matten-data` readiness:
+  `--demo data-readiness` or
+  `--input <csv> --kind data-readiness --select <cols> [--output <path>]`.
+- Small deterministic fixtures and exact-output tests for successful conversion, missing values,
+  non-numeric values, and explicit CLI policy.
+- RFC-063 Phase 3 local-tool handoff as the implementation record for the first local-tool slice.
+
+### Changed
+
+- Wired `matten-report` check/test/Clippy/smoke commands into CI and the release checklist by
+  manifest path because the tool is intentionally workspace-excluded.
+- Documented the accepted local-tool dependency policy: path-only local dependencies for this
+  `publish = false` tool, with API drift caught by manifest-path check/test/Clippy gates.
+- Current-family documentation and install snippets retargeted from `0.29.0-pre.3` to
+  `0.29.0-pre.4`.
+
+### Version
+
+- Prerelease bump `0.29.0-pre.3` -> `0.29.0-pre.4` for the RFC-063 Phase 3 first local-tool
+  milestone. Lock-step family versioning still applies to all workspace crates; `matten-report`
+  remains a local unpublished tool at version `0.0.0`.
+
+### Threat model
+
+Local tool, docs, RFC/handoff, CI, and release-metadata updates only. No public API, published
+dependency, core dependency addition, parser behavior in published crates, automatic project
+mutation, network, telemetry, generated image, SVG, HTML, Vega-Lite, plotting, notebook, GUI, or
+runtime behavior change. Future report families remain deferred.
+
 ## [0.29.0-pre.3] - 2026-07-03
 
 RFC-063 optional `matten-mlprep` visual-standardization summary prerelease. This release adds one

@@ -1,0 +1,16 @@
+[package]
+name        = "matten-report"
+description = "Local-only plain-text reporting tool for matten readiness summaries."
+version                 = "0.0.0"
+edition                 = "2024"
+rust-version            = "1.85"
+license                 = "Apache-2.0"
+authors                 = ["nabbisen"]
+publish = false
+
+[dependencies]
+# This tool is workspace-excluded and publish = false. Use path-only local
+# dependencies so prerelease family-version bumps do not require tool manifest
+# churn; API drift is caught by cargo check/test/clippy via --manifest-path.
+matten                      = { path = "../../crates/matten", default-features = false }
+matten-data                 = { path = "../../crates/matten-data", features = ["csv"] }

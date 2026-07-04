@@ -1,0 +1,4 @@
+region,sales,cost,note
+north,100,40,ok
+south,150,,review
+east,120,55,ok

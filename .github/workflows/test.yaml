@@ -171,3 +171,10 @@ jobs:
       - run: cargo run -p matten-data --example data_04_to_tensor
       - run: cargo run -p matten-data --example data_05_errors
       - run: cargo run -p matten-data --example data_06_visual_readiness_summary
+      # local tools
+      - run: cargo check --manifest-path tools/matten-report/Cargo.toml
+      - run: cargo test --manifest-path tools/matten-report/Cargo.toml
+      - run: cargo clippy --manifest-path tools/matten-report/Cargo.toml -- -D warnings
+      - run: cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo data-readiness
+      - run: cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo data-readiness --output target/matten-report-demo.md
+      - run: cargo run --manifest-path tools/matten-report/Cargo.toml -- --input tools/matten-report/fixtures/small.csv --kind data-readiness --select sales,cost

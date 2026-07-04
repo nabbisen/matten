@@ -30,5 +30,9 @@ target
 # its Cargo.lock is regenerated on demand and must not be tracked (see RFC-049 Q2).
 /benchmarks/Cargo.lock
 
+# The RFC-063 local report tool is workspace-excluded (publish = false);
+# its Cargo.lock is regenerated on demand and must not be tracked.
+/tools/matten-report/Cargo.lock
+
 # custom
 /.git-exclude/

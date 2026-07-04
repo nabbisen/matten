@@ -76,7 +76,7 @@ for RFC state; the Status field inside each file mirrors the folder.
 | 037 | [Deferred Streaming and Large CSV Policy](./proposed/037-deferred-streaming-and-large-csv-policy.md) | v0.20.0 / later |
 | 049 | [Benchmarking, Complexity Metrics, and Positioning Report](./proposed/049-benchmarking-complexity-metrics-and-positioning-report.md) | **Accepted** — Phase 1 baseline (0.22.1) + Phase 2 Rust peer comparison (accepted 2026-06-25) complete; Phases 3–4 deferred |
 | 054 | [`matten-migrate` Assisted Migration Tool](./proposed/054-matten-migrate-assisted-migration-tool.md) | **Accepted as future direction** (2026-06-24; deferral confirmed in deep review 2026-06-27) — implementation deferred |
-| 063 | [Visual Understanding and Reporting](./proposed/063-visual-understanding-and-reporting.md) | **Accepted for planning with clarifications** — Phase 1 Markdown/ASCII docs implemented in `0.29.0-pre.1`; Phase 2 canonical example reports implemented in `0.29.0-pre.2`; optional `matten-mlprep` visual-standardization example implemented in `0.29.0-pre.3`; tooling requires later approval |
+| 063 | [Visual Understanding and Reporting](./proposed/063-visual-understanding-and-reporting.md) | **Accepted for planning with clarifications** — Phase 1 Markdown/ASCII docs implemented in `0.29.0-pre.1`; Phase 2 canonical example reports implemented in `0.29.0-pre.2`; optional `matten-mlprep` visual-standardization example implemented in `0.29.0-pre.3`; Phase 3 first local-tool slice implemented in `0.29.0-pre.4` for `matten-data` readiness only |
 
 Implementation handoffs for the v0.20+ proposed set (RFC-033–042), the examples
 program (RFC-043–048), and the benchmarking program (RFC-049) live in

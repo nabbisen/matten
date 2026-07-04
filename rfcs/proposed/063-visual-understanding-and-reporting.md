@@ -1,6 +1,6 @@
 # RFC-063: Visual Understanding and Reporting
 
-**Status:** Accepted for planning with scope clarifications; Phase 1 visual docs implemented in `0.29.0-pre.1`; Phase 2 canonical example reports implemented in `0.29.0-pre.2`; optional `matten-mlprep` visual-standardization example implemented in `0.29.0-pre.3`; Phase 3+ require separate handoffs or RFC approval
+**Status:** Accepted for planning with scope clarifications; Phase 1 visual docs implemented in `0.29.0-pre.1`; Phase 2 canonical example reports implemented in `0.29.0-pre.2`; optional `matten-mlprep` visual-standardization example implemented in `0.29.0-pre.3`; Phase 3 first local-tool slice implemented in `0.29.0-pre.4` for `matten-data` readiness only
 **Target:** v0.29+ design/docs phase, with implementation split by later handoffs  
 **Theme:** Visual understanding, explanatory reporting, and optional visualization tooling  
 **Depends on:** RFC-014, RFC-021, RFC-022, RFC-043, RFC-048, RFC-050, RFC-053  
@@ -125,10 +125,16 @@ examples, add no dependencies, and create no public API commitment.
 ### 5.3 Optional tooling later
 
 If the examples prove valuable, a later review may consider a local tool. This
-RFC does not authorize creating any of these:
+RFC did not authorize a tool by itself; the first separate Phase 3 handoff chose
+and implemented:
 
 ```text
 tools/matten-report      # publish = false, workspace-excluded
+```
+
+Still-deferred possibilities:
+
+```text
 tools/matten-viz         # publish = false, workspace-excluded
 crates/matten-report     # only after a later stability review
 crates/matten-viz        # only after a later stability review
@@ -136,8 +142,9 @@ crates/matten-viz        # only after a later stability review
 
 Initial tooling should follow the `benchmarks/` and RFC-054 pattern: local,
 optional, `publish = false`, and kept out of the published crate dependency graph.
-However, the tool name, output formats, dependencies, security guarantees, and CI
-behavior remain undecided until a separate handoff or RFC.
+The first implemented tool slice is Markdown/plain text `matten-data` readiness
+only. Other output formats, dependencies, report families, security guarantees,
+and CI behavior remain subject to separate handoffs or RFCs.
 
 ### 5.4 Core remains computation-only
 
@@ -329,18 +336,19 @@ Acceptance:
 
 ### Phase 3: Optional local reporting tool
 
-Scope, if later authorized by a separate RFC or handoff:
+First implemented slice, authorized by the Phase 3 local-tool handoff:
 
 ```text
-tools/matten-report or tools/matten-viz
+tools/matten-report
 publish = false
 workspace-excluded unless a later review says otherwise
+Markdown/plain text only
+matten-data readiness report only
 ```
 
-Possible output formats:
+Deferred output formats, requiring later review:
 
 ```text
-Markdown
 HTML fragment
 SVG file
 Vega-Lite JSON
@@ -374,7 +382,7 @@ existing matten workspace crates
 Markdown / ASCII output produced by examples
 ```
 
-Not allowed until Phase 3 review:
+Not allowed until later review:
 
 ```text
 small SVG writer
@@ -438,10 +446,11 @@ The initial review answered the first five open questions:
    then one `matten-mlprep` before/after summary example.
 2. Phase 1 is Markdown / ASCII only. No generated images and no checked-in image
    assets yet.
-3. No local-tool naming decision now. If tooling is revisited later,
-   `matten-report` is slightly preferred over `matten-viz`, but this is not a
-   current decision.
-4. SVG output is not accepted before Markdown / terminal output proves useful.
+3. The first local-tool slice chose `tools/matten-report` for Markdown/plain text
+   `matten-data` readiness reporting. `tools/matten-viz` and published report/viz
+   crates remain deferred.
+4. SVG, HTML, and Vega-Lite output remain deferred until Markdown / terminal
+   output proves useful and a later handoff or RFC accepts the format.
 5. Report helpers should not become public APIs now. Keep them in docs,
    examples, local helper functions inside examples, or possibly a future
    `publish = false` tool.

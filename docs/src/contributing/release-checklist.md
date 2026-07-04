@@ -52,6 +52,12 @@ cargo check -p matten --example dynamic_09_visual_readiness_summary
 cargo run -p matten --example dynamic_09_visual_readiness_summary --features dynamic
 cargo run -p matten-data --example data_06_visual_readiness_summary
 cargo run -p matten-mlprep --example mlprep_visual_standardize_summary
+cargo check --manifest-path tools/matten-report/Cargo.toml
+cargo test --manifest-path tools/matten-report/Cargo.toml
+cargo clippy --manifest-path tools/matten-report/Cargo.toml -- -D warnings
+cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo data-readiness
+cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo data-readiness --output target/matten-report-demo.md
+cargo run --manifest-path tools/matten-report/Cargo.toml -- --input tools/matten-report/fixtures/small.csv --kind data-readiness --select sales,cost
 ```
 
 ### 4. MSRV

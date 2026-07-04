@@ -55,5 +55,5 @@ fn main() {
         assert!((value - 1.0).abs() < 1e-9);
     }
 
-    println!("mlprep_visual_standardize_summary: OK");
+    println!("summary complete");
 }
