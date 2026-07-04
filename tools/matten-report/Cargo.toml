@@ -14,3 +14,4 @@ publish = false
 # churn; API drift is caught by cargo check/test/clippy via --manifest-path.
 matten                      = { path = "../../crates/matten", default-features = false, features = ["dynamic"] }
 matten-data                 = { path = "../../crates/matten-data", features = ["csv"] }
+matten-mlprep               = { path = "../../crates/matten-mlprep" }

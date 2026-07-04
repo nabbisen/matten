@@ -1,6 +1,6 @@
 # RFC-063: Visual Understanding and Reporting
 
-**Status:** Accepted for planning with scope clarifications; Phase 1 visual docs implemented in `0.29.0-pre.1`; Phase 2 canonical example reports implemented in `0.29.0-pre.2`; optional `matten-mlprep` visual-standardization example implemented in `0.29.0-pre.3`; Phase 3 local-tool slices implemented in `0.29.0-pre.4` for `matten-data` readiness, `0.29.0-pre.5` for demo-only shape-flow, and `0.29.0-pre.6` for demo-only dynamic-readiness
+**Status:** Accepted for planning with scope clarifications; Phase 1 visual docs implemented in `0.29.0-pre.1`; Phase 2 canonical example reports implemented in `0.29.0-pre.2`; optional `matten-mlprep` visual-standardization example implemented in `0.29.0-pre.3`; Phase 3 local-tool slices implemented in `0.29.0-pre.4` for `matten-data` readiness, `0.29.0-pre.5` for demo-only shape-flow, `0.29.0-pre.6` for demo-only dynamic-readiness, and `0.29.0-pre.7` for demo-only mlprep-standardization
 **Target:** v0.29+ design/docs phase, with implementation split by later handoffs  
 **Theme:** Visual understanding, explanatory reporting, and optional visualization tooling  
 **Depends on:** RFC-014, RFC-021, RFC-022, RFC-043, RFC-048, RFC-050, RFC-053  

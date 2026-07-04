@@ -62,6 +62,8 @@ cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo shape-flow
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo shape-flow --output target/matten-report-shape-flow.md
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo dynamic-readiness
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo dynamic-readiness --output target/matten-report-dynamic-readiness.md
+cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo mlprep-standardization
+cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo mlprep-standardization --output target/matten-report-mlprep-standardization.md
 ```
 
 ### 4. MSRV

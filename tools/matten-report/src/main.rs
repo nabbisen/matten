@@ -6,6 +6,7 @@ use std::path::PathBuf;
 
 use matten::{Element, NumericPolicy, Tensor};
 use matten_data::{MattenDataError, Table};
+use matten_mlprep::standardize_columns;
 
 const DEMO_CSV: &str = "\
 region,sales,cost,note
@@ -16,6 +17,7 @@ east,120,55,ok";
 const KIND_DATA_READINESS: &str = "data-readiness";
 const KIND_SHAPE_FLOW: &str = "shape-flow";
 const KIND_DYNAMIC_READINESS: &str = "dynamic-readiness";
+const KIND_MLPREP_STANDARDIZATION: &str = "mlprep-standardization";
 
 #[derive(Debug)]
 struct Config {
@@ -171,7 +173,7 @@ fn parse_select(value: &str) -> Result<Vec<String>, String> {
 fn require_kind_or_demo_label(label: &str, kind: Option<&str>) -> Result<(), String> {
     if !is_supported_demo(label) {
         return Err(format!(
-            "unsupported --demo {label:?}; expected {KIND_DATA_READINESS:?}, {KIND_SHAPE_FLOW:?}, or {KIND_DYNAMIC_READINESS:?}"
+            "unsupported --demo {label:?}; expected {KIND_DATA_READINESS:?}, {KIND_SHAPE_FLOW:?}, {KIND_DYNAMIC_READINESS:?}, or {KIND_MLPREP_STANDARDIZATION:?}"
         ));
     }
     if let Some(kind) = kind {
@@ -187,7 +189,10 @@ fn require_kind_or_demo_label(label: &str, kind: Option<&str>) -> Result<(), Str
 fn is_supported_demo(label: &str) -> bool {
     matches!(
         label,
-        KIND_DATA_READINESS | KIND_SHAPE_FLOW | KIND_DYNAMIC_READINESS
+        KIND_DATA_READINESS
+            | KIND_SHAPE_FLOW
+            | KIND_DYNAMIC_READINESS
+            | KIND_MLPREP_STANDARDIZATION
     )
 }
 
@@ -196,6 +201,9 @@ fn render_report(config: &Config) -> Result<String, Box<dyn Error>> {
         Input::Demo { label } if label == KIND_SHAPE_FLOW => render_shape_flow_report(),
         Input::Demo { label } if label == KIND_DYNAMIC_READINESS => {
             render_dynamic_readiness_report()
+        }
+        Input::Demo { label } if label == KIND_MLPREP_STANDARDIZATION => {
+            render_mlprep_standardization_report()
         }
         Input::Demo { label } if label == KIND_DATA_READINESS => {
             let table = Table::from_csv_str(DEMO_CSV).map_err(Box::<dyn Error>::from)?;
@@ -435,6 +443,99 @@ fn render_dynamic_readiness_report() -> Result<String, Box<dyn Error>> {
     Ok(report)
 }
 
+fn render_mlprep_standardization_report() -> Result<String, Box<dyn Error>> {
+    let input = Tensor::new(vec![8.0, 80.0, 10.0, 100.0, 12.0, 120.0], &[3, 2]);
+    let standardized = standardize_columns(&input).map_err(Box::<dyn Error>::from)?;
+    let before_mean = input.mean_axis(0);
+    let before_std = input.std_axis(0);
+    let after_mean = standardized.mean_axis(0);
+    let after_std = standardized.std_axis(0);
+
+    let mut report = String::new();
+    writeln!(report, "# matten mlprep-standardization report")?;
+    writeln!(report)?;
+
+    writeln!(report, "## Input")?;
+    writeln!(report, "demo: {KIND_MLPREP_STANDARDIZATION}")?;
+    writeln!(
+        report,
+        "note: fixed demo report, not automatic model-quality analysis"
+    )?;
+    writeln!(report)?;
+
+    writeln!(report, "## Operation")?;
+    writeln!(report, "operation: standardize_columns(input)")?;
+    writeln!(
+        report,
+        "meaning: each column is centered to mean 0 and population standard deviation 1"
+    )?;
+    writeln!(report)?;
+
+    writeln!(report, "## Before")?;
+    writeln!(report, "shape: {:?}", input.shape())?;
+    writeln!(
+        report,
+        "row-major values: {}",
+        format_fixed_values(input.as_slice())
+    )?;
+    writeln!(
+        report,
+        "column mean: {}",
+        format_fixed_values(before_mean.as_slice())
+    )?;
+    writeln!(
+        report,
+        "column population std: {}",
+        format_fixed_values(before_std.as_slice())
+    )?;
+    writeln!(report)?;
+
+    writeln!(report, "## After")?;
+    writeln!(report, "shape: {:?}", standardized.shape())?;
+    writeln!(
+        report,
+        "row-major values: {}",
+        format_fixed_values(standardized.as_slice())
+    )?;
+    writeln!(
+        report,
+        "column mean: {}",
+        format_fixed_values(after_mean.as_slice())
+    )?;
+    writeln!(
+        report,
+        "column population std: {}",
+        format_fixed_values(after_std.as_slice())
+    )?;
+    writeln!(report)?;
+
+    writeln!(report, "## Shape meaning")?;
+    writeln!(
+        report,
+        "shape flow: {:?} -> {:?}",
+        input.shape(),
+        standardized.shape()
+    )?;
+    writeln!(report, "rows: samples unchanged")?;
+    writeln!(report, "columns: features unchanged")?;
+
+    Ok(report)
+}
+
+fn format_fixed_values(values: &[f64]) -> String {
+    let values = values
+        .iter()
+        .map(|&value| format_fixed_value(value))
+        .collect::<Vec<_>>()
+        .join(", ");
+    format!("[{values}]")
+}
+
+fn format_fixed_value(value: f64) -> String {
+    let stable = if value.abs() < 0.0005 { 0.0 } else { value };
+    format!("{stable:.3}")
+}
+
 fn write_dynamic_values(report: &mut String, tensor: &Tensor) -> Result<(), std::fmt::Error> {
     let shape = tensor.shape();
     let columns = shape.get(1).copied().unwrap_or(1);
@@ -534,6 +635,7 @@ Usage:
   matten-report --demo data-readiness [--output <report.md>]
   matten-report --demo shape-flow [--output <report.md>]
   matten-report --demo dynamic-readiness [--output <report.md>]
+  matten-report --demo mlprep-standardization [--output <report.md>]
   matten-report --input <csv-path> --kind data-readiness --select <col1,col2> [--output <report.md>]
 
 Demo reports are fixed examples. Input mode supports only data-readiness."
@@ -645,6 +747,33 @@ mod tests {
     }
 
     #[test]
+    fn demo_mlprep_standardization_allows_output() {
+        let action = parse_args(args(&[
+            "--demo",
+            "mlprep-standardization",
+            "--output",
+            "target/matten-report-mlprep-standardization.md",
+        ]))
+        .expect("mlprep-standardization demo with output should parse");
+
+        let Action::Run(config) = action else {
+            panic!("expected run action");
+        };
+        assert!(matches!(
+            config.input,
+            Input::Demo { ref label } if label == "mlprep-standardization"
+        ));
+        assert_eq!(config.kind, "mlprep-standardization");
+        assert!(config.select.is_empty());
+        assert_eq!(
+            config.output,
+            Some(PathBuf::from(
+                "target/matten-report-mlprep-standardization.md"
+            ))
+        );
+    }
+
+    #[test]
     fn shape_flow_input_mode_is_not_supported() {
         let err = parse_args(args(&[
             "--input",
@@ -677,10 +806,27 @@ mod tests {
     }
 
     #[test]
+    fn mlprep_standardization_input_mode_is_not_supported() {
+        let err = parse_args(args(&[
+            "--input",
+            "fixtures/small.csv",
+            "--kind",
+            "mlprep-standardization",
+            "--select",
+            "sales,cost",
+        ]))
+        .unwrap_err();
+
+        assert!(err.contains(
+            "unsupported --kind \"mlprep-standardization\"; expected \"data-readiness\""
+        ));
+    }
+
+    #[test]
     fn unsupported_demo_label_remains_readable() {
         let err = parse_args(args(&["--demo", "unknown"])).unwrap_err();
 
-        assert!(err.contains("unsupported --demo \"unknown\"; expected \"data-readiness\", \"shape-flow\", or \"dynamic-readiness\""));
+        assert!(err.contains("unsupported --demo \"unknown\"; expected \"data-readiness\", \"shape-flow\", \"dynamic-readiness\", or \"mlprep-standardization\""));
     }
 
     #[test]
@@ -767,6 +913,44 @@ result: error: strict conversion rejects Text and None values
 policy: none_as(0.0) + allow_text_parse()
 converted shape: [2, 3]
 converted row-major values: [1.0, 2.5, 0.0, 4.0, 6.0, 8.0]
+"
+        );
+    }
+
+    #[test]
+    fn mlprep_standardization_report_matches_expected_markdown() {
+        let report = render_mlprep_standardization_report()
+            .expect("mlprep-standardization report should render");
+
+        assert_eq!(
+            report,
+            "\
+# matten mlprep-standardization report
+
+## Input
+demo: mlprep-standardization
+note: fixed demo report, not automatic model-quality analysis
+
+## Operation
+operation: standardize_columns(input)
+meaning: each column is centered to mean 0 and population standard deviation 1
+
+## Before
+shape: [3, 2]
+row-major values: [8.000, 80.000, 10.000, 100.000, 12.000, 120.000]
+column mean: [10.000, 100.000]
+column population std: [1.633, 16.330]
+
+## After
+shape: [3, 2]
+row-major values: [-1.225, -1.225, 0.000, 0.000, 1.225, 1.225]
+column mean: [0.000, 0.000]
+column population std: [1.000, 1.000]
+
+## Shape meaning
+shape flow: [3, 2] -> [3, 2]
+rows: samples unchanged
+columns: features unchanged
 "
         );
     }

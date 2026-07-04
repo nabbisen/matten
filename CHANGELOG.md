@@ -18,6 +18,51 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.29.0-pre.7] - 2026-07-04
+
+RFC-063 Phase 3 mlprep-standardization local-tool prerelease. This release extends the local-only
+`tools/matten-report` tool with one fixed `matten-mlprep` standardization demo report for
+before/after preprocessing effects. No public API, published crate, core dependency, core default
+feature, runtime behavior, MSRV, or maturity-label change.
+
+### Added
+
+- **`tools/matten-report --demo mlprep-standardization`** as a deterministic Markdown/plain-text
+  report for a fixed numeric tensor before and after `matten_mlprep::standardize_columns`.
+- Before/after row-major values, per-column means, per-column population standard deviations, and
+  unchanged shape reporting with stable three-decimal formatting and negative-zero normalization.
+- Exact-output tests for the mlprep-standardization report, plus CLI-policy coverage that keeps
+  mlprep-standardization demo-only and rejects input-mode use.
+- RFC-063 Phase 3 mlprep-standardization report handoff as the implementation record for this
+  fourth local-tool slice.
+
+### Changed
+
+- Added `matten-mlprep` as a path-only dependency of the workspace-excluded, `publish = false`
+  `tools/matten-report` tool. Core `matten` defaults and all published crate dependency graphs are
+  unchanged.
+- Wired mlprep-standardization report smoke commands into CI and the release checklist by manifest
+  path.
+- Documented in `tools/matten-report/README.md` that the local tool's `matten-mlprep` dependency is
+  tool-only, and that mlprep-standardization is a fixed demo report, not model-quality analysis.
+- Current-family documentation and install snippets retargeted from `0.29.0-pre.6` to
+  `0.29.0-pre.7`.
+
+### Version
+
+- Prerelease bump `0.29.0-pre.6` -> `0.29.0-pre.7` for the RFC-063 Phase 3
+  mlprep-standardization local-tool milestone. Lock-step family versioning still applies to all
+  workspace crates; `matten-report` remains a local unpublished tool at version `0.0.0`.
+
+### Threat model
+
+Local tool, docs, RFC/handoff, CI, and release-metadata updates only. No public API, published
+dependency, core dependency addition, core default feature change, parser behavior in published
+crates, mlprep-standardization input mode, preprocessing flags, model-quality analysis,
+data-quality scoring, automatic project mutation, network, telemetry, generated image, SVG, HTML,
+Vega-Lite, JSON, plotting, notebook, GUI, or runtime behavior change. Future report families and
+richer output formats remain deferred.
+
 ## [0.29.0-pre.6] - 2026-07-04
 
 RFC-063 Phase 3 dynamic-readiness local-tool prerelease. This release extends the local-only

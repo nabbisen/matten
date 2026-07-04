@@ -12,8 +12,8 @@ For joins, group-by, lazy queries, datetime handling, or large/streaming data, u
 
 ```toml
 [dependencies]
-matten = "0.29.0-pre.6"
-matten-data = "0.29.0-pre.6"
+matten = "0.29.0-pre.7"
+matten-data = "0.29.0-pre.7"
 ```
 
 Both crates share one lock-step family version (RFC-030); maturity is a per-crate

@@ -9,6 +9,7 @@ Current supported reports:
 data-readiness
 shape-flow
 dynamic-readiness
+mlprep-standardization
 ```
 
 Scope:
@@ -27,6 +28,10 @@ no project mutation
 The local report tool enables matten's dynamic feature only for its own demo
 reporting. This does not change core matten defaults or any published crate's
 dependency graph.
+
+The local report tool depends on matten-mlprep only for its own fixed demo
+report. This does not change any published crate dependency graph or core
+matten defaults.
 
 Run the data-readiness demo report:
 
@@ -55,6 +60,16 @@ The dynamic-readiness report is a fixed demo for dynamic values, missing-value
 masks, strict numeric readiness, and explicit policy conversion. It is not
 automatic data profiling and does not accept input files.
 
+Run the mlprep-standardization demo report:
+
+```bash
+cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo mlprep-standardization
+```
+
+The mlprep-standardization report is a fixed demo for `standardize_columns`,
+before/after values, column means, population standard deviations, and unchanged
+shape. It is not model-quality analysis and does not accept input files.
+
 Run on a CSV file:
 
 ```bash
@@ -82,6 +97,12 @@ cargo run --manifest-path tools/matten-report/Cargo.toml -- \
 cargo run --manifest-path tools/matten-report/Cargo.toml -- \
   --demo dynamic-readiness \
   --output target/matten-report-dynamic-readiness.md
+```
+
+```bash
+cargo run --manifest-path tools/matten-report/Cargo.toml -- \
+  --demo mlprep-standardization \
+  --output target/matten-report-mlprep-standardization.md
 ```
 
 Run the local hardening tests:
