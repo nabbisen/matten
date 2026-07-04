@@ -18,6 +18,44 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.29.0-pre.5] - 2026-07-04
+
+RFC-063 Phase 3 shape-flow local-tool prerelease. This release extends the local-only
+`tools/matten-report` tool with one fixed shape-flow demo report for common tensor shape
+transformations. No public API, published crate, core dependency, runtime behavior, MSRV, or
+maturity-label change.
+
+### Added
+
+- **`tools/matten-report --demo shape-flow`** as a deterministic Markdown/plain-text report for
+  broadcasting, reshape, `mean_axis(0)`, `mean_axis(1)`, and matrix multiplication shape flow.
+- Exact-output tests for the shape-flow report, plus CLI-policy coverage that keeps shape-flow
+  demo-only and rejects input-mode use.
+- RFC-063 Phase 3 shape-flow report handoff as the implementation record for this second local-tool
+  slice.
+
+### Changed
+
+- Wired shape-flow report smoke commands into CI and the release checklist by manifest path.
+- Documented in `tools/matten-report/README.md` that shape-flow is a fixed demo, not automatic
+  expression tracing and not source-file inspection.
+- Current-family documentation and install snippets retargeted from `0.29.0-pre.4` to
+  `0.29.0-pre.5`.
+
+### Version
+
+- Prerelease bump `0.29.0-pre.4` -> `0.29.0-pre.5` for the RFC-063 Phase 3 shape-flow local-tool
+  milestone. Lock-step family versioning still applies to all workspace crates; `matten-report`
+  remains a local unpublished tool at version `0.0.0`.
+
+### Threat model
+
+Local tool, docs, RFC/handoff, CI, and release-metadata updates only. No public API, published
+dependency, core dependency addition, parser behavior in published crates, automatic expression
+tracing, shape-flow input mode, automatic project mutation, network, telemetry, generated image,
+SVG, HTML, Vega-Lite, JSON, plotting, notebook, GUI, or runtime behavior change. Future report
+families remain deferred.
+
 ## [0.29.0-pre.4] - 2026-07-04
 
 RFC-063 Phase 3 first local-tool prerelease. This release adds a workspace-excluded,

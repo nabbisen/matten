@@ -4,6 +4,7 @@ use std::fmt::Write as _;
 use std::fs;
 use std::path::PathBuf;
 
+use matten::Tensor;
 use matten_data::{MattenDataError, Table};
 
 const DEMO_CSV: &str = "\
@@ -13,6 +14,7 @@ south,150,45,review
 east,120,55,ok";
 
 const KIND_DATA_READINESS: &str = "data-readiness";
+const KIND_SHAPE_FLOW: &str = "shape-flow";
 
 #[derive(Debug)]
 struct Config {
@@ -98,16 +100,21 @@ where
             require_kind_or_demo_label(&label, kind.as_deref())?;
             if select.is_some() {
                 return Err(format!(
-                    "--select is only accepted with --input; demo mode uses a fixed selection\n\n{}",
+                    "--select is only accepted with --input; demo mode uses fixed inputs\n\n{}",
                     usage()
                 ));
             }
+            let select = if label == KIND_DATA_READINESS {
+                vec!["sales".to_string(), "cost".to_string()]
+            } else {
+                Vec::new()
+            };
             Ok(Action::Run(Config {
                 input: Input::Demo {
                     label: label.clone(),
                 },
                 kind: label,
-                select: vec!["sales".to_string(), "cost".to_string()],
+                select,
                 output,
             }))
         }
@@ -161,42 +168,45 @@ fn parse_select(value: &str) -> Result<Vec<String>, String> {
 }
 
 fn require_kind_or_demo_label(label: &str, kind: Option<&str>) -> Result<(), String> {
-    if label != KIND_DATA_READINESS {
+    if !is_supported_demo(label) {
         return Err(format!(
-            "unsupported --demo {label:?}; expected {KIND_DATA_READINESS:?}"
+            "unsupported --demo {label:?}; expected {KIND_DATA_READINESS:?} or {KIND_SHAPE_FLOW:?}"
         ));
     }
     if let Some(kind) = kind {
-        if kind != KIND_DATA_READINESS {
+        if kind != label {
             return Err(format!(
-                "unsupported --kind {kind:?}; expected {KIND_DATA_READINESS:?}"
+                "unsupported --kind {kind:?} for --demo {label:?}; expected {label:?}"
             ));
         }
     }
     Ok(())
 }
 
+fn is_supported_demo(label: &str) -> bool {
+    matches!(label, KIND_DATA_READINESS | KIND_SHAPE_FLOW)
+}
+
 fn render_report(config: &Config) -> Result<String, Box<dyn Error>> {
-    let (input_label, table) = match &config.input {
-        Input::Demo { label } => (
-            format!("demo: {label}"),
-            Table::from_csv_str(DEMO_CSV).map_err(Box::<dyn Error>::from)?,
-        ),
-        Input::CsvPath { path } => (
-            format!("path: {}", path.display()),
-            Table::from_csv_path(path).map_err(Box::<dyn Error>::from)?,
-        ),
-    };
-
-    if config.kind != KIND_DATA_READINESS {
-        return Err(format!(
-            "unsupported report kind {:?}; expected {KIND_DATA_READINESS:?}",
-            config.kind
-        )
-        .into());
+    match &config.input {
+        Input::Demo { label } if label == KIND_SHAPE_FLOW => render_shape_flow_report(),
+        Input::Demo { label } if label == KIND_DATA_READINESS => {
+            let table = Table::from_csv_str(DEMO_CSV).map_err(Box::<dyn Error>::from)?;
+            render_table_report(&format!("demo: {label}"), &table, &config.select)
+        }
+        Input::Demo { label } => Err(format!("unsupported demo label {label:?}").into()),
+        Input::CsvPath { path } => {
+            if config.kind != KIND_DATA_READINESS {
+                return Err(format!(
+                    "unsupported report kind {:?}; expected {KIND_DATA_READINESS:?}",
+                    config.kind
+                )
+                .into());
+            }
+            let table = Table::from_csv_path(path).map_err(Box::<dyn Error>::from)?;
+            render_table_report(&format!("path: {}", path.display()), &table, &config.select)
+        }
     }
-
-    render_table_report(&input_label, &table, &config.select)
 }
 
 fn render_table_report(
@@ -260,6 +270,89 @@ fn render_table_report(
     Ok(report)
 }
 
+fn render_shape_flow_report() -> Result<String, Box<dyn Error>> {
+    let a = Tensor::new(vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0], &[2, 3]);
+    let b = Tensor::new(vec![10.0, 20.0, 30.0], &[3]);
+    let broadcast = &a + &b;
+    let reshaped = a.reshape(&[3, 2]);
+    let mean_axis_0 = a.mean_axis(0);
+    let mean_axis_1 = a.mean_axis(1);
+    let left = Tensor::new(vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0], &[2, 3]);
+    let right = Tensor::new(vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0], &[3, 2]);
+    let product = left.matmul(&right);
+
+    let mut report = String::new();
+    writeln!(report, "# matten shape-flow report")?;
+    writeln!(report)?;
+
+    writeln!(report, "## Input")?;
+    writeln!(report, "demo: {KIND_SHAPE_FLOW}")?;
+    writeln!(
+        report,
+        "note: fixed demo report, not automatic expression tracing"
+    )?;
+    writeln!(report)?;
+
+    writeln!(report, "## Broadcast add")?;
+    writeln!(report, "input a: shape {:?}", a.shape())?;
+    writeln!(report, "input b: shape {:?}", b.shape())?;
+    writeln!(report, "operation: a + b")?;
+    writeln!(
+        report,
+        "shape flow: {:?} + {:?} -> {:?}",
+        a.shape(),
+        b.shape(),
+        broadcast.shape()
+    )?;
+    writeln!(report, "result values: {:?}", broadcast.as_slice())?;
+    writeln!(report)?;
+
+    writeln!(report, "## Reshape")?;
+    writeln!(report, "input: shape {:?}", a.shape())?;
+    writeln!(report, "operation: reshape([3, 2])")?;
+    writeln!(
+        report,
+        "shape flow: {:?} -> {:?}",
+        a.shape(),
+        reshaped.shape()
+    )?;
+    writeln!(report, "result values: {:?}", reshaped.as_slice())?;
+    writeln!(report)?;
+
+    writeln!(report, "## Axis reductions")?;
+    writeln!(report, "input: shape {:?}", a.shape())?;
+    writeln!(
+        report,
+        "mean_axis(0): {:?} -> {:?}",
+        a.shape(),
+        mean_axis_0.shape()
+    )?;
+    writeln!(report, "mean_axis(0) values: {:?}", mean_axis_0.as_slice())?;
+    writeln!(
+        report,
+        "mean_axis(1): {:?} -> {:?}",
+        a.shape(),
+        mean_axis_1.shape()
+    )?;
+    writeln!(report, "mean_axis(1) values: {:?}", mean_axis_1.as_slice())?;
+    writeln!(report)?;
+
+    writeln!(report, "## Matrix multiplication")?;
+    writeln!(report, "left: shape {:?}", left.shape())?;
+    writeln!(report, "right: shape {:?}", right.shape())?;
+    writeln!(report, "operation: left.matmul(right)")?;
+    writeln!(
+        report,
+        "shape flow: {:?} @ {:?} -> {:?}",
+        left.shape(),
+        right.shape(),
+        product.shape()
+    )?;
+    writeln!(report, "result values: {:?}", product.as_slice())?;
+
+    Ok(report)
+}
+
 fn write_list(report: &mut String, values: &[String]) -> Result<(), std::fmt::Error> {
     if values.is_empty() {
         writeln!(report, "- none")?;
@@ -302,9 +395,10 @@ fn usage() -> String {
     "\
 Usage:
   matten-report --demo data-readiness [--output <report.md>]
+  matten-report --demo shape-flow [--output <report.md>]
   matten-report --input <csv-path> --kind data-readiness --select <col1,col2> [--output <report.md>]
 
-Only the data-readiness report is supported in this first local-tool slice."
+Demo reports are fixed examples. Input mode supports only data-readiness."
         .to_string()
 }
 
@@ -360,6 +454,98 @@ mod tests {
     fn demo_mode_rejects_select() {
         let err = parse_args(args(&["--demo", "data-readiness", "--select", "sales"])).unwrap_err();
         assert!(err.contains("--select is only accepted with --input"));
+    }
+
+    #[test]
+    fn demo_shape_flow_allows_output() {
+        let action = parse_args(args(&[
+            "--demo",
+            "shape-flow",
+            "--output",
+            "target/matten-report-shape-flow.md",
+        ]))
+        .expect("shape-flow demo with output should parse");
+
+        let Action::Run(config) = action else {
+            panic!("expected run action");
+        };
+        assert!(matches!(
+            config.input,
+            Input::Demo { ref label } if label == "shape-flow"
+        ));
+        assert_eq!(config.kind, "shape-flow");
+        assert!(config.select.is_empty());
+        assert_eq!(
+            config.output,
+            Some(PathBuf::from("target/matten-report-shape-flow.md"))
+        );
+    }
+
+    #[test]
+    fn shape_flow_input_mode_is_not_supported() {
+        let err = parse_args(args(&[
+            "--input",
+            "fixtures/small.csv",
+            "--kind",
+            "shape-flow",
+            "--select",
+            "sales,cost",
+        ]))
+        .unwrap_err();
+
+        assert!(err.contains("unsupported --kind \"shape-flow\"; expected \"data-readiness\""));
+    }
+
+    #[test]
+    fn unsupported_demo_label_remains_readable() {
+        let err = parse_args(args(&["--demo", "unknown"])).unwrap_err();
+
+        assert!(err.contains(
+            "unsupported --demo \"unknown\"; expected \"data-readiness\" or \"shape-flow\""
+        ));
+    }
+
+    #[test]
+    fn shape_flow_report_matches_expected_markdown() {
+        let report = render_shape_flow_report().expect("shape-flow report should render");
+
+        assert_eq!(
+            report,
+            "\
+# matten shape-flow report
+
+## Input
+demo: shape-flow
+note: fixed demo report, not automatic expression tracing
+
+## Broadcast add
+input a: shape [2, 3]
+input b: shape [3]
+operation: a + b
+shape flow: [2, 3] + [3] -> [2, 3]
+result values: [11.0, 22.0, 33.0, 14.0, 25.0, 36.0]
+
+## Reshape
+input: shape [2, 3]
+operation: reshape([3, 2])
+shape flow: [2, 3] -> [3, 2]
+result values: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+
+## Axis reductions
+input: shape [2, 3]
+mean_axis(0): [2, 3] -> [3]
+mean_axis(0) values: [2.5, 3.5, 4.5]
+mean_axis(1): [2, 3] -> [2]
+mean_axis(1) values: [2.0, 5.0]
+
+## Matrix multiplication
+left: shape [2, 3]
+right: shape [3, 2]
+operation: left.matmul(right)
+shape flow: [2, 3] @ [3, 2] -> [2, 2]
+result values: [22.0, 28.0, 49.0, 64.0]
+"
+        );
     }
 
     #[test]

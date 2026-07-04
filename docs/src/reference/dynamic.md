@@ -4,7 +4,7 @@ The `dynamic` feature enables heterogeneous dynamic tensors. Enable it in
 `Cargo.toml`:
 
 ```toml
-matten = { version = "0.29.0-pre.4", features = ["dynamic"] }
+matten = { version = "0.29.0-pre.5", features = ["dynamic"] }
 ```
 
 `matten` is **not** a dataframe library. The `dynamic` feature is for ingesting
