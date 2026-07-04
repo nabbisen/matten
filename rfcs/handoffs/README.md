@@ -25,6 +25,7 @@ working documents for the implementation team and may be revised as work proceed
 | `063-phase-2-example-reports-handoff.md` | RFC-063 Visual Understanding and Reporting — Phase 2 example reports |
 | `063-phase-3-local-report-tool-handoff.md` | RFC-063 Visual Understanding and Reporting — Phase 3 first local report tool slice |
 | `063-phase-3-shape-flow-report-handoff.md` | RFC-063 Visual Understanding and Reporting — Phase 3 shape-flow local report slice |
+| `063-phase-3-dynamic-readiness-report-handoff.md` | RFC-063 Visual Understanding and Reporting — Phase 3 dynamic-readiness local report slice |
 
 Some handoffs are planning records and some are retained implementation records.
 A handoff alone does not authorize new work; each new implementation slice still

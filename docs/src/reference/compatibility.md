@@ -155,9 +155,10 @@ copy-semantics, error, or zero-copy change, and core `matten` still carries no `
 A public-dependency compatibility event handled as a lock-step family minor (RFC-030); it does
 **not** imply v1.0.
 
-The **v0.29 prerelease family** adds RFC-063 visual-understanding documentation: Markdown /
-ASCII diagrams for broadcasting, shape operations, matrix multiplication, axis reductions,
-statistics reductions, dynamic readiness, and the `matten-data` table-to-Tensor flow. This is a
-documentation-only prerelease: no public API, runtime behavior, dependency, MSRV, maturity label, or
-scope boundary changes. Later visualization/reporting work remains unimplemented and requires
-separate handoffs or RFC approval.
+The **v0.29 prerelease family** adds RFC-063 visual-understanding work: Markdown / ASCII diagrams
+for broadcasting, shape operations, matrix multiplication, axis reductions, statistics reductions,
+dynamic readiness, and the `matten-data` table-to-Tensor flow; canonical visual-summary examples;
+and the local-only `tools/matten-report` Markdown/plain-text report tool. These prereleases do not
+change public API, published crate dependency graphs, core default features, runtime behavior, MSRV,
+maturity labels, or scope boundaries. Richer visualization/reporting work remains deferred and
+requires separate handoffs or RFC approval.

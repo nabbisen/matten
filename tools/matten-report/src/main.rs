@@ -4,7 +4,7 @@ use std::fmt::Write as _;
 use std::fs;
 use std::path::PathBuf;
 
-use matten::Tensor;
+use matten::{Element, NumericPolicy, Tensor};
 use matten_data::{MattenDataError, Table};
 
 const DEMO_CSV: &str = "\
@@ -15,6 +15,7 @@ east,120,55,ok";
 
 const KIND_DATA_READINESS: &str = "data-readiness";
 const KIND_SHAPE_FLOW: &str = "shape-flow";
+const KIND_DYNAMIC_READINESS: &str = "dynamic-readiness";
 
 #[derive(Debug)]
 struct Config {
@@ -170,7 +171,7 @@ fn parse_select(value: &str) -> Result<Vec<String>, String> {
 fn require_kind_or_demo_label(label: &str, kind: Option<&str>) -> Result<(), String> {
     if !is_supported_demo(label) {
         return Err(format!(
-            "unsupported --demo {label:?}; expected {KIND_DATA_READINESS:?} or {KIND_SHAPE_FLOW:?}"
+            "unsupported --demo {label:?}; expected {KIND_DATA_READINESS:?}, {KIND_SHAPE_FLOW:?}, or {KIND_DYNAMIC_READINESS:?}"
         ));
     }
     if let Some(kind) = kind {
@@ -184,12 +185,18 @@ fn require_kind_or_demo_label(label: &str, kind: Option<&str>) -> Result<(), Str
 }
 
 fn is_supported_demo(label: &str) -> bool {
-    matches!(label, KIND_DATA_READINESS | KIND_SHAPE_FLOW)
+    matches!(
+        label,
+        KIND_DATA_READINESS | KIND_SHAPE_FLOW | KIND_DYNAMIC_READINESS
+    )
 }
 
 fn render_report(config: &Config) -> Result<String, Box<dyn Error>> {
     match &config.input {
         Input::Demo { label } if label == KIND_SHAPE_FLOW => render_shape_flow_report(),
+        Input::Demo { label } if label == KIND_DYNAMIC_READINESS => {
+            render_dynamic_readiness_report()
+        }
         Input::Demo { label } if label == KIND_DATA_READINESS => {
             let table = Table::from_csv_str(DEMO_CSV).map_err(Box::<dyn Error>::from)?;
             render_table_report(&format!("demo: {label}"), &table, &config.select)
@@ -353,6 +360,136 @@ fn render_shape_flow_report() -> Result<String, Box<dyn Error>> {
     Ok(report)
 }
 
+fn render_dynamic_readiness_report() -> Result<String, Box<dyn Error>> {
+    let dynamic = Tensor::from_elements(
+        vec![
+            Element::Float(1.0),
+            Element::text("2.5"),
+            Element::None,
+            Element::Int(4),
+            Element::text("6.0"),
+            Element::Float(8.0),
+        ],
+        &[2, 3],
+    );
+    let none_mask = dynamic.none_mask();
+    let numeric_mask = dynamic.numeric_mask();
+    let converted = dynamic
+        .try_numeric_with(NumericPolicy::default().none_as(0.0).allow_text_parse())
+        .map_err(Box::<dyn Error>::from)?;
+
+    let mut report = String::new();
+    writeln!(report, "# matten dynamic-readiness report")?;
+    writeln!(report)?;
+
+    writeln!(report, "## Input")?;
+    writeln!(report, "demo: {KIND_DYNAMIC_READINESS}")?;
+    writeln!(
+        report,
+        "note: fixed demo report, not automatic data profiling"
+    )?;
+    writeln!(report)?;
+
+    writeln!(report, "## Dynamic values")?;
+    writeln!(report, "shape: {:?}", dynamic.shape())?;
+    writeln!(report, "row-major values:")?;
+    write_dynamic_values(&mut report, &dynamic)?;
+    writeln!(report, "schema summary:")?;
+    write_dynamic_schema_summary(&mut report, &dynamic)?;
+    writeln!(report)?;
+
+    writeln!(report, "## Readiness masks")?;
+    writeln!(report, "none mask: {:?}", none_mask.as_slice())?;
+    writeln!(
+        report,
+        "numeric mask: strict policy readiness {:?}",
+        numeric_mask.as_slice()
+    )?;
+    writeln!(
+        report,
+        "strict numeric-ready: {}",
+        dynamic.is_numeric_convertible()
+    )?;
+    writeln!(report)?;
+
+    writeln!(report, "## Strict conversion")?;
+    if dynamic.try_numeric().is_err() {
+        writeln!(
+            report,
+            "result: error: strict conversion rejects Text and None values"
+        )?;
+    } else {
+        return Err("strict dynamic conversion unexpectedly succeeded".into());
+    }
+    writeln!(report)?;
+
+    writeln!(report, "## Explicit policy conversion")?;
+    writeln!(report, "policy: none_as(0.0) + allow_text_parse()")?;
+    writeln!(report, "converted shape: {:?}", converted.shape())?;
+    writeln!(
+        report,
+        "converted row-major values: {:?}",
+        converted.as_slice()
+    )?;
+
+    Ok(report)
+}
+
+fn write_dynamic_values(report: &mut String, tensor: &Tensor) -> Result<(), std::fmt::Error> {
+    let shape = tensor.shape();
+    let columns = shape.get(1).copied().unwrap_or(1);
+    for (index, element) in tensor.to_elements().iter().enumerate() {
+        let row = index / columns;
+        let column = index % columns;
+        writeln!(
+            report,
+            "- [{row}, {column}] {}",
+            format_dynamic_element(element)
+        )?;
+    }
+    Ok(())
+}
+
+fn write_dynamic_schema_summary(
+    report: &mut String,
+    tensor: &Tensor,
+) -> Result<(), std::fmt::Error> {
+    let mut floats = 0;
+    let mut ints = 0;
+    let mut texts = 0;
+    let mut bools = 0;
+    let mut none = 0;
+
+    for element in tensor.to_elements() {
+        match element {
+            Element::Float(_) => floats += 1,
+            Element::Int(_) => ints += 1,
+            Element::Text(_) => texts += 1,
+            Element::Bool(_) => bools += 1,
+            Element::None => none += 1,
+        }
+    }
+
+    writeln!(report, "- Float: {floats}")?;
+    writeln!(report, "- Int: {ints}")?;
+    writeln!(report, "- Text: {texts}")?;
+    if bools > 0 {
+        writeln!(report, "- Bool: {bools}")?;
+    }
+    writeln!(report, "- None: {none}")?;
+    Ok(())
+}
+
+fn format_dynamic_element(element: &Element) -> String {
+    match element {
+        Element::Float(value) => format!("Float({value:?})"),
+        Element::Int(value) => format!("Int({value})"),
+        Element::Text(value) => format!("Text({value:?})"),
+        Element::Bool(value) => format!("Bool({value})"),
+        Element::None => "None".to_string(),
+    }
+}
+
 fn write_list(report: &mut String, values: &[String]) -> Result<(), std::fmt::Error> {
     if values.is_empty() {
         writeln!(report, "- none")?;
@@ -396,6 +533,7 @@ fn usage() -> String {
 Usage:
   matten-report --demo data-readiness [--output <report.md>]
   matten-report --demo shape-flow [--output <report.md>]
+  matten-report --demo dynamic-readiness [--output <report.md>]
   matten-report --input <csv-path> --kind data-readiness --select <col1,col2> [--output <report.md>]
 
 Demo reports are fixed examples. Input mode supports only data-readiness."
@@ -482,6 +620,31 @@ mod tests {
     }
 
     #[test]
+    fn demo_dynamic_readiness_allows_output() {
+        let action = parse_args(args(&[
+            "--demo",
+            "dynamic-readiness",
+            "--output",
+            "target/matten-report-dynamic-readiness.md",
+        ]))
+        .expect("dynamic-readiness demo with output should parse");
+
+        let Action::Run(config) = action else {
+            panic!("expected run action");
+        };
+        assert!(matches!(
+            config.input,
+            Input::Demo { ref label } if label == "dynamic-readiness"
+        ));
+        assert_eq!(config.kind, "dynamic-readiness");
+        assert!(config.select.is_empty());
+        assert_eq!(
+            config.output,
+            Some(PathBuf::from("target/matten-report-dynamic-readiness.md"))
+        );
+    }
+
+    #[test]
     fn shape_flow_input_mode_is_not_supported() {
         let err = parse_args(args(&[
             "--input",
@@ -497,16 +660,31 @@ mod tests {
     }
 
     #[test]
-    fn unsupported_demo_label_remains_readable() {
-        let err = parse_args(args(&["--demo", "unknown"])).unwrap_err();
+    fn dynamic_readiness_input_mode_is_not_supported() {
+        let err = parse_args(args(&[
+            "--input",
+            "fixtures/small.csv",
+            "--kind",
+            "dynamic-readiness",
+            "--select",
+            "sales,cost",
+        ]))
+        .unwrap_err();
 
-        assert!(err.contains(
-            "unsupported --demo \"unknown\"; expected \"data-readiness\" or \"shape-flow\""
-        ));
+        assert!(
+            err.contains("unsupported --kind \"dynamic-readiness\"; expected \"data-readiness\"")
+        );
     }
 
     #[test]
-    fn shape_flow_report_matches_expected_markdown() {
+    fn unsupported_demo_label_remains_readable() {
+        let err = parse_args(args(&["--demo", "unknown"])).unwrap_err();
+
+        assert!(err.contains("unsupported --demo \"unknown\"; expected \"data-readiness\", \"shape-flow\", or \"dynamic-readiness\""));
+    }
+
+    #[test]
+    fn shape_flow_report_still_matches_expected_markdown() {
         let report = render_shape_flow_report().expect("shape-flow report should render");
 
         assert_eq!(
@@ -549,7 +727,52 @@ result values: [22.0, 28.0, 49.0, 64.0]
     }
 
     #[test]
-    fn success_report_matches_expected_markdown() {
+    fn dynamic_readiness_report_matches_expected_markdown() {
+        let report =
+            render_dynamic_readiness_report().expect("dynamic-readiness report should render");
+
+        assert_eq!(
+            report,
+            "\
+# matten dynamic-readiness report
+
+## Input
+demo: dynamic-readiness
+note: fixed demo report, not automatic data profiling
+
+## Dynamic values
+shape: [2, 3]
+row-major values:
+- [0, 0] Float(1.0)
+- [0, 1] Text(\"2.5\")
+- [0, 2] None
+- [1, 0] Int(4)
+- [1, 1] Text(\"6.0\")
+- [1, 2] Float(8.0)
+schema summary:
+- Float: 2
+- Int: 1
+- Text: 2
+- None: 1
+
+## Readiness masks
+none mask: [0.0, 0.0, 1.0, 0.0, 0.0, 0.0]
+numeric mask: strict policy readiness [1.0, 0.0, 0.0, 1.0, 0.0, 1.0]
+strict numeric-ready: false
+
+## Strict conversion
+result: error: strict conversion rejects Text and None values
+
+## Explicit policy conversion
+policy: none_as(0.0) + allow_text_parse()
+converted shape: [2, 3]
+converted row-major values: [1.0, 2.5, 0.0, 4.0, 6.0, 8.0]
+"
+        );
+    }
+
+    #[test]
+    fn data_readiness_report_still_matches_expected_markdown() {
         let report = render_fixture_report("fixture: small.csv", SMALL_CSV, &["sales", "cost"]);
 
         assert_eq!(

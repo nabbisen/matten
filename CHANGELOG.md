@@ -18,6 +18,50 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.29.0-pre.6] - 2026-07-04
+
+RFC-063 Phase 3 dynamic-readiness local-tool prerelease. This release extends the local-only
+`tools/matten-report` tool with one fixed dynamic-readiness demo report for heterogeneous tensor
+values, strict numeric readiness, and explicit policy conversion. No public API, published crate,
+core dependency, core default feature, runtime behavior, MSRV, or maturity-label change.
+
+### Added
+
+- **`tools/matten-report --demo dynamic-readiness`** as a deterministic Markdown/plain-text report
+  for fixed dynamic values, stable element/schema counts, missing-value masks, strict-policy numeric
+  readiness masks, strict conversion failure, and explicit
+  `none_as(0.0) + allow_text_parse()` conversion success.
+- Exact-output tests for the dynamic-readiness report, plus CLI-policy coverage that keeps
+  dynamic-readiness demo-only and rejects input-mode use.
+- RFC-063 Phase 3 dynamic-readiness report handoff as the implementation record for this third
+  local-tool slice.
+
+### Changed
+
+- Enabled `matten`'s `dynamic` feature only for the workspace-excluded, `publish = false`
+  `tools/matten-report` dependency. Core `matten` defaults and all published crate dependency
+  graphs are unchanged.
+- Wired dynamic-readiness report smoke commands into CI and the release checklist by manifest path.
+- Documented in `tools/matten-report/README.md` that the local tool's dynamic feature use is
+  tool-only, and that dynamic-readiness is a fixed demo report, not automatic data profiling.
+- Current-family documentation and install snippets retargeted from `0.29.0-pre.5` to
+  `0.29.0-pre.6`.
+
+### Version
+
+- Prerelease bump `0.29.0-pre.5` -> `0.29.0-pre.6` for the RFC-063 Phase 3 dynamic-readiness
+  local-tool milestone. Lock-step family versioning still applies to all workspace crates;
+  `matten-report` remains a local unpublished tool at version `0.0.0`.
+
+### Threat model
+
+Local tool, docs, RFC/handoff, CI, and release-metadata updates only. No public API, published
+dependency, core dependency addition, core default feature change, parser behavior in published
+crates, dynamic-readiness input mode, policy flags, automatic data profiling, automatic cleanup,
+automatic project mutation, network, telemetry, generated image, SVG, HTML, Vega-Lite, JSON,
+plotting, notebook, GUI, or runtime behavior change. Future report families and richer output
+formats remain deferred.
+
 ## [0.29.0-pre.5] - 2026-07-04
 
 RFC-063 Phase 3 shape-flow local-tool prerelease. This release extends the local-only

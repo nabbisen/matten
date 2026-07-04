@@ -12,5 +12,5 @@ publish = false
 # This tool is workspace-excluded and publish = false. Use path-only local
 # dependencies so prerelease family-version bumps do not require tool manifest
 # churn; API drift is caught by cargo check/test/clippy via --manifest-path.
-matten                      = { path = "../../crates/matten", default-features = false }
+matten                      = { path = "../../crates/matten", default-features = false, features = ["dynamic"] }
 matten-data                 = { path = "../../crates/matten-data", features = ["csv"] }
