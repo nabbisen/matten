@@ -85,7 +85,9 @@ template. The full contract:
 - **SemVer:** pre-1.0 (`0.x`). A `0.x` minor bump may contain breaking changes;
   patch releases are additive only. Pin the release explicitly (`matten-ndarray = "0.29.0"`).
 - **MSRV:** Rust 1.85 (edition 2024).
-- **`matten`:** shares the `0.29.x` family version (RFC-030).
+- **`matten`:** released with the `0.29.x` family version (RFC-030). The published
+  manifest uses the workspace's broad pre-1.0 core requirement for maintenance
+  (`matten = "0"`, RFC-064); users should still declare the matched family explicitly.
 - **`ndarray`:** supports the `0.17` minor (requirement `"0.17"`; CI targets `0.17.2`). Because
   `to_arrayd`/`from_arrayd` use `ndarray::ArrayD<f64>`, the supported `ndarray` minor is part of the
   bridge's public type identity — build against `ndarray 0.17`. `ndarray 0.17.0` is yanked; use a

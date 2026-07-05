@@ -163,6 +163,24 @@ change:
   `benchmarks/Cargo.toml`), its pin is synced by hand and `check-benchmark-dependency-sync.sh`
   passes — the harness cannot inherit `{ workspace = true }`, so this guard catches a forgotten sync.
 
+### Workspace core-dependency requirement
+
+Companion crates inherit core `matten` through `[workspace.dependencies]` as
+`matten = { version = "0", path = "crates/matten", default-features = false }`
+(RFC-064). Do not narrow this requirement during routine family releases. User
+docs and examples still show explicit matched release pins so downstreams see the
+supported family set.
+
+Before release, verify that package dry-runs account for publish ordering:
+
+- `matten` must be published first.
+- Companion package dry-runs may fail before core is visible on crates.io if they
+  need to resolve the just-released core version; record that as a sequencing
+  caveat rather than a dependency-policy failure.
+- If the broad requirement is intentionally changed, update RFC-030/RFC-064,
+  this checklist, companion README compatibility notes, and package dry-run
+  expectations in the same review slice.
+
 ---
 
 ## v1.0.0 gate

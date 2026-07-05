@@ -57,6 +57,19 @@ the lean core. Enabling `dynamic` does not rename or remove any numeric Tensor A
 - **`#[non_exhaustive]`** on `MattenError` and `DataFormat` means match arms
   must include a wildcard — new variants may be added without a semver break.
 
+## Family version and core dependency requirement
+
+The published crates are released as one lock-step family (RFC-030): matching
+crate versions are the supported, documented set. Downstream examples therefore
+show explicit matched pins such as `matten = "0.29.0"` plus a companion at the
+same release.
+
+Inside the workspace, companion crates inherit the core dependency from
+`[workspace.dependencies]` as a broad pre-1.0 requirement (`matten = "0"` plus a
+local path). This is a maintenance policy (RFC-064): it reduces version-line
+churn in member manifests while keeping release identity, maturity labels, and
+user-facing install guidance tied to the lock-step family.
+
 ## v1.0 requirements
 
 v1.0.0 requires explicit maintainer confirmation. Before that can happen:

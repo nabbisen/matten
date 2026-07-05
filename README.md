@@ -31,6 +31,9 @@ This repository is a Cargo workspace, where core `matten` stays small and depend
 All crates share one **family version** (RFC-030): matching numbers mean a
 matched, compatible set. A crate's **maturity is the Status column**, not its
 version number — a crate may sit at the shared family version and still be `beta`.
+Internally, companion crates inherit a broad core requirement from
+`[workspace.dependencies]` for maintenance (`matten = "0"` plus the workspace path),
+but user-facing examples still pin the matched family explicitly (RFC-064).
 
 These labels describe **stability within `matten`'s documented scope** (PoC,
 learning, and small workflows): *production-ready* means dependable **for that

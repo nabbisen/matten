@@ -72,8 +72,11 @@ misread as 18 minor releases of churn.
 ## 6. Mechanics
 
 - `[workspace.package] version = "X.Y.Z"`; each member uses `version.workspace = true`.
-- Companion crates depend on core as `matten = { version = "X.Y", ... }`, matching
-  the family minor.
+- Companion crates inherit the core dependency from `[workspace.dependencies]`.
+  As amended by RFC-064, the workspace requirement is broad pre-1.0
+  (`matten = { version = "0", path = "crates/matten", default-features = false }`)
+  for maintenance, while release identity remains lock-step and user docs still
+  show explicit matched family pins.
 - Per-crate `keywords`/`categories`/`description` stay **per crate** (they differ
   and aid crates.io discoverability); only truly shared metadata
   (version, edition, rust-version, license, authors, repository) is inherited.
@@ -84,3 +87,10 @@ misread as 18 minor releases of churn.
   and that maturity is the Status column.
 - RFC-022 §7 annotated as superseded by this RFC.
 - ROADMAP §10 updated to the lock-step model.
+
+## 8. Document history
+
+| Version | Date | Change |
+|---|---|---|
+| 0.1.0 | 2026-06-21 | Initial lock-step family versioning policy. |
+| 0.2.0 | 2026-07-05 | Amended by RFC-064: companion crates use a broad pre-1.0 core dependency requirement internally, while lock-step release identity and explicit user pins remain. |

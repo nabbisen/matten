@@ -21,6 +21,12 @@ matten = "0.19"
 matten-ndarray = "0.19"
 ```
 
+The exact downstream version number follows the current release family; official
+examples may use a full patch pin. This user-facing convention is separate from
+the workspace member dependency requirement: companion manifests inherit
+`matten = { version = "0", path = "...", default-features = false }` for
+maintenance per RFC-064.
+
 ```rust
 use matten::Tensor;
 use matten_ndarray::to_arrayd;
@@ -356,3 +362,4 @@ executable specification for §3.2 and §3.4, consistent with the project's
 |---|---|---|
 | 0.1.0 | 2026-06-21 | Initial proposal. Adopts explicit-dependency convention (Option A); forbids broad core-type re-exports; defers whole-crate `pub use matten;`; specifies README note and release-doc guardrails with implementer handoff. |
 | 0.1.1 | 2026-06-21 | Implemented in v0.19.2: README convention notes added to both companions; release-doc guardrails (§3.2/§3.3 and §3.4) added; moved to `rfcs/done/`. |
+| 0.1.2 | 2026-07-05 | Clarified that explicit matched pins are the downstream/user-facing convention; workspace member manifests use the RFC-064 broad core requirement for maintenance. |

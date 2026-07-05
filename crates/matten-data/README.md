@@ -76,5 +76,8 @@ Declare both `matten` and this crate in your `Cargo.toml` (RFC-032).
 
 ## Compatibility
 
-- **SemVer:** pre-1.0 (`0.x`). Shares the `matten` family version (RFC-030).
+- **SemVer:** pre-1.0 (`0.x`). Released with the `matten` family version (RFC-030).
+- **`matten`:** the published manifest uses the workspace's broad pre-1.0 core
+  requirement for maintenance (`matten = "0"`, RFC-064); users should still
+  declare the matched family explicitly.
 - **MSRV:** Rust 1.85 (edition 2024).

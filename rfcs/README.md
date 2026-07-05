@@ -68,6 +68,7 @@ for RFC state; the Status field inside each file mirrors the folder.
 | 061 | [Maturity-Label Clarity — Keep "Production-Ready", Add an Entrance Note](./done/061-maturity-label-clarity-entrance-note.md) | 0.27.1 |
 | 062 | [`matten-ndarray` Supported `ndarray` Version — 0.16 → 0.17](./done/062-matten-ndarray-supported-ndarray-version.md) | 0.28.0 |
 | 063 | [Visual Understanding and Reporting](./done/063-visual-understanding-and-reporting.md) | 0.29.0 (visual docs, examples, local `matten-report` tool; public report/viz crates deferred) |
+| 064 | [Workspace Core Dependency Requirement Maintenance Policy](./done/064-workspace-core-dependency-requirement-maintenance-policy.md) | post-0.29.0 repository policy |
 
 ## Proposed
 

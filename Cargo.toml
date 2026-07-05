@@ -38,8 +38,11 @@ license         = "Apache-2.0"
 authors         = ["nabbisen"]
 repository      = "https://github.com/nabbisen/matten"
 
-# Core `matten` is path-published; companions depend on it by path + version so
-# they resolve locally in the workspace and by version on crates.io.
+# Core `matten` is path-published; companions inherit this path + version
+# requirement. The broad pre-1.0 requirement (`version = "0"`) is intentional:
+# workspace members still ship in lock-step, while maintenance releases avoid a
+# per-family edit to every companion dependency (RFC-064). User docs still show
+# explicit family pins.
 [workspace.dependencies]
 matten              = { version = "0", path = "crates/matten", default-features = false }
 
