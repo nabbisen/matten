@@ -98,7 +98,7 @@ docs/src/contributing/release-checklist.md
 Optional documentation files if useful:
 
 ```text
-rfcs/proposed/063-visual-understanding-and-reporting.md
+rfcs/done/063-visual-understanding-and-reporting.md
 rfcs/handoffs/README.md
 ```
 

@@ -57,7 +57,7 @@ expose a second computation engine.
 
 ## Status and scope
 
-- **Maturity:** production-ready candidate. The table-to-Tensor API is mostly stable but pre-1.0; pin the prerelease explicitly.
+- **Maturity:** production-ready candidate. The table-to-Tensor API is mostly stable but pre-1.0; pin the release explicitly.
 - **Scope lock:** table-to-Tensor preparation only (RFC-033, RFC-042).
 - **Dependency direction:** `matten-data` depends on core `matten`; core never
   depends on `matten-data` (enforced by the dependency-boundary CI check).

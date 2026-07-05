@@ -12,8 +12,8 @@ For joins, group-by, lazy queries, datetime handling, or large/streaming data, u
 
 ```toml
 [dependencies]
-matten = "0.29.0-pre.7"
-matten-data = "0.29.0-pre.7"
+matten = "0.29.0"
+matten-data = "0.29.0"
 ```
 
 Both crates share one lock-step family version (RFC-030); maturity is a per-crate
@@ -174,5 +174,5 @@ data. When you need those capabilities, reach for a dataframe/query engine
 ## Status and maturity
 
 **Production-ready candidate** (`0.29.x` family). The table-to-Tensor API is mostly stable but pre-1.0;
-pin the prerelease explicitly. The crate's scope is locked and enforced in CI (RFC-042), and
+pin the release explicitly. The crate's scope is locked and enforced in CI (RFC-042), and
 core `matten` never depends on it (RFC-022).

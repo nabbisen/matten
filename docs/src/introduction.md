@@ -14,4 +14,4 @@ This book is organized by reader:
 - **Reference** — the rules that shape the public API.
 - **Contributors** — project layout, milestones, and process.
 
-> This documentation tracks the current 0.29 prerelease family, which adds RFC-063 visual-understanding docs on top of the completed companion-maturity line and the `matten-ndarray` bridge on `ndarray` 0.17.
+> This documentation tracks the current 0.29 release family, which adds RFC-063 visual-understanding docs on top of the completed companion-maturity line and the `matten-ndarray` bridge on `ndarray` 0.17.

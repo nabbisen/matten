@@ -18,6 +18,49 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.29.0] - 2026-07-05
+
+RFC-063 visual-understanding and reporting release. This release consolidates the `0.29.0-pre.*`
+line into the final `0.29.0` family: Markdown/ASCII visual docs, canonical readability examples,
+one optional `matten-mlprep` visual-standardization example, and the local-only
+`tools/matten-report` Markdown/plain-text report tool. No public API, published crate dependency
+graph, core default feature, runtime behavior, MSRV, or maturity-label change.
+
+### Added
+
+- Markdown/ASCII visual-understanding docs for shape flow, broadcasting, axis reductions, dynamic
+  readiness, and the `matten-data` table-to-Tensor path.
+- Canonical readability examples for core shape/axis flow, dynamic readiness, `matten-data`
+  readiness, and `matten-mlprep` standardization effects.
+- Local-only `tools/matten-report` demo reports for `data-readiness`, `shape-flow`,
+  `dynamic-readiness`, and `mlprep-standardization`, plus `data-readiness` input mode for explicit
+  CSV selection.
+- `docs/src/examples/visual-understanding.md` as the RFC-063 examples and local-tool landing page.
+
+### Changed
+
+- Current-family install snippets and workspace versions retargeted from `0.29.0-pre.7` to
+  `0.29.0`.
+- `docs/src/examples/index.md` now links every listed Rust example filename to its source.
+- `docs/src/SUMMARY.md` now exposes the visual-understanding examples page, the contributing
+  landing page, and the moved panic-vs-result page.
+- RFC-063 status now treats the `0.29.0` visual-understanding work as implemented, with richer
+  visualization output, public report/viz APIs, and published report/viz crates deferred to later
+  RFCs or explicit amendments.
+
+### Version
+
+- Final release bump `0.29.0-pre.7` -> `0.29.0`. Lock-step family versioning still applies to all
+  workspace crates; `matten-report` remains a local unpublished tool at version `0.0.0`.
+
+### Threat model
+
+Docs, examples, local-tool, RFC/handoff, CI/checklist, and release-metadata updates only. No public
+API, published dependency, core dependency addition, core default feature change, parser behavior in
+published crates, automatic project mutation, network, telemetry, generated image, SVG, HTML,
+Vega-Lite, JSON, plotting, notebook, GUI, runtime behavior, MSRV, or maturity-label change. Future
+public report/viz crates and richer output formats remain deferred.
+
 ## [0.29.0-pre.7] - 2026-07-04
 
 RFC-063 Phase 3 mlprep-standardization local-tool prerelease. This release extends the local-only

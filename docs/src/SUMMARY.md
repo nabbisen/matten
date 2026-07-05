@@ -14,6 +14,7 @@
 # Examples
 
 - [Examples index](./examples/index.md)
+- [Visual understanding examples](./examples/visual-understanding.md)
 - [Beginner applied math](./examples/beginner-math.md)
 - [Matrix iteration](./examples/matrix-iteration.md)
 - [Numerical methods](./examples/numerical-methods.md)
@@ -25,6 +26,7 @@
 # Reference
 
 - [Error model](./reference/error-model.md)
+  - [Panic vs Result (moved)](./panic-vs-result.md)
 - [Construction and conversion](./reference/construction.md)
 - [Operators and broadcasting](./reference/operators.md)
 - [Shape operations](./reference/shape-ops.md)
@@ -65,6 +67,7 @@
 
 # Contributors
 
-- [Development process](./contributing/development-process.md)
-- [Release checklist](./contributing/release-checklist.md)
-- [Architecture](./contributing/architecture.md)
+- [Contributing](./contributing.md)
+  - [Development process](./contributing/development-process.md)
+  - [Release checklist](./contributing/release-checklist.md)
+  - [Architecture](./contributing/architecture.md)

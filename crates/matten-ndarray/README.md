@@ -83,7 +83,7 @@ template. The full contract:
 ## Compatibility
 
 - **SemVer:** pre-1.0 (`0.x`). A `0.x` minor bump may contain breaking changes;
-  patch releases are additive only. Pin the prerelease explicitly (`matten-ndarray = "0.29.0-pre.7"`).
+  patch releases are additive only. Pin the release explicitly (`matten-ndarray = "0.29.0"`).
 - **MSRV:** Rust 1.85 (edition 2024).
 - **`matten`:** shares the `0.29.x` family version (RFC-030).
 - **`ndarray`:** supports the `0.17` minor (requirement `"0.17"`; CI targets `0.17.2`). Because

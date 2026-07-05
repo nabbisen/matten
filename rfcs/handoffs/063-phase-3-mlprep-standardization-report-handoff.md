@@ -3,7 +3,7 @@
 **Project:** `matten`  
 **Related RFC:** RFC-063: Visual Understanding and Reporting  
 **Document kind:** Compact local-tool planning handoff  
-**Status:** Implemented and architect-reviewed; prepared for `0.29.0-pre.7`; retained as implementation record  
+**Status:** Implemented and architect-reviewed; shipped in `0.29.0-pre.7` and included in `0.29.0`; retained as implementation record
 **Scope:** Local-only `tools/matten-report` mlprep-standardization demo report  
 
 ---
@@ -113,7 +113,7 @@ Optional documentation files if useful:
 
 ```text
 rfcs/handoffs/README.md
-rfcs/proposed/063-visual-understanding-and-reporting.md
+rfcs/done/063-visual-understanding-and-reporting.md
 ```
 
 Version files, changelog, and release notes remain out of scope until a later
@@ -444,7 +444,8 @@ public report APIs
 ## 8. Recommended Next Step
 
 Retain this file as the implementation record for the `--demo
-mlprep-standardization` local-tool slice prepared for `0.29.0-pre.7`.
+mlprep-standardization` local-tool slice shipped in `0.29.0-pre.7` and included
+in `0.29.0`.
 
 ## Acceptance Checklist
 

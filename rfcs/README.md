@@ -67,6 +67,7 @@ for RFC state; the Status field inside each file mirrors the folder.
 | 060 | [Surface Benchmark Evidence in the Rendered Documentation](./done/060-surface-benchmark-evidence-in-docs.md) | 0.27.1 |
 | 061 | [Maturity-Label Clarity — Keep "Production-Ready", Add an Entrance Note](./done/061-maturity-label-clarity-entrance-note.md) | 0.27.1 |
 | 062 | [`matten-ndarray` Supported `ndarray` Version — 0.16 → 0.17](./done/062-matten-ndarray-supported-ndarray-version.md) | 0.28.0 |
+| 063 | [Visual Understanding and Reporting](./done/063-visual-understanding-and-reporting.md) | 0.29.0 (visual docs, examples, local `matten-report` tool; public report/viz crates deferred) |
 
 ## Proposed
 
@@ -76,7 +77,6 @@ for RFC state; the Status field inside each file mirrors the folder.
 | 037 | [Deferred Streaming and Large CSV Policy](./proposed/037-deferred-streaming-and-large-csv-policy.md) | v0.20.0 / later |
 | 049 | [Benchmarking, Complexity Metrics, and Positioning Report](./proposed/049-benchmarking-complexity-metrics-and-positioning-report.md) | **Accepted** — Phase 1 baseline (0.22.1) + Phase 2 Rust peer comparison (accepted 2026-06-25) complete; Phases 3–4 deferred |
 | 054 | [`matten-migrate` Assisted Migration Tool](./proposed/054-matten-migrate-assisted-migration-tool.md) | **Accepted as future direction** (2026-06-24; deferral confirmed in deep review 2026-06-27) — implementation deferred |
-| 063 | [Visual Understanding and Reporting](./proposed/063-visual-understanding-and-reporting.md) | **Accepted for planning with clarifications** — Phase 1 Markdown/ASCII docs implemented in `0.29.0-pre.1`; Phase 2 canonical example reports implemented in `0.29.0-pre.2`; optional `matten-mlprep` visual-standardization example implemented in `0.29.0-pre.3`; Phase 3 local-tool slices implemented in `0.29.0-pre.4` (`matten-data` readiness), `0.29.0-pre.5` (demo-only shape-flow), `0.29.0-pre.6` (demo-only dynamic-readiness), and `0.29.0-pre.7` (demo-only mlprep-standardization) |
 
 Implementation handoffs for the v0.20+ proposed set (RFC-033–042), the examples
 program (RFC-043–048), and the benchmarking program (RFC-049) live in

@@ -108,7 +108,7 @@ Optional documentation files if useful:
 
 ```text
 rfcs/handoffs/README.md
-rfcs/proposed/063-visual-understanding-and-reporting.md
+rfcs/done/063-visual-understanding-and-reporting.md
 ```
 
 Version files, changelog, and release notes remain out of scope until a later
