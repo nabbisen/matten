@@ -10,6 +10,7 @@ data-readiness
 shape-flow
 dynamic-readiness
 mlprep-standardization
+educational-path
 ```
 
 Scope:
@@ -70,6 +71,17 @@ The mlprep-standardization report is a fixed demo for `standardize_columns`,
 before/after values, column means, population standard deviations, and unchanged
 shape. It is not model-quality analysis and does not accept input files.
 
+Run the educational-path demo report:
+
+```bash
+cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo educational-path
+```
+
+The educational-path report is a fixed guided walkthrough across shape-first
+reading, broadcasting, reshape/transpose, axis reductions, matmul, dynamic
+readiness, and standardization. It is not automatic expression tracing and does
+not accept input files.
+
 Run on a CSV file:
 
 ```bash
@@ -103,6 +115,12 @@ cargo run --manifest-path tools/matten-report/Cargo.toml -- \
 cargo run --manifest-path tools/matten-report/Cargo.toml -- \
   --demo mlprep-standardization \
   --output target/matten-report-mlprep-standardization.md
+```
+
+```bash
+cargo run --manifest-path tools/matten-report/Cargo.toml -- \
+  --demo educational-path \
+  --output target/matten-report-educational-path.md
 ```
 
 Run the local hardening tests:

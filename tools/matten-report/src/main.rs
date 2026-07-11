@@ -18,6 +18,7 @@ const KIND_DATA_READINESS: &str = "data-readiness";
 const KIND_SHAPE_FLOW: &str = "shape-flow";
 const KIND_DYNAMIC_READINESS: &str = "dynamic-readiness";
 const KIND_MLPREP_STANDARDIZATION: &str = "mlprep-standardization";
+const KIND_EDUCATIONAL_PATH: &str = "educational-path";
 
 #[derive(Debug)]
 struct Config {
@@ -173,7 +174,7 @@ fn parse_select(value: &str) -> Result<Vec<String>, String> {
 fn require_kind_or_demo_label(label: &str, kind: Option<&str>) -> Result<(), String> {
     if !is_supported_demo(label) {
         return Err(format!(
-            "unsupported --demo {label:?}; expected {KIND_DATA_READINESS:?}, {KIND_SHAPE_FLOW:?}, {KIND_DYNAMIC_READINESS:?}, or {KIND_MLPREP_STANDARDIZATION:?}"
+            "unsupported --demo {label:?}; expected {KIND_DATA_READINESS:?}, {KIND_SHAPE_FLOW:?}, {KIND_DYNAMIC_READINESS:?}, {KIND_MLPREP_STANDARDIZATION:?}, or {KIND_EDUCATIONAL_PATH:?}"
         ));
     }
     if let Some(kind) = kind {
@@ -193,6 +194,7 @@ fn is_supported_demo(label: &str) -> bool {
             | KIND_SHAPE_FLOW
             | KIND_DYNAMIC_READINESS
             | KIND_MLPREP_STANDARDIZATION
+            | KIND_EDUCATIONAL_PATH
     )
 }
 
@@ -205,6 +207,7 @@ fn render_report(config: &Config) -> Result<String, Box<dyn Error>> {
         Input::Demo { label } if label == KIND_MLPREP_STANDARDIZATION => {
             render_mlprep_standardization_report()
         }
+        Input::Demo { label } if label == KIND_EDUCATIONAL_PATH => render_educational_path_report(),
         Input::Demo { label } if label == KIND_DATA_READINESS => {
             let table = Table::from_csv_str(DEMO_CSV).map_err(Box::<dyn Error>::from)?;
             render_table_report(&format!("demo: {label}"), &table, &config.select)
@@ -522,6 +525,187 @@ fn render_mlprep_standardization_report() -> Result<String, Box<dyn Error>> {
     Ok(report)
 }
 
+fn render_educational_path_report() -> Result<String, Box<dyn Error>> {
+    let broadcast_left = Tensor::new(vec![1.0, 2.0, 3.0], &[3, 1]);
+    let broadcast_right = Tensor::new(vec![10.0, 20.0, 30.0, 40.0], &[1, 4]);
+    let broadcast = &broadcast_left + &broadcast_right;
+
+    let shape_input = Tensor::new(vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0], &[2, 3]);
+    let reshaped = shape_input.reshape(&[3, 2]);
+    let transposed = shape_input.transpose();
+    let mean_axis_0 = shape_input.mean_axis(0);
+    let mean_axis_1 = shape_input.mean_axis(1);
+
+    let matmul_left = Tensor::new((1..=6).map(|value| value as f64).collect(), &[2, 3]);
+    let matmul_right = Tensor::new((1..=12).map(|value| value as f64).collect(), &[3, 4]);
+    let matmul = matmul_left.matmul(&matmul_right);
+
+    let dynamic = Tensor::from_elements(
+        vec![
+            Element::Float(1.0),
+            Element::text("2.5"),
+            Element::None,
+            Element::Int(4),
+            Element::text("6.0"),
+            Element::Float(8.0),
+        ],
+        &[2, 3],
+    );
+    let none_mask = dynamic.none_mask();
+    let numeric_mask = dynamic.numeric_mask();
+
+    let standardization_input = Tensor::new(vec![8.0, 80.0, 10.0, 100.0, 12.0, 120.0], &[3, 2]);
+    let standardized =
+        standardize_columns(&standardization_input).map_err(Box::<dyn Error>::from)?;
+    let before_mean = standardization_input.mean_axis(0);
+    let before_std = standardization_input.std_axis(0);
+    let after_mean = standardized.mean_axis(0);
+    let after_std = standardized.std_axis(0);
+
+    let mut report = String::new();
+    writeln!(report, "# matten educational-path report")?;
+    writeln!(report)?;
+
+    writeln!(report, "## Input")?;
+    writeln!(report, "demo: {KIND_EDUCATIONAL_PATH}")?;
+    writeln!(
+        report,
+        "note: fixed educational demo report, not automatic expression tracing"
+    )?;
+    writeln!(report)?;
+
+    writeln!(report, "## How to read shapes first")?;
+    writeln!(report, "1. ask what shape each input has")?;
+    writeln!(report, "2. ask which axes align, disappear, or remain")?;
+    writeln!(report, "3. read the output shape before reading values")?;
+    writeln!(report, "4. convert dynamic data before numeric computation")?;
+    writeln!(report)?;
+
+    writeln!(report, "## Broadcasting")?;
+    writeln!(
+        report,
+        "shape flow: {:?} + {:?} -> {:?}",
+        broadcast_left.shape(),
+        broadcast_right.shape(),
+        broadcast.shape()
+    )?;
+    writeln!(report, "axis 1: left repeats across 4 columns")?;
+    writeln!(report, "axis 0: right repeats across 3 rows")?;
+    writeln!(report, "result values: {:?}", broadcast.as_slice())?;
+    writeln!(report)?;
+
+    writeln!(report, "## Reshape and transpose")?;
+    writeln!(
+        report,
+        "reshape: {:?} -> {:?}",
+        shape_input.shape(),
+        reshaped.shape()
+    )?;
+    writeln!(report, "reshape values: {:?}", reshaped.as_slice())?;
+    writeln!(
+        report,
+        "transpose: {:?} -> {:?}",
+        shape_input.shape(),
+        transposed.shape()
+    )?;
+    writeln!(report, "transpose values: {:?}", transposed.as_slice())?;
+    writeln!(
+        report,
+        "meaning: reshape changes grouping; transpose changes coordinate meaning"
+    )?;
+    writeln!(report)?;
+
+    writeln!(report, "## Axis reductions")?;
+    writeln!(
+        report,
+        "mean_axis(0): {:?} -> {:?}",
+        shape_input.shape(),
+        mean_axis_0.shape()
+    )?;
+    writeln!(
+        report,
+        "mean_axis(0) keeps columns: {:?}",
+        mean_axis_0.as_slice()
+    )?;
+    writeln!(
+        report,
+        "mean_axis(1): {:?} -> {:?}",
+        shape_input.shape(),
+        mean_axis_1.shape()
+    )?;
+    writeln!(
+        report,
+        "mean_axis(1) keeps rows: {:?}",
+        mean_axis_1.as_slice()
+    )?;
+    writeln!(report)?;
+
+    writeln!(report, "## Matrix multiplication")?;
+    writeln!(
+        report,
+        "shape flow: {:?} @ {:?} -> {:?}",
+        matmul_left.shape(),
+        matmul_right.shape(),
+        matmul.shape()
+    )?;
+    writeln!(report, "shared inner dimension: 3")?;
+    writeln!(report, "result values: {:?}", matmul.as_slice())?;
+    writeln!(report)?;
+
+    writeln!(report, "## Dynamic readiness")?;
+    writeln!(report, "dynamic shape: {:?}", dynamic.shape())?;
+    writeln!(report, "none mask: {:?}", none_mask.as_slice())?;
+    writeln!(
+        report,
+        "numeric mask: strict policy readiness {:?}",
+        numeric_mask.as_slice()
+    )?;
+    writeln!(
+        report,
+        "Text values are not numeric-ready under the strict mask"
+    )?;
+    writeln!(report, "next step: clean values, then call try_numeric()")?;
+    writeln!(report)?;
+
+    writeln!(report, "## Standardization")?;
+    writeln!(report, "operation: standardize_columns(input)")?;
+    writeln!(
+        report,
+        "shape flow: {:?} -> {:?}",
+        standardization_input.shape(),
+        standardized.shape()
+    )?;
+    writeln!(
+        report,
+        "before column mean: {}",
+        format_fixed_values(before_mean.as_slice())
+    )?;
+    writeln!(
+        report,
+        "before column population std: {}",
+        format_fixed_values(before_std.as_slice())
+    )?;
+    writeln!(
+        report,
+        "after column mean: {}",
+        format_fixed_values(after_mean.as_slice())
+    )?;
+    writeln!(
+        report,
+        "after column population std: {}",
+        format_fixed_values(after_std.as_slice())
+    )?;
+    writeln!(report)?;
+
+    writeln!(report, "## What this report is not")?;
+    writeln!(report, "- not a public API")?;
+    writeln!(report, "- not source scanning")?;
+    writeln!(report, "- not a renderer")?;
+    writeln!(report, "- not model-quality analysis")?;
+
+    Ok(report)
+}
+
 fn format_fixed_values(values: &[f64]) -> String {
     let values = values
         .iter()
@@ -636,6 +820,7 @@ Usage:
   matten-report --demo shape-flow [--output <report.md>]
   matten-report --demo dynamic-readiness [--output <report.md>]
   matten-report --demo mlprep-standardization [--output <report.md>]
+  matten-report --demo educational-path [--output <report.md>]
   matten-report --input <csv-path> --kind data-readiness --select <col1,col2> [--output <report.md>]
 
 Demo reports are fixed examples. Input mode supports only data-readiness."
@@ -774,6 +959,33 @@ mod tests {
     }
 
     #[test]
+    fn demo_educational_path_allows_kind_and_output() {
+        let action = parse_args(args(&[
+            "--demo",
+            "educational-path",
+            "--kind",
+            "educational-path",
+            "--output",
+            "target/matten-report-educational-path.md",
+        ]))
+        .expect("educational-path demo with matching kind and output should parse");
+
+        let Action::Run(config) = action else {
+            panic!("expected run action");
+        };
+        assert!(matches!(
+            config.input,
+            Input::Demo { ref label } if label == "educational-path"
+        ));
+        assert_eq!(config.kind, "educational-path");
+        assert!(config.select.is_empty());
+        assert_eq!(
+            config.output,
+            Some(PathBuf::from("target/matten-report-educational-path.md"))
+        );
+    }
+
+    #[test]
     fn shape_flow_input_mode_is_not_supported() {
         let err = parse_args(args(&[
             "--input",
@@ -823,10 +1035,35 @@ mod tests {
     }
 
     #[test]
+    fn educational_path_input_mode_is_not_supported() {
+        let err = parse_args(args(&[
+            "--input",
+            "fixtures/small.csv",
+            "--kind",
+            "educational-path",
+            "--select",
+            "sales,cost",
+        ]))
+        .unwrap_err();
+
+        assert!(
+            err.contains("unsupported --kind \"educational-path\"; expected \"data-readiness\"")
+        );
+    }
+
+    #[test]
+    fn educational_path_demo_rejects_select() {
+        let err =
+            parse_args(args(&["--demo", "educational-path", "--select", "sales"])).unwrap_err();
+
+        assert!(err.contains("--select is only accepted with --input"));
+    }
+
+    #[test]
     fn unsupported_demo_label_remains_readable() {
         let err = parse_args(args(&["--demo", "unknown"])).unwrap_err();
 
-        assert!(err.contains("unsupported --demo \"unknown\"; expected \"data-readiness\", \"shape-flow\", \"dynamic-readiness\", or \"mlprep-standardization\""));
+        assert!(err.contains("unsupported --demo \"unknown\"; expected \"data-readiness\", \"shape-flow\", \"dynamic-readiness\", \"mlprep-standardization\", or \"educational-path\""));
     }
 
     #[test]
@@ -951,6 +1188,74 @@ column population std: [1.000, 1.000]
 shape flow: [3, 2] -> [3, 2]
 rows: samples unchanged
 columns: features unchanged
+"
+        );
+    }
+
+    #[test]
+    fn educational_path_report_matches_expected_markdown() {
+        let report =
+            render_educational_path_report().expect("educational-path report should render");
+
+        assert_eq!(
+            report,
+            "\
+# matten educational-path report
+
+## Input
+demo: educational-path
+note: fixed educational demo report, not automatic expression tracing
+
+## How to read shapes first
+1. ask what shape each input has
+2. ask which axes align, disappear, or remain
+3. read the output shape before reading values
+4. convert dynamic data before numeric computation
+
+## Broadcasting
+shape flow: [3, 1] + [1, 4] -> [3, 4]
+axis 1: left repeats across 4 columns
+axis 0: right repeats across 3 rows
+result values: [11.0, 21.0, 31.0, 41.0, 12.0, 22.0, 32.0, 42.0, 13.0, 23.0, 33.0, 43.0]
+
+## Reshape and transpose
+reshape: [2, 3] -> [3, 2]
+reshape values: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+transpose: [2, 3] -> [3, 2]
+transpose values: [1.0, 4.0, 2.0, 5.0, 3.0, 6.0]
+meaning: reshape changes grouping; transpose changes coordinate meaning
+
+## Axis reductions
+mean_axis(0): [2, 3] -> [3]
+mean_axis(0) keeps columns: [2.5, 3.5, 4.5]
+mean_axis(1): [2, 3] -> [2]
+mean_axis(1) keeps rows: [2.0, 5.0]
+
+## Matrix multiplication
+shape flow: [2, 3] @ [3, 4] -> [2, 4]
+shared inner dimension: 3
+result values: [38.0, 44.0, 50.0, 56.0, 83.0, 98.0, 113.0, 128.0]
+
+## Dynamic readiness
+dynamic shape: [2, 3]
+none mask: [0.0, 0.0, 1.0, 0.0, 0.0, 0.0]
+numeric mask: strict policy readiness [1.0, 0.0, 0.0, 1.0, 0.0, 1.0]
+Text values are not numeric-ready under the strict mask
+next step: clean values, then call try_numeric()
+
+## Standardization
+operation: standardize_columns(input)
+shape flow: [3, 2] -> [3, 2]
+before column mean: [10.000, 100.000]
+before column population std: [1.633, 16.330]
+after column mean: [0.000, 0.000]
+after column population std: [1.000, 1.000]
+
+## What this report is not
+- not a public API
+- not source scanning
+- not a renderer
+- not model-quality analysis
 "
         );
     }

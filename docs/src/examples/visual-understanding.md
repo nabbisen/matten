@@ -28,6 +28,7 @@ cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo data-readines
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo shape-flow
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo dynamic-readiness
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo mlprep-standardization
+cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo educational-path
 ```
 
 Input mode is currently accepted only for `data-readiness`:
