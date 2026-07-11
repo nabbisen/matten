@@ -25,6 +25,8 @@ jobs:
         run: bash scripts/check-published-dependency-isolation.sh
       - name: Benchmark harness dependency sync
         run: bash scripts/check-benchmark-dependency-sync.sh
+      - name: Streaming scope guard (RFC-037)
+        run: bash scripts/check-streaming-scope.sh
       - name: Release documentation truth checks
         run: bash scripts/check-release-docs.sh
       - name: Clippy (workspace, all features)

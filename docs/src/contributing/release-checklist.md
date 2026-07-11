@@ -13,6 +13,7 @@ bash scripts/check-core-dependency-boundary.sh   # RFC-022 core boundary gate
 bash scripts/check-published-dependency-isolation.sh  # RFC-049 §B1 per-crate peer-dep isolation
 bash scripts/check-matten-data-scope.sh          # RFC-042 matten-data anti-scope guard
 bash scripts/check-benchmark-dependency-sync.sh  # benchmark harness ndarray pin == workspace requirement
+bash scripts/check-streaming-scope.sh            # RFC-037 streaming / large-CSV anti-scope guard
 bash scripts/check-release-docs.sh               # doc-truth + examples naming-band guards
 cargo clippy --all-targets --all-features -- -D warnings
 cargo clippy --all-targets --no-default-features -- -D warnings

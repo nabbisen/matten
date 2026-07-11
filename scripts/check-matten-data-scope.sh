@@ -50,7 +50,7 @@ if grep -rEn 'pub[[:space:]]+(struct|enum|type)[[:space:]]+(DataFrame|Series)\b'
   echo "ERROR: matten-data must not define a public DataFrame/Series type (RFC-042 §4/§5)"
   FAIL=1
 fi
-if grep -rEn 'pub[[:space:]]+fn[[:space:]]+(groupby|group_by|join|merge|pivot|query|loc|iloc)[[:space:]]*[(<]' "$SRC_DIR"; then
+if grep -rEn 'pub[[:space:]]+(async[[:space:]]+)?fn[[:space:]]+(groupby|group_by|join|merge|pivot|query|loc|iloc)[[:space:]]*[(<]' "$SRC_DIR"; then
   echo "ERROR: matten-data must not expose a dataframe-style public API (groupby/join/merge/pivot/query/loc/iloc) (RFC-042 §4/§5)"
   FAIL=1
 fi

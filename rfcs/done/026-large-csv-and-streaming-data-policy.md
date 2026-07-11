@@ -1,7 +1,7 @@
 # RFC-026: Large CSV and Streaming Data Policy
 
-**Status:** Proposed  
-**Target:** design spike no earlier than v0.20+; implementation later only after separate approval  
+**Status:** Superseded by RFC-037; retained as historical policy record  
+**Target:** consolidated into RFC-037 resolved deferral policy  
 **Theme:** Large data and streaming boundary  
 **Depends on:** RFC-018, RFC-022, RFC-023
 
@@ -10,6 +10,11 @@
 ## 1. Summary
 
 This RFC defines the policy for large CSV and streaming data support.
+
+This earlier policy note is superseded by
+[RFC-037](./037-deferred-streaming-and-large-csv-policy.md), which is the
+canonical resolved deferral-policy record. Streaming remains deferred and may be
+reopened only by a future implementation RFC.
 
 Streaming remains design-only until the project has explicit answers for batch lifecycle, schema drift, malformed rows, memory budget, and sync-vs-async strategy.
 

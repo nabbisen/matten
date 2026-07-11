@@ -1,7 +1,7 @@
 # RFC-037: Deferred Streaming and Large CSV Policy
 
-**Status:** Proposed  
-**Target Release:** v0.20.0 policy; implementation deferred  
+**Status:** Resolved deferral-policy record; canonical large-data / streaming boundary. Streaming remains deferred and may be reopened only by a future implementation RFC.  
+**Target Release:** v0.20.0 policy; post-0.30 lifecycle closure  
 **Related:** RFC-033, RFC-034, RFC-035, RFC-036  
 **Scope:** Explicit deferral and reopening criteria for streaming / large CSV
 
@@ -10,6 +10,10 @@
 ## 1. Summary
 
 This RFC states that streaming and large CSV processing are **not** part of v0.20 `matten-data` implementation.
+
+This is the canonical resolved deferral-policy record for large CSV and
+streaming. It consolidates the earlier RFC-026 policy note, which is retained as
+a superseded historical record.
 
 They remain design-only until the project answers:
 

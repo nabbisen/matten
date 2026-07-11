@@ -34,6 +34,7 @@ for RFC state; the Status field inside each file mirrors the folder.
 | 023 | [`matten-data` Scope and Non-goals](./done/023-matten-data-scope-and-non-goals.md) | 0.22.0 (resolved: Outcome B → Beta) |
 | 024 | [`matten-mlprep` Scope and Non-goals](./done/024-matten-mlprep-scope-and-non-goals.md) | 0.18.0 (impl RFC-028; maturity RFC-029) |
 | 025 | [Bridge Crate Policy for ndarray, nalgebra, and candle](./done/025-bridge-crate-policy-for-ndarray-nalgebra-and-candle.md) | 0.17.0 (matten-ndarray; nalgebra/candle deferred) |
+| 026 | [Large CSV and Streaming Data Policy](./done/026-large-csv-and-streaming-data-policy.md) | superseded by RFC-037; retained as historical policy record |
 | 027 | [`matten-ndarray` Design and Implementation](./done/027-matten-ndarray-design-and-implementation.md) | 0.17.0 |
 | 028 | [`matten-mlprep` Design and Implementation](./done/028-matten-mlprep-design-and-implementation.md) | 0.18.0 |
 | 029 | [Companion Maturity Evaluation (v0.19.0)](./done/029-companion-maturity-evaluation-v0-19.md) | 0.19.0 |
@@ -44,6 +45,7 @@ for RFC state; the Status field inside each file mirrors the folder.
 | 034 | [`matten-data` Table Model and Public API Boundary](./done/034-matten-data-table-model-and-public-api-boundary.md) | 0.20.1 |
 | 035 | [CSV Ingestion, Schema Summary, Missing Values, and Numeric Conversion](./done/035-csv-ingestion-schema-summary-missing-values-and-numeric-conversion.md) | 0.20.1 |
 | 036 | [`matten-data` Examples, Documentation, and Release Gate](./done/036-matten-data-examples-documentation-and-release-gate.md) | 0.22.0 |
+| 037 | [Deferred Streaming and Large CSV Policy](./done/037-deferred-streaming-and-large-csv-policy.md) | resolved deferral policy; streaming requires future implementation RFC |
 | 038 | [Core Numeric Comfort APIs](./done/038-core-numeric-comfort-apis.md) | 0.20.9 (elementwise); 0.20.10 (selection); 0.20.11 (creation); 0.20.12 (shape) |
 | 039 | [Shape Composition API Boundary](./done/039-shape-composition-api-boundary.md) | 0.21.0 (`concatenate` + `stack`; `repeat`/`tile`/`meshgrid` deferred) |
 | 040 | [Small Statistics Boundary — Core vs Companion](./done/040-small-statistics-boundary-core-vs-companion.md) | 0.21.2 (`var`/`std` + `var_axis`/`std_axis`, population; quantile/histogram/cov/corr deferred) |
@@ -75,8 +77,6 @@ for RFC state; the Status field inside each file mirrors the folder.
 
 | ID | Title | Target |
 |---:|---|---|
-| 026 | [Large CSV and Streaming Data Policy](./proposed/026-large-csv-and-streaming-data-policy.md) | design spike no earlier than v0.20+ |
-| 037 | [Deferred Streaming and Large CSV Policy](./proposed/037-deferred-streaming-and-large-csv-policy.md) | v0.20.0 / later |
 | 049 | [Benchmarking, Complexity Metrics, and Positioning Report](./proposed/049-benchmarking-complexity-metrics-and-positioning-report.md) | **Accepted** — Phase 1 baseline (0.22.1) + Phase 2 Rust peer comparison (accepted 2026-06-25) complete; Phases 3–4 deferred |
 | 054 | [`matten-migrate` Assisted Migration Tool](./proposed/054-matten-migrate-assisted-migration-tool.md) | **Accepted as future direction** (2026-06-24; deferral confirmed in deep review 2026-06-27) — implementation deferred |
 Implementation handoffs for the v0.20+ proposed set (RFC-033–042), the examples
