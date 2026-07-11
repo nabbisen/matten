@@ -279,6 +279,37 @@ if [ -d "$MIG_DOCS_DIR" ]; then
   fi
 fi
 
+echo "=== Checking educational positioning consistency and overclaim guard (RFC-065) ==="
+# RFC-065 keeps matten's public positioning broad enough for learning/teaching
+# while still bounded to small workflows and early prototypes. Scope this check
+# to current high-visibility positioning surfaces; RFCs and historical notes are
+# intentionally excluded.
+POSITIONING_DOCS=(
+  README.md
+  "$CORE/README.md"
+  "$CORE/src/lib.rs"
+  docs/src/introduction.md
+  docs/src/philosophy.md
+  docs/src/tutorial/start-here.md
+  docs/src/examples/visual-understanding.md
+)
+for doc in "${POSITIONING_DOCS[@]}"; do
+  if ! grep -qiE 'learn|learning' "$doc"; then
+    echo "ERROR: RFC-065 positioning doc lacks learning-oriented wording: $doc"
+    FAIL=1
+  fi
+done
+for doc in README.md "$CORE/README.md" "$CORE/src/lib.rs" docs/src/introduction.md; do
+  if ! grep -qi 'teaching' "$doc"; then
+    echo "ERROR: RFC-065 high-visibility positioning doc lacks 'teaching': $doc"
+    FAIL=1
+  fi
+done
+if grep -RInE 'business-critical|business workflows|production performance|production-scale|scales to|faster than' "${POSITIONING_DOCS[@]}" 2>/dev/null; then
+  echo "ERROR: RFC-065 positioning docs contain an overclaim phrase"
+  FAIL=1
+fi
+
 echo "=== Checking CHANGELOG release headings are well-formed ==="
 # (1) The current workspace version must be the top-most release heading, so a release never
 #     ships without its own heading. (2) No single release block may contain more than one

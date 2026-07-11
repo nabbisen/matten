@@ -1,12 +1,12 @@
 # Introduction
 
 `matten` is a developer-experience-first multidimensional array (tensor) library
-for Rust — the *family car* for small numerical and data-exploration
-proof-of-concept work.
+for Rust — the *family car* for learning, teaching, small numerical workflows,
+data exploration, and early prototypes.
 
 > Maturity labels in this book — such as *production-ready* — describe stability
 > **within that scope**, not performance or scale. `matten` optimizes for time to
-> a runnable PoC, not benchmark leadership.
+> first understanding and a runnable PoC, not benchmark leadership.
 
 This book is organized by reader:
 

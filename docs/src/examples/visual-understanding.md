@@ -4,6 +4,10 @@ These examples make shapes, axes, data readiness, and preprocessing effects easi
 to inspect in plain terminal output. They are examples and local tooling only:
 no plotting dependency, no public visualization API, and no generated image assets.
 
+Use this page when code runs but the shape, axis, or data meaning is still hard
+to see. The examples are intended for learning and teaching small tensor
+workflows, not for dashboarding or large-data visualization.
+
 ## Runnable examples
 
 | Area | Example | Run |
@@ -46,6 +50,28 @@ Which dynamic values are numeric, text, or missing?
 Which selected table columns can become a numeric Tensor?
 What did standardization change, and what shape stayed the same?
 ```
+
+## Worked shape question
+
+For a `[rows, columns]` matrix, axis reductions answer "which axis disappears?"
+
+```text
+input shape: [3, 2]
+
+rows axis    = axis 0
+columns axis = axis 1
+
+mean_axis(0): collapse rows, keep columns
+  [3, 2] -> [2]
+  result has one mean per column
+
+mean_axis(1): collapse columns, keep rows
+  [3, 2] -> [3]
+  result has one mean per row
+```
+
+Read a reduction from the output shape first: the missing axis is the one the
+operation summarized.
 
 They deliberately do not add:
 

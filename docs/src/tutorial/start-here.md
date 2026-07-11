@@ -2,6 +2,10 @@
 
 This is the recommended learning path for `matten`.
 
+The goal is to learn tensor-shaped computation in small, readable steps: first
+numeric tensors, then messy-data cleanup, then visual summaries when shapes or
+axes become hard to reason about from code alone.
+
 ## Numeric tensors
 
 If your data is already clean numeric values, follow these examples in order:
@@ -20,6 +24,9 @@ If your data is already clean numeric values, follow these examples in order:
 | 10 | `cargo run --example 12_boundary_error_handling` | Safe error handling |
 
 After these ten examples you understand the numeric core.
+
+For the visual side of the same path, see
+[Visual understanding examples](../examples/visual-understanding.md).
 
 ## Dynamic ingestion: messy data with `dynamic`
 

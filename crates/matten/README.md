@@ -4,25 +4,26 @@
 [![docs.rs](https://img.shields.io/docsrs/matten)](https://docs.rs/matten)
 [![license](https://img.shields.io/crates/l/matten.svg)](../../LICENSE)
 
-**A family car of Rust array (tensor) library — easy to start, predictable, and friendly for quick numerical trials / PoCs.**
+**A family-car Rust array (tensor) library — easy to start, predictable, and friendly for learning, teaching, small workflows, and early prototypes.**
 
 ## Overview
 
 `matten` is a developer-experience-first multidimensional array (tensor) library
-for Rust. It makes early-stage numerical and data-exploration work feel close to
-NumPy/Pandas ergonomics while staying native Rust: one concrete `Tensor` type, no
-visible lifetimes, no generic dtype puzzles, and human-readable failures.
+for Rust. It makes learning-oriented, teaching-oriented, early-stage numerical,
+and data-exploration work feel close to NumPy/Pandas ergonomics while staying
+native Rust: one concrete `Tensor` type, no visible lifetimes, no generic dtype
+puzzles, and human-readable failures.
 
 It deliberately favors **developer experience over peak performance**, and is not
 a replacement for `ndarray`, `nalgebra`, or `candle` on hot paths.
 
 ## Why / when to use it
 
-Reach for `matten` when you want to prototype quickly: represent vectors,
-matrices, and tensors, do simple shape work and arithmetic, and move messy
-JSON/CSV in and out — without wrestling with views, lifetimes, or trait bounds.
-When a prototype becomes performance-critical, `matten` is designed to hand its
-flat data off to a specialized crate.
+Reach for `matten` when you want to learn, teach, or prototype quickly: represent
+vectors, matrices, and tensors, do simple shape work and arithmetic, and move
+messy JSON/CSV in and out — without wrestling with views, lifetimes, or trait
+bounds. When a prototype becomes performance-critical, `matten` is designed to
+hand its flat data off to a specialized crate.
 
 > **Status: active pre-1.0 development.** The numeric core is strong;
 > The `dynamic` feature supports heterogeneous ingestion (`from_json_dynamic`, `from_csv_dynamic`),

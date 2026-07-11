@@ -27,6 +27,7 @@ working documents for the implementation team and may be revised as work proceed
 | `063-phase-3-shape-flow-report-handoff.md` | RFC-063 Visual Understanding and Reporting — Phase 3 shape-flow local report slice |
 | `063-phase-3-dynamic-readiness-report-handoff.md` | RFC-063 Visual Understanding and Reporting — Phase 3 dynamic-readiness local report slice |
 | `063-phase-3-mlprep-standardization-report-handoff.md` | RFC-063 Visual Understanding and Reporting — Phase 3 mlprep-standardization local report slice |
+| `065-educational-visualization-handoff.md` | RFC-065 Educational Visualization and Tensor Learning Path — first docs/positioning slice |
 
 Some handoffs are planning records and some are retained implementation records.
 A handoff alone does not authorize new work; each new implementation slice still

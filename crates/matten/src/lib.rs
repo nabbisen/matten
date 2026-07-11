@@ -1,9 +1,9 @@
 //! `matten` — a developer-experience-first multidimensional array (tensor)
 //! library for Rust.
 //!
-//! `matten` is a *family car* of Rust tensor library: easy to start,
-//! predictable, and friendly for non-expert Rust developers doing small
-//! numerical, data-exploration, or business proof-of-concept work. It
+//! `matten` is a *family car* Rust tensor library: easy to start,
+//! predictable, and friendly for non-expert Rust developers learning, teaching,
+//! or building small numerical and data-exploration workflows. It
 //! deliberately prioritizes **developer experience over peak performance**, and
 //! is not a replacement for `ndarray`, `nalgebra`, or `candle` on hot paths.
 //!
@@ -54,7 +54,7 @@
 //!
 //! # Cargo features
 //!
-//! The default profile is convenient for PoC users:
+//! The default profile is convenient for learning, teaching, and PoC users:
 //!
 //! - `serde` *(default)* — `Serialize` / `Deserialize` for [`Tensor`].
 //! - `json` *(default, implies `serde`)* — `from_json` / `load_json`.

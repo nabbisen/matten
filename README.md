@@ -13,7 +13,8 @@
 [![matten-data crates.io](https://img.shields.io/crates/v/matten-data.svg?label=data)](https://crates.io/crates/matten-data)
 
 **A family-car multidimensional array (tensor) library for Rust** —
-and a small, optional ecosystem of companion crates around it.
+for learning, teaching, small workflows, and early prototypes, with a small,
+optional ecosystem of companion crates around it.
 
 ## Overview
 
@@ -44,9 +45,10 @@ runnable PoC, not benchmark leadership. Full rung definitions are in the
 ### matten
 
 `matten` is a developer-experience-first multidimensional array (tensor) library
-for Rust. It makes early-stage numerical and data-exploration work feel close to
-NumPy/Pandas ergonomics while staying native Rust: one concrete `Tensor` type, no
-visible lifetimes, no generic dtype puzzles, and human-readable failures.
+for Rust. It makes learning-oriented, teaching-oriented, early-stage numerical,
+and data-exploration work feel close to NumPy/Pandas ergonomics while staying
+native Rust: one concrete `Tensor` type, no visible lifetimes, no generic dtype
+puzzles, and human-readable failures.
 
 It deliberately favors **developer experience over peak performance**, and is not
 a replacement for `ndarray`, `nalgebra`, or `candle` on hot paths.
@@ -74,9 +76,12 @@ It depends only on core `matten` (no default features); it adds **no**
 ## Why / when
 
 Use core `matten` to get a NumPy-like tensor going quickly in Rust without
-generics, lifetimes, or view-type puzzles. Reach for a companion crate only when
-you need to cross a boundary — e.g. `matten-ndarray` to hand data to the ndarray
-ecosystem. Core stays a family car; companions are the trailer hitch.
+generics, lifetimes, or view-type puzzles. It is intentionally approachable for
+learning tensor shapes, teaching small numerical transformations, and building a
+readable first version before handing off to a heavier ecosystem. Reach for a
+companion crate only when you need to cross a boundary — e.g. `matten-ndarray`
+to hand data to the ndarray ecosystem. Core stays a family car; companions are
+the trailer hitch.
 
 ## Quick start
 
