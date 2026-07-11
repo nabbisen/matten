@@ -11,6 +11,12 @@ about your own workload. There is no generator and no source-scanner.
 Keep that framing in mind: the report's job is to make a migration *decision* explicit and
 reviewable, not to certify anything.
 
+For a local first draft, `tools/matten-migrate` can inspect a project and emit a
+Markdown report using this vocabulary. Its detection is heuristic: it may miss
+real `matten` usage, may over-report source-like text, and has not been
+validated against real downstream projects. Use its output as a starting point
+for manual review, not as an automated decision.
+
 ## How to use the template
 
 Copy the skeleton below into your own doc and fill each section. Sections you have nothing to
@@ -64,4 +70,3 @@ move the kernel, keep matten for setup/glue, and a checkpoint to reassess.
 
 See [Linear regression (GD) readiness](./examples/linear-regression-gd-readiness.md) for the
 template applied to the `35_linear_regression_gradient_descent` example.
-

@@ -28,6 +28,8 @@ working documents for the implementation team and may be revised as work proceed
 | `063-phase-3-dynamic-readiness-report-handoff.md` | RFC-063 Visual Understanding and Reporting — Phase 3 dynamic-readiness local report slice |
 | `063-phase-3-mlprep-standardization-report-handoff.md` | RFC-063 Visual Understanding and Reporting — Phase 3 mlprep-standardization local report slice |
 | `026-037-large-data-streaming-policy-closure-handoff.md` | RFC-026 / RFC-037 Large Data and Streaming Policy — proposed policy-closure slice |
+| `054-matten-migrate-readiness-audit.md` | RFC-054 `matten-migrate` readiness audit |
+| `054-matten-migrate-first-tool-handoff.md` | RFC-054 `matten-migrate` first local advisory tool slice |
 | `065-educational-visualization-handoff.md` | RFC-065 Educational Visualization and Tensor Learning Path — first docs/positioning slice |
 | `065-phase-2-educational-shape-data-path-handoff.md` | RFC-065 Educational Visualization and Tensor Learning Path — Phase 2 educational shape/data docs slice |
 | `065-phase-3-educational-path-report-handoff.md` | RFC-065 Educational Visualization and Tensor Learning Path — Phase 3 local educational-path report slice |

@@ -1,0 +1,2 @@
+This is not Rust source.
+It mentions Tensor::new, matten_data::Table, and matten_ndarray::to_arrayd in prose.

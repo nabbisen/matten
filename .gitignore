@@ -34,5 +34,9 @@ target
 # its Cargo.lock is regenerated on demand and must not be tracked.
 /tools/matten-report/Cargo.lock
 
+# The RFC-054 local migration-readiness tool is workspace-excluded (publish = false);
+# its Cargo.lock is regenerated on demand and must not be tracked.
+/tools/matten-migrate/Cargo.lock
+
 # custom
 /.git-exclude/

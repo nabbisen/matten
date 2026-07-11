@@ -67,6 +67,13 @@ cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo mlprep-standa
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo mlprep-standardization --output target/matten-report-mlprep-standardization.md
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo educational-path
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo educational-path --output target/matten-report-educational-path.md
+cargo check --manifest-path tools/matten-migrate/Cargo.toml
+cargo test --manifest-path tools/matten-migrate/Cargo.toml
+cargo clippy --manifest-path tools/matten-migrate/Cargo.toml -- -D warnings
+cargo run --manifest-path tools/matten-migrate/Cargo.toml -- list-targets
+cargo run --manifest-path tools/matten-migrate/Cargo.toml -- inspect tools/matten-migrate/fixtures/simple-core-project
+cargo run --manifest-path tools/matten-migrate/Cargo.toml -- report tools/matten-migrate/fixtures/simple-core-project
+cargo run --manifest-path tools/matten-migrate/Cargo.toml -- report tools/matten-migrate/fixtures/simple-core-project --output target/matten-migration-report.md
 ```
 
 ### 4. MSRV

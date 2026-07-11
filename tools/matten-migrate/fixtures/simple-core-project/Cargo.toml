@@ -1,0 +1,7 @@
+[package]
+name = "simple-core-project"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+matten = "0.30.0"

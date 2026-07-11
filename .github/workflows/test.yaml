@@ -188,3 +188,10 @@ jobs:
       - run: cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo mlprep-standardization --output target/matten-report-mlprep-standardization.md
       - run: cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo educational-path
       - run: cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo educational-path --output target/matten-report-educational-path.md
+      - run: cargo check --manifest-path tools/matten-migrate/Cargo.toml
+      - run: cargo test --manifest-path tools/matten-migrate/Cargo.toml
+      - run: cargo clippy --manifest-path tools/matten-migrate/Cargo.toml -- -D warnings
+      - run: cargo run --manifest-path tools/matten-migrate/Cargo.toml -- list-targets
+      - run: cargo run --manifest-path tools/matten-migrate/Cargo.toml -- inspect tools/matten-migrate/fixtures/simple-core-project
+      - run: cargo run --manifest-path tools/matten-migrate/Cargo.toml -- report tools/matten-migrate/fixtures/simple-core-project
+      - run: cargo run --manifest-path tools/matten-migrate/Cargo.toml -- report tools/matten-migrate/fixtures/simple-core-project --output target/matten-migration-report.md

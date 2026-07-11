@@ -24,6 +24,9 @@ exclude = [
     # RFC-063 Phase 3 local reporting tool. Kept out of the workspace so its
     # tool-only policy and future dependencies cannot leak into published crates.
     "tools/matten-report",
+    # RFC-054 first local migration-readiness advisory tool. Kept out of the
+    # workspace so source-scanning/tool policy cannot leak into published crates.
+    "tools/matten-migrate",
 ]
 
 # Shared package metadata inherited by member crates via `field.workspace = true`.

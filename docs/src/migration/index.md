@@ -28,6 +28,12 @@ It is explicitly **not**:
   migration. (An assisted tool, `matten-migrate`, is a deferred future possibility, not part
   of this guide.)
 
+`tools/matten-migrate` is now available as a local, unpublished, advisory helper
+for generating a first migration-readiness report. It is a heuristic
+text/dependency scan, not a source rewriter and not a correctness oracle: it may
+miss or over-report usage, has not been validated against real downstream
+projects yet, and should be treated as a starting point for manual review.
+
 ## The layered idea
 
 ```text
