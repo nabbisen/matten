@@ -35,6 +35,18 @@ working documents for the implementation team and may be revised as work proceed
 | `065-phase-2-educational-shape-data-path-handoff.md` | RFC-065 Educational Visualization and Tensor Learning Path — Phase 2 educational shape/data docs slice |
 | `065-phase-3-educational-path-report-handoff.md` | RFC-065 Educational Visualization and Tensor Learning Path — Phase 3 local educational-path report slice |
 
+## Documentation-governance handoffs
+
+These translate the specs supersession analysis into design-team work. They are not tied to a
+single RFC; their authority is the supersession map. Run in order: 01 (gap closure) before 02
+(archival); 03 (philosophy) may run after 01.
+
+| Handoff | Purpose |
+|---|---|
+| `docs-governance-01-spec-coverage-gap-closure-handoff.md` | Resolve the three unowned spec fragments (perf targets, golden/fuzz/property tests, `Display`) before archival |
+| `docs-governance-02-spec-archival-and-ownership-rule-handoff.md` | Archive the v0.19.0 specs as tracked banner-marked history; declare the three-plane ownership rule |
+| `docs-governance-03-philosophy-distillation-handoff.md` | Expand `docs/src/philosophy.md` into a guarded, evergreen principles page distilled from the specs |
+
 Some handoffs are planning records and some are retained implementation records.
 A handoff alone does not authorize new work; each new implementation slice still
 requires the corresponding RFC acceptance or follow-up review before coding begins.

@@ -27,6 +27,38 @@ The v0.16+ prospect supersedes older schedule lines that placed `matten-data` at
 
 ---
 
+## 0.1 Documentation-governance track
+
+The v0.19.0 requirements, external-design, and roadmap snapshot documents are
+historical inputs, not current authority. The tracked docs-governance handoffs
+close their remaining value in this order:
+
+```text
+1. docs-governance-01-spec-coverage-gap-closure-handoff.md
+   Resolve the three unowned spec fragments before archival:
+   non-binding performance targets, golden/fuzz/property testing status, and Display formatting.
+
+2. docs-governance-02-spec-archival-and-ownership-rule-handoff.md
+   Archive the v0.19.0 specs as tracked history and write down the ownership rule.
+
+3. docs-governance-03-philosophy-distillation-handoff.md
+   Distill the tracked archived specs into an evergreen Philosophy page after archival exists.
+```
+
+The intended ownership model is:
+
+```text
+rfcs/                = normative decisions
+docs/src/            = user-facing evergreen contract and positioning
+ROADMAP.md           = forward schedule and milestone history
+docs/design/history/ = dated historical design snapshots only
+```
+
+These handoffs are tracked in `rfcs/handoffs/README.md`. They are docs/design
+work only: no public API, dependency, version, or release-scope change.
+
+---
+
 ## 1. Long-term positioning
 
 `matten` core remains a **Sedan-first** Rust tensor library:
