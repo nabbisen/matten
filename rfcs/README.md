@@ -69,6 +69,7 @@ for RFC state; the Status field inside each file mirrors the folder.
 | 062 | [`matten-ndarray` Supported `ndarray` Version — 0.16 → 0.17](./done/062-matten-ndarray-supported-ndarray-version.md) | 0.28.0 |
 | 063 | [Visual Understanding and Reporting](./done/063-visual-understanding-and-reporting.md) | 0.29.0 (visual docs, examples, local `matten-report` tool; public report/viz crates deferred) |
 | 064 | [Workspace Core Dependency Requirement Maintenance Policy](./done/064-workspace-core-dependency-requirement-maintenance-policy.md) | post-0.29.0 repository policy |
+| 065 | [Educational Visualization and Tensor Learning Path](./done/065-educational-visualization-and-tensor-learning-path.md) | 0.30.0 (educational positioning, learner docs path, local `educational-path` report; public report/viz crates deferred) |
 
 ## Proposed
 
@@ -78,8 +79,6 @@ for RFC state; the Status field inside each file mirrors the folder.
 | 037 | [Deferred Streaming and Large CSV Policy](./proposed/037-deferred-streaming-and-large-csv-policy.md) | v0.20.0 / later |
 | 049 | [Benchmarking, Complexity Metrics, and Positioning Report](./proposed/049-benchmarking-complexity-metrics-and-positioning-report.md) | **Accepted** — Phase 1 baseline (0.22.1) + Phase 2 Rust peer comparison (accepted 2026-06-25) complete; Phases 3–4 deferred |
 | 054 | [`matten-migrate` Assisted Migration Tool](./proposed/054-matten-migrate-assisted-migration-tool.md) | **Accepted as future direction** (2026-06-24; deferral confirmed in deep review 2026-06-27) — implementation deferred |
-| 065 | [Educational Visualization and Tensor Learning Path](./proposed/065-educational-visualization-and-tensor-learning-path.md) | Proposed for v0.30+ docs/examples planning; implementation requires accepted handoff(s) |
-
 Implementation handoffs for the v0.20+ proposed set (RFC-033–042), the examples
 program (RFC-043–048), and the benchmarking program (RFC-049) live in
 [`./handoffs/`](./handoffs/). They translate each RFC into PR boundaries, checks,

@@ -18,6 +18,47 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.30.0] - 2026-07-11
+
+RFC-065 educational-visualization release. This release builds on the RFC-063 visual-understanding
+base and makes `matten` more explicitly useful for learning and teaching tensor-shaped computation:
+positioning guardrails, a worked educational docs path, and one local-only `matten-report`
+educational-path demo. No public API, published crate dependency graph, core default feature,
+runtime behavior, MSRV, or maturity-label change.
+
+### Added
+
+- RFC-065 educational positioning guardrails and an overclaim check in the release-doc guard.
+- Worked educational explanations for broadcasting, reshape/flatten/transpose, axis reductions,
+  matmul shape flow, dynamic readiness, and standardization before/after effects.
+- `tools/matten-report --demo educational-path`, a deterministic Markdown/plain-text local report
+  that summarizes the learner path across shape flow, axis choice, data readiness, and
+  preprocessing effects.
+- RFC-065 handoffs for the positioning/docs slice, educational shape/data docs slice, and local
+  educational-path report slice.
+
+### Changed
+
+- Public docs and crate metadata retargeted from the `0.29.0` family to `0.30.0`.
+- The current-family documentation now describes RFC-065 educational visualization as the `0.30`
+  focus while preserving RFC-063 as the already-shipped visual-understanding base.
+- RFC-065 moved to implemented status for the authorized docs/examples/local-tool scope; public
+  `matten-viz` and public `matten-report` crates remain deferred to future RFCs or explicit
+  amendments.
+
+### Version
+
+- Final release bump `0.29.0` -> `0.30.0`. Lock-step family versioning still applies to all
+  workspace crates; `matten-report` remains a local unpublished tool at version `0.0.0`.
+
+### Threat model
+
+Docs, examples, local-tool, RFC/handoff, CI/checklist, and release-metadata updates only. No public
+API, published dependency, core dependency addition, core default feature change, parser behavior in
+published crates, automatic project mutation, network, telemetry, generated image, SVG, HTML,
+Vega-Lite, JSON, plotting, notebook, GUI, runtime behavior, MSRV, or maturity-label change. Public
+report/viz crates, expression tracing, autograd, and richer renderers remain deferred.
+
 ## [0.29.0] - 2026-07-05
 
 RFC-063 visual-understanding and reporting release. This release consolidates the `0.29.0-pre.*`

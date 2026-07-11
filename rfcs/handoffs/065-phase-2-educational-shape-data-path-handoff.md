@@ -3,7 +3,7 @@
 **Project:** `matten`  
 **Related RFC:** RFC-065: Educational Visualization and Tensor Learning Path  
 **Document kind:** Compact implementation handoff  
-**Status:** Draft for review; not implementation authority until accepted  
+**Status:** Implemented and reviewed; retained as the RFC-065 Phase 2 record
 **Scope:** Documentation/examples only; educational shape and data-understanding path  
 
 ---
@@ -119,7 +119,7 @@ the slice:
 ```text
 scripts/check-release-docs.sh
 rfcs/done/063-visual-understanding-and-reporting.md
-rfcs/proposed/065-educational-visualization-and-tensor-learning-path.md
+rfcs/done/065-educational-visualization-and-tensor-learning-path.md
 ```
 
 Do not edit version files, changelog, Cargo manifests, or source APIs for this

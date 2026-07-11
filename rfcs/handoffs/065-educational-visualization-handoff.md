@@ -3,7 +3,7 @@
 **Project:** `matten`  
 **Related RFC:** RFC-065: Educational Visualization and Tensor Learning Path  
 **Document kind:** Compact planning handoff  
-**Status:** Draft for review; not implementation authority until accepted  
+**Status:** Implemented and reviewed; retained as the RFC-065 Phase 1 record
 **Scope:** Positioning consistency audit, overclaim guard, and first educational visualization docs slice  
 
 ---

@@ -61,7 +61,7 @@ the lean core. Enabling `dynamic` does not rename or remove any numeric Tensor A
 
 The published crates are released as one lock-step family (RFC-030): matching
 crate versions are the supported, documented set. Downstream examples therefore
-show explicit matched pins such as `matten = "0.29.0"` plus a companion at the
+show explicit matched pins such as `matten = "0.30.0"` plus a companion at the
 same release.
 
 Inside the workspace, companion crates inherit the core dependency from
@@ -175,3 +175,10 @@ and the local-only `tools/matten-report` Markdown/plain-text report tool. This r
 change public API, published crate dependency graphs, core default features, runtime behavior, MSRV,
 maturity labels, or scope boundaries. Richer visualization/reporting work remains deferred and
 requires separate handoffs or RFC approval.
+
+The **v0.30 release family** adds RFC-065 educational visualization and tensor-learning path work on
+top of the RFC-063 base: positioning guardrails, worked learner questions for shape/data meaning,
+and a local-only `tools/matten-report --demo educational-path` report. This release remains
+docs/examples/local-tool only: no public visualization/report crate, plotting dependency, expression
+tracer, autograd, public API change, published dependency change, runtime behavior change, MSRV
+change, or maturity-label change.

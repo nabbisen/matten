@@ -71,7 +71,7 @@ csv     = ["dep:csv"]
 dynamic = []
 ```
 
-Lean build: `matten = { version = "0.29.0", default-features = false }`.
+Lean build: `matten = { version = "0.30.0", default-features = false }`.
 The strict compile-time baseline (< 15 s on a modern laptop) applies to the
 lean profile. The `default` profile is the convenient PoC baseline; `dynamic`
 is off by default.

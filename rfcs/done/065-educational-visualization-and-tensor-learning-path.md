@@ -1,7 +1,7 @@
 # RFC-065: Educational Visualization and Tensor Learning Path
 
-**Status:** Proposed  
-**Target:** v0.30+ docs/examples planning; implementation requires accepted handoff(s)  
+**Status:** Implemented for `0.30.0`; public report/viz crates and richer renderers deferred  
+**Target:** v0.30 docs/examples/local-tool educational path  
 **Theme:** Educational tensor understanding, visual learning aids, and honest positioning  
 **Depends on:** RFC-014, RFC-021, RFC-049, RFC-050, RFC-063  
 **Related:** RFC-054, RFC-060, RFC-064  
@@ -30,6 +30,15 @@ artifacts. This RFC does not authorize a public `matten-viz` crate, plotting
 dependency, automatic expression tracer, GUI, notebook integration, or runtime
 visualization API.
 
+Implemented `0.30.0` scope:
+
+```text
+positioning consistency audit and overclaim guard
+worked educational shape/data path in docs
+local-only tools/matten-report --demo educational-path report
+no public visualization/report crate
+```
+
 ---
 
 ## 2. Reviewer Overview
@@ -51,7 +60,7 @@ shapes, axes, and small data transformations?
 The requested review should confirm:
 
 ```text
-[ ] the background accurately reflects the current 0.29 project state
+[ ] the background accurately reflects the 0.29 project state at authoring time
 [ ] the existing educational positioning fits matten's family-car scope
 [ ] the first slice is appropriately small and objectively checkable
 [ ] the boundaries against public plotting/viz/autograd scope are strong enough

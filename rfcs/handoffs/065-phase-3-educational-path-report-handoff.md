@@ -3,7 +3,7 @@
 **Project:** `matten`  
 **Related RFC:** RFC-065: Educational Visualization and Tensor Learning Path  
 **Document kind:** Compact local-tool implementation handoff  
-**Status:** Draft for review; not implementation authority until accepted  
+**Status:** Implemented and reviewed; retained as the RFC-065 Phase 3 record
 **Scope:** Local-only fixed educational-path demo report in `tools/matten-report`  
 
 ---
