@@ -3,24 +3,45 @@
 **Project:** `matten`  
 **Document kind:** Deferred implementation note  
 **Scope:** RFC-054 only  
-**Status:** Do not implement yet  
-**Recommended revisit:** after RFC-050–053 are implemented and reviewed  
+**Status:** Superseded for the first local advisory slice; retained as historical deferral record
+**Recommended revisit:** satisfied for the first advisory tool slice; rewrite/apply remain deferred
 
 ---
 
 ## 1. Decision
 
-Do **not** implement `matten-migrate` now.
-
-RFC-054 is accepted only as a future direction until the following are stable:
+This note originally deferred all `matten-migrate` implementation. That
+deferral has now been superseded for the first local advisory tool slice only:
 
 ```text
-[ ] RFC-050 migration guide exists
-[ ] RFC-051 bridge conversion contracts exist
-[ ] RFC-052 target playbooks exist
-[ ] RFC-053 readiness report template exists
-[ ] at least one worked readiness report exists
-[ ] users or maintainers still want tool support after using the docs
+tools/matten-migrate
+inspect / report / list-targets
+workspace-excluded
+publish = false
+local-only
+non-mutating
+```
+
+The reopening and implementation records are:
+
+```text
+rfcs/handoffs/054-matten-migrate-readiness-audit.md
+rfcs/handoffs/054-matten-migrate-first-tool-handoff.md
+```
+
+The original prohibition still applies to public crates, rewrite/apply flows,
+automatic source conversion, network/telemetry behavior, and any stronger
+correctness-oracle claims.
+
+RFC-054 was accepted only as a future direction until the following were stable:
+
+```text
+[x] RFC-050 migration guide exists
+[x] RFC-051 bridge conversion contracts exist
+[x] RFC-052 target playbooks exist
+[x] RFC-053 readiness report template exists
+[x] at least one worked readiness report exists
+[x] users or maintainers still want tool support after using the docs
 ```
 
 ---
@@ -57,14 +78,13 @@ Allowed:
 [✓] create a placeholder docs note
 [✓] create manual migration readiness report template
 [✓] collect tool requirements from users
+[✓] maintain the reviewed local advisory `tools/matten-migrate` slice
 ```
 
 Not allowed:
 
 ```text
-[ ] create tools/matten-migrate
 [ ] create crates/matten-migrate
-[ ] implement source scanning
 [ ] implement Cargo.toml editing
 [ ] implement rewrite/apply commands
 [ ] add telemetry/network behavior
@@ -74,20 +94,23 @@ Not allowed:
 
 ## 4. Future full handoff trigger
 
-Create a full developer handoff for RFC-054 only when at least one of these is true:
+The first local advisory handoff was created after these triggers became true.
+Future tool expansion still needs a separate handoff/review gate.
+
+Original trigger list:
 
 ```text
-[ ] RFC-050–053 are implemented and reviewed
+[x] RFC-050–053 are implemented and reviewed
 [ ] maintainers have used the manual report template on real projects
-[ ] at least two migration target playbooks are stable
-[ ] there is a concrete request for automation
+[x] at least two migration target playbooks are stable
+[x] there is a concrete request for automation
 ```
 
 ---
 
 ## 5. Future first tool scope
 
-When RFC-054 eventually starts, first scope should be advisory only:
+The first RFC-054 implementation started with advisory-only scope:
 
 ```bash
 matten-migrate inspect .
@@ -134,8 +157,10 @@ not rewritten source code.
 Treat RFC-054 as:
 
 ```text
-future approved direction
-not current implementation work
+first local advisory slice implemented
+future expansion still requires explicit handoff/review
+rewrite/apply still deferred
 ```
 
-If implementation pressure appears, return for a full handoff before writing code.
+If further implementation pressure appears, return for a full handoff before
+writing code.

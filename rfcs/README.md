@@ -78,7 +78,7 @@ for RFC state; the Status field inside each file mirrors the folder.
 | ID | Title | Target |
 |---:|---|---|
 | 049 | [Benchmarking, Complexity Metrics, and Positioning Report](./proposed/049-benchmarking-complexity-metrics-and-positioning-report.md) | **Accepted** — Phase 1 baseline (0.22.1) + Phase 2 Rust peer comparison (accepted 2026-06-25) complete; Phases 3–4 deferred |
-| 054 | [`matten-migrate` Assisted Migration Tool](./proposed/054-matten-migrate-assisted-migration-tool.md) | **Accepted as future direction** (2026-06-24; deferral confirmed in deep review 2026-06-27) — implementation deferred |
+| 054 | [`matten-migrate` Assisted Migration Tool](./proposed/054-matten-migrate-assisted-migration-tool.md) | **Accepted as future direction** (2026-06-24); first local advisory tool slice implemented; rewrite/apply and public crate remain deferred |
 Implementation handoffs for the v0.20+ proposed set (RFC-033–042), the examples
 program (RFC-043–048), and the benchmarking program (RFC-049) live in
 [`./handoffs/`](./handoffs/). They translate each RFC into PR boundaries, checks,
@@ -101,6 +101,10 @@ covers the documentation/policy/template work (RFC-050–053) for v0.23.x, with 
 [acceptance/QA checklist](./handoffs/050-053-acceptance-qa-checklist.md) and a
 [release-guard checklist](./handoffs/050-053-release-guard-checklist.md); RFC-054's
 [`054-deferred-implementation-note.md`](./handoffs/054-deferred-implementation-note.md)
-keeps the `matten-migrate` CLI explicitly deferred. These RFCs add no core dependency: all
-migration support lives in docs, bridge crates, and (later, if ever) workspace-excluded
-tooling.
+records the original deferral boundary, while
+[`054-matten-migrate-readiness-audit.md`](./handoffs/054-matten-migrate-readiness-audit.md)
+and
+[`054-matten-migrate-first-tool-handoff.md`](./handoffs/054-matten-migrate-first-tool-handoff.md)
+record the reviewed reopening and first local advisory tool slice. These RFCs add
+no core dependency: migration support lives in docs, bridge crates, and
+workspace-excluded tooling.

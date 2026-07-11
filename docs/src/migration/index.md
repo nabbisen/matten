@@ -25,8 +25,8 @@ It is explicitly **not**:
 - a claim that `matten` is faster, or a promise that you can swap `matten` out unchanged;
 - a claim that any target is universally "better" — it depends entirely on the workload;
 - a tool that rewrites your code for you. `matten` helps you understand and plan a
-  migration. (An assisted tool, `matten-migrate`, is a deferred future possibility, not part
-  of this guide.)
+  migration. The local `matten-migrate` helper can draft an advisory report, but it is
+  not a source rewriter.
 
 `tools/matten-migrate` is now available as a local, unpublished, advisory helper
 for generating a first migration-readiness report. It is a heuristic
