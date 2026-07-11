@@ -28,6 +28,9 @@ cargo run --manifest-path tools/matten-migrate/Cargo.toml -- list-targets
 cargo run --manifest-path tools/matten-migrate/Cargo.toml -- inspect tools/matten-migrate/fixtures/simple-core-project
 cargo run --manifest-path tools/matten-migrate/Cargo.toml -- report tools/matten-migrate/fixtures/simple-core-project
 cargo run --manifest-path tools/matten-migrate/Cargo.toml -- report tools/matten-migrate/fixtures/simple-core-project --output target/matten-migration-report.md
+cargo run --manifest-path tools/matten-migrate/Cargo.toml -- suggest --target ndarray tools/matten-migrate/fixtures/receiver-method-project
+cargo run --manifest-path tools/matten-migrate/Cargo.toml -- suggest --target polars-pandas tools/matten-migrate/fixtures/common-rust-collisions-project
+cargo run --manifest-path tools/matten-migrate/Cargo.toml -- suggest --target stay-with-matten tools/matten-migrate/fixtures/simple-core-project
 ```
 
 Supported commands:
@@ -35,8 +38,29 @@ Supported commands:
 ```text
 inspect <path>
 report <path> [--output <path>]
+suggest --target <target> <path>
 list-targets
 --help
+```
+
+Supported targets:
+
+```text
+ndarray
+nalgebra
+polars-pandas
+candle
+numpy
+stay-with-matten
+```
+
+Supported aliases:
+
+```text
+polars
+pandas
+stay
+matten
 ```
 
 Not supported:
@@ -45,7 +69,8 @@ Not supported:
 rewrite
 apply
 explain-api
-suggest --target
+suggest --all
+suggest --output
 check-bridges
 ```
 

@@ -41,8 +41,55 @@ const TARGETS: &[(&str, &str)] = &[
 enum Command {
     Inspect { path: PathBuf },
     Report { path: PathBuf, output: Option<PathBuf> },
+    Suggest { target: Target, path: PathBuf },
     ListTargets,
     Help,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Target {
+    Ndarray,
+    Nalgebra,
+    PolarsPandas,
+    Candle,
+    Numpy,
+    StayWithMatten,
+}
+
+impl Target {
+    fn parse(value: &str) -> Option<Self> {
+        match value {
+            "ndarray" => Some(Self::Ndarray),
+            "nalgebra" => Some(Self::Nalgebra),
+            "polars-pandas" | "polars" | "pandas" => Some(Self::PolarsPandas),
+            "candle" => Some(Self::Candle),
+            "numpy" => Some(Self::Numpy),
+            "stay-with-matten" | "stay" | "matten" => Some(Self::StayWithMatten),
+            _ => None,
+        }
+    }
+
+    fn slug(self) -> &'static str {
+        match self {
+            Self::Ndarray => "ndarray",
+            Self::Nalgebra => "nalgebra",
+            Self::PolarsPandas => "polars-pandas",
+            Self::Candle => "candle",
+            Self::Numpy => "numpy",
+            Self::StayWithMatten => "stay-with-matten",
+        }
+    }
+
+    fn display(self) -> &'static str {
+        match self {
+            Self::Ndarray => "ndarray",
+            Self::Nalgebra => "nalgebra",
+            Self::PolarsPandas => "Polars / Pandas",
+            Self::Candle => "Candle",
+            Self::Numpy => "NumPy",
+            Self::StayWithMatten => "stay with matten",
+        }
+    }
 }
 
 #[derive(Debug, Default)]
@@ -78,6 +125,10 @@ fn run() -> Result<(), Box<dyn Error>> {
                 print!("{report}");
             }
         }
+        Command::Suggest { target, path } => {
+            let analysis = analyze_path(&path)?;
+            print!("{}", render_suggest(&analysis, target));
+        }
         Command::ListTargets => print!("{}", render_targets()),
         Command::Help => print!("{}", usage()),
     }
@@ -107,14 +158,15 @@ where
             })
         }
         "report" => parse_report_args(args),
+        "suggest" => parse_suggest_args(args),
         "list-targets" => {
             if !args.is_empty() {
                 return Err(format!("list-targets does not accept arguments\n\n{}", usage()));
             }
             Ok(Command::ListTargets)
         }
-        "rewrite" | "apply" | "explain-api" | "suggest" | "check-bridges" => Err(format!(
-            "{command:?} is not supported in this first advisory slice\n\n{}",
+        "rewrite" | "apply" | "explain-api" | "check-bridges" => Err(format!(
+            "{command:?} is not supported in this local advisory tool\n\n{}",
             usage()
         )),
         other => Err(format!("unknown command: {other}\n\n{}", usage())),
@@ -154,15 +206,75 @@ fn parse_report_args(args: Vec<String>) -> Result<Command, String> {
     Ok(Command::Report { path, output })
 }
 
+fn parse_suggest_args(args: Vec<String>) -> Result<Command, String> {
+    if args.is_empty() {
+        return Err(format!(
+            "suggest expects --target <target> and one path\n\n{}",
+            usage()
+        ));
+    }
+
+    let mut target: Option<Target> = None;
+    let mut path: Option<PathBuf> = None;
+    let mut iter = args.into_iter();
+    while let Some(arg) = iter.next() {
+        match arg.as_str() {
+            "--target" => {
+                let value = iter
+                    .next()
+                    .ok_or_else(|| "--target requires a target".to_string())?;
+                target = Some(Target::parse(&value).ok_or_else(|| {
+                    format!("unsupported target: {value}\n\n{}", supported_targets())
+                })?);
+            }
+            "--all" => return Err("suggest --all is not supported in this slice".to_string()),
+            "--output" => return Err("suggest --output is not supported in this slice".to_string()),
+            "--edit" => return Err("suggest --edit is not supported in this slice".to_string()),
+            "--json" => return Err("suggest --json is not supported in this slice".to_string()),
+            "--help" | "-h" => return Ok(Command::Help),
+            value if value.starts_with("--") => {
+                return Err(format!("unknown suggest argument: {value}\n\n{}", usage()));
+            }
+            value => {
+                if path.is_some() {
+                    return Err(format!("suggest accepts only one input path\n\n{}", usage()));
+                }
+                path = Some(PathBuf::from(value));
+            }
+        }
+    }
+
+    let target = target.ok_or_else(|| format!("suggest requires --target <target>\n\n{}", usage()))?;
+    let path = path.ok_or_else(|| format!("suggest expects a path\n\n{}", usage()))?;
+    Ok(Command::Suggest { target, path })
+}
+
+fn supported_targets() -> String {
+    "\
+Supported targets:
+  ndarray
+  nalgebra
+  polars-pandas
+  candle
+  numpy
+  stay-with-matten
+
+Aliases:
+  polars, pandas, stay, matten
+"
+    .to_string()
+}
+
 fn usage() -> String {
     "\
 Usage:
   matten-migrate inspect <path>
   matten-migrate report <path> [--output <path>]
+  matten-migrate suggest --target <target> <path>
   matten-migrate list-targets
 
-This first slice is local-only, advisory, and non-mutating.
-It does not support rewrite/apply/explain-api/suggest/check-bridges.
+This local tool is advisory and non-mutating except for report --output.
+It does not support rewrite/apply/explain-api/check-bridges.
 "
     .to_string()
 }
@@ -587,6 +699,181 @@ fn render_report(analysis: &Analysis) -> String {
     out
 }
 
+fn render_suggest(analysis: &Analysis, target: Target) -> String {
+    let mut out = String::new();
+    writeln!(out, "# matten Migration Target Suggestion").unwrap();
+    writeln!(out).unwrap();
+    writeln!(out, "> {DISCLAIMER}").unwrap();
+    writeln!(out, "> {DETECTION_LIMITS}").unwrap();
+    writeln!(out).unwrap();
+    writeln!(out, "Target: `{}`.", target.slug()).unwrap();
+    writeln!(out, "Project: `{}`.", analysis.project_name).unwrap();
+    writeln!(out).unwrap();
+    writeln!(out, "## Local evidence").unwrap();
+    writeln!(out).unwrap();
+    write_target_evidence(&mut out, analysis, target);
+    writeln!(out).unwrap();
+    writeln!(out, "## Target fit notes").unwrap();
+    writeln!(out).unwrap();
+    write_target_fit_notes(&mut out, analysis, target);
+    writeln!(out).unwrap();
+    writeln!(out, "## Manual checks").unwrap();
+    writeln!(out).unwrap();
+    write_manual_checks_for_target(&mut out, target);
+    writeln!(out).unwrap();
+    writeln!(out, "## Risks").unwrap();
+    writeln!(out).unwrap();
+    writeln!(out, "- Treat this as a reading aid for the `{}` playbook, not a migration decision.", target.display()).unwrap();
+    writeln!(out, "- Heuristic detection can miss usage or report source-like text; verify every finding manually.").unwrap();
+    writeln!(out, "- Profile before moving hot paths or adding bridge conversions.").unwrap();
+    writeln!(out).unwrap();
+    writeln!(out, "## Next steps").unwrap();
+    writeln!(out).unwrap();
+    writeln!(out, "1. Review the local evidence manually.").unwrap();
+    writeln!(out, "2. Read the `{}` playbook if the notes match real requirements.", target.display()).unwrap();
+    writeln!(out, "3. Keep `matten` where small, readable glue is enough.").unwrap();
+    out
+}
+
+fn write_target_evidence(out: &mut String, analysis: &Analysis, target: Target) {
+    let categories = evidence_categories(target);
+    let mut wrote = false;
+    for category in categories {
+        if let Some(signals) = analysis.signals.get(category) {
+            if signals.is_empty() {
+                continue;
+            }
+            wrote = true;
+            writeln!(out, "- {category}:").unwrap();
+            for signal in signals {
+                writeln!(out, "  - {signal}").unwrap();
+            }
+        }
+    }
+
+    if !wrote {
+        writeln!(
+            out,
+            "- no strong local evidence for `{}` in this heuristic scan",
+            target.slug()
+        )
+        .unwrap();
+    }
+}
+
+fn evidence_categories(target: Target) -> &'static [&'static str] {
+    match target {
+        Target::Ndarray => &[
+            "shape operations",
+            "reductions",
+            "matten-ndarray bridge",
+            "core Tensor construction",
+        ],
+        Target::Nalgebra => &["linear algebra"],
+        Target::PolarsPandas => &["matten-data", "dataframe pressure"],
+        Target::Candle => &[],
+        Target::Numpy => &[],
+        Target::StayWithMatten => &[
+            "core Tensor construction",
+            "dynamic ingestion",
+            "matten-data",
+            "detected crates/features",
+        ],
+    }
+}
+
+fn write_target_fit_notes(out: &mut String, analysis: &Analysis, target: Target) {
+    match target {
+        Target::Ndarray => {
+            if has_signal(analysis, "shape operations")
+                || has_signal(analysis, "reductions")
+                || has_signal(analysis, "matten-ndarray bridge")
+            {
+                writeln!(out, "- `ndarray` may be relevant when dense N-D operations become measured hot paths.").unwrap();
+            } else {
+                writeln!(out, "- No strong local `ndarray` pressure was detected by this scan.").unwrap();
+            }
+            writeln!(out, "- If bridge evidence appears, review copy boundaries and the `f64` conversion contract.").unwrap();
+        }
+        Target::Nalgebra => {
+            if has_signal(analysis, "linear algebra") {
+                writeln!(out, "- `nalgebra` may be relevant for dense matrix/vector redesigns and solver needs.").unwrap();
+            } else {
+                writeln!(out, "- No strong local `nalgebra` pressure was detected by this scan.").unwrap();
+            }
+            writeln!(out, "- Manual review should decide whether fixed or dynamic dimensions matter.").unwrap();
+        }
+        Target::PolarsPandas => {
+            if has_signal(analysis, "matten-data") && has_signal(analysis, "dataframe pressure") {
+                writeln!(out, "- `Polars / Pandas` may be relevant when table analytics such as group-by, join, pivot, or query are real requirements.").unwrap();
+            } else if has_signal(analysis, "matten-data") {
+                writeln!(out, "- `matten-data` appears, but dataframe pressure was not detected; do not treat ingestion alone as a Polars / Pandas reason.").unwrap();
+            } else {
+                writeln!(out, "- No strong local Polars / Pandas pressure was detected by this scan.").unwrap();
+            }
+            writeln!(out, "- Manual review should decide whether table work belongs outside `matten-data`.").unwrap();
+        }
+        Target::Candle => {
+            writeln!(out, "- No strong local `Candle` evidence is detected in this slice unless explicit training, device, or model terms are added by a reviewed scanner refinement.").unwrap();
+            writeln!(out, "- Do not treat a single `matmul` or `dot` occurrence as ML pressure.").unwrap();
+        }
+        Target::Numpy => {
+            writeln!(out, "- No strong local `NumPy` evidence is detected unless the project explicitly shows a Python ecosystem handoff.").unwrap();
+            writeln!(out, "- Manual review should decide whether downstream work belongs next to Python data or science tooling.").unwrap();
+        }
+        Target::StayWithMatten => {
+            if !has_signal(analysis, "dataframe pressure")
+                && !has_signal(analysis, "linear algebra")
+                && !has_signal(analysis, "reductions")
+            {
+                writeln!(out, "- Staying with `matten` may be relevant when no strong production pressure appears.").unwrap();
+            } else {
+                writeln!(out, "- Staying with `matten` can still be valid if the work remains small, readable, and not a measured hot path.").unwrap();
+            }
+            writeln!(out, "- Dynamic ingestion can remain useful as cleanup before numeric conversion.").unwrap();
+        }
+    }
+}
+
+fn write_manual_checks_for_target(out: &mut String, target: Target) {
+    let checks = match target {
+        Target::Ndarray => &[
+            "rank and shape assumptions",
+            "conversion boundary frequency",
+            "whether N-D operations dominate real workloads",
+        ][..],
+        Target::Nalgebra => &[
+            "fixed versus dynamic dimensions",
+            "solver or decomposition needs",
+            "whether matrix/vector semantics are clearer outside core matten",
+        ],
+        Target::PolarsPandas => &[
+            "whether table work is more than simple ingestion",
+            "whether group-by, join, pivot, or query are real requirements",
+            "whether `matten-data` should stay as a table-to-Tensor boundary",
+        ],
+        Target::Candle => &[
+            "training loop requirements",
+            "device execution requirements",
+            "model serialization requirements",
+        ],
+        Target::Numpy => &[
+            "whether downstream work belongs in Python",
+            "data interchange boundaries",
+            "team and deployment constraints",
+        ],
+        Target::StayWithMatten => &[
+            "readability",
+            "workload size",
+            "whether profiling shows real hot paths",
+        ],
+    };
+
+    for check in checks {
+        writeln!(out, "- {check}").unwrap();
+    }
+}
+
 fn status_line(analysis: &Analysis) -> &'static str {
     if analysis.signals.is_empty() {
         "no matten usage detected"
@@ -843,6 +1130,82 @@ signals:
     }
 
     #[test]
+    fn ndarray_suggestion_matches_expected_output() {
+        let analysis = analyze_path(&fixture("receiver-method-project")).unwrap();
+        let suggestion = render_suggest(&analysis, Target::Ndarray);
+        let expected = "\
+# matten Migration Target Suggestion
+
+> This report is advisory. It does not prove production readiness, does not guarantee a target library is better, and does not perform automatic conversion.
+> Detection is a heuristic text/dependency scan. It may miss real matten usage and may over-report source-like text as usage. It has not been validated against real downstream projects; treat results as a starting point for manual review.
+
+Target: `ndarray`.
+Project: `receiver-method-project`.
+
+## Local evidence
+
+- reductions:
+  - mean (src/main.rs:7)
+  - sum (src/main.rs:6)
+- core Tensor construction:
+  - Tensor::new (src/main.rs:4)
+  - Tensor::new (src/main.rs:5)
+
+## Target fit notes
+
+- `ndarray` may be relevant when dense N-D operations become measured hot paths.
+- If bridge evidence appears, review copy boundaries and the `f64` conversion contract.
+
+## Manual checks
+
+- rank and shape assumptions
+- conversion boundary frequency
+- whether N-D operations dominate real workloads
+
+## Risks
+
+- Treat this as a reading aid for the `ndarray` playbook, not a migration decision.
+- Heuristic detection can miss usage or report source-like text; verify every finding manually.
+- Profile before moving hot paths or adding bridge conversions.
+
+## Next steps
+
+1. Review the local evidence manually.
+2. Read the `ndarray` playbook if the notes match real requirements.
+3. Keep `matten` where small, readable glue is enough.
+";
+        assert_eq!(suggestion, expected);
+        assert!(suggestion.contains("This report is advisory"));
+        assert!(!suggestion.contains("must migrate"));
+        assert!(!suggestion.contains("best target"));
+        assert!(!suggestion.contains("guaranteed"));
+        assert!(!suggestion.contains("faster"));
+        assert!(!suggestion.contains("drop-in replacement"));
+    }
+
+    #[test]
+    fn polars_pandas_suggestion_requires_dataframe_pressure() {
+        let collision = analyze_path(&fixture("common-rust-collisions-project")).unwrap();
+        let collision_suggestion = render_suggest(&collision, Target::PolarsPandas);
+        assert!(!has_signal(&collision, "dataframe pressure"));
+        assert!(collision_suggestion.contains("do not treat ingestion alone"));
+        assert!(!collision_suggestion.contains("may be relevant when table analytics"));
+
+        let data = analyze_path(&fixture("data-project")).unwrap();
+        let data_suggestion = render_suggest(&data, Target::PolarsPandas);
+        assert!(has_signal(&data, "dataframe pressure"));
+        assert!(data_suggestion.contains("may be relevant when table analytics"));
+    }
+
+    #[test]
+    fn stay_with_matten_suggestion_handles_simple_usage() {
+        let analysis = analyze_path(&fixture("simple-core-project")).unwrap();
+        let suggestion = render_suggest(&analysis, Target::StayWithMatten);
+        assert!(suggestion.contains("Staying with `matten` can still be valid"));
+        assert!(suggestion.contains("Keep `matten` where small, readable glue is enough."));
+    }
+
+    #[test]
     fn ndarray_bridge_points_to_bridge_not_automatic_migration() {
         let analysis = analyze_path(&fixture("ndarray-bridge-project")).unwrap();
         assert!(has_signal(&analysis, "matten-ndarray bridge"));
@@ -871,6 +1234,52 @@ matten migration target playbooks
     #[test]
     fn parse_rejects_deferred_commands() {
         let err = parse_args(["rewrite".to_string()]).unwrap_err();
+        assert!(err.contains("not supported"));
+        let err = parse_args(["explain-api".to_string()]).unwrap_err();
+        assert!(err.contains("not supported"));
+        let err = parse_args(["check-bridges".to_string()]).unwrap_err();
+        assert!(err.contains("not supported"));
+    }
+
+    #[test]
+    fn suggest_rejects_unsupported_forms() {
+        let err = parse_args(["suggest".to_string(), "fixtures".to_string()]).unwrap_err();
+        assert!(err.contains("requires --target"));
+
+        let err = parse_args([
+            "suggest".to_string(),
+            "--target".to_string(),
+            "unknown".to_string(),
+            "fixtures".to_string(),
+        ])
+        .unwrap_err();
+        assert!(err.contains("unsupported target"));
+
+        let err = parse_args([
+            "suggest".to_string(),
+            "--target".to_string(),
+            "ndarray".to_string(),
+        ])
+        .unwrap_err();
+        assert!(err.contains("expects a path"));
+
+        let err = parse_args([
+            "suggest".to_string(),
+            "--all".to_string(),
+            "fixtures".to_string(),
+        ])
+        .unwrap_err();
+        assert!(err.contains("not supported"));
+
+        let err = parse_args([
+            "suggest".to_string(),
+            "--target".to_string(),
+            "ndarray".to_string(),
+            "--output".to_string(),
+            "target/out.md".to_string(),
+            "fixtures".to_string(),
+        ])
+        .unwrap_err();
         assert!(err.contains("not supported"));
     }
 }
