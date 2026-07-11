@@ -11,10 +11,11 @@ complete numbers, environment details, and regeneration steps live in the report
 > regression-visibility reference — **not a ranking, and not a "faster than X" claim.** `matten`
 > optimizes for time to a runnable PoC, not benchmark leadership.
 
-The numbers below are the **v0.2 maintainer refresh at workspace `0.28.3`**, produced under the
-unchanged RFC-049 methodology. The architect-accepted reference baseline is v0.1 (see the reports);
-the relative positioning matches v0.1. Absolute timings drift run-to-run with VM load — all
-libraries move together — so the *shape* of the results is the signal, not the exact microseconds.
+The Phase 1/2 timing numbers below are the **v0.2 maintainer refresh at workspace `0.28.3`**,
+produced under the unchanged RFC-049 methodology. The architect-accepted Rust reference baseline is
+v0.1 (see the reports); the relative positioning matches v0.1. Absolute timings drift run-to-run
+with VM load — all libraries move together — so the *shape* of the results is the signal, not the
+exact microseconds. Phase 3 adds code-shape evidence, not timing numbers.
 
 ## Phase 1 — internal baseline
 
@@ -79,13 +80,40 @@ show the widest gaps (~7.5–9×). A consistent internal pattern is that `matten
 is its widest gap while its vector×matrix path is competitive — echoing the axis-reduction signal
 from Phase 1.
 
+## Phase 3 — Python reference comparison
+
+The Python reference comparison is code-shape-first: it records ELOC, dependency footprint, and
+short code-shape notes for small NumPy/Pandas references next to matching minimal `matten`
+solution snippets. Runtime context is intentionally omitted in the first report.
+
+- **Report ID:** `matten-rfc049-python-reference-comparison-v0.1`.
+- **Scope:** NumPy for the five scenario tasks; Pandas only for CSV → selected columns → missing
+  fill → numeric matrix.
+- **Environment note:** NumPy `2.3.5` and Pandas `2.3.3` were installed from the pinned
+  requirements for the refreshed report. Dependency counts exclude optional extras.
+
+Representative ELOC rows (`without imports / with imports`):
+
+| Task | Python reference | minimal `matten` snippet |
+|---|---:|---:|
+| cosine similarity | 8 / 9 | 9 / 10 |
+| Markov chain step | 10 / 11 | 21 / 22 |
+| tiny PageRank step | 12 / 13 | 29 / 30 |
+| linear-regression GD step | 10 / 11 | 21 / 22 |
+| heat-equation 1D step | 10 / 11 | 21 / 22 |
+| CSV to numeric matrix | 10 / 12 | 12 / 13 |
+
+ELOC is an approachability signal, not a quality or performance score. NumPy/Pandas are
+mature ecosystems with broad native surfaces; `matten` keeps the same small workflows in a
+Rust-first `Tensor` path without claiming to replace those ecosystems.
+
 ## Read next
 
 - [Methodology](./methodology.md) — what is measured, what is not, and the rules that keep the
   program honest.
 - Full reports with complete tables, environment, and regeneration commands:
-  `benchmarks/reports/internal-baseline-v0.2.md` and `benchmarks/reports/peer-comparison-v0.2.md`
-  (and the accepted v0.1 references alongside them).
+  `benchmarks/reports/internal-baseline-v0.2.md`, `benchmarks/reports/peer-comparison-v0.2.md`,
+  and `benchmarks/reports/python-reference-comparison-v0.1.md` (with accepted v0.1 references
+  alongside the Rust reports).
 
-Phases 3 (NumPy/Pandas reference) and 4 (regression gates) are designed in RFC-049 but deferred and
-not yet measured.
+Phase 4 (regression gates) is designed in RFC-049 but deferred and not yet measured.

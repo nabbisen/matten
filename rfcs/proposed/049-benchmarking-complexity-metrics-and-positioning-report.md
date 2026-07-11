@@ -1,7 +1,8 @@
 # RFC-049: Benchmarking, Complexity Metrics, and Positioning Report
 
 **Status:** Accepted. Phase 1 implemented and accepted; Phase 2 implemented and accepted
-(official Rust peer comparison accepted 2026-06-25); Phases 3–4 deferred.  
+(official Rust peer comparison accepted 2026-06-25); Phase 3 code-shape-first Python reference
+tooling and refreshed report implemented and accepted by review on 2026-07-11; Phase 4 deferred.
 **Target Release:** Phase 1 internal baseline in v0.22.1; Phase 2 peer-comparison
 harness/template in v0.22.4; official Phase 2 peer comparison accepted in v0.22.7; Phases 3–4 TBD.  
 **Acceptance:** Approved by architect ruling (2026-06-24). Phase 1 (PR-049-1 methodology
@@ -11,9 +12,11 @@ internal baseline was accepted (Baseline ID `matten-rfc049-internal-baseline-v0.
 report template shipped in v0.22.4 under the `peers` feature, and the **official peer
 comparison was filled from a maintainer run and accepted by architect ruling on 2026-06-25**
 (Report ID `matten-rfc049-rust-peer-comparison-v0.1`). Phase 3 (NumPy/Pandas reference
-comparison) and Phase 4 (regression thresholds / hard gates) remain designed but **not
-authorized**. Per the 4-folder RFC lifecycle, this RFC stays in `proposed/` until fully
-implemented or explicitly split/resolved (Phases 3–4 remain).  
+comparison) has code-shape-first tooling prepared for review (Report ID
+`matten-rfc049-python-reference-comparison-v0.1`, accepted by review on 2026-07-11);
+Phase 4 (regression thresholds / hard gates) remains designed but **not authorized**. Per the
+4-folder RFC lifecycle, this RFC stays in `proposed/` until fully implemented or explicitly
+split/resolved (Phase 4 remains).
 **Owner:** `matten` maintainers  
 **Related:** RFC-030, RFC-033–048, RFC-038, RFC-040, RFC-041  
 **Scope:** Benchmark harness, reproducible measurement policy, complexity metrics, positioning report  
@@ -393,7 +396,8 @@ Acceptance:
 > `matten-rfc049-rust-peer-comparison-v0.1`).** Phase 2 was authorized once the maintainer-run
 > internal baseline (Phase 1) was accepted. The peer-comparison harness is implemented under
 > the settled design below, and the official peer comparison has been filled from a maintainer
-> run and accepted. Phase 3 (NumPy/Pandas) and hard performance gates remain unauthorized.
+> run and accepted. Phase 3 (NumPy/Pandas) has code-shape-first tooling and a refreshed report
+> accepted by review on 2026-07-11; hard performance gates remain unauthorized.
 >
 > - **Peer-dependency isolation (B1).** Do not rely on workspace exclusion alone. Published
 >   crates must be *positively proven* free of peer deps via
@@ -996,10 +1000,11 @@ Phase 2 acceptance:
 Phase 3 acceptance:
 
 ```text
-[ ] NumPy reference tasks implemented, if approved
-[ ] Pandas reference task limited to table-to-Tensor workflow
-[ ] report uses "reference comparison" language
-[ ] no SciPy/Candle scope creep
+[x] NumPy reference tasks implemented as like-for-like code-shape evidence
+[x] Pandas reference task limited to table-to-Tensor workflow
+[x] report uses "reference comparison" language
+[x] dependency-footprint report filled from a pinned-dependency maintainer run and accepted
+[x] no SciPy/Candle scope creep
 ```
 
 Phase 4 acceptance:
@@ -1138,16 +1143,16 @@ Acceptance:
 
 ### PR-049-8: Ecosystem reference comparison
 
-Optional after Rust peer comparison.
+Prepared as a code-shape-first reference slice after Rust peer comparison.
 
-Add NumPy/Pandas scripts.
+Adds optional NumPy/Pandas scripts. Runtime context is omitted by default.
 
 Acceptance:
 
 ```text
-[ ] Python references are optional
-[ ] no normal CI dependency
-[ ] report uses reference-comparison framing
+[x] Python references are optional
+[x] no normal CI dependency
+[x] report uses reference-comparison framing
 ```
 
 ---

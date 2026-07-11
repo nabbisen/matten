@@ -1,4 +1,4 @@
-# `matten` benchmark harness (RFC-049) — Phase 1 baseline and Phase 2 peer comparison
+# `matten` benchmark harness (RFC-049)
 
 A small, reproducible benchmark harness for the `matten` workspace. Its purpose is
 to **clarify `matten`'s position with evidence** — execution time, memory behavior,
@@ -6,15 +6,17 @@ example-code size, dependency footprint — **not** to claim `matten` is faster 
 larger ecosystems. See [the methodology](../docs/src/benchmarks/methodology.md) for
 the full policy.
 
-## Status: Phase 1 baseline + Phase 2 peer comparison (opt-in)
+## Status: Phase 1 baseline + Phase 2 peer comparison + Phase 3 references
 
 Phase 1 (internal Rust baseline) is implemented and **accepted**. **Phase 2** (Rust peer
 comparison vs `ndarray` / `nalgebra`) is **complete and accepted** (architect ruling
 2026-06-25): the official report is filled from a maintainer run on the baseline's machine
 class (`reports/peer-comparison-v0.1.md`). Phase 2 remains **opt-in** behind the `peers`
-feature and off by default. Cross-language reference comparisons (NumPy/Pandas, Phase 3) and
-any regression thresholds (Phase 4) are designed in RFC-049 but **not yet
-implemented/authorized**.
+feature and off by default. **Phase 3** (Python reference comparison) is prepared as an optional,
+code-shape-first reference slice: ELOC, dependency footprint, and code-shape notes only; runtime
+context is omitted by default. The report has been refreshed with pinned Python dependencies and
+accepted by review on 2026-07-11. Regression thresholds (Phase 4) are designed in RFC-049 but **not
+yet implemented/authorized**.
 
 ## How to regenerate (with environment capture)
 
@@ -66,6 +68,14 @@ ordinary CI — compile-checked only by the manual/scheduled peers workflow,
 cargo bench --manifest-path benchmarks/Cargo.toml --features peers --bench peers -- --noplot
 ```
 
+**6. Phase 3 Python references** (optional; Python dependencies are pinned in
+`python/requirements.txt`; setup may contact PyPI, reference runs must not):
+
+```bash
+python3 benchmarks/python/run_references.py --environment
+python3 benchmarks/python/run_references.py --all
+```
+
 macOS (`/usr/bin/time -l`) and Windows are deferred. Curated reports live in `reports/`; the
 in-book reader summary is [`docs/src/benchmarks/results.md`](../docs/src/benchmarks/results.md).
 
@@ -82,6 +92,7 @@ always invoked with an explicit manifest path, and it has its own (git-ignored)
 ```text
 benchmarks/
   Cargo.toml            # excluded from the workspace; publish = false
+  python/               # optional NumPy/Pandas reference scripts (RFC-049 Phase 3)
   src/
     common.rs           # deterministic, pinned input generators
     workloads/

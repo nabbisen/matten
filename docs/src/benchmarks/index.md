@@ -29,10 +29,13 @@ The benchmark program is staged.
   official peer comparison was filled from a maintainer run on the baseline's machine class
   and accepted by architect ruling on 2026-06-25. Peer tasks are opt-in behind the `peers`
   feature (off by default).
+- **Phase 3 — Python reference comparison (NumPy/Pandas): implemented and accepted.**
+  Optional scripts record ELOC, dependency footprint, versions, and code-shape notes. Runtime
+  context is omitted by default and must never be used as a ranking. The report was refreshed with
+  pinned Python dependencies and accepted by review on 2026-07-11.
 
 Still deferred (designed in RFC-049, not yet implemented/authorized):
 
-- **Phase 3** — ecosystem reference comparison (NumPy/Pandas), script-driven;
 - **Phase 4** — regression tracking policy and hard thresholds/gates.
 
 ## Read next

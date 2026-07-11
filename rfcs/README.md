@@ -89,7 +89,10 @@ examples use an additive 30+ band, and existing distance/cosine/companion exampl
 are audited/improved rather than duplicated. The benchmarking handoff
 ([`049-benchmarking-developer-handoff.md`](./handoffs/049-benchmarking-developer-handoff.md))
 keeps all benchmark tooling in an isolated `publish = false` package so core
-`matten` gains no benchmark dependency.
+`matten` gains no benchmark dependency. The Phase 3 Python reference-comparison
+implementation handoff is tracked separately in
+[`049-phase-3-python-reference-comparison-handoff.md`](./handoffs/049-phase-3-python-reference-comparison-handoff.md)
+as the accepted code-shape-first NumPy/Pandas reference slice.
 
 The production-migration set (RFC-050–054) ships its handoff bundle in
 [`./handoffs/`](./handoffs/): the

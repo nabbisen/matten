@@ -1,7 +1,8 @@
 # Benchmark methodology
 
 This page records how `matten`'s benchmarks are measured and the rules that keep the
-program honest. It reflects **Phase 1** (internal Rust baseline) of RFC-049.
+program honest. It reflects RFC-049 Phase 1 (internal Rust baseline), Phase 2 (Rust peer
+comparison), and Phase 3 (Python reference comparison).
 
 ## Purpose
 
@@ -14,7 +15,7 @@ positioning and regression-visibility tool, not a ranking or a marketing claim.
 The benchmark program must not:
 
 - claim `matten` is faster than NumPy, or a replacement for `ndarray`/`nalgebra`;
-- include SciPy, Pandas, Candle, or GPU suites;
+- include SciPy, Candle, GPU suites, or broad Pandas dataframe benchmarks;
 - add hard CI speed-fail thresholds (initially);
 - change any public API merely to make a benchmark faster;
 - pressure the project into scope creep.
@@ -27,7 +28,8 @@ The benchmark program must not:
   optimizer from deleting the work.
 - **Memory** — peak resident set size (see below). Informative, not a gate.
 - **Example ELOC** and **dependency footprint** — reported alongside timings when
-  available, to show approachability and dependency trade-offs.
+  available, and as the main Phase 3 Python-reference evidence, to show approachability and
+  dependency trade-offs.
 
 ## Workloads (Phase 1)
 
@@ -41,7 +43,7 @@ cosine similarity, a Markov-chain step, a tiny PageRank step, a linear-regressio
 gradient-descent step, and a 1-D heat-equation step.
 
 Heavier examples (k-means, nearest-neighbor, finite differences, trapezoidal
-integration) and any peer/reference comparisons are deferred to later phases.
+integration) remain outside the benchmark set.
 
 ## Memory measurement policy
 
@@ -104,5 +106,37 @@ The Phase 2 **harness, report template, and official peer report are complete**:
 official Rust peer comparison was filled from a maintainer run on the same machine class as
 the accepted internal baseline and **accepted by architect ruling on 2026-06-25**
 (`benchmarks/reports/peer-comparison-v0.1.md`, Report ID
-`matten-rfc049-rust-peer-comparison-v0.1`). Phase 3 (NumPy/Pandas) and hard performance
-gates remain **not** authorized.
+`matten-rfc049-rust-peer-comparison-v0.1`).
+
+## Phase 3 — Python reference comparison (implemented and accepted)
+
+Phase 3 is implemented as a code-shape-first reference slice. It is:
+
+- **optional** — Python, NumPy, and Pandas are not required for ordinary Rust CI;
+- **not a runtime ranking** — the first report omits runtime context entirely;
+- **narrow** — NumPy covers the five scenario tasks; Pandas is limited to CSV/table cleanup into a
+  numeric matrix;
+- **dependency-explicit** — `benchmarks/python/requirements.txt` pins exact versions, setup may
+  contact PyPI, and reference runs must not access the network.
+
+The Phase 3 runner records:
+
+- ELOC without imports and with imports, comparing Python scripts with minimal `matten`
+  task-equivalent snippets rather than didactic examples;
+- direct dependency pins and installed versions;
+- transitive dependency counts where packages are installed;
+- short code-shape notes;
+- missing optional dependency behavior when NumPy/Pandas are not installed.
+
+Run it with:
+
+```bash
+python3 benchmarks/python/run_references.py --environment
+python3 benchmarks/python/run_references.py --all
+```
+
+If runtime context is added later, it must be same-machine, same-report context for both `matten`
+and the Python references, and it must not be sorted or worded as a winner/loser ranking.
+
+The report was refreshed with pinned Python dependencies installed and accepted by review on
+2026-07-11. Hard performance gates remain **not** authorized.
