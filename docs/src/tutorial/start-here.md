@@ -26,7 +26,15 @@ If your data is already clean numeric values, follow these examples in order:
 After these ten examples you understand the numeric core.
 
 For the visual side of the same path, see
-[Visual understanding examples](../examples/visual-understanding.md).
+[Visual understanding examples](../examples/visual-understanding.md). Use that
+page when you want to check a shape before reading values:
+
+| Question | Visual path |
+|---|---|
+| Which dimensions expand during broadcasting? | Broadcasting shape alignment |
+| Did reshape change values or only grouping? | Reshape, flatten, and transpose |
+| Which matmul dimensions must match? | Matmul shape flow |
+| Which dynamic values block numeric conversion? | Dynamic readiness |
 
 ## Dynamic ingestion: messy data with `dynamic`
 
