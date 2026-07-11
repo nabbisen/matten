@@ -31,6 +31,7 @@ working documents for the implementation team and may be revised as work proceed
 | `054-matten-migrate-readiness-audit.md` | RFC-054 `matten-migrate` readiness audit |
 | `054-matten-migrate-first-tool-handoff.md` | RFC-054 `matten-migrate` first local advisory tool slice |
 | `054-matten-migrate-target-suggestion-handoff.md` | RFC-054 `matten-migrate` target-specific suggestion slice |
+| `054-matten-migrate-explain-api-handoff.md` | RFC-054 `matten-migrate` static API explanation slice |
 | `065-educational-visualization-handoff.md` | RFC-065 Educational Visualization and Tensor Learning Path — first docs/positioning slice |
 | `065-phase-2-educational-shape-data-path-handoff.md` | RFC-065 Educational Visualization and Tensor Learning Path — Phase 2 educational shape/data docs slice |
 | `065-phase-3-educational-path-report-handoff.md` | RFC-065 Educational Visualization and Tensor Learning Path — Phase 3 local educational-path report slice |

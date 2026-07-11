@@ -78,7 +78,7 @@ for RFC state; the Status field inside each file mirrors the folder.
 | ID | Title | Target |
 |---:|---|---|
 | 049 | [Benchmarking, Complexity Metrics, and Positioning Report](./proposed/049-benchmarking-complexity-metrics-and-positioning-report.md) | **Accepted** — Phase 1 baseline (0.22.1) + Phase 2 Rust peer comparison (accepted 2026-06-25) complete; Phases 3–4 deferred |
-| 054 | [`matten-migrate` Assisted Migration Tool](./proposed/054-matten-migrate-assisted-migration-tool.md) | **Accepted as future direction** (2026-06-24); first local advisory tool slice implemented; rewrite/apply and public crate remain deferred |
+| 054 | [`matten-migrate` Assisted Migration Tool](./proposed/054-matten-migrate-assisted-migration-tool.md) | **Accepted as future direction** (2026-06-24); local advisory inspect/report/suggest/explain-api slices implemented; check-bridges/rewrite/apply and public crate remain deferred |
 Implementation handoffs for the v0.20+ proposed set (RFC-033–042), the examples
 program (RFC-043–048), and the benchmarking program (RFC-049) live in
 [`./handoffs/`](./handoffs/). They translate each RFC into PR boundaries, checks,

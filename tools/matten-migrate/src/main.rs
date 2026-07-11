@@ -37,13 +37,322 @@ const TARGETS: &[(&str, &str)] = &[
     ("stay with matten", "small work, ingestion, glue, and learning"),
 ];
 
+const API_CATALOG: &[ApiDoc] = &[
+    construction_api(
+        "Tensor::new",
+        &["new"],
+        &["Constructs a numeric Tensor from row-major data and a runtime shape; panics on mismatch."],
+        &["shape order", "allocation size", "panic boundary versus Tensor::try_new"],
+    ),
+    construction_api(
+        "Tensor::try_new",
+        &[],
+        &["Constructs a numeric Tensor from row-major data and a runtime shape with a Result boundary."],
+        &["shape order", "allocation errors", "caller error handling"],
+    ),
+    construction_api(
+        "Tensor::from_vec",
+        &[],
+        &["Constructs a rank-1 numeric Tensor from a flat Vec."],
+        &["whether the target should stay rank-1", "when to reshape after construction"],
+    ),
+    shape_api(
+        "Tensor::reshape",
+        &["reshape"],
+        &["Changes the Tensor shape over the same logical data; panics on mismatch or dynamic tensors."],
+        &["whether the target reshape is a view or a copy", "row-major logical order", "panic boundary versus Tensor::try_reshape"],
+    ),
+    shape_api(
+        "Tensor::try_reshape",
+        &[],
+        &["Changes Tensor shape with a Result boundary; returns Unsupported on dynamic tensors."],
+        &["whether the target reshape is a view or a copy", "shape validation", "dynamic tensor rejection"],
+    ),
+    shape_api(
+        "Tensor::flatten",
+        &[],
+        &["Returns an owned rank-1 Tensor copy of the logical data; panics on dynamic tensors."],
+        &["row-major order", "whether flattening is a view or copy in the target"],
+    ),
+    shape_api(
+        "Tensor::transpose",
+        &[],
+        &["Reverses Tensor axes for numeric tensors; panics on dynamic tensors."],
+        &["axis order", "whether the target transpose is lazy, a view, or a copy"],
+    ),
+    reduction_api(
+        "Tensor::sum",
+        &[],
+        &["Reduces all numeric elements to one f64 value."],
+        &["NaN behavior", "whether a Result-form API is preferred", "profile before moving hot paths"],
+    ),
+    reduction_api(
+        "Tensor::mean",
+        &[],
+        &["Computes the whole-Tensor arithmetic mean as one f64 value."],
+        &["NaN behavior", "empty-data assumptions", "whether a Result-form API is preferred"],
+    ),
+    reduction_api(
+        "Tensor::sum_axis",
+        &["sum_axis"],
+        &["Reduces one axis and drops that axis from the result shape."],
+        &["axis meaning", "result shape", "target axis numbering"],
+    ),
+    reduction_api(
+        "Tensor::mean_axis",
+        &["mean_axis"],
+        &["Computes means along one axis and drops that axis from the result shape."],
+        &["axis meaning", "result shape", "NaN behavior"],
+    ),
+    linalg_api(
+        "Tensor::dot",
+        &["dot"],
+        &["Runs core-lite dense dot/matmul semantics over supported vector and matrix rank cases."],
+        &["rank/shape cases", "target dot semantics", "whether solver or decomposition APIs are needed"],
+    ),
+    linalg_api(
+        "Tensor::matmul",
+        &["matmul"],
+        &["Alias for Tensor::dot for supported dense vector and matrix rank cases."],
+        &["rank/shape cases", "whether matrix multiplication dominates real workloads", "target error model"],
+    ),
+    linalg_api(
+        "Tensor::norm",
+        &[],
+        &["Computes L2/Frobenius norm over all numeric elements; NaN propagates."],
+        &["norm convention", "NaN behavior", "whether target linalg semantics are clearer"],
+    ),
+    linalg_api(
+        "Tensor::trace",
+        &[],
+        &["Computes the rank-2 trace, using the rectangular diagonal length when needed."],
+        &["rank-2 requirement", "rectangular matrices", "target trace behavior"],
+    ),
+    linalg_api(
+        "Tensor::outer",
+        &[],
+        &["Computes an outer product for rank-1 numeric tensors."],
+        &["rank-1 requirement", "allocation size", "target vector/matrix semantics"],
+    ),
+    dynamic_api(
+        "Tensor::try_numeric",
+        &[],
+        &["Converts a dynamic Tensor to a numeric Tensor using the default numeric policy."],
+        &["conversion policy", "missing or text values", "whether cleanup belongs before target-library handoff"],
+    ),
+    dynamic_api(
+        "Tensor::from_json_dynamic",
+        &[],
+        &["Parses JSON into a dynamic Tensor when the json and dynamic features are enabled."],
+        &["feature requirements", "data cleanup", "conversion with Tensor::try_numeric"],
+    ),
+    dynamic_api(
+        "Tensor::from_csv_dynamic",
+        &[],
+        &["Parses CSV into a dynamic Tensor when the csv and dynamic features are enabled."],
+        &["feature requirements", "missing values", "conversion with Tensor::try_numeric"],
+    ),
+    bridge_api(
+        "matten_ndarray::to_arrayd",
+        &["to_arrayd"],
+        &["Converts a numeric matten Tensor into an ndarray ArrayD<f64>; dynamic tensors are rejected."],
+        &["copy boundary", "dynamic rejection", "conversion outside hot loops"],
+    ),
+    bridge_api(
+        "matten_ndarray::from_arrayd",
+        &["from_arrayd"],
+        &["Converts an ndarray ArrayD<f64> into a matten Tensor using logical element order."],
+        &["copy boundary", "non-standard ndarray layout", "zero-sized-axis rejection"],
+    ),
+    data_api(
+        "matten_data::Table",
+        &["Table"],
+        &["Represents a small table-oriented ingestion boundary before explicit numeric conversion."],
+        &["whether table work remains simple ingestion", "whether dataframe analytics are real requirements"],
+    ),
+    data_api(
+        "matten_data::try_numeric",
+        &[],
+        &["Access path: Table::try_numeric(); converts a Table into a NumericTable after explicit cleanup and numeric validation."],
+        &["missing values", "non-numeric cells", "conversion policy before to_tensor"],
+    ),
+    data_api(
+        "matten_data::to_tensor",
+        &[],
+        &["Access path: Table::try_numeric()?.to_tensor(); calls NumericTable::to_tensor to convert into a Tensor."],
+        &["the Table -> NumericTable -> Tensor boundary", "whether table analytics exceed matten-data scope"],
+    ),
+];
+
+const fn construction_api(
+    canonical: &'static str,
+    aliases: &'static [&'static str],
+    meaning: &'static [&'static str],
+    checks: &'static [&'static str],
+) -> ApiDoc {
+    ApiDoc {
+        canonical,
+        aliases,
+        meaning,
+        relevance: &["This API usually maps to target-specific array or tensor constructors."],
+        playbooks: &["ndarray", "nalgebra", "NumPy", "Candle"],
+        checks,
+        docs: &[
+            "docs/src/reference/public-api-snapshot.md",
+            "docs/src/reference/construction.md",
+            "docs/src/migration/target-selection.md",
+        ],
+    }
+}
+
+const fn shape_api(
+    canonical: &'static str,
+    aliases: &'static [&'static str],
+    meaning: &'static [&'static str],
+    checks: &'static [&'static str],
+) -> ApiDoc {
+    ApiDoc {
+        canonical,
+        aliases,
+        meaning,
+        relevance: &["This API usually matters when shape movement, layout, or axis semantics affect migration."],
+        playbooks: &["ndarray", "NumPy"],
+        checks,
+        docs: &[
+            "docs/src/reference/public-api-snapshot.md",
+            "docs/src/reference/shape-ops.md",
+            "docs/src/migration/playbooks/ndarray.md",
+            "docs/src/migration/playbooks/python-numpy.md",
+        ],
+    }
+}
+
+const fn reduction_api(
+    canonical: &'static str,
+    aliases: &'static [&'static str],
+    meaning: &'static [&'static str],
+    checks: &'static [&'static str],
+) -> ApiDoc {
+    ApiDoc {
+        canonical,
+        aliases,
+        meaning,
+        relevance: &["This API usually maps to target axis-reduction APIs when reductions are real workload pressure."],
+        playbooks: &["ndarray", "NumPy"],
+        checks,
+        docs: &[
+            "docs/src/reference/public-api-snapshot.md",
+            "docs/src/reference/math.md",
+            "docs/src/migration/playbooks/ndarray.md",
+            "docs/src/migration/playbooks/python-numpy.md",
+        ],
+    }
+}
+
+const fn linalg_api(
+    canonical: &'static str,
+    aliases: &'static [&'static str],
+    meaning: &'static [&'static str],
+    checks: &'static [&'static str],
+) -> ApiDoc {
+    ApiDoc {
+        canonical,
+        aliases,
+        meaning,
+        relevance: &["This API usually points at ndarray or nalgebra only when dense numeric work dominates measured runtime."],
+        playbooks: &["ndarray", "nalgebra", "NumPy", "Candle"],
+        checks,
+        docs: &[
+            "docs/src/reference/public-api-snapshot.md",
+            "docs/src/reference/linalg.md",
+            "docs/src/migration/playbooks/ndarray.md",
+            "docs/src/migration/playbooks/nalgebra.md",
+        ],
+    }
+}
+
+const fn dynamic_api(
+    canonical: &'static str,
+    aliases: &'static [&'static str],
+    meaning: &'static [&'static str],
+    checks: &'static [&'static str],
+) -> ApiDoc {
+    ApiDoc {
+        canonical,
+        aliases,
+        meaning,
+        relevance: &["This API usually remains useful as explicit cleanup before handing numeric data to another ecosystem."],
+        playbooks: &["stay with matten", "Polars / Pandas", "NumPy"],
+        checks,
+        docs: &[
+            "docs/src/reference/public-api-snapshot.md",
+            "docs/src/reference/dynamic.md",
+            "docs/src/migration/common-pitfalls.md",
+        ],
+    }
+}
+
+const fn bridge_api(
+    canonical: &'static str,
+    aliases: &'static [&'static str],
+    meaning: &'static [&'static str],
+    checks: &'static [&'static str],
+) -> ApiDoc {
+    ApiDoc {
+        canonical,
+        aliases,
+        meaning,
+        relevance: &["This API is an explicit bridge boundary; convert at edges rather than inside hot loops."],
+        playbooks: &["ndarray"],
+        checks,
+        docs: &[
+            "docs/src/reference/public-api-snapshot.md",
+            "docs/src/migration/bridge-contracts.md",
+            "docs/src/migration/playbooks/ndarray.md",
+        ],
+    }
+}
+
+const fn data_api(
+    canonical: &'static str,
+    aliases: &'static [&'static str],
+    meaning: &'static [&'static str],
+    checks: &'static [&'static str],
+) -> ApiDoc {
+    ApiDoc {
+        canonical,
+        aliases,
+        meaning,
+        relevance: &["This API usually belongs to the small table-to-Tensor ingestion boundary, not a dataframe engine."],
+        playbooks: &["stay with matten", "Polars / Pandas"],
+        checks,
+        docs: &[
+            "docs/src/reference/public-api-snapshot.md",
+            "docs/src/migration/playbooks/polars-and-pandas.md",
+            "docs/src/migration/common-pitfalls.md",
+        ],
+    }
+}
+
 #[derive(Debug)]
 enum Command {
     Inspect { path: PathBuf },
     Report { path: PathBuf, output: Option<PathBuf> },
     Suggest { target: Target, path: PathBuf },
+    ExplainApi { api: &'static ApiDoc },
     ListTargets,
     Help,
+}
+
+#[derive(Debug)]
+struct ApiDoc {
+    canonical: &'static str,
+    aliases: &'static [&'static str],
+    meaning: &'static [&'static str],
+    relevance: &'static [&'static str],
+    playbooks: &'static [&'static str],
+    checks: &'static [&'static str],
+    docs: &'static [&'static str],
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -129,6 +438,7 @@ fn run() -> Result<(), Box<dyn Error>> {
             let analysis = analyze_path(&path)?;
             print!("{}", render_suggest(&analysis, target));
         }
+        Command::ExplainApi { api } => print!("{}", render_explain_api(api)),
         Command::ListTargets => print!("{}", render_targets()),
         Command::Help => print!("{}", usage()),
     }
@@ -159,13 +469,14 @@ where
         }
         "report" => parse_report_args(args),
         "suggest" => parse_suggest_args(args),
+        "explain-api" => parse_explain_api_args(args),
         "list-targets" => {
             if !args.is_empty() {
                 return Err(format!("list-targets does not accept arguments\n\n{}", usage()));
             }
             Ok(Command::ListTargets)
         }
-        "rewrite" | "apply" | "explain-api" | "check-bridges" => Err(format!(
+        "rewrite" | "apply" | "check-bridges" => Err(format!(
             "{command:?} is not supported in this local advisory tool\n\n{}",
             usage()
         )),
@@ -249,6 +560,60 @@ fn parse_suggest_args(args: Vec<String>) -> Result<Command, String> {
     Ok(Command::Suggest { target, path })
 }
 
+fn parse_explain_api_args(args: Vec<String>) -> Result<Command, String> {
+    if args.is_empty() {
+        return Err(format!("explain-api expects one API name\n\n{}", usage()));
+    }
+
+    if args.iter().any(|arg| arg == "--all") {
+        return Err("explain-api --all is not supported in this slice".to_string());
+    }
+    for unsupported in ["--json", "--output", "--target"] {
+        if args.iter().any(|arg| arg == unsupported) {
+            return Err(format!(
+                "explain-api {unsupported} is not supported in this slice"
+            ));
+        }
+    }
+    if args.len() != 1 {
+        return Err(format!(
+            "explain-api accepts exactly one API name\n\n{}",
+            usage()
+        ));
+    }
+
+    let name = &args[0];
+    let api = find_api_doc(name)?;
+    Ok(Command::ExplainApi { api })
+}
+
+fn find_api_doc(name: &str) -> Result<&'static ApiDoc, String> {
+    match name {
+        "try_numeric" => {
+            return Err(
+                "ambiguous API: try_numeric\n\nUse one of:\n  Tensor::try_numeric\n  matten_data::try_numeric"
+                    .to_string(),
+            )
+        }
+        "to_tensor" => {
+            return Err(
+                "ambiguous API: to_tensor\n\nUse:\n  matten_data::to_tensor\n\nAccess path: Table::try_numeric()?.to_tensor()"
+                    .to_string(),
+            )
+        }
+        _ => {}
+    }
+
+    API_CATALOG
+        .iter()
+        .find(|api| api.canonical == name || api.aliases.contains(&name))
+        .ok_or_else(|| {
+            format!(
+                "unsupported API: {name}\n\nUse a qualified API name from the curated catalog. See docs/src/reference/public-api-snapshot.md and docs/src/migration/."
+            )
+        })
+}
+
 fn supported_targets() -> String {
     "\
 Supported targets:
@@ -271,10 +636,11 @@ Usage:
   matten-migrate inspect <path>
   matten-migrate report <path> [--output <path>]
   matten-migrate suggest --target <target> <path>
+  matten-migrate explain-api <api-name>
   matten-migrate list-targets
 
 This local tool is advisory and non-mutating except for report --output.
-It does not support rewrite/apply/explain-api/check-bridges.
+It does not support rewrite/apply/check-bridges.
 "
     .to_string()
 }
@@ -733,6 +1099,53 @@ fn render_suggest(analysis: &Analysis, target: Target) -> String {
     writeln!(out, "2. Read the `{}` playbook if the notes match real requirements.", target.display()).unwrap();
     writeln!(out, "3. Keep `matten` where small, readable glue is enough.").unwrap();
     out
+}
+
+fn render_explain_api(api: &ApiDoc) -> String {
+    let mut out = String::new();
+    writeln!(out, "# matten API Migration Note").unwrap();
+    writeln!(out).unwrap();
+    writeln!(
+        out,
+        "> This note is advisory. It is a static curated glossary entry, not a compatibility oracle or migration decision."
+    )
+    .unwrap();
+    writeln!(
+        out,
+        "> The API catalog is curated and incomplete; verify details against `docs/src/reference/public-api-snapshot.md`."
+    )
+    .unwrap();
+    writeln!(out).unwrap();
+    writeln!(out, "API: `{}`.", api.canonical).unwrap();
+    writeln!(out).unwrap();
+    writeln!(out, "## What it means in matten").unwrap();
+    writeln!(out).unwrap();
+    write_lines(&mut out, api.meaning);
+    writeln!(out).unwrap();
+    writeln!(out, "## Migration relevance").unwrap();
+    writeln!(out).unwrap();
+    write_lines(&mut out, api.relevance);
+    writeln!(out).unwrap();
+    writeln!(out, "## Possible target playbooks").unwrap();
+    writeln!(out).unwrap();
+    for playbook in api.playbooks {
+        writeln!(out, "- read `{playbook}` if it matches real requirements").unwrap();
+    }
+    writeln!(out).unwrap();
+    writeln!(out, "## Manual checks").unwrap();
+    writeln!(out).unwrap();
+    write_lines(&mut out, api.checks);
+    writeln!(out).unwrap();
+    writeln!(out, "## Related docs").unwrap();
+    writeln!(out).unwrap();
+    write_lines(&mut out, api.docs);
+    out
+}
+
+fn write_lines(out: &mut String, lines: &[&str]) {
+    for line in lines {
+        writeln!(out, "- {line}").unwrap();
+    }
 }
 
 fn write_target_evidence(out: &mut String, analysis: &Analysis, target: Target) {
@@ -1206,6 +1619,73 @@ Project: `receiver-method-project`.
     }
 
     #[test]
+    fn explain_api_matmul_matches_expected_output() {
+        let api = find_api_doc("Tensor::matmul").unwrap();
+        let note = render_explain_api(api);
+        let expected = "\
+# matten API Migration Note
+
+> This note is advisory. It is a static curated glossary entry, not a compatibility oracle or migration decision.
+> The API catalog is curated and incomplete; verify details against `docs/src/reference/public-api-snapshot.md`.
+
+API: `Tensor::matmul`.
+
+## What it means in matten
+
+- Alias for Tensor::dot for supported dense vector and matrix rank cases.
+
+## Migration relevance
+
+- This API usually points at ndarray or nalgebra only when dense numeric work dominates measured runtime.
+
+## Possible target playbooks
+
+- read `ndarray` if it matches real requirements
+- read `nalgebra` if it matches real requirements
+- read `NumPy` if it matches real requirements
+- read `Candle` if it matches real requirements
+
+## Manual checks
+
+- rank/shape cases
+- whether matrix multiplication dominates real workloads
+- target error model
+
+## Related docs
+
+- docs/src/reference/public-api-snapshot.md
+- docs/src/reference/linalg.md
+- docs/src/migration/playbooks/ndarray.md
+- docs/src/migration/playbooks/nalgebra.md
+";
+        assert_eq!(note, expected);
+        assert!(note.contains("curated and incomplete"));
+        assert!(!note.contains("must migrate"));
+        assert!(!note.contains("best target"));
+        assert!(!note.contains("guaranteed"));
+        assert!(!note.contains("faster"));
+        assert!(!note.contains("automatic conversion"));
+        assert!(!note.contains("complete API coverage"));
+    }
+
+    #[test]
+    fn explain_api_alias_and_catalog_entries_resolve() {
+        assert_eq!(find_api_doc("matmul").unwrap().canonical, "Tensor::matmul");
+        assert_eq!(
+            find_api_doc("to_arrayd").unwrap().canonical,
+            "matten_ndarray::to_arrayd"
+        );
+        assert_eq!(
+            find_api_doc("Table").unwrap().canonical,
+            "matten_data::Table"
+        );
+        let data_to_tensor = render_explain_api(find_api_doc("matten_data::to_tensor").unwrap());
+        assert!(data_to_tensor.contains("Table::try_numeric()?.to_tensor()"));
+        assert!(data_to_tensor.contains("NumericTable::to_tensor"));
+        assert!(!data_to_tensor.contains("Access path: Table::to_tensor"));
+    }
+
+    #[test]
     fn ndarray_bridge_points_to_bridge_not_automatic_migration() {
         let analysis = analyze_path(&fixture("ndarray-bridge-project")).unwrap();
         assert!(has_signal(&analysis, "matten-ndarray bridge"));
@@ -1234,8 +1714,6 @@ matten migration target playbooks
     #[test]
     fn parse_rejects_deferred_commands() {
         let err = parse_args(["rewrite".to_string()]).unwrap_err();
-        assert!(err.contains("not supported"));
-        let err = parse_args(["explain-api".to_string()]).unwrap_err();
         assert!(err.contains("not supported"));
         let err = parse_args(["check-bridges".to_string()]).unwrap_err();
         assert!(err.contains("not supported"));
@@ -1281,5 +1759,57 @@ matten migration target playbooks
         ])
         .unwrap_err();
         assert!(err.contains("not supported"));
+    }
+
+    #[test]
+    fn explain_api_rejects_unsupported_forms() {
+        let err = parse_args(["explain-api".to_string()]).unwrap_err();
+        assert!(err.contains("expects one API name"));
+
+        let err = parse_args([
+            "explain-api".to_string(),
+            "Tensor::matmul".to_string(),
+            ".".to_string(),
+        ])
+        .unwrap_err();
+        assert!(err.contains("exactly one API name"));
+
+        let err = parse_args([
+            "explain-api".to_string(),
+            "--target".to_string(),
+            "ndarray".to_string(),
+            "Tensor::matmul".to_string(),
+        ])
+        .unwrap_err();
+        assert!(err.contains("not supported"));
+
+        let err = parse_args([
+            "explain-api".to_string(),
+            "--json".to_string(),
+            "Tensor::matmul".to_string(),
+        ])
+        .unwrap_err();
+        assert!(err.contains("not supported"));
+
+        let err = parse_args(["explain-api".to_string(), "--all".to_string()]).unwrap_err();
+        assert!(err.contains("not supported"));
+
+        let err = parse_args([
+            "explain-api".to_string(),
+            "Tensor::unknown".to_string(),
+        ])
+        .unwrap_err();
+        assert!(err.contains("unsupported API"));
+    }
+
+    #[test]
+    fn explain_api_rejects_ambiguous_bare_aliases() {
+        let err = parse_args(["explain-api".to_string(), "try_numeric".to_string()]).unwrap_err();
+        assert!(err.contains("Tensor::try_numeric"));
+        assert!(err.contains("matten_data::try_numeric"));
+
+        let err = parse_args(["explain-api".to_string(), "to_tensor".to_string()]).unwrap_err();
+        assert!(err.contains("matten_data::to_tensor"));
+        assert!(err.contains("Table::try_numeric()?.to_tensor()"));
     }
 }

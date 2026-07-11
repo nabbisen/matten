@@ -77,6 +77,10 @@ cargo run --manifest-path tools/matten-migrate/Cargo.toml -- report tools/matten
 cargo run --manifest-path tools/matten-migrate/Cargo.toml -- suggest --target ndarray tools/matten-migrate/fixtures/receiver-method-project
 cargo run --manifest-path tools/matten-migrate/Cargo.toml -- suggest --target polars-pandas tools/matten-migrate/fixtures/common-rust-collisions-project
 cargo run --manifest-path tools/matten-migrate/Cargo.toml -- suggest --target stay-with-matten tools/matten-migrate/fixtures/simple-core-project
+cargo run --manifest-path tools/matten-migrate/Cargo.toml -- explain-api Tensor::matmul
+cargo run --manifest-path tools/matten-migrate/Cargo.toml -- explain-api matmul
+cargo run --manifest-path tools/matten-migrate/Cargo.toml -- explain-api matten_ndarray::to_arrayd
+cargo run --manifest-path tools/matten-migrate/Cargo.toml -- explain-api matten_data::Table
 ```
 
 ### 4. MSRV

@@ -31,6 +31,10 @@ cargo run --manifest-path tools/matten-migrate/Cargo.toml -- report tools/matten
 cargo run --manifest-path tools/matten-migrate/Cargo.toml -- suggest --target ndarray tools/matten-migrate/fixtures/receiver-method-project
 cargo run --manifest-path tools/matten-migrate/Cargo.toml -- suggest --target polars-pandas tools/matten-migrate/fixtures/common-rust-collisions-project
 cargo run --manifest-path tools/matten-migrate/Cargo.toml -- suggest --target stay-with-matten tools/matten-migrate/fixtures/simple-core-project
+cargo run --manifest-path tools/matten-migrate/Cargo.toml -- explain-api Tensor::matmul
+cargo run --manifest-path tools/matten-migrate/Cargo.toml -- explain-api matmul
+cargo run --manifest-path tools/matten-migrate/Cargo.toml -- explain-api matten_ndarray::to_arrayd
+cargo run --manifest-path tools/matten-migrate/Cargo.toml -- explain-api matten_data::Table
 ```
 
 Supported commands:
@@ -39,9 +43,14 @@ Supported commands:
 inspect <path>
 report <path> [--output <path>]
 suggest --target <target> <path>
+explain-api <api-name>
 list-targets
 --help
 ```
+
+`explain-api` prints a local static glossary entry for one curated API. The
+catalog is advisory, curated, and incomplete; verify API details against the
+reference docs before using the output as migration guidance.
 
 Supported targets:
 
@@ -68,10 +77,13 @@ Not supported:
 ```text
 rewrite
 apply
-explain-api
+check-bridges
+explain-api --all
+explain-api --json
+explain-api --output <path>
+explain-api --target <target>
 suggest --all
 suggest --output
-check-bridges
 ```
 
 Run local checks:
