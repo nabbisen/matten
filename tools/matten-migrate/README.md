@@ -35,6 +35,8 @@ cargo run --manifest-path tools/matten-migrate/Cargo.toml -- explain-api Tensor:
 cargo run --manifest-path tools/matten-migrate/Cargo.toml -- explain-api matmul
 cargo run --manifest-path tools/matten-migrate/Cargo.toml -- explain-api matten_ndarray::to_arrayd
 cargo run --manifest-path tools/matten-migrate/Cargo.toml -- explain-api matten_data::Table
+cargo run --manifest-path tools/matten-migrate/Cargo.toml -- check-bridges tools/matten-migrate/fixtures/ndarray-bridge-project
+cargo run --manifest-path tools/matten-migrate/Cargo.toml -- check-bridges tools/matten-migrate/fixtures/simple-core-project
 ```
 
 Supported commands:
@@ -44,6 +46,7 @@ inspect <path>
 report <path> [--output <path>]
 suggest --target <target> <path>
 explain-api <api-name>
+check-bridges <path>
 list-targets
 --help
 ```
@@ -51,6 +54,10 @@ list-targets
 `explain-api` prints a local static glossary entry for one curated API. The
 catalog is advisory, curated, and incomplete; verify API details against the
 reference docs before using the output as migration guidance.
+
+`check-bridges` prints a local bridge-readiness note. It is advisory and
+heuristic; it does not install dependencies, edit `Cargo.toml`, or rewrite
+source.
 
 Supported targets:
 
@@ -77,7 +84,10 @@ Not supported:
 ```text
 rewrite
 apply
-check-bridges
+check-bridges --json
+check-bridges --output <path>
+check-bridges --fix
+check-bridges --target <target>
 explain-api --all
 explain-api --json
 explain-api --output <path>

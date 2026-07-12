@@ -2,7 +2,7 @@
 
 **Project:** `matten`  
 **Milestone:** Future / post-guide / post-bridge stabilization  
-**Status:** Accepted as future direction (architect ruling 2026-06-24); local advisory inspect/report/suggest/explain-api slices implemented; check-bridges/rewrite/apply and public crate remain deferred
+**Status:** Accepted as future direction (architect ruling 2026-06-24); local advisory inspect/report/suggest/explain-api/check-bridges slices implemented; rewrite/apply and public crate remain deferred
 **Document type:** RFC  
 **Primary audience:** tool authors, maintainers, advanced users  
 **Depends on:** RFC-050 Production Migration Guide, RFC-051 Bridge Conversion Contracts, RFC-052 Production Target Playbooks, RFC-053 Migration Readiness Diagnostics  

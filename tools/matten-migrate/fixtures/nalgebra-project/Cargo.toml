@@ -1,7 +1,8 @@
 [package]
-name = "receiver-method-project"
+name = "nalgebra-project"
 version = "0.0.0"
 edition = "2024"
 
 [dependencies]
 matten = "0.30.0"
+nalgebra = "0.34"

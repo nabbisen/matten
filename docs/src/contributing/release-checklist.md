@@ -81,6 +81,8 @@ cargo run --manifest-path tools/matten-migrate/Cargo.toml -- explain-api Tensor:
 cargo run --manifest-path tools/matten-migrate/Cargo.toml -- explain-api matmul
 cargo run --manifest-path tools/matten-migrate/Cargo.toml -- explain-api matten_ndarray::to_arrayd
 cargo run --manifest-path tools/matten-migrate/Cargo.toml -- explain-api matten_data::Table
+cargo run --manifest-path tools/matten-migrate/Cargo.toml -- check-bridges tools/matten-migrate/fixtures/ndarray-bridge-project
+cargo run --manifest-path tools/matten-migrate/Cargo.toml -- check-bridges tools/matten-migrate/fixtures/simple-core-project
 ```
 
 ### 4. MSRV

@@ -340,6 +340,7 @@ enum Command {
     Report { path: PathBuf, output: Option<PathBuf> },
     Suggest { target: Target, path: PathBuf },
     ExplainApi { api: &'static ApiDoc },
+    CheckBridges { path: PathBuf },
     ListTargets,
     Help,
 }
@@ -439,6 +440,10 @@ fn run() -> Result<(), Box<dyn Error>> {
             print!("{}", render_suggest(&analysis, target));
         }
         Command::ExplainApi { api } => print!("{}", render_explain_api(api)),
+        Command::CheckBridges { path } => {
+            let analysis = analyze_path(&path)?;
+            print!("{}", render_bridge_check(&analysis));
+        }
         Command::ListTargets => print!("{}", render_targets()),
         Command::Help => print!("{}", usage()),
     }
@@ -470,13 +475,14 @@ where
         "report" => parse_report_args(args),
         "suggest" => parse_suggest_args(args),
         "explain-api" => parse_explain_api_args(args),
+        "check-bridges" => parse_check_bridges_args(args),
         "list-targets" => {
             if !args.is_empty() {
                 return Err(format!("list-targets does not accept arguments\n\n{}", usage()));
             }
             Ok(Command::ListTargets)
         }
-        "rewrite" | "apply" | "check-bridges" => Err(format!(
+        "rewrite" | "apply" => Err(format!(
             "{command:?} is not supported in this local advisory tool\n\n{}",
             usage()
         )),
@@ -587,6 +593,30 @@ fn parse_explain_api_args(args: Vec<String>) -> Result<Command, String> {
     Ok(Command::ExplainApi { api })
 }
 
+fn parse_check_bridges_args(args: Vec<String>) -> Result<Command, String> {
+    if args.is_empty() {
+        return Err(format!("check-bridges expects one path\n\n{}", usage()));
+    }
+
+    for unsupported in ["--json", "--output", "--fix", "--target"] {
+        if args.iter().any(|arg| arg == unsupported) {
+            return Err(format!(
+                "check-bridges {unsupported} is not supported in this slice"
+            ));
+        }
+    }
+    if args.len() != 1 {
+        return Err(format!(
+            "check-bridges accepts exactly one path\n\n{}",
+            usage()
+        ));
+    }
+
+    Ok(Command::CheckBridges {
+        path: PathBuf::from(&args[0]),
+    })
+}
+
 fn find_api_doc(name: &str) -> Result<&'static ApiDoc, String> {
     match name {
         "try_numeric" => {
@@ -637,10 +667,11 @@ Usage:
   matten-migrate report <path> [--output <path>]
   matten-migrate suggest --target <target> <path>
   matten-migrate explain-api <api-name>
+  matten-migrate check-bridges <path>
   matten-migrate list-targets
 
 This local tool is advisory and non-mutating except for report --output.
-It does not support rewrite/apply/check-bridges.
+It does not support rewrite/apply.
 "
     .to_string()
 }
@@ -777,6 +808,24 @@ fn scan_cargo_toml(text: &str, path: &Path, root: &Path, analysis: &mut Analysis
                     .entry("detected crates/features")
                     .or_default()
                     .insert(format!("{crate_name} dependency ({evidence})"));
+                if crate_name == "matten-ndarray" {
+                    analysis
+                        .signals
+                        .entry("matten-ndarray bridge")
+                        .or_default()
+                        .insert(format!("matten-ndarray dependency ({evidence})"));
+                }
+            }
+        }
+        if let Some(key) = cargo_dependency_key(trimmed) {
+            if !matches!(key, "matten-ndarray" | "matten_ndarray") {
+                if let Some(target) = direct_target_family(key) {
+                    analysis
+                        .signals
+                        .entry("direct target-library dependency")
+                        .or_default()
+                        .insert(format!("{target} dependency ({evidence})"));
+                }
             }
         }
         if trimmed.contains("dynamic") && trimmed.contains("features") {
@@ -786,6 +835,28 @@ fn scan_cargo_toml(text: &str, path: &Path, root: &Path, analysis: &mut Analysis
                 .or_default()
                 .insert(format!("dynamic feature mention ({evidence})"));
         }
+    }
+}
+
+fn cargo_dependency_key(trimmed: &str) -> Option<&str> {
+    if trimmed.is_empty() || trimmed.starts_with('[') {
+        return None;
+    }
+
+    let key = trimmed
+        .split(|ch: char| ch == '=' || ch == '.' || ch.is_whitespace())
+        .next()?;
+    if key.is_empty() { None } else { Some(key) }
+}
+
+fn direct_target_family(key: &str) -> Option<&'static str> {
+    match key {
+        "ndarray" => Some("ndarray"),
+        "nalgebra" => Some("nalgebra"),
+        "polars" => Some("Polars"),
+        "candle-core" | "candle-nn" | "candle-transformers" => Some("Candle"),
+        key if key.starts_with("polars-") => Some("Polars"),
+        _ => None,
     }
 }
 
@@ -1140,6 +1211,154 @@ fn render_explain_api(api: &ApiDoc) -> String {
     writeln!(out).unwrap();
     write_lines(&mut out, api.docs);
     out
+}
+
+fn render_bridge_check(analysis: &Analysis) -> String {
+    let mut out = String::new();
+    writeln!(out, "# matten Bridge Check").unwrap();
+    writeln!(out).unwrap();
+    writeln!(out, "> {DISCLAIMER}").unwrap();
+    writeln!(out, "> {DETECTION_LIMITS}").unwrap();
+    writeln!(out).unwrap();
+    writeln!(out, "Project: `{}`.", analysis.project_name).unwrap();
+    writeln!(out).unwrap();
+    writeln!(out, "## Bridge evidence").unwrap();
+    writeln!(out).unwrap();
+    write_bridge_evidence(&mut out, analysis);
+    writeln!(out, "## Current bridge candidates").unwrap();
+    writeln!(out).unwrap();
+    write_current_bridge_candidates(&mut out, analysis);
+    writeln!(out, "## Ecosystems without approved bridges").unwrap();
+    writeln!(out).unwrap();
+    write_unavailable_bridge_notes(&mut out, analysis);
+    writeln!(out, "## Manual checks").unwrap();
+    writeln!(out).unwrap();
+    writeln!(out, "- convert once at boundaries").unwrap();
+    writeln!(out, "- avoid conversions inside hot loops").unwrap();
+    writeln!(
+        out,
+        "- make dynamic tensors numeric before bridge conversion"
+    )
+    .unwrap();
+    writeln!(
+        out,
+        "- confirm whether table work is ingestion-only before moving to dataframe tooling"
+    )
+    .unwrap();
+    writeln!(out).unwrap();
+    writeln!(out, "## Risks").unwrap();
+    writeln!(out).unwrap();
+    writeln!(
+        out,
+        "- Treat bridge evidence as a reading aid, not a dependency decision."
+    )
+    .unwrap();
+    writeln!(
+        out,
+        "- Heuristic detection can miss usage or report source-like text; verify every finding manually."
+    )
+    .unwrap();
+    writeln!(
+        out,
+        "- Do not edit dependencies or source without manual review."
+    )
+    .unwrap();
+    writeln!(out).unwrap();
+    writeln!(out, "## Next steps").unwrap();
+    writeln!(out).unwrap();
+    writeln!(out, "1. Review bridge evidence manually.").unwrap();
+    writeln!(
+        out,
+        "2. Read `docs/src/migration/bridge-contracts.md` if boundary conversion is real."
+    )
+    .unwrap();
+    writeln!(
+        out,
+        "3. Read the relevant playbook only if the local evidence matches real requirements."
+    )
+    .unwrap();
+    out
+}
+
+fn write_bridge_evidence(out: &mut String, analysis: &Analysis) {
+    let mut wrote = false;
+    wrote |= write_signal_category(out, analysis, "matten-ndarray bridge");
+    wrote |= write_signal_category(out, analysis, "direct target-library dependency");
+    wrote |= write_signal_category(out, analysis, "matten-data");
+    if !wrote {
+        writeln!(
+            out,
+            "- No strong bridge signal detected by this heuristic scan."
+        )
+        .unwrap();
+    }
+    writeln!(out).unwrap();
+}
+
+fn write_signal_category(out: &mut String, analysis: &Analysis, category: &str) -> bool {
+    let Some(signals) = analysis.signals.get(category) else {
+        return false;
+    };
+    if signals.is_empty() {
+        return false;
+    }
+    writeln!(out, "- {category}:").unwrap();
+    for signal in signals {
+        writeln!(out, "  - {signal}").unwrap();
+    }
+    true
+}
+
+fn write_current_bridge_candidates(out: &mut String, analysis: &Analysis) {
+    if has_signal(analysis, "matten-ndarray bridge") {
+        writeln!(out, "- `matten-ndarray` is the current approved bridge for `Tensor` <-> `ndarray::ArrayD<f64>`.").unwrap();
+        writeln!(out, "- It copies both directions, rejects dynamic tensors, and preserves logical row-major order.").unwrap();
+    } else if direct_target_signal_contains(analysis, "ndarray") {
+        writeln!(out, "- Direct `ndarray` evidence may be a bridge-contract reading candidate if data crosses `Tensor` <-> `ArrayD` boundaries.").unwrap();
+        writeln!(
+            out,
+            "- This is not evidence that a bridge dependency is required."
+        )
+        .unwrap();
+    } else {
+        writeln!(out, "- No current bridge candidate detected.").unwrap();
+    }
+    if has_signal(analysis, "matten-data") {
+        writeln!(
+            out,
+            "- `matten-data` evidence is a table-to-Tensor on-ramp, not a bridge crate."
+        )
+        .unwrap();
+    }
+    writeln!(out).unwrap();
+}
+
+fn write_unavailable_bridge_notes(out: &mut String, analysis: &Analysis) {
+    let mut wrote = false;
+    if direct_target_signal_contains(analysis, "nalgebra") {
+        writeln!(out, "- `nalgebra`: no approved matten bridge exists today; read the playbook for manual conversion or redesign.").unwrap();
+        wrote = true;
+    }
+    if direct_target_signal_contains(analysis, "Polars") || has_signal(analysis, "dataframe pressure")
+    {
+        writeln!(out, "- `Polars / Pandas`: no approved bridge crate exists today; enter dataframe tooling at the data-source or table boundary.").unwrap();
+        wrote = true;
+    }
+    if direct_target_signal_contains(analysis, "Candle") {
+        writeln!(out, "- `Candle`: no approved bridge crate exists today; f64 -> f32, device, and model boundaries require manual design.").unwrap();
+        wrote = true;
+    }
+    if !wrote {
+        writeln!(out, "- none detected by this scan").unwrap();
+    }
+    writeln!(out).unwrap();
+}
+
+fn direct_target_signal_contains(analysis: &Analysis, needle: &str) -> bool {
+    analysis
+        .signals
+        .get("direct target-library dependency")
+        .is_some_and(|signals| signals.iter().any(|signal| signal.contains(needle)))
 }
 
 fn write_lines(out: &mut String, lines: &[&str]) {
@@ -1695,6 +1914,117 @@ API: `Tensor::matmul`.
     }
 
     #[test]
+    fn check_bridges_ndarray_bridge_matches_expected_output() {
+        let analysis = analyze_path(&fixture("ndarray-bridge-project")).unwrap();
+        let report = render_bridge_check(&analysis);
+        let expected = "\
+# matten Bridge Check
+
+> This report is advisory. It does not prove production readiness, does not guarantee a target library is better, and does not perform automatic conversion.
+> Detection is a heuristic text/dependency scan. It may miss real matten usage and may over-report source-like text as usage. It has not been validated against real downstream projects; treat results as a starting point for manual review.
+
+Project: `ndarray-bridge-project`.
+
+## Bridge evidence
+
+- matten-ndarray bridge:
+  - from_arrayd (src/main.rs:2)
+  - from_arrayd (src/main.rs:7)
+  - matten-ndarray dependency (Cargo.toml:8)
+  - matten_ndarray (src/main.rs:2)
+  - to_arrayd (src/main.rs:2)
+  - to_arrayd (src/main.rs:6)
+
+## Current bridge candidates
+
+- `matten-ndarray` is the current approved bridge for `Tensor` <-> `ndarray::ArrayD<f64>`.
+- It copies both directions, rejects dynamic tensors, and preserves logical row-major order.
+
+## Ecosystems without approved bridges
+
+- none detected by this scan
+
+## Manual checks
+
+- convert once at boundaries
+- avoid conversions inside hot loops
+- make dynamic tensors numeric before bridge conversion
+- confirm whether table work is ingestion-only before moving to dataframe tooling
+
+## Risks
+
+- Treat bridge evidence as a reading aid, not a dependency decision.
+- Heuristic detection can miss usage or report source-like text; verify every finding manually.
+- Do not edit dependencies or source without manual review.
+
+## Next steps
+
+1. Review bridge evidence manually.
+2. Read `docs/src/migration/bridge-contracts.md` if boundary conversion is real.
+3. Read the relevant playbook only if the local evidence matches real requirements.
+";
+        assert_eq!(report, expected);
+        assert!(report.contains("This report is advisory"));
+        assert!(!report.contains("must add"));
+        assert!(!report.contains("missing dependency"));
+        assert!(!report.contains("best bridge"));
+        assert!(!report.contains("guaranteed compatible"));
+        assert!(!report.contains("safe to rewrite"));
+        assert!(!report.contains("fix available"));
+    }
+
+    #[test]
+    fn check_bridges_disambiguates_direct_target_dependencies() {
+        let bridge = analyze_path(&fixture("ndarray-bridge-project")).unwrap();
+        assert!(has_signal(&bridge, "matten-ndarray bridge"));
+        assert!(!has_signal(&bridge, "direct target-library dependency"));
+        let bridge_report = render_bridge_check(&bridge);
+        assert!(!bridge_report.contains("direct target-library dependency"));
+
+        let direct_ndarray = analyze_path(&fixture("direct-ndarray-project")).unwrap();
+        assert!(has_signal(
+            &direct_ndarray,
+            "direct target-library dependency"
+        ));
+        assert!(!has_signal(&direct_ndarray, "matten-ndarray bridge"));
+        let report = render_bridge_check(&direct_ndarray);
+        assert!(report.contains("ndarray dependency (Cargo.toml:8)"));
+        assert!(report.contains("bridge-contract reading candidate"));
+        assert!(report.contains("not evidence that a bridge dependency is required"));
+        assert!(!report.contains("missing dependency"));
+    }
+
+    #[test]
+    fn check_bridges_handles_on_ramps_and_unavailable_bridges() {
+        let data = analyze_path(&fixture("data-project")).unwrap();
+        let data_report = render_bridge_check(&data);
+        assert!(data_report.contains("table-to-Tensor on-ramp, not a bridge crate"));
+        assert!(data_report.contains("Polars / Pandas"));
+
+        let nalgebra = analyze_path(&fixture("nalgebra-project")).unwrap();
+        let nalgebra_report = render_bridge_check(&nalgebra);
+        assert!(nalgebra_report.contains("nalgebra dependency (Cargo.toml:8)"));
+        assert!(nalgebra_report.contains("no approved matten bridge exists today"));
+        assert!(!nalgebra_report.contains("matten-nalgebra"));
+
+        let simple = analyze_path(&fixture("simple-core-project")).unwrap();
+        let simple_report = render_bridge_check(&simple);
+        assert!(simple_report.contains("No strong bridge signal detected"));
+    }
+
+    #[test]
+    fn check_bridges_core_linalg_does_not_create_nalgebra_pressure() {
+        let analysis = analyze_path(&fixture("receiver-method-project")).unwrap();
+        assert!(has_signal(&analysis, "linear algebra"));
+        assert!(!has_signal(&analysis, "direct target-library dependency"));
+
+        let report = render_bridge_check(&analysis);
+        assert!(report.contains("No strong bridge signal detected"));
+        assert!(!report.contains("nalgebra"));
+        assert!(!report.contains("manual conversion or redesign"));
+    }
+
+    #[test]
     fn list_targets_is_deterministic() {
         let targets = render_targets();
         assert_eq!(
@@ -1715,7 +2045,7 @@ matten migration target playbooks
     fn parse_rejects_deferred_commands() {
         let err = parse_args(["rewrite".to_string()]).unwrap_err();
         assert!(err.contains("not supported"));
-        let err = parse_args(["check-bridges".to_string()]).unwrap_err();
+        let err = parse_args(["apply".to_string()]).unwrap_err();
         assert!(err.contains("not supported"));
     }
 
@@ -1811,5 +2141,29 @@ matten migration target playbooks
         let err = parse_args(["explain-api".to_string(), "to_tensor".to_string()]).unwrap_err();
         assert!(err.contains("matten_data::to_tensor"));
         assert!(err.contains("Table::try_numeric()?.to_tensor()"));
+    }
+
+    #[test]
+    fn check_bridges_rejects_unsupported_forms() {
+        let err = parse_args(["check-bridges".to_string()]).unwrap_err();
+        assert!(err.contains("expects one path"));
+
+        let err = parse_args([
+            "check-bridges".to_string(),
+            "fixtures".to_string(),
+            "extra".to_string(),
+        ])
+        .unwrap_err();
+        assert!(err.contains("exactly one path"));
+
+        for unsupported in ["--json", "--output", "--fix", "--target"] {
+            let err = parse_args([
+                "check-bridges".to_string(),
+                unsupported.to_string(),
+                "fixtures".to_string(),
+            ])
+            .unwrap_err();
+            assert!(err.contains("not supported"));
+        }
     }
 }
