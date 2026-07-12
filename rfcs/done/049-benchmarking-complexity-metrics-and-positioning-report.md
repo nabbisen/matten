@@ -1,10 +1,13 @@
 # RFC-049: Benchmarking, Complexity Metrics, and Positioning Report
 
-**Status:** Accepted. Phase 1 implemented and accepted; Phase 2 implemented and accepted
-(official Rust peer comparison accepted 2026-06-25); Phase 3 code-shape-first Python reference
-tooling and refreshed report implemented and accepted by review on 2026-07-11; Phase 4 deferred.
+**Status:** Implemented for Phases 1-3. Phase 1 implemented and accepted; Phase 2 implemented
+and accepted (official Rust peer comparison accepted 2026-06-25); Phase 3 code-shape-first
+Python reference tooling and refreshed report implemented and accepted by review on
+2026-07-11. Phase 4 hard gates are outside RFC-049's closed scope and require a future
+separate RFC or explicit release-policy decision.
 **Target Release:** Phase 1 internal baseline in v0.22.1; Phase 2 peer-comparison
-harness/template in v0.22.4; official Phase 2 peer comparison accepted in v0.22.7; Phases 3–4 TBD.  
+harness/template in v0.22.4; official Phase 2 peer comparison accepted in v0.22.7; Phase 3
+accepted on 2026-07-11; Phase 4 extracted to future policy/RFC ownership.
 **Acceptance:** Approved by architect ruling (2026-06-24). Phase 1 (PR-049-1 methodology
 docs + PR-049-2 internal Rust baseline harness) is authorized and implemented in v0.22.1; its
 internal baseline was accepted (Baseline ID `matten-rfc049-internal-baseline-v0.1`). Phase 2
@@ -14,9 +17,9 @@ comparison was filled from a maintainer run and accepted by architect ruling on 
 (Report ID `matten-rfc049-rust-peer-comparison-v0.1`). Phase 3 (NumPy/Pandas reference
 comparison) has code-shape-first tooling prepared for review (Report ID
 `matten-rfc049-python-reference-comparison-v0.1`, accepted by review on 2026-07-11);
-Phase 4 (regression thresholds / hard gates) remains designed but **not authorized**. Per the
-4-folder RFC lifecycle, this RFC stays in `proposed/` until fully implemented or explicitly
-split/resolved (Phase 4 remains).
+Phase 4 (regression thresholds / hard gates) remains designed but **not authorized** and is
+extracted from RFC-049's implemented scope. Any future hard-gate work requires a separate RFC
+or explicit release-policy decision.
 **Owner:** `matten` maintainers  
 **Related:** RFC-030, RFC-033–048, RFC-038, RFC-040, RFC-041  
 **Scope:** Benchmark harness, reproducible measurement policy, complexity metrics, positioning report  
@@ -522,9 +525,13 @@ Python/NumPy/Pandas use different execution models and mature native kernels.
 These comparisons are for user-context and code-shape understanding, not a direct replacement claim.
 ```
 
-### Phase 4: Regression tracking
+### Phase 4: Regression tracking (extracted future policy)
 
-Use benchmarks to detect unexpected slowdowns.
+This section is retained as historical design context. It is not part of RFC-049's implemented
+closure scope. Any hard regression thresholds or release gates require a future separate RFC or
+explicit release-policy decision.
+
+Future policy may use benchmarks to detect unexpected slowdowns.
 
 Initial policy:
 
@@ -1007,11 +1014,11 @@ Phase 3 acceptance:
 [x] no SciPy/Candle scope creep
 ```
 
-Phase 4 acceptance:
+Phase 4 future-policy criteria:
 
 ```text
-[ ] at least three historical runs exist
-[ ] regression policy proposed separately
+[ ] at least three historical runs exist before hard-gate policy is considered
+[ ] regression policy proposed separately in a future RFC or explicit release-policy decision
 [ ] no hard speed gate added without approval
 ```
 

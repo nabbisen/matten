@@ -57,6 +57,7 @@ for RFC state; the Status field inside each file mirrors the folder.
 | 046 | [Numerical Methods and Scientific Toy Examples](./done/046-numerical-methods-and-scientific-toy-examples.md) | 0.20.7 (35–36); 0.20.13 (39–40) |
 | 047 | [Small ML-Like Examples Without ML-Framework Scope](./done/047-small-ml-like-examples-without-ml-framework-scope.md) | 0.20.8 (examples 37–38) |
 | 048 | [Companion-Crate Examples](./done/048-companion-crate-examples.md) | 0.20.6 |
+| 049 | [Benchmarking, Complexity Metrics, and Positioning Report](./done/049-benchmarking-complexity-metrics-and-positioning-report.md) | Phases 1-3 implemented; Phase 4 hard gates extracted to future RFC/release-policy ownership |
 | 050 | [Production Migration Guide and Bridge Strategy](./done/050-production-migration-guide-and-bridge-strategy.md) | 0.23.0 |
 | 051 | [Bridge Conversion Contracts and Companion-Crate Policy](./done/051-bridge-conversion-contracts-and-companion-crate-policy.md) | 0.23.2 |
 | 052 | [Production Target Playbooks](./done/052-production-target-playbooks.md) | 0.23.0–0.23.1 |
@@ -77,7 +78,6 @@ for RFC state; the Status field inside each file mirrors the folder.
 
 | ID | Title | Target |
 |---:|---|---|
-| 049 | [Benchmarking, Complexity Metrics, and Positioning Report](./proposed/049-benchmarking-complexity-metrics-and-positioning-report.md) | **Accepted** — Phase 1 baseline (0.22.1) + Phase 2 Rust peer comparison (accepted 2026-06-25) complete; Phases 3–4 deferred |
 | 054 | [`matten-migrate` Assisted Migration Tool](./proposed/054-matten-migrate-assisted-migration-tool.md) | **Accepted as future direction** (2026-06-24); local advisory inspect/report/suggest/explain-api/check-bridges slices implemented; rewrite/apply and public crate remain deferred |
 Implementation handoffs for the v0.20+ proposed set (RFC-033–042), the examples
 program (RFC-043–048), and the benchmarking program (RFC-049) live in

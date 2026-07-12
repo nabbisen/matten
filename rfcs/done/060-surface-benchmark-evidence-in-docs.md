@@ -90,7 +90,8 @@ project whose brand is honest, evidence-backed positioning, that is a real gap.
 ## 7. Non-goals
 
 - No new benchmarks, workloads, or measurements; no re-running on new hardware as part of this RFC.
-- No Phase 3 (NumPy/Pandas) or Phase 4 (regression gates) work — both stay deferred (RFC-049).
+- No new Phase 3 (NumPy/Pandas) or Phase 4 (regression gates) work in this RFC; RFC-049 later
+  accepted Phase 3, while hard gates remain future RFC/release-policy work.
 - No ranking, marketing, or "faster than X" language; no public-API change to make any number look
   better.
 - No change to harness isolation or to the lock-step family versioning.
