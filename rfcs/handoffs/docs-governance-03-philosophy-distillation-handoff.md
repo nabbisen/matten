@@ -2,7 +2,7 @@
 
 **Project:** `matten`
 **Document kind:** Documentation-governance handoff (design team)
-**Status:** Draft for execution; produced by the reviewer, to be implemented then re-reviewed
+**Status:** Implemented; prepared for review
 **Authority / source:** `.git-exclude/reviewed/matten-specs-supersession-map-v0.1.md` §6, §7 (item 4)
 **Sequence:** Runs after Handoff 01 and after Handoff 02 has created tracked archived specs under
 `docs/design/history/`. Do not rely on `.git-exclude` originals for this slice; they are not
