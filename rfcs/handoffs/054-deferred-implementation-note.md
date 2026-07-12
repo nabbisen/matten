@@ -3,19 +3,19 @@
 **Project:** `matten`  
 **Document kind:** Deferred implementation note  
 **Scope:** RFC-054 only  
-**Status:** Superseded for the first local advisory slice; retained as historical deferral record
-**Recommended revisit:** satisfied for the first advisory tool slice; rewrite/apply remain deferred
+**Status:** Superseded for reviewed local advisory slices; retained as historical deferral record
+**Recommended revisit:** satisfied for inspect/report/suggest/explain-api/check-bridges; rewrite/apply remain deferred
 
 ---
 
 ## 1. Decision
 
 This note originally deferred all `matten-migrate` implementation. That
-deferral has now been superseded for the first local advisory tool slice only:
+deferral has now been superseded for reviewed local advisory tool slices only:
 
 ```text
 tools/matten-migrate
-inspect / report / list-targets
+inspect / report / suggest / explain-api / check-bridges / list-targets
 workspace-excluded
 publish = false
 local-only
@@ -27,6 +27,9 @@ The reopening and implementation records are:
 ```text
 rfcs/handoffs/054-matten-migrate-readiness-audit.md
 rfcs/handoffs/054-matten-migrate-first-tool-handoff.md
+rfcs/handoffs/054-matten-migrate-target-suggestion-handoff.md
+rfcs/handoffs/054-matten-migrate-explain-api-handoff.md
+rfcs/handoffs/054-matten-migrate-check-bridges-handoff.md
 ```
 
 The original prohibition still applies to public crates, rewrite/apply flows,
@@ -78,7 +81,7 @@ Allowed:
 [✓] create a placeholder docs note
 [✓] create manual migration readiness report template
 [✓] collect tool requirements from users
-[✓] maintain the reviewed local advisory `tools/matten-migrate` slice
+[✓] maintain the reviewed local advisory `tools/matten-migrate` slices
 ```
 
 Not allowed:
@@ -110,11 +113,14 @@ Original trigger list:
 
 ## 5. Future first tool scope
 
-The first RFC-054 implementation started with advisory-only scope:
+The reviewed RFC-054 local implementation is advisory-only:
 
 ```bash
 matten-migrate inspect .
 matten-migrate report .
+matten-migrate suggest --target ndarray .
+matten-migrate explain-api Tensor::matmul
+matten-migrate check-bridges .
 matten-migrate list-targets
 ```
 
@@ -157,7 +163,7 @@ not rewritten source code.
 Treat RFC-054 as:
 
 ```text
-first local advisory slice implemented
+reviewed local advisory slices implemented
 future expansion still requires explicit handoff/review
 rewrite/apply still deferred
 ```

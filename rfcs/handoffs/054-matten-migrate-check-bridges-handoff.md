@@ -3,7 +3,7 @@
 **Project:** `matten`
 **Related RFC:** RFC-054: `matten-migrate` Assisted Migration Tool
 **Document kind:** Compact implementation handoff
-**Status:** Accepted; implementation prepared for review
+**Status:** Implemented; implementation review conditional GO resolved; committed in `392dd95`
 **Scope:** Local-only bridge-readiness advisory output for `tools/matten-migrate`
 
 ---
