@@ -47,7 +47,7 @@ single RFC; their authority is the supersession map. Run in order: 01 (gap closu
 | Handoff | Purpose |
 |---|---|
 | `docs-governance-01-spec-coverage-gap-closure-handoff.md` | Resolve the three unowned spec fragments (perf targets, golden/fuzz/property tests, `Display`) before archival |
-| `docs-governance-02-spec-archival-and-ownership-rule-handoff.md` | Archive the v0.19.0 specs as tracked banner-marked history; declare the three-plane ownership rule |
+| `docs-governance-02-spec-archival-and-ownership-rule-handoff.md` | Archive the v0.19.0 specs as tracked banner-marked history; declare the ownership rule |
 | `docs-governance-03-philosophy-distillation-handoff.md` | Expand `docs/src/philosophy.md` into a guarded, evergreen principles page distilled from the specs |
 
 Some handoffs are planning records and some are retained implementation records.

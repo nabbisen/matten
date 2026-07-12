@@ -4,6 +4,11 @@ Design decisions for `matten` are tracked here using the lifecycle policy in
 [RFC-000](./done/000-rfc-lifecycle-policy.md). The folder is the source of truth
 for RFC state; the Status field inside each file mirrors the folder.
 
+The broader documentation ownership model is recorded in
+[`docs/design/README.md`](../docs/design/README.md): RFCs are canonical normative decisions,
+`docs/src/` is the evergreen user contract, `ROADMAP.md` owns schedule/history, and
+`docs/design/history/` contains historical snapshots only.
+
 ## Done
 
 | ID | Title | Shipped in |

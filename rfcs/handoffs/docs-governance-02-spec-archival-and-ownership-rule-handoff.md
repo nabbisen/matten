@@ -2,7 +2,7 @@
 
 **Project:** `matten`
 **Document kind:** Documentation-governance handoff (design team)
-**Status:** Draft for execution; produced by the reviewer, to be implemented then re-reviewed
+**Status:** Implemented; prepared for review
 **Authority / source:** `.git-exclude/reviewed/matten-specs-supersession-map-v0.1.md` §0, §1, §5, §6, §7
 **Sequence:** Runs **after Handoff 01** (coverage-gap closure). Do not archive until the three §4
 gaps are resolved, or normative content is lost to history.

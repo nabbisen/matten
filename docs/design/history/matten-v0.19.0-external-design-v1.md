@@ -1,17 +1,21 @@
 # `matten` External Design
 
-> **HISTORICAL DESIGN SNAPSHOT — DO NOT CITE AS CURRENT.**
-> This pre-v0.19 tracked external-design file is superseded by the current RFC corpus
-> (`rfcs/`), user documentation (`docs/src/`), and the archived v0.19.0 snapshots under
-> `docs/design/history/`. It is retained only for design traceability.
+> **HISTORICAL SNAPSHOT — DO NOT CITE AS CURRENT.**
+> As-built through v0.19.0 (RFCs 000–030). Superseded by the current RFC corpus
+> (`rfcs/`) and user documentation (`docs/src/`); forward schedule lives in
+> `ROADMAP.md`. This document froze ~35 RFCs ago and predates matten-data, the
+> 0.20–0.30 API/companion work, and the visual/educational/migration programs.
+> Retained for design traceability only. Section-by-section canonical owners:
+> see `docs/design/README.md`. Terminology note: the "Phase 1/Phase 2/Sedan/SUV"
+> vocabulary here is retired and is banned from user docs.
 
 **Project:** `matten`  
 **Document Kind:** External Design / Public API Contract  
-**Document Version:** `0.3.0`  
-**Target Crate Version:** `0.1.0` for Phase 1, with Phase 2 public-direction notes  
+**Document Version:** `0.4.1`  
+**Target Crate Version:** as-built through the `0.19.0` family release (core `matten` + `matten-ndarray` + `matten-mlprep`)  
 **Date:** 2026-06-21  
-**Status:** Reconciled with v0.16+ companion-crate roadmap  
-**Revision note:** `0.3.0` continues the `0.2.0` line (no `1.0` document baseline exists yet); it incorporates the v0.16+ companion-crate reconciliation and the boundary-confirmation corrections.  
+**Status:** Reviewed and corrected against the shipped state through v0.19.0  
+**Revision note:** `0.4.1` is a review correction over `0.4.0`: it preserves the as-built v0.19.0 contract while aligning feature defaults, exact `MattenError` fields, dynamic text storage, dynamic JSON examples, and companion dynamic-rejection wording with the shipped code and the v0.19.0 review findings. See §0.3, §0.4, and §18.
 
 ---
 
@@ -54,6 +58,47 @@ This revision incorporates the v0.16+ companion-crate prospect and roadmap recon
 - streaming / large CSV remains design-only until batch, schema, error, and memory policy are proven.
 
 Old text that described bridge examples as core feature-gated examples is superseded by companion-crate examples.
+
+### 0.3 Changes in v0.4 (as-built through v0.19.0)
+
+This revision records the contract **as shipped**, where earlier revisions
+described direction:
+
+- **The actual core public root surface** is `Tensor`, `MattenError`,
+  `DataFormat`, `MattenLimits`, and `SliceBuilder` (always), plus `Element` and
+  `NumericPolicy` under `#[cfg(feature = "dynamic")]`. Slice plumbing
+  (`IntoSliceRange`, `SliceConvert`, `SliceSpecRepr`) is exported `#[doc(hidden)]`
+  behind a sealed trait. This supersedes §2.2's narrower "allowed root exports"
+  list, which predated `MattenLimits`/`SliceBuilder`/`NumericPolicy`.
+- **The shipped `MattenError`** is `Shape`, `Broadcast`, `Allocation`, `Slice`,
+  `Parse { format: DataFormat }`, `Io`, `Unsupported` (`#[non_exhaustive]`, derives
+  only `Debug`) — the canonical set from RFC-005, narrower than the variant list
+  sketched in §8.1.
+- **`dynamic` is an ingestion/on-ramp**, not a second compute engine (RFC-016):
+  ingest mixed JSON/CSV → `Element`, clean missing values, then `try_numeric()` to
+  a plain numeric `Tensor`. Dynamic reshape/slice/arithmetic are guarded.
+- **Companion crates are built** and their external contracts are specified in
+  §18.6–§18.7: `matten-ndarray` (`to_arrayd`/`from_arrayd`) and `matten-mlprep`
+  (`standardize_columns`, `minmax_scale_columns`, `add_bias_column`,
+  `train_test_split`).
+- **Lock-step family versioning** (RFC-030) replaces independent per-crate SemVer:
+  all crates share one version; maturity is a Status label, not the version number.
+
+It does **not** change the core `Tensor` data model, shape model, arithmetic
+contract, or boundary-error policy.
+
+### 0.4 Review corrections in v0.4.1
+
+This correction pass updates the active external contract to match v0.19.0 more
+precisely:
+
+- default features are `serde`, `json`, and `csv`;
+- `Element::Text` is recorded as `Arc<str>`;
+- the exact shipped `MattenError` fields are recorded;
+- mixed JSON ingestion examples use `from_json_dynamic`;
+- companion crates must return companion `DynamicTensor` errors for dynamic inputs.
+  If the implementation can panic under a core-dynamic / companion-default feature
+  combination, that is a v0.19.1 hardening issue.
 
 ---
 
@@ -149,6 +194,15 @@ pub use crate::error::MattenError;
 pub use crate::element::Element;
 ```
 
+> **As-built (v0.19.0).** The shipped root surface is larger than this kickoff
+> sketch but still minimal: `Tensor`, `MattenError`, `DataFormat`, `MattenLimits`,
+> `SliceBuilder` (always), plus `Element` and `NumericPolicy` under `dynamic`.
+> `DataFormat` appears because it is a field of `MattenError::Parse`; `MattenLimits`
+> (RFC-018) and `SliceBuilder` are part of the supported surface; `NumericPolicy`
+> (RFC-017) governs dynamic coercion. Slice plumbing (`IntoSliceRange`,
+> `SliceConvert`, `SliceSpecRepr`) is exported `#[doc(hidden)]` behind a sealed trait
+> and is not part of the user-facing surface.
+
 The implementation MUST NOT require ordinary users to import internal storage types, layout traits, lifetime-bearing view types, or feature-specific engine structs.
 
 The following style is prohibited for normal user-facing examples:
@@ -185,17 +239,22 @@ Phase 2 dynamic support is feature-gated and exposes mixed values through `Eleme
 
 | Feature | Default | Purpose | Public Impact |
 |---|---:|---|---|
-| `serde` | Yes | JSON/web/API integration | Enables serialization/deserialization support. |
-| `dynamic` | No | Mixed-type data support | Adds `Element` and dynamic-data methods. |
+| `serde` | Yes | Serialization integration | Enables serde support used by JSON representation. |
+| `json` | Yes | JSON/web/API integration | Enables `from_json`, `to_json`, and `load_json`; implies `serde`. |
+| `csv` | Yes | CSV boundary integration | Enables `from_csv` and `load_csv`. |
+| `dynamic` | No | Mixed-type ingestion/on-ramp | Adds `Element`, `NumericPolicy`, dynamic JSON/CSV ingestion, missing-value cleanup, and explicit numeric conversion. |
 
-Recommended dependency forms:
+Recommended dependency forms for the v0.19 family:
 
 ```toml
-# Phase 1: default f64 numerical engine
-matten = "0.1"
+# Convenient PoC profile: serde + JSON + CSV enabled by default
+matten = "0.19"
 
-# Phase 2: mixed-type dynamic engine
-matten = { version = "0.1", features = ["dynamic"] }
+# Lean core profile
+matten = { version = "0.19", default-features = false }
+
+# Mixed-data ingestion/on-ramp profile
+matten = { version = "0.19", features = ["dynamic"] }
 ```
 
 ### 3.2 Default Feature Contract
@@ -231,7 +290,7 @@ pub enum Element {
 }
 ```
 
-The external semantic contract is `Element::Text` represents UTF-8 text. The exact internal representation of the text payload is intentionally left to RFC design because memory layout is a known Phase 2 risk.
+The external semantic contract is `Element::Text` represents UTF-8 text. As shipped in v0.19.0, text is stored as `Arc<str>` and should be constructed through `Element::text(...)`; users should not depend on internal layout beyond UTF-8 text semantics.
 
 `dynamic` MUST NOT change the fact that `Tensor` is the primary user-facing container.
 
@@ -328,17 +387,20 @@ External guarantees:
 
 ### 4.5 Phase 2 Dynamic Storage Contract
 
-With `dynamic`, a tensor conceptually stores `Element` values.
-
-The initial high-level storage direction is Copy-on-Write using shared backing data, but the exact representation is RFC-owned.
+With `dynamic`, a tensor conceptually stores `Element` values. In v0.19.0 this
+feature is an ingestion/on-ramp layer, not a public CoW view engine.
 
 External guarantees:
 
-- `Element::Float`, `Element::Int`, `Element::Text`, `Element::Bool`, and `Element::None` are supported semantically;
-- slicing and reshaping SHOULD be cheap where possible;
-- mutation MUST NOT unexpectedly mutate unrelated tensor values visible to the user;
+- `Element::Float`, `Element::Int`, `Element::Text(Arc<str>)`, `Element::Bool`,
+  and `Element::None` are supported semantically;
 - missing values are represented by `Element::None`;
-- text storage must be chosen after explicit memory-layout evaluation.
+- dynamic tensors support inspection, missing-value cleanup, masks, schema summary,
+  and explicit conversion through `try_numeric()` / `try_numeric_with(...)`;
+- dynamic reshape/slice/arithmetic are guarded rather than promised as a dynamic
+  computation engine;
+- public APIs must not expose internal storage layout or lifetime-bearing view
+  types.
 
 ---
 
@@ -736,6 +798,29 @@ pub enum MattenError {
 
 Exact variant names are RFC-owned, but the final error type MUST express these categories.
 
+> **As-built (RFC-005, v0.19.0).** The shipped `MattenError` consolidated the above
+> into seven `#[non_exhaustive]` variants with the following public fields:
+>
+> ```rust
+> #[derive(Debug)]
+> #[non_exhaustive]
+> pub enum MattenError {
+>     Shape { operation: &'static str, message: String },
+>     Broadcast { left: Vec<usize>, right: Vec<usize> },
+>     Allocation { requested_elements: usize, message: String },
+>     Slice { input: Option<String>, message: String },
+>     Parse { format: DataFormat, message: String },
+>     Io { path: std::path::PathBuf, source: std::io::Error },
+>     Unsupported { operation: &'static str, message: String },
+> }
+> ```
+>
+> It derives **only `Debug`** (it embeds `std::io::Error`), implements `Display` and
+> `std::error::Error` with `source()`, and must be matched by variant, not `==`.
+> `DataFormat` (`Json` / `Csv`, `#[non_exhaustive]`) is the format tag on `Parse`.
+> Companion crates define their own error types and never extend `MattenError`
+> (RFC-022 §8).
+
 ### 8.2 Panic Zone vs Result Zone
 
 `matten` intentionally has two error zones.
@@ -826,17 +911,20 @@ impl Element {
 }
 ```
 
-Possible tensor-level helpers:
+As-built tensor-level helpers include:
 
 ```rust
 #[cfg(feature = "dynamic")]
 impl Tensor {
-    pub fn fill_none(&self, fallback: Element) -> Tensor;
-    pub fn fill_none_f64(&self, fallback: f64) -> Tensor;
+    pub fn fill_none(&self, value: impl Into<Element>) -> Tensor;
+    pub fn forward_fill_none(&self, fallback: impl Into<Element>) -> Tensor;
+    pub fn none_mask(&self) -> Tensor;
+    pub fn numeric_mask(&self) -> Tensor;
+    pub fn count_none(&self) -> usize;
+    pub fn try_numeric(&self) -> Result<Tensor, MattenError>;
+    pub fn try_numeric_with(&self, policy: NumericPolicy) -> Result<Tensor, MattenError>;
 }
 ```
-
-Exact method names are RFC-owned.
 
 ### 9.3 Numeric Coercion Policy
 
@@ -856,20 +944,9 @@ String-to-number parsing MUST require an explicit user-facing conversion API, no
 
 ### 9.4 Dynamic Text Storage
 
-The external API MUST NOT prematurely require `Text(String)` as the final storage representation.
+The external API no longer requires `Text(String)` as the final storage representation.
 
-Reason: Rust enum size is determined by the largest variant, and a text variant may inflate every element. This is a known Phase 2 memory risk.
-
-Phase 2 RFCs must compare at least:
-
-- `String`;
-- `Box<str>`;
-- `Arc<str>`;
-- small-string optimization crate options;
-- string interning for repeated values;
-- separate typed columns or side storage if needed.
-
-External contract: users see text as UTF-8 string data. Internal layout is not user-visible.
+As shipped in v0.19.0, `Element::Text` uses `Arc<str>` and should be constructed through `Element::text(...)`. Users see UTF-8 text data and should not rely on the internal text storage layout beyond the public `Element` API.
 
 ---
 
@@ -1324,7 +1401,7 @@ Boundary examples SHOULD prefer `Result`-returning `main` functions:
 use matten::Tensor;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let tensor = Tensor::from_csv_path("examples/data/numeric_2x3.csv")?;
+    let tensor = Tensor::load_csv("examples/data/numeric_2x3.csv")?;
     println!("{:?}", tensor);
     Ok(())
 }
@@ -1445,9 +1522,9 @@ The following RFCs should be created or updated after this external design.
 
 ---
 
-## 16. Open Questions
+## 16. Historical Open Questions
 
-These questions should be resolved by RFC, not ad hoc implementation:
+These questions were part of the early external design. Through v0.19.0, most were resolved by RFCs 000–030. They are retained for traceability; unresolved items require future RFCs, not ad hoc implementation:
 
 1. Should zero-sized tensors be supported in v0.1, or rejected until later?
 2. What exact default allocation limit should boundary APIs enforce, if any?
@@ -1465,17 +1542,17 @@ These questions should be resolved by RFC, not ad hoc implementation:
 
 ## 17. Acceptance Criteria for This External Design
 
-This external design is ready for implementation RFC work when:
+The original acceptance gate was implementation-RFC readiness. As of v0.19.0, the document is ready to land when:
 
-- the public API philosophy is accepted;
+- the public API philosophy remains accepted and still matches the shipped root surface;
 - Phase 1 and Phase 2 boundaries are understood;
 - the panic-zone vs Result-zone policy is accepted;
 - the threat model section is accepted as the external contract summary;
 - the executable examples/documentation contract is accepted as a release-readiness gate;
 - the RFC dependency map includes RFC-014 as a scope-controlled examples RFC;
-- the RFC dependency map is accepted as the next planning step;
+- the RFC map and ROADMAP agree that RFCs 000–030 are the current decision history;
 - no public API exposes internal lifetime-bearing view types;
-- no initial requirement forces premature dynamic text storage layout.
+- no active requirement forces dynamic CoW views, dynamic arithmetic, or in-core bridge dependencies.
 
 ---
 
@@ -1521,7 +1598,7 @@ fn main() -> Result<(), matten::MattenError> {
         [2.0, null, false]
     ]"#;
 
-    let data = Tensor::from_json(input)?;
+    let data = Tensor::from_json_dynamic(input)?;
     println!("shape = {:?}", data.shape());
 
     Ok(())
@@ -1539,41 +1616,28 @@ Core `matten` remains focused on `Tensor`, shape manipulation, broadcasting, sli
 
 Core `matten` MUST NOT depend on companion crates or heavy external numeric/data frameworks.
 
-### 18.2 Companion crate order
+### 18.2 Companion crate order (status through v0.19.0)
 
 ```text
-v0.16.0
-  companion boundary confirmation
-
-v0.17.0
-  matten-ndarray experimental
-
-v0.18.0
-  matten-mlprep experimental
-
-v0.19.0
-  matten-ndarray production-ready candidate
-  matten-mlprep beta decision / hardening
-
-v0.20+
-  matten-data beta decision phase
-
-v0.25.0
-  matten-ndarray production-ready
-
-v0.26.0
-  matten-mlprep production-ready candidate
-
-v0.27.0
-  matten-data production-ready candidate
-
-later
-  nalgebra / candle / streaming only after separate RFCs
+v0.16.0  [shipped]  companion boundary confirmation (RFC-022)
+v0.17.0  [shipped]  Cargo workspace + matten-ndarray 0.1.0 experimental (RFC-027)
+v0.18.0  [shipped]  matten-mlprep 0.1.0 experimental (RFC-028)
+v0.19.0  [shipped]  matten-ndarray -> production-ready candidate
+                    matten-mlprep  -> beta (RFC-029)
+                    lock-step family versioning; family aligned to 0.19.0 (RFC-030)
+v0.20+   [planned]  matten-data beta decision phase (RFC-023)
+later    [planned]  nalgebra / candle / streaming only after separate RFCs
+                    (RFC-025 §10, RFC-026)
 ```
 
 ### 18.3 Versioning
 
-Companion crates use independent SemVer. A core `matten` version does not imply maturity of any companion crate.
+The workspace uses **lock-step family versioning** (RFC-030, superseding the
+earlier independent-per-crate-SemVer plan): every crate shares one version, set in
+`[workspace.package].version`. Matching versions mean a matched, compatible set.
+A crate's **maturity is its Status label** (experimental / beta / production-ready
+candidate / production-ready), not its version number — a crate at `0.19.0` may
+still be `beta`. A `1.0` release requires explicit maintainer confirmation.
 
 ### 18.4 Error policy
 
@@ -1582,3 +1646,49 @@ Each companion crate defines its own error type. Companion crates may wrap `matt
 ### 18.5 External examples
 
 Examples for bridge, preprocessing, and table workflows live in the corresponding companion crate once that crate exists. Core `matten` may link to released companion examples but must not contain broken pseudo-examples or add feature-gated bridge dependencies.
+
+### 18.6 `matten-ndarray` external contract (production-ready candidate)
+
+```rust
+pub fn to_arrayd(tensor: &matten::Tensor) -> Result<ndarray::ArrayD<f64>, MattenNdarrayError>;
+pub fn from_arrayd(array: ndarray::ArrayD<f64>) -> Result<matten::Tensor, MattenNdarrayError>;
+```
+
+- Both directions **copy**; no zero-copy is claimed.
+- `from_arrayd` preserves **logical element order** for non-standard-layout
+  (transposed / sliced) inputs, and **rejects zero-length axes** (`matten` forbids
+  zero-sized dims).
+- Dynamic tensors must return `MattenNdarrayError::DynamicTensor` rather than panicking. This is a companion contract; implementation must not rely on users enabling a mirror `dynamic` feature on the companion crate.
+- `MattenNdarrayError` (`#[non_exhaustive]`): `DynamicTensor`, `ZeroSizedAxis`,
+  `NdarrayShape`, `Matten`. Supported `ndarray`: the `0.16` minor (RFC-025 §6).
+
+### 18.7 `matten-mlprep` external contract (beta)
+
+```rust
+pub fn standardize_columns(x: &Tensor)  -> Result<Tensor, MattenMlprepError>;
+pub fn minmax_scale_columns(x: &Tensor) -> Result<Tensor, MattenMlprepError>;
+pub fn add_bias_column(x: &Tensor)      -> Result<Tensor, MattenMlprepError>;
+pub fn train_test_split(x: &Tensor, train_ratio: f64)
+    -> Result<(Tensor, Tensor), MattenMlprepError>;
+```
+
+- **Rank-2 only**, `rows = samples`, `columns = features`; non-2D is an error. No
+  silent transposition.
+- `standardize_columns` uses **population** std (divide by `n`). A constant
+  (zero-variance / zero-range) column returns `ZeroVariance { column }` — an
+  explicit error, never a silent zero column.
+- `add_bias_column` **prepends** a `1.0` intercept column (`[n,m] -> [n,m+1]`).
+- `train_test_split` is **ordered and deterministic** (no shuffle): first
+  `floor(n·ratio)` rows are train. A seeded variant is deferred (RFC-024 §6).
+- Pure, deterministic, no RNG; depends only on core `matten` (no `ndarray`,
+  `candle`, or `rand`).
+- Dynamic tensors must return `MattenMlprepError::DynamicTensor` rather than panicking; implementation must not rely on users enabling a mirror `dynamic` feature on the companion crate.
+- `MattenMlprepError` (`#[non_exhaustive]`): `DynamicTensor`, `ExpectedMatrix`,
+  `InvalidRatio`, `EmptySplit`, `ZeroVariance`, `Matten`.
+
+
+## 19. Document History
+
+| Version | Date | Change |
+|---|---|---|
+| 0.4.1 | 2026-06-21 | Review correction pass: aligned active feature matrix, exact `MattenError` fields, dynamic storage and mixed JSON examples, and companion dynamic rejection wording with v0.19.0 as-built state. |
