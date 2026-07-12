@@ -2,9 +2,9 @@
 
 **Project:** `matten`  
 **Document Kind:** Canonical Project Roadmap  
-**Document Version:** `1.55.0`
-**Date:** 2026-07-12
-**Status:** Canonical roadmap updated for documentation-governance philosophy distillation after the v0.30.0 educational-visualization release and RFC-049 lifecycle closure. The docs-governance sequence is 01 coverage-gap closure, 02 archival/ownership rule, then 03 philosophy distillation.
+**Document Version:** `1.56.0`
+**Date:** 2026-07-13
+**Status:** Canonical roadmap updated for RFC-054 lifecycle closure after the v0.30.0 educational-visualization release, docs-governance completion, and RFC-049 lifecycle closure. The active RFC index currently has no proposed RFCs; future rewrite/apply migration automation, public `matten-migrate` packaging, and other extracted work still require separate RFC or explicit release-policy ownership.
 **Planning Baseline:** core `matten` completed RFC-015 through RFC-021 (shipped through v0.15.3); RFC-022 boundary confirmation shipped in v0.16.0; v0.17.0 introduced the Cargo workspace and the `matten-ndarray` companion crate under the family version (RFC-025, RFC-027); v0.18.0 introduced the `matten-mlprep` companion crate under the family version (RFC-024, RFC-028); v0.19.0 promoted `matten-ndarray` to production-ready candidate status and `matten-mlprep` to beta status under lock-step family versioning (RFC-029); v0.19.1 shipped feature-robust dynamic rejection (RFC-031); v0.19.2 confirmed the companion dependency/import convention (RFC-032); v0.19.3 added the RFC-033-042 v0.20+ design set; v0.20.0 shipped the matten-data experimental scaffold (RFC-033); v0.20.1 shipped the matten-data table/CSV-to-Tensor API (RFC-034, RFC-035, Experimental). Under lock-step family versioning (RFC-030), every crate shares the family version (e.g. `0.19.2`); maturity is expressed by per-crate Status labels, not by separate version numbers. Next: v0.20+ materialization phase. RFC-032 is consumed by the companion dependency/import convention; v0.20+ planning starts at RFC-033. The first v0.20+ branch is `matten-data` decision/materialization; the second is small NumPy-inspired core comfort APIs that preserve the `matten` philosophy; the third is the examples program (RFC-043–048), which demonstrates famous small math/numerical problems and companion workflows without expanding product scope.
 
 ---
@@ -37,15 +37,15 @@ close their remaining value in this order:
 1. docs-governance-01-spec-coverage-gap-closure-handoff.md
    Resolve the three unowned spec fragments before archival:
    non-binding performance targets, golden/fuzz/property testing status, and Display formatting.
-   Status: prepared for review in docs/design/coverage-gap-resolution.md.
+   Status: implemented and reviewed in docs/design/coverage-gap-resolution.md.
 
 2. docs-governance-02-spec-archival-and-ownership-rule-handoff.md
    Archive the v0.19.0 specs as tracked history and write down the ownership rule.
-   Status: prepared for review in docs/design/README.md and docs/design/history/.
+   Status: implemented and reviewed in docs/design/README.md and docs/design/history/.
 
 3. docs-governance-03-philosophy-distillation-handoff.md
    Distill the tracked archived specs into an evergreen Philosophy page after archival exists.
-   Status: prepared for review in docs/src/philosophy.md.
+   Status: implemented and reviewed in docs/src/philosophy.md.
 ```
 
 The intended ownership model is:
@@ -1084,3 +1084,4 @@ dependency gated by a non-default feature would not appear, producing a false pa
 | 1.53.0 | 2026-07-12 | Docs-governance Handoff 01 implementation prepared for review. Added `docs/design/coverage-gap-resolution.md` to resolve the three pre-archival coverage gaps: retired unmaintained numeric compile/rebuild/memory targets as live requirements, inventoried current NumPy golden coverage while keeping property/fuzz work as future hardening, and recorded that `Tensor` has `Debug` but no `Display` contract. Aligned contributing docs, RFC-013, and compatibility docs. No public API, dependency, version, release-scope, runtime, benchmark, or test-gate change. |
 | 1.54.0 | 2026-07-12 | Docs-governance Handoff 02 implementation prepared for review. Archived the v0.19.0 requirements, external-design, and roadmap snapshots under `docs/design/history/` with historical-only banners; added `docs/design/README.md` with the four-plane ownership rule and the README-note-over-RFC-066 disposition; linked the rule from `rfcs/README.md`; kept `docs/design/**` outside the mdBook. No public API, dependency, version, release-scope, runtime, or user-doc contract change. |
 | 1.55.0 | 2026-07-13 | Docs-governance Handoff 03 implementation prepared for review. Expanded `docs/src/philosophy.md` from a stub into an evergreen principles page distilled from tracked `docs/design/history/` snapshots: developer-experience-first tensor work, family-car positioning, one concrete `Tensor`, no visible lifetime burden, concrete-before-generic dynamic ingestion, panic-local/Result-boundary split, explicit non-goals, and a short migration pointer. No public API, dependency, version, release-scope, runtime, benchmark guarantee, or mdBook structure change. |
+| 1.56.0 | 2026-07-13 | RFC-054 lifecycle closure status alignment. Closed `matten-migrate` as implemented for the reviewed local advisory tool scope, moved RFC-054 to `rfcs/done/`, and recorded that rewrite/apply, source mutation, Cargo.toml editing, public `matten-migrate` packaging, and stronger migration automation are extracted to future RFC/release-policy ownership. The active RFC index now has no proposed RFCs. Roadmap-only alignment; no public API, dependency, version, release-scope, runtime, or tool behavior change. |
