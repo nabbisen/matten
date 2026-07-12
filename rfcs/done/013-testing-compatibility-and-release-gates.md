@@ -231,3 +231,18 @@ lands — it holds no fixed reservation, having previously floated through RFC-0
 RFC-057 earmarks as each was taken by the migration set, the v0.24 reduction set, and the
 `matten-ndarray` promotion respectively) may formalize this if the team chooses. This note records that
 RFC-013's broad strategy is partially aspirational relative to the shipped discipline.
+
+## Docs-governance coverage note (2026-07-12)
+
+The current shipped NumPy golden coverage is checked in under:
+
+```text
+crates/matten/tests/golden/numpy_broadcasting.json
+crates/matten/tests/golden/numpy_matmul.json
+crates/matten/tests/smoke.rs
+```
+
+These tests cover broadcasting and matrix multiplication without requiring Python at test time.
+Property-based tests and fuzz targets remain future hardening candidates, not current release
+gates. The durable resolution record for this inventory is
+`docs/design/coverage-gap-resolution.md`.

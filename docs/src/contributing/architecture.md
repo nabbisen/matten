@@ -72,9 +72,11 @@ dynamic = []
 ```
 
 Lean build: `matten = { version = "0.30.0", default-features = false }`.
-The strict compile-time baseline (< 15 s on a modern laptop) applies to the
-lean profile. The `default` profile is the convenient PoC baseline; `dynamic`
-is off by default.
+The lean profile is the low-friction baseline. Older design snapshots mentioned
+numeric compile-time targets, but those numbers are not maintained release
+requirements; current gates focus on feature-matrix builds, dependency
+boundaries, and documentation truth. The `default` profile is the convenient
+PoC baseline; `dynamic` is off by default.
 
 ## Design invariants
 

@@ -85,12 +85,20 @@ v1.0.0 requires explicit maintainer confirmation. Before that can happen:
 `rust-version = "1.85"` (Rust 2024 edition). The MSRV may be relaxed in a
 future release; it will not be raised without a documented breaking change.
 
+## Formatting contract
+
+`Tensor` implements `Debug` for compact inspection output. `Tensor` does not
+implement `Display`, and matrix-like display formatting is not part of the
+current public contract. Any future `Display` format should be designed
+separately because documented formatting becomes a compatibility surface.
+
 ## Deferred items
 
 The following items were considered and explicitly deferred:
 
 | Item | Status | Reason |
 |---|---|---|
+| `Display` for `Tensor` | Not implemented | Formatting contract deferred to a future design decision. |
 | `is_empty()` | Deferred | Zero-sized dims rejected; always false. Future RFC. |
 | `set_flat` | Not implemented | Mutation API deferred. |
 | `arange` max elements | `1<<20` (~1 M) | Lowered from `1<<28` in v0.12.0 for OOM safety. |

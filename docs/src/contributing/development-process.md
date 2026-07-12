@@ -28,8 +28,10 @@ cargo test --all-features
 ```
 
 When the PR touches parser, JSON, CSV, indexing, or shape arithmetic, add at
-least one targeted property or fuzz-oriented test module. The fuzz target does
-not need to run on every PR, but it must compile if the fuzz crate is included.
+least one targeted invariant or regression test. Property tests and fuzz targets
+are future hardening candidates rather than current release gates; if a fuzz
+crate is introduced for a slice, its targets should compile even when they do
+not run on every PR.
 
 ## Reviewer checklist
 
