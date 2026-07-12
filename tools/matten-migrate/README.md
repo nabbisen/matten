@@ -10,7 +10,7 @@ local tool only
 advisory output only
 heuristic text/dependency scan
 non-mutating unless --output is provided
-no rewrite/apply commands
+rewrite/apply explicitly rejected
 no network
 no telemetry
 no source upload

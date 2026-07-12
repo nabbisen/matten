@@ -1,8 +1,13 @@
 # RFC-054 — `matten-migrate` Assisted Migration Tool
 
 **Project:** `matten`  
-**Milestone:** Future / post-guide / post-bridge stabilization  
-**Status:** Accepted as future direction (architect ruling 2026-06-24); local advisory inspect/report/suggest/explain-api/check-bridges slices implemented; rewrite/apply and public crate remain deferred
+**Milestone:** Post-guide / post-bridge stabilization  
+**Status:** Implemented for the reviewed local advisory tool scope. The
+workspace-excluded `tools/matten-migrate` CLI supports inspect/report/list-targets/
+suggest/explain-api/check-bridges as advisory, local-only, unpublished tooling.
+rewrite/apply, source mutation, Cargo.toml editing, public-crate packaging, and
+stronger migration automation are outside RFC-054's closed scope and require a
+future separate RFC or explicit release-policy decision.
 **Document type:** RFC  
 **Primary audience:** tool authors, maintainers, advanced users  
 **Depends on:** RFC-050 Production Migration Guide, RFC-051 Bridge Conversion Contracts, RFC-052 Production Target Playbooks, RFC-053 Migration Readiness Diagnostics  
@@ -12,7 +17,7 @@
 
 ## 1. Summary
 
-This RFC proposes a future `matten-migrate` command-line tool.
+This RFC defines the reviewed first `matten-migrate` command-line tool.
 
 The first version should be advisory, not an automatic code rewriter.
 
@@ -125,7 +130,7 @@ matten-migrate suggest --target ndarray .
 matten-migrate suggest --target nalgebra .
 ```
 
-Possible later commands:
+Implemented later commands:
 
 ```bash
 matten-migrate list-targets
@@ -133,7 +138,7 @@ matten-migrate explain-api Tensor::matmul
 matten-migrate check-bridges
 ```
 
-Do not include in first version:
+The local advisory CLI explicitly rejects these automation commands:
 
 ```bash
 matten-migrate rewrite
@@ -269,13 +274,13 @@ This helps avoid bad suggestions.
 This RFC is implemented when:
 
 ```text
-[ ] Tool can inspect Cargo.toml and source tree locally.
-[ ] Tool can generate RFC-053-style Markdown report.
-[ ] Tool suggests at least ndarray/nalgebra/Polars/Pandas/Candle playbooks.
-[ ] Tool has no network behavior.
-[ ] Tool makes no automatic code changes.
-[ ] Tool is publish=false initially.
-[ ] Docs clearly label it experimental/advisory.
+[x] Tool can inspect Cargo.toml and source tree locally.
+[x] Tool can generate RFC-053-style Markdown report.
+[x] Tool suggests at least ndarray/nalgebra/Polars/Pandas/Candle playbooks.
+[x] Tool has no network behavior.
+[x] Tool makes no automatic code changes.
+[x] Tool is publish=false initially.
+[x] Docs clearly label it advisory.
 ```
 
 ---
@@ -317,7 +322,7 @@ Those should remain deferred.
 | Risk | Mitigation |
 |---|---|
 | Users trust suggestions too much | Strong advisory wording. |
-| Tool becomes a code-rewriter too early | No rewrite command in v1. |
+| Tool becomes a code-rewriter too early | rewrite/apply are explicitly rejected in v1. |
 | Source privacy concerns | Local-only, no telemetry. |
 | Poor suggestions | Allow config and conservative rules. |
 | Maintenance burden | Start publish=false and small. |
@@ -344,3 +349,8 @@ RFC-054:
 ```
 
 This RFC must not be implemented before RFC-050 through RFC-053 have usable documentation.
+
+RFC-050 through RFC-053 are implemented, and RFC-054 is closed only for the
+reviewed local advisory tool scope. Future rewrite/apply behavior, source
+mutation, public-crate packaging, or stronger automation remains extracted to a
+future separate RFC or explicit release-policy decision.

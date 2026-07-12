@@ -67,6 +67,7 @@ The broader documentation ownership model is recorded in
 | 051 | [Bridge Conversion Contracts and Companion-Crate Policy](./done/051-bridge-conversion-contracts-and-companion-crate-policy.md) | 0.23.2 |
 | 052 | [Production Target Playbooks](./done/052-production-target-playbooks.md) | 0.23.0–0.23.1 |
 | 053 | [Migration Readiness Diagnostics and Report Format](./done/053-migration-readiness-diagnostics-and-report-format.md) | 0.23.4 |
+| 054 | [`matten-migrate` Assisted Migration Tool](./done/054-matten-migrate-assisted-migration-tool.md) | local advisory tool scope implemented; rewrite/apply and public crate extracted to future RFC/release-policy ownership |
 | 055 | [Result-Form Scalar Reductions (`try_sum`/`try_mean`/`try_min`/`try_max`/`try_norm`)](./done/055-result-form-scalar-reductions.md) | 0.24.0 |
 | 056 | [Result-Form Axis Reductions (`try_sum_axis`/`try_mean_axis`/`try_min_axis`/`try_max_axis`)](./done/056-result-form-axis-reductions.md) | 0.24.0 |
 | 057 | [Promote `matten-ndarray` — Production-Ready Candidate → Production-Ready](./done/057-promote-matten-ndarray-production-ready.md) | 0.25.0 |
@@ -81,9 +82,8 @@ The broader documentation ownership model is recorded in
 
 ## Proposed
 
-| ID | Title | Target |
-|---:|---|---|
-| 054 | [`matten-migrate` Assisted Migration Tool](./proposed/054-matten-migrate-assisted-migration-tool.md) | **Accepted as future direction** (2026-06-24); local advisory inspect/report/suggest/explain-api/check-bridges slices implemented; rewrite/apply and public crate remain deferred |
+No active proposed RFCs.
+
 Implementation handoffs for the v0.20+ proposed set (RFC-033–042), the examples
 program (RFC-043–048), and the benchmarking program (RFC-049) live in
 [`./handoffs/`](./handoffs/). They translate each RFC into PR boundaries, checks,
@@ -106,10 +106,11 @@ covers the documentation/policy/template work (RFC-050–053) for v0.23.x, with 
 [acceptance/QA checklist](./handoffs/050-053-acceptance-qa-checklist.md) and a
 [release-guard checklist](./handoffs/050-053-release-guard-checklist.md); RFC-054's
 [`054-deferred-implementation-note.md`](./handoffs/054-deferred-implementation-note.md)
-records the original deferral boundary, while
+records the original deferral boundary, while the
 [`054-matten-migrate-readiness-audit.md`](./handoffs/054-matten-migrate-readiness-audit.md)
 and
 [`054-matten-migrate-first-tool-handoff.md`](./handoffs/054-matten-migrate-first-tool-handoff.md)
-record the reviewed reopening and first local advisory tool slice. These RFCs add
-no core dependency: migration support lives in docs, bridge crates, and
-workspace-excluded tooling.
+record the reviewed reopening and first local advisory tool slice. Later RFC-054
+handoffs cover target suggestions, static API explanations, bridge-readiness
+checks, and lifecycle closure. These RFCs add no core dependency: migration
+support lives in docs, bridge crates, and workspace-excluded tooling.
