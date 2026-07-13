@@ -3,7 +3,7 @@
 **Project:** `matten`
 **Document kind:** Documentation-governance handoff (design team)
 **Status:** Implemented; prepared for review
-**Authority / source:** `.git-exclude/reviewed/matten-specs-supersession-map-v0.1.md` §0, §1, §5, §6, §7
+**Authority / source:** Docs-governance supersession review; durable outputs in `docs/design/README.md` and `docs/design/history/`
 **Sequence:** Runs **after Handoff 01** (coverage-gap closure). Do not archive until the three §4
 gaps are resolved, or normative content is lost to history.
 
@@ -12,8 +12,8 @@ gaps are resolved, or normative content is lost to history.
 ## 1. Summary
 
 The v0.19.0 specs already self-declare RFCs/`ROADMAP.md` as canonical and label themselves
-historical, but they (a) sit in `.git-exclude/` so they are invisible to anyone cloning the repo,
-(b) carry no "superseded" banner, and (c) freeze at RFCs 000–030 (~35 RFCs stale). This slice
+historical, but before archival they were only available as local untracked specification files,
+carried no "superseded" banner, and froze at RFCs 000–030 (~35 RFCs stale). This slice
 closes priorities #1 (single source of truth) and #2 (discoverability) by **archiving the specs as
 tracked, banner-marked history** and **writing down the three-plane ownership rule**.
 
@@ -41,9 +41,9 @@ docs/design/history/matten-v0.19.0-roadmap-milestones-v1.md
 
 (The roadmap snapshot is included for consistency; its canonical successor is `ROADMAP.md`.)
 
-After the tracked copies exist and are verified, the `.git-exclude/specs/` originals **may be
-deleted** to avoid a duplicate untracked shadow copy (keep only if you want a personal scratch
-copy — but the tracked copy is now the history-of-record).
+After the tracked copies exist and are verified, any local untracked originals **may be deleted** to
+avoid a duplicate shadow copy (keep only if you want a personal scratch copy — but the tracked copy
+is now the history-of-record).
 
 ## 3. Required banner (top of each archived file)
 
@@ -96,7 +96,7 @@ chosen.
 [ ] do not add any docs/design/** file to docs/src/SUMMARY.md (must stay out of the published book)
 [ ] no public API / dependency / version / CHANGELOG change
 [ ] do not copy retired "Phase/Sedan/SUV" vocabulary into any docs/src page
-[ ] do not delete the .git-exclude originals until tracked copies are verified in place
+[ ] do not delete any local scratch originals until tracked copies are verified in place
 ```
 
 ## 6. Files
@@ -121,7 +121,7 @@ rfcs/handoffs/README.md                                     # mark this handoff 
 [ ] rfcs/README.md links to docs/design/README.md
 [ ] ROADMAP.md points to the ownership rule location and records that archived specs are historical only
 [ ] ownership-rule disposition recorded (README note vs RFC-066) with rationale
-[ ] no duplicate authoritative-looking copy remains (.git-exclude originals removed or clearly scratch)
+[ ] no duplicate authoritative-looking copy remains (local originals removed or clearly scratch)
 [ ] check-release-docs.sh passes; mdbook build docs succeeds; git diff --check clean
 ```
 
@@ -140,6 +140,6 @@ grep -rn "docs/design" docs/src/SUMMARY.md || echo "correctly absent from the bo
 whether the banner is present and unambiguous on all three snapshots
 whether docs/design/** is genuinely outside the published book (no SUMMARY entry, mdbook clean)
 whether the ownership rule is written down and reachable, and the RFC-vs-note choice is recorded
-whether the .git-exclude shadow copy is resolved (no two live copies)
+whether any local shadow copy is resolved (no two live authoritative copies)
 whether Handoff 01's gap resolutions landed before this archival (nothing normative lost)
 ```

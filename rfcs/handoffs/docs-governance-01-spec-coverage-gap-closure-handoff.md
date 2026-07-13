@@ -3,7 +3,7 @@
 **Project:** `matten`
 **Document kind:** Documentation-governance handoff (design team)
 **Status:** Implemented; prepared for review
-**Authority / source:** `.git-exclude/reviewed/matten-specs-supersession-map-v0.1.md` §4
+**Authority / source:** Docs-governance supersession review; durable outcome recorded in `docs/design/coverage-gap-resolution.md`
 **Sequence:** **This handoff runs FIRST** — before Handoff 02 (archival). Nothing normative may be
 lost to "history" until the three gaps below are resolved.
 

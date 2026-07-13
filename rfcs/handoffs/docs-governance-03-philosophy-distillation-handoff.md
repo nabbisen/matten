@@ -3,9 +3,9 @@
 **Project:** `matten`
 **Document kind:** Documentation-governance handoff (design team)
 **Status:** Implemented; prepared for review
-**Authority / source:** `.git-exclude/reviewed/matten-specs-supersession-map-v0.1.md` §6, §7 (item 4)
+**Authority / source:** Docs-governance supersession review; durable source snapshots in `docs/design/history/`
 **Sequence:** Runs after Handoff 01 and after Handoff 02 has created tracked archived specs under
-`docs/design/history/`. Do not rely on `.git-exclude` originals for this slice; they are not
+`docs/design/history/`. Do not rely on local untracked originals for this slice; they are not
 available in a fresh clone.
 
 ---
@@ -94,7 +94,7 @@ ROADMAP.md                             # record this slice after the tracked arc
 
 ```text
 [ ] philosophy.md is a coherent principles page distilled from the specs, evergreen (no version pins)
-[ ] source material comes from tracked docs/design/history snapshots, not .git-exclude originals
+[ ] source material comes from tracked docs/design/history snapshots, not local untracked originals
 [ ] positioning is honest: "family car" / learning / PoC framing, explicit non-goals, migration pointer
 [ ] no retired vocabulary and no overclaim verbs present
 [ ] philosophy.md is covered by the RFC-065 positioning guard and passes it
