@@ -84,6 +84,7 @@ maintainer may choose a v1.0 release." It prevents accidental v1.0 drift.
 7. Verify the serde/JSON/CSV compatibility story is stable enough for v1.0 discussion.
 8. Verify limitations, non-goals, and deferred items are clear.
 9. Verify release gates are adequate for a v1.0 decision.
+10. Reconcile both documented v1.0 gates: compatibility policy and release checklist.
 
 ---
 
@@ -120,7 +121,7 @@ Review:
 
 ```text
 docs/src/reference/public-api-snapshot.md
-src/lib.rs
+crates/matten/src/lib.rs
 crates/*/src/lib.rs
 crate READMEs' Public API sections
 ```
@@ -162,8 +163,8 @@ Review:
 ```text
 docs/src/reference/boundary.md
 rfcs/done/009-serde-json-csv-and-boundary-integration.md
-examples/10_json_roundtrip.rs
-examples/11_csv_numeric_loading.rs
+crates/matten/examples/10_json_roundtrip.rs
+crates/matten/examples/11_csv_numeric_loading.rs
 ```
 
 Questions:
@@ -220,6 +221,33 @@ Questions:
 ```
 
 The audit must make this a maintainer decision point, not hide it.
+
+### 5.6 Release Checklist v1.0 Gate
+
+Review:
+
+```text
+docs/src/contributing/release-checklist.md
+docs/src/tutorials/start-here.md
+docs/src/examples/
+docs/src/reference/error-model.md
+docs/src/reference/dynamic.md
+rfcs/done/022-companion-crate-boundary-policy.md
+```
+
+Questions:
+
+```text
+[ ] Is the core public API stable enough for v1 discussion?
+[ ] Is the dynamic on-ramp story clear and documented?
+[ ] Are examples strong, scoped, current, and not smuggling in deferred scope?
+[ ] Are diagnostics reliable enough for the documented panic/Result boundary?
+[ ] Is the companion-crate boundary documented and still consistent with RFC-022?
+[ ] Is the feature matrix clean across default, no-default, and opt-in feature profiles?
+```
+
+This section reconciles the separate v1.0.0 gate in the release checklist with
+the compatibility-policy v1.0 requirements. The audit must cover both.
 
 ---
 
@@ -294,7 +322,7 @@ This RFC is accepted when reviewers agree that:
 
 ```text
 [ ] the audit does not authorize v1.0
-[ ] the audit questions cover the existing documented v1.0 requirements
+[ ] the audit questions cover the existing documented v1.0 requirements in compatibility policy and release checklist
 [ ] lock-step family / companion maturity is treated as an explicit decision point
 [ ] deferred items are evaluated without forcing implementation
 [ ] the required report shape is concrete enough for implementation review
