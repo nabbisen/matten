@@ -1,7 +1,7 @@
 # Release Guard Checklist — Production Migration Docs
 
 **Project:** `matten`  
-**Scope:** RFC-050–053 migration documentation  
+**Scope:** RFC-050–054 migration documentation and local advisory tooling notes
 **Purpose:** Prevent overclaiming and scope drift in current public docs  
 
 ---
@@ -59,9 +59,9 @@ So a first guard may be warning-only, followed by manual review.
 
 **Phrase-anchored only (architect ruling 2026-06-24).** Do **not** add bare-word bans such
 as `always`, `never`, `automatic`, or `replace`: legitimate docs say "always copies",
-"never panics", "does not provide automatic conversion", and "`matten-migrate` is a future
-possibility", so single-word scans false-positive badly. Match multi-word phrases only, and
-allow negated/educational and future-tense uses. This mirrors how the existing
+"never panics", "does not provide automatic conversion", and "`tools/matten-migrate` is a
+local advisory helper", so single-word scans false-positive badly. Match multi-word phrases only, and
+allow negated, educational, advisory-tool, and future-tense uses. This mirrors how the existing
 `scripts/check-release-docs.sh` guards are deliberately scoped to precise patterns.
 
 ---
@@ -115,17 +115,25 @@ matten-data will grow group-by/join/pivot/query.
 Current docs may say:
 
 ```text
-matten-migrate is a future possibility.
+tools/matten-migrate is a local, unpublished, advisory helper.
+matten-migrate can draft a migration-readiness report.
+matten-migrate is heuristic and must be reviewed manually.
 ```
 
 Current docs must not imply:
 
 ```text
-matten-migrate exists now.
-matten can automatically rewrite your project.
+matten-migrate is a public/published crate.
+matten-migrate automatically rewrites your project.
+matten-migrate edits Cargo.toml or injects dependencies.
+matten-migrate proves conversion correctness.
+matten-migrate uploads source, uses the network, or sends telemetry.
 ```
 
-Until RFC-054 implementation is explicitly approved.
+RFC-054 is closed only for the reviewed local advisory `tools/matten-migrate`
+scope. rewrite/apply, source mutation, public-crate packaging, and stronger
+automation remain future-owned work requiring a separate RFC or explicit
+release-policy decision.
 
 ---
 
@@ -138,5 +146,5 @@ Until RFC-054 implementation is explicitly approved.
 [ ] README top-level text remains modest.
 [ ] examples referenced exist.
 [ ] mdBook builds.
-[ ] RFC-054 remains deferred.
+[ ] RFC-054 future automation/public-crate scope remains extracted and unauthorized.
 ```

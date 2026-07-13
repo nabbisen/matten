@@ -4,6 +4,11 @@
 **Document kind:** Acceptance / QA checklist  
 **Scope:** RFC-050, RFC-051, RFC-052, RFC-053  
 
+This checklist governed the RFC-050–053 documentation batch. RFC-054's local
+advisory `tools/matten-migrate` helper was reopened, reviewed, and closed later
+under separate RFC-054 handoffs; the CLI/tooling line below remains the
+acceptance boundary for the original RFC-050–053 slice only.
+
 ---
 
 ## 1. Global Acceptance
@@ -12,7 +17,7 @@
 [ ] No new dependency in core matten.
 [ ] No new runtime behavior in core matten.
 [ ] No new bridge crate unless separately approved.
-[ ] No CLI/tooling implementation.
+[ ] No CLI/tooling implementation in the RFC-050–053 slice.
 [ ] mdBook builds.
 [ ] All new docs are linked from SUMMARY.md.
 [ ] No broken internal links.

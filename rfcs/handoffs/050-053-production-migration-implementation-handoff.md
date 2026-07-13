@@ -3,8 +3,8 @@
 **Project:** `matten`  
 **Document kind:** Compact implementation handoff  
 **Scope:** RFC-050, RFC-051, RFC-052, RFC-053  
-**Status:** Ready for implementation planning  
-**Explicitly excluded:** RFC-054 implementation  
+**Status:** Implemented; retained as the original RFC-050–053 planning record
+**Explicitly excluded:** RFC-054 implementation in this handoff; RFC-054 local advisory tooling was reopened and closed later through separate handoffs
 **Recommended target:** v0.23.0 / v0.23.x  
 **Primary audience:** documentation implementers, bridge-crate maintainers, release maintainers  
 
@@ -39,7 +39,7 @@ The implementation should be mostly documentation, templates, and bridge-contrac
 
 Do **not** add heavy dependencies to core `matten`.
 
-Do **not** implement `matten-migrate` yet.
+Do **not** implement `matten-migrate` in this RFC-050–053 handoff.
 
 ---
 
@@ -66,7 +66,7 @@ docs:
   provide report templates
 
 tools:
-  deferred until docs and bridge contracts stabilize
+  deferred from this handoff until docs and bridge contracts stabilize
 ```
 
 The correct user promise is:
@@ -105,7 +105,7 @@ matten automatically converts every PoC into production code.
 [ ] matten-nalgebra implementation
 [ ] matten-polars implementation
 [ ] matten-candle implementation
-[ ] matten-migrate CLI
+[ ] matten-migrate CLI in this handoff
 [ ] automatic source rewriting
 [ ] new core matten API
 [ ] new core matten dependencies
@@ -327,7 +327,7 @@ Alternative worked example:
 36_heat_equation_1d
 ```
 
-Do not implement a CLI.
+Do not implement a CLI in this handoff.
 
 ---
 
@@ -457,8 +457,8 @@ RFC-053 is done when:
 [ ] checklist maps pressure signals to target playbooks
 [ ] one worked report example exists
 [ ] report is advisory, not automatic conversion
-[ ] no CLI is introduced
-[ ] no source-code scanning tool is introduced
+[ ] no CLI is introduced in this handoff
+[ ] no source-code scanning tool is introduced in this handoff
 ```
 
 Required advisory disclaimer:
@@ -479,7 +479,7 @@ Guard categories:
 ```text
 [ ] no "matten is faster than" in migration docs
 [ ] no "drop-in replacement" in migration docs
-[ ] no "automatic conversion" claim except in RFC-054 future/deferred context
+[ ] no "automatic conversion" claim except as negated/advisory language
 [ ] no new target-library dependency in core matten
 [ ] no dataframe feature promises in matten-data docs
 ```
@@ -576,7 +576,7 @@ For production, replace matten with nalgebra.
 Do not implement now:
 
 ```text
-matten-migrate CLI
+matten-migrate CLI in this handoff
 matten-nalgebra bridge crate
 matten-polars bridge crate
 matten-candle bridge crate
@@ -599,7 +599,7 @@ This compact handoff is complete when:
 [ ] RFC-052 playbooks are merged
 [ ] RFC-051 bridge contract template and matten-ndarray audit are merged
 [ ] RFC-053 report template and one worked example are merged
-[ ] RFC-054 remains explicitly deferred
+[ ] RFC-054 remains outside this handoff's implementation scope
 [ ] release-doc checks protect the main scope promises
 ```
 
