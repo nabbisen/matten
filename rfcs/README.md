@@ -82,7 +82,9 @@ The broader documentation ownership model is recorded in
 
 ## Proposed
 
-No active proposed RFCs.
+| ID | Title | Target |
+|---:|---|---|
+| 066 | [v1.0 Readiness Audit and Release Decision Gate](./proposed/066-v1-readiness-audit-and-release-decision-gate.md) | Proposed audit-only RFC; no v1.0 release authorization |
 
 Implementation handoffs for the v0.20+ proposed set (RFC-033–042), the examples
 program (RFC-043–048), and the benchmarking program (RFC-049) live in
