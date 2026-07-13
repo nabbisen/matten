@@ -4,7 +4,7 @@
 [![Docs.rs](https://docs.rs/matten-ndarray/badge.svg)](https://docs.rs/matten-ndarray)
 [![license](https://img.shields.io/crates/l/matten-ndarray.svg)](../../LICENSE)
 
-> **Production-ready (`0.30.x` family).** A small conversion bridge between
+> **Production-ready (`0.31.x` family).** A small conversion bridge between
 > [`matten::Tensor`](https://crates.io/crates/matten) and
 > `ndarray::ArrayD<f64>`. The scope is closed and the API is stable; still
 > pre-1.0, so pin the minor version.
@@ -83,9 +83,9 @@ template. The full contract:
 ## Compatibility
 
 - **SemVer:** pre-1.0 (`0.x`). A `0.x` minor bump may contain breaking changes;
-  patch releases are additive only. Pin the release explicitly (`matten-ndarray = "0.30.0"`).
+  patch releases are additive only. Pin the release explicitly (`matten-ndarray = "0.31.0"`).
 - **MSRV:** Rust 1.85 (edition 2024).
-- **`matten`:** released with the `0.30.x` family version (RFC-030). The published
+- **`matten`:** released with the `0.31.x` family version (RFC-030). The published
   manifest uses the workspace's broad pre-1.0 core requirement for maintenance
   (`matten = "0"`, RFC-064); users should still declare the matched family explicitly.
 - **`ndarray`:** supports the `0.17` minor (requirement `"0.17"`; CI targets `0.17.2`). Because

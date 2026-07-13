@@ -71,7 +71,7 @@ csv     = ["dep:csv"]
 dynamic = []
 ```
 
-Lean build: `matten = { version = "0.30.0", default-features = false }`.
+Lean build: `matten = { version = "0.31.0", default-features = false }`.
 The lean profile is the low-friction baseline. Older design snapshots mentioned
 numeric compile-time targets, but those numbers are not maintained release
 requirements; current gates focus on feature-matrix builds, dependency

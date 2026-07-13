@@ -14,4 +14,4 @@ This book is organized by reader:
 - **Reference** — the rules that shape the public API.
 - **Contributors** — project layout, milestones, and process.
 
-> This documentation tracks the current 0.30 release family, which adds the RFC-065 educational tensor-learning path on top of the RFC-063 visual-understanding docs and local reporting tool.
+> This documentation tracks the current 0.31 release family, an RFC-066/RFC-067 policy-cleanup release that records the v1.0 readiness audit and family-maturity rule without authorizing v1.0 release preparation.

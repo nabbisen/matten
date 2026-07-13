@@ -4,7 +4,7 @@
 [![Docs.rs](https://docs.rs/matten-mlprep/badge.svg)](https://docs.rs/matten-mlprep)
 [![license](https://img.shields.io/crates/l/matten-mlprep.svg)](../../LICENSE)
 
-> **Production-ready candidate (`0.30.x` family).** Small, transparent, deterministic preprocessing helpers for
+> **Production-ready candidate (`0.31.x` family).** Small, transparent, deterministic preprocessing helpers for
 > [`matten::Tensor`](https://crates.io/crates/matten). Not an ML framework. The
 > API is intended to be mostly stable but is still pre-1.0; pin the minor version.
 
@@ -104,9 +104,9 @@ pub enum MattenMlprepError {
 ## Compatibility
 
 - **SemVer:** pre-1.0 (`0.x`). A `0.x` minor bump may break and carries migration
-  notes; patch releases are additive only. Pin the release explicitly (`matten-mlprep = "0.30.0"`).
+  notes; patch releases are additive only. Pin the release explicitly (`matten-mlprep = "0.31.0"`).
 - **MSRV:** Rust 1.85 (edition 2024).
-- **`matten`:** released with the `0.30.x` family version (RFC-030). The published
+- **`matten`:** released with the `0.31.x` family version (RFC-030). The published
   manifest uses the workspace's broad pre-1.0 core requirement for maintenance
   (`matten = "0"`, RFC-064); users should still declare the matched family explicitly.
 - A `1.0` release requires explicit maintainer confirmation.

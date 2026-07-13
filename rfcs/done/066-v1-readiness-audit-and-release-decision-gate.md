@@ -1,7 +1,7 @@
 # RFC-066 — v1.0 Readiness Audit and Release Decision Gate
 
 **Project:** `matten`
-**Status:** Accepted for audit handoff planning; audit-only, no v1.0 release authorization
+**Status:** Implemented (v0.31.0); audit-only, no v1.0 release authorization
 **Document type:** RFC
 **Primary audience:** maintainers, release reviewers, public-API reviewers
 **Scope:** Audit and decision process only; no version bump or release authorization

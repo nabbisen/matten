@@ -18,6 +18,44 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.31.0] - 2026-07-13
+
+RFC-066/RFC-067 policy-cleanup release. This release records the reviewed v1.0 readiness audit,
+closes the audit's BF-1 documentation mismatch, adopts the RFC-067 family maturity policy, and keeps
+v1.0 release preparation separate. No public API, published crate dependency graph, core default
+feature, runtime behavior, MSRV, or maturity-label change.
+
+### Added
+
+- `docs/design/v1-readiness-audit.md`, the reviewed RFC-066 v1.0 readiness audit report.
+- RFC-067 v1.0 family maturity policy: candidate-labeled companions are not automatic v1.0 blockers,
+  but any future v1.0 release RFC must include a family maturity table and decide candidate-labeled
+  crate inclusion explicitly.
+
+### Changed
+
+- Public API snapshot wording now matches source behavior for dynamic serde serialization: dynamic
+  `Serialize` returns a serde error instead of panicking.
+- The compatibility policy and release checklist now require the RFC-067 family maturity table in
+  any future v1.0 release RFC if any lock-step family crate remains `production-ready candidate`.
+- RFC-066 moved to implemented status for the audit-only scope; RFC-067 is implemented as repository
+  policy.
+- Current-family documentation and install snippets retargeted from `0.30.0` to `0.31.0`.
+
+### Version
+
+- Release bump `0.30.0` -> `0.31.0`. Lock-step family versioning still applies to all workspace
+  crates; `tools/matten-report` and `tools/matten-migrate` remain local unpublished tools at their
+  own tool versions.
+
+### Threat model
+
+Docs, RFC, roadmap, release-checklist, compatibility-policy, and release-metadata updates only. No
+v1.0 release preparation, tag, publish, public API change, published dependency change, core default
+feature change, parser behavior change, runtime behavior change, MSRV change, maturity-label change,
+companion promotion, automatic project mutation, network, telemetry, generated image, SVG, HTML,
+Vega-Lite, JSON, plotting, notebook, GUI, or public tooling crate change.
+
 ## [0.30.0] - 2026-07-11
 
 RFC-065 educational-visualization release. This release builds on the RFC-063 visual-understanding
