@@ -35,6 +35,7 @@ working documents for the implementation team and may be revised as work proceed
 | `054-matten-migrate-explain-api-handoff.md` | RFC-054 `matten-migrate` static API explanation slice |
 | `054-matten-migrate-check-bridges-handoff.md` | RFC-054 `matten-migrate` bridge-readiness check slice |
 | `054-lifecycle-closure-handoff.md` | RFC-054 lifecycle closure / future automation extraction handoff |
+| `066-v1-readiness-audit-handoff.md` | RFC-066 v1.0 readiness audit report handoff |
 | `065-educational-visualization-handoff.md` | RFC-065 Educational Visualization and Tensor Learning Path — first docs/positioning slice |
 | `065-phase-2-educational-shape-data-path-handoff.md` | RFC-065 Educational Visualization and Tensor Learning Path — Phase 2 educational shape/data docs slice |
 | `065-phase-3-educational-path-report-handoff.md` | RFC-065 Educational Visualization and Tensor Learning Path — Phase 3 local educational-path report slice |
