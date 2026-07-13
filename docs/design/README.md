@@ -58,6 +58,7 @@ User-facing usage/reference/tutorials       -> docs/src/
 Forward schedule and release history        -> ROADMAP.md
 Historical snapshot traceability            -> docs/design/history/
 Coverage-gap decisions before archival      -> docs/design/coverage-gap-resolution.md
+v1.0 readiness audit report                 -> docs/design/v1-readiness-audit.md
 ```
 
 The archived snapshots retain retired vocabulary inside historical text. That vocabulary must not be
