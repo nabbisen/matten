@@ -3,7 +3,7 @@
 **Project:** `matten`
 **Related RFC:** RFC-066: v1.0 Readiness Audit and Release Decision Gate
 **Document kind:** Readiness audit report
-**Status:** Draft for implementation review
+**Status:** Accepted audit; BF-1 remediation update pending review
 **Scope:** Audit report only; no v1.0 release authorization
 
 ---
@@ -11,13 +11,15 @@
 ## Summary
 
 The current `matten` family is close enough to justify a maintainer-level v1.0
-readiness discussion, but it is **not ready as-is for v1.0 release preparation**.
+readiness discussion, but it is **not ready for v1.0 release preparation until
+the companion-maturity policy decision is made explicitly**.
 
-The audit found:
+The original audit found:
 
 ```text
-blocking finding:
-  BF-1: public API snapshot has an inconsistent dynamic serde statement.
+resolved blocking finding:
+  BF-1: public API snapshot had an inconsistent dynamic serde statement.
+        Remediated in docs/src/reference/public-api-snapshot.md.
 
 maintainer-decision finding:
   MD-1: lock-step v1.0 with production-ready-candidate companions must be
@@ -34,8 +36,8 @@ Recommendation:
 
 ```text
 Do not start v1.0 release preparation yet.
-First fix BF-1 and make an explicit maintainer decision on MD-1.
-After that, maintainers may decide whether to draft a separate v1.0 release RFC.
+BF-1 has been remediated; MD-1 remains required.
+After MD-1, maintainers may decide whether to draft a separate v1.0 release RFC.
 ```
 
 This report does not authorize a v1.0 release.
@@ -131,13 +133,13 @@ status, scope, dependency direction, and exported crate root, but its README is
 less explicit as a public API snapshot than the other companions. That is
 recorded as NF-1, not as a current release blocker.
 
-Finding BF-1: `docs/src/reference/public-api-snapshot.md` is internally
-inconsistent about dynamic serde behavior. The dynamic behavior table says
-`Serialize` returns a serde error, while the later boundary/serde table says
-`Serialize` panics on dynamic. Source review of `crates/matten/src/ser.rs` shows
-that dynamic serialization returns `Err(serde::ser::Error::custom(...))`.
-Because v1.0 requires an approved public API snapshot, this mismatch blocks
-v1.0 release preparation until corrected and reviewed.
+Original finding BF-1: `docs/src/reference/public-api-snapshot.md` was
+internally inconsistent about dynamic serde behavior. The dynamic behavior table
+said `Serialize` returns a serde error, while the later boundary/serde table
+said `Serialize` panics on dynamic. Source review of `crates/matten/src/ser.rs`
+shows that dynamic serialization returns `Err(serde::ser::Error::custom(...))`.
+The snapshot now matches source behavior: dynamic serialization returns a serde
+error.
 
 ## Panic/Result Boundary Review
 
@@ -166,8 +168,9 @@ file/parse APIs returning `Result<Tensor, MattenError>`. Dynamic tensors are als
 guarded: numeric operations reject them until the user explicitly calls
 `try_numeric()` or `try_numeric_with(policy)`.
 
-The panic/Result split is stable enough for v1.0 discussion after BF-1 is fixed.
-BF-1 is documentation inconsistency, not an apparent source behavior defect.
+The panic/Result split is stable enough for v1.0 discussion after BF-1
+remediation. BF-1 was a documentation inconsistency, not an apparent source
+behavior defect.
 
 ## Serde/Format Review
 
@@ -210,7 +213,8 @@ csv    -> from_csv / load_csv
 dynamic -> heterogeneous ingestion and explicit numeric conversion
 ```
 
-After BF-1, the serde/format story is stable enough for v1.0 discussion.
+With BF-1 remediated, the serde/format story is stable enough for v1.0
+discussion.
 
 ## Companion Maturity Review
 
@@ -336,10 +340,10 @@ Assessment against the v1.0.0 gate:
 
 | Gate | Assessment |
 |---|---|
-| stable core public API | Mostly yes, but BF-1 must be fixed before the snapshot can be approved. |
+| stable core public API | Mostly yes. BF-1 has been remediated; the official future public API snapshot step still needs release-prep ownership. |
 | clear dynamic on-ramp story | Yes. `docs/src/reference/dynamic.md` and `docs/src/tutorial/start-here.md` teach ingest, inspect, clean, convert, then compute. |
 | strong, scoped examples | Yes. Examples are grouped, linked to source, and explicitly constrained to accepted APIs. |
-| reliable diagnostics | Mostly yes. `docs/src/reference/error-model.md` documents error variants, panic prefix, and matching guidance. BF-1 should be fixed to avoid serde-boundary ambiguity. |
+| reliable diagnostics | Mostly yes. `docs/src/reference/error-model.md` documents error variants, panic prefix, and matching guidance. BF-1 has been remediated to avoid serde-boundary ambiguity. |
 | documented companion-crate boundary | Yes. README, migration docs, and RFC-022/RFC-030 family policy keep core dependency-light and companions optional. |
 | clean feature matrix | The release checklist defines the required feature-matrix commands. This audit did not convert those commands into a new gate. |
 
@@ -349,7 +353,9 @@ boundary/format documentation. This report is not that confirmation.
 
 ## Blocking Findings
 
-### BF-1: Public API snapshot contradicts itself on dynamic serde behavior
+No unresolved blocking source/doc mismatch remains after BF-1 remediation.
+
+### Resolved BF-1: Public API snapshot contradicted itself on dynamic serde behavior
 
 Path:
 
@@ -362,22 +368,22 @@ Problem:
 
 ```text
 The dynamic behavior table says Serialize returns a serde error.
-The boundary/serde table says Serialize panics on dynamic.
+The boundary/serde table said Serialize panics on dynamic.
 The source returns a serde error for dynamic tensors.
 ```
 
 Impact:
 
 ```text
-The public API snapshot cannot be approved for v1.0 while it contains
+The public API snapshot could not be approved for v1.0 while it contained
 contradictory behavior for a public serde implementation.
 ```
 
-Required before v1.0 release preparation:
+Remediation:
 
 ```text
-Correct the snapshot to match source behavior and re-review the public API
-snapshot.
+The boundary/serde table now says Serialize returns a serde error on dynamic.
+Review this correction before treating BF-1 as closed.
 ```
 
 ## Maintainer-Decision Findings
@@ -481,18 +487,18 @@ actual v1.0 release-prep decision.
 Current recommendation:
 
 ```text
-not ready as-is for v1.0 release preparation
+not ready for v1.0 release preparation until MD-1 is decided
 ```
 
 Minimum next steps:
 
 ```text
-1. Fix BF-1 in the public API snapshot and review that correction.
+1. Review the BF-1 remediation.
 2. Make an explicit maintainer decision on MD-1.
 3. If MD-1 requires full production-ready companions, draft follow-up maturity
    RFCs for matten-mlprep and matten-data before v1.0 release preparation.
 4. If MD-1 allows candidate-labeled companions in a lock-step v1.0 family,
-   draft a separate v1.0 release RFC only after BF-1 is fixed.
+   draft a separate v1.0 release RFC only after that decision is recorded.
 ```
 
 No v1.0 release is authorized by this report.

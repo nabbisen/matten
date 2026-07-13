@@ -212,7 +212,7 @@ percentile, histogram, covariance, correlation, and z-score are out of core scop
 | `load_json(path)` | `Result<Tensor, MattenError>` | |
 | `from_csv(input)` | `Result<Tensor, MattenError>` | numeric only |
 | `load_csv(path)` | `Result<Tensor, MattenError>` | |
-| `Serialize` (serde) | via feature `serde` | panics on dynamic |
+| `Serialize` (serde) | via feature `serde` | returns serde error on dynamic |
 | `Deserialize` (serde) | via feature `serde` | |
 
 ## `Tensor` — dynamic (`#[cfg(feature = "dynamic")]`)
