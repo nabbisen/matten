@@ -1,6 +1,6 @@
 # RFC-067: v1.0 Family Maturity Policy
 
-**Status:** Proposed
+**Status:** Implemented (repository policy; no v1.0 release authorization)
 **Target:** v1.0 decision policy; no release authorization
 **Theme:** Resolve RFC-066 MD-1 for lock-step v1.0 family composition
 **Depends on:** RFC-030, RFC-057, RFC-058, RFC-059, RFC-066
@@ -182,7 +182,7 @@ settle the final v1.0 release decision.
 
 ## 9. Follow-up Work
 
-If accepted, update the v1.0 audit and release-prep documentation to say:
+The v1.0 audit and release-prep documentation record:
 
 ```text
 MD-1 is resolved by RFC-067.
@@ -190,5 +190,4 @@ Any future v1.0 release RFC must include the family maturity table and
 candidate-inclusion checks required here.
 ```
 
-That follow-up still does not authorize release preparation by itself.
-
+That follow-up does not authorize release preparation by itself.

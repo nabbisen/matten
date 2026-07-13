@@ -214,4 +214,6 @@ Before v1.0.0, the project should have:
 - strong, scoped examples;
 - reliable diagnostics;
 - documented companion-crate boundary (RFC-022);
-- clean feature matrix across all profiles.
+- clean feature matrix across all profiles;
+- an RFC-067 family maturity table in the v1.0 release RFC if any lock-step
+  family crate remains `production-ready candidate`.

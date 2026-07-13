@@ -78,7 +78,10 @@ v1.0.0 requires explicit maintainer confirmation. Before that can happen:
 - `cargo public-api` snapshot must be taken and approved;
 - the panic/Result split must be finalised;
 - the `serde` canonical format must be declared stable;
-- limitations and non-goals must be clearly documented.
+- limitations and non-goals must be clearly documented;
+- if any lock-step family crate remains `production-ready candidate`, the v1.0
+  release RFC must include the RFC-067 family maturity table and explicitly
+  decide that crate's inclusion without silently promoting its maturity label.
 
 ## MSRV
 

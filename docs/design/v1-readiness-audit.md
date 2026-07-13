@@ -3,7 +3,7 @@
 **Project:** `matten`
 **Related RFC:** RFC-066: v1.0 Readiness Audit and Release Decision Gate
 **Document kind:** Readiness audit report
-**Status:** Accepted audit; BF-1 remediation update pending review
+**Status:** Accepted audit; BF-1 and MD-1 follow-ups recorded
 **Scope:** Audit report only; no v1.0 release authorization
 
 ---
@@ -11,8 +11,9 @@
 ## Summary
 
 The current `matten` family is close enough to justify a maintainer-level v1.0
-readiness discussion, but it is **not ready for v1.0 release preparation until
-the companion-maturity policy decision is made explicitly**.
+readiness discussion. BF-1 has been remediated, and MD-1 has been resolved by
+RFC-067 as repository policy. The project is still **not authorized for v1.0
+release preparation** until a separate v1.0 release RFC is drafted and reviewed.
 
 The original audit found:
 
@@ -23,7 +24,7 @@ resolved blocking finding:
 
 maintainer-decision finding:
   MD-1: lock-step v1.0 with production-ready-candidate companions must be
-        decided explicitly.
+        decided explicitly. Resolved by RFC-067.
 
 non-blocking findings:
   NF-1: companion snapshot-equivalent docs are adequate, but matten-data would
@@ -36,8 +37,8 @@ Recommendation:
 
 ```text
 Do not start v1.0 release preparation yet.
-BF-1 has been remediated; MD-1 remains required.
-After MD-1, maintainers may decide whether to draft a separate v1.0 release RFC.
+BF-1 has been remediated; MD-1 is resolved by RFC-067.
+Maintainers may decide whether to draft a separate v1.0 release RFC.
 ```
 
 This report does not authorize a v1.0 release.
@@ -249,7 +250,7 @@ Can a lock-step v1.0 family include production-ready-candidate companions
 with explicit labels, or must all family crates become production-ready first?
 ```
 
-This audit does not answer that silently. It records MD-1:
+This audit did not answer that silently. It recorded MD-1:
 
 ```text
 MD-1: Before v1.0 release preparation, the maintainer must decide whether the
@@ -265,6 +266,12 @@ release notes and README state the distinction clearly.
 If the answer is "all v1 family crates must be production-ready," then
 `matten-mlprep` and `matten-data` need follow-up maturity RFCs before v1.0
 release preparation.
+
+Resolution: RFC-067 adopts the middle rule. Candidate-labeled companions are not
+automatic v1.0 blockers, but a future v1.0 release RFC must include a family
+maturity table and decide each candidate-labeled crate's inclusion explicitly.
+That policy does not promote any companion and does not authorize v1.0 release
+preparation.
 
 ## Deferred-Item Review
 
@@ -383,12 +390,12 @@ Remediation:
 
 ```text
 The boundary/serde table now says Serialize returns a serde error on dynamic.
-Review this correction before treating BF-1 as closed.
+The correction was reviewed and BF-1 is closed.
 ```
 
 ## Maintainer-Decision Findings
 
-### MD-1: Lock-step v1.0 with candidate-labeled companions
+### Resolved MD-1: Lock-step v1.0 with candidate-labeled companions
 
 Path:
 
@@ -401,7 +408,7 @@ rfcs/done/059-promote-matten-data-production-ready-candidate.md
 crates/*/README.md
 ```
 
-Question:
+Original question:
 
 ```text
 Can the v1.0 family include matten-mlprep and matten-data as
@@ -410,6 +417,14 @@ production-ready candidates, or must they first become production-ready?
 
 This is not a source defect. It is a release-policy decision created by the
 combination of lock-step family versioning and per-crate maturity labels.
+
+Resolution:
+
+```text
+RFC-067 resolves MD-1. Production-ready-candidate companions are not automatic
+v1.0 blockers, but any future v1.0 release RFC must include the RFC-067 family
+maturity table and decide candidate-labeled crate inclusion explicitly.
+```
 
 ## Non-Blocking Findings
 
@@ -487,18 +502,17 @@ actual v1.0 release-prep decision.
 Current recommendation:
 
 ```text
-not ready for v1.0 release preparation until MD-1 is decided
+not authorized for v1.0 release preparation until a separate v1.0 release RFC
+is drafted and reviewed
 ```
 
 Minimum next steps:
 
 ```text
-1. Review the BF-1 remediation.
-2. Make an explicit maintainer decision on MD-1.
-3. If MD-1 requires full production-ready companions, draft follow-up maturity
-   RFCs for matten-mlprep and matten-data before v1.0 release preparation.
-4. If MD-1 allows candidate-labeled companions in a lock-step v1.0 family,
-   draft a separate v1.0 release RFC only after that decision is recorded.
+1. Record RFC-067 as the MD-1 policy resolution.
+2. If maintainers choose to continue, draft a separate v1.0 release RFC.
+3. In that release RFC, include the RFC-067 family maturity table and decide
+   candidate-labeled crate inclusion explicitly.
 ```
 
 No v1.0 release is authorized by this report.

@@ -79,13 +79,13 @@ The broader documentation ownership model is recorded in
 | 063 | [Visual Understanding and Reporting](./done/063-visual-understanding-and-reporting.md) | 0.29.0 (visual docs, examples, local `matten-report` tool; public report/viz crates deferred) |
 | 064 | [Workspace Core Dependency Requirement Maintenance Policy](./done/064-workspace-core-dependency-requirement-maintenance-policy.md) | post-0.29.0 repository policy |
 | 065 | [Educational Visualization and Tensor Learning Path](./done/065-educational-visualization-and-tensor-learning-path.md) | 0.30.0 (educational positioning, learner docs path, local `educational-path` report; public report/viz crates deferred) |
+| 067 | [v1.0 Family Maturity Policy](./done/067-v1-family-maturity-policy.md) | repository policy; resolves RFC-066 MD-1 without v1.0 release authorization |
 
 ## Proposed
 
 | ID | Title | Target |
 |---:|---|---|
 | 066 | [v1.0 Readiness Audit and Release Decision Gate](./proposed/066-v1-readiness-audit-and-release-decision-gate.md) | Accepted for audit handoff planning; no v1.0 release authorization |
-| 067 | [v1.0 Family Maturity Policy](./proposed/067-v1-family-maturity-policy.md) | Proposed policy decision for RFC-066 MD-1; no v1.0 release authorization |
 
 Implementation handoffs for the v0.20+ proposed set (RFC-033–042), the examples
 program (RFC-043–048), and the benchmarking program (RFC-049) live in
