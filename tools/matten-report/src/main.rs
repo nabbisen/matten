@@ -590,7 +590,64 @@ fn render_mlprep_standardization_report() -> Result<String, Box<dyn Error>> {
     Ok(report)
 }
 
-fn render_educational_path_report() -> Result<String, Box<dyn Error>> {
+struct EducationalPathReportData {
+    reading_steps: [&'static str; 4],
+    broadcast: EducationalBroadcastData,
+    reshape_transpose: EducationalReshapeTransposeData,
+    axis_reductions: EducationalAxisReductionData,
+    matmul: EducationalMatmulData,
+    dynamic_readiness: EducationalDynamicReadinessData,
+    standardization: EducationalStandardizationData,
+    non_goals: [&'static str; 4],
+}
+
+struct EducationalBroadcastData {
+    left_shape: Vec<usize>,
+    right_shape: Vec<usize>,
+    result_shape: Vec<usize>,
+    result_values: Vec<f64>,
+}
+
+struct EducationalReshapeTransposeData {
+    input_shape: Vec<usize>,
+    reshape_shape: Vec<usize>,
+    reshape_values: Vec<f64>,
+    transpose_shape: Vec<usize>,
+    transpose_values: Vec<f64>,
+}
+
+struct EducationalAxisReductionData {
+    input_shape: Vec<usize>,
+    mean_axis_0_shape: Vec<usize>,
+    mean_axis_0_values: Vec<f64>,
+    mean_axis_1_shape: Vec<usize>,
+    mean_axis_1_values: Vec<f64>,
+}
+
+struct EducationalMatmulData {
+    left_shape: Vec<usize>,
+    right_shape: Vec<usize>,
+    result_shape: Vec<usize>,
+    shared_inner_dimension: usize,
+    result_values: Vec<f64>,
+}
+
+struct EducationalDynamicReadinessData {
+    shape: Vec<usize>,
+    none_mask_values: Vec<f64>,
+    numeric_mask_values: Vec<f64>,
+}
+
+struct EducationalStandardizationData {
+    input_shape: Vec<usize>,
+    output_shape: Vec<usize>,
+    before_mean: Vec<f64>,
+    before_std: Vec<f64>,
+    after_mean: Vec<f64>,
+    after_std: Vec<f64>,
+}
+
+fn educational_path_report_data() -> Result<EducationalPathReportData, Box<dyn Error>> {
     let broadcast_left = Tensor::new(vec![1.0, 2.0, 3.0], &[3, 1]);
     let broadcast_right = Tensor::new(vec![10.0, 20.0, 30.0, 40.0], &[1, 4]);
     let broadcast = &broadcast_left + &broadcast_right;
@@ -627,6 +684,64 @@ fn render_educational_path_report() -> Result<String, Box<dyn Error>> {
     let after_mean = standardized.mean_axis(0);
     let after_std = standardized.std_axis(0);
 
+    Ok(EducationalPathReportData {
+        reading_steps: [
+            "ask what shape each input has",
+            "ask which axes align, disappear, or remain",
+            "read the output shape before reading values",
+            "convert dynamic data before numeric computation",
+        ],
+        broadcast: EducationalBroadcastData {
+            left_shape: broadcast_left.shape().to_vec(),
+            right_shape: broadcast_right.shape().to_vec(),
+            result_shape: broadcast.shape().to_vec(),
+            result_values: broadcast.as_slice().to_vec(),
+        },
+        reshape_transpose: EducationalReshapeTransposeData {
+            input_shape: shape_input.shape().to_vec(),
+            reshape_shape: reshaped.shape().to_vec(),
+            reshape_values: reshaped.as_slice().to_vec(),
+            transpose_shape: transposed.shape().to_vec(),
+            transpose_values: transposed.as_slice().to_vec(),
+        },
+        axis_reductions: EducationalAxisReductionData {
+            input_shape: shape_input.shape().to_vec(),
+            mean_axis_0_shape: mean_axis_0.shape().to_vec(),
+            mean_axis_0_values: mean_axis_0.as_slice().to_vec(),
+            mean_axis_1_shape: mean_axis_1.shape().to_vec(),
+            mean_axis_1_values: mean_axis_1.as_slice().to_vec(),
+        },
+        matmul: EducationalMatmulData {
+            left_shape: matmul_left.shape().to_vec(),
+            right_shape: matmul_right.shape().to_vec(),
+            result_shape: matmul.shape().to_vec(),
+            shared_inner_dimension: matmul_left.shape()[1],
+            result_values: matmul.as_slice().to_vec(),
+        },
+        dynamic_readiness: EducationalDynamicReadinessData {
+            shape: dynamic.shape().to_vec(),
+            none_mask_values: none_mask.as_slice().to_vec(),
+            numeric_mask_values: numeric_mask.as_slice().to_vec(),
+        },
+        standardization: EducationalStandardizationData {
+            input_shape: standardization_input.shape().to_vec(),
+            output_shape: standardized.shape().to_vec(),
+            before_mean: before_mean.as_slice().to_vec(),
+            before_std: before_std.as_slice().to_vec(),
+            after_mean: after_mean.as_slice().to_vec(),
+            after_std: after_std.as_slice().to_vec(),
+        },
+        non_goals: [
+            "not a public API",
+            "not source scanning",
+            "not a renderer",
+            "not model-quality analysis",
+        ],
+    })
+}
+
+fn render_educational_path_report() -> Result<String, Box<dyn Error>> {
+    let data = educational_path_report_data()?;
     let mut report = String::new();
     writeln!(report, "# matten educational-path report")?;
     writeln!(report)?;
@@ -640,40 +755,43 @@ fn render_educational_path_report() -> Result<String, Box<dyn Error>> {
     writeln!(report)?;
 
     writeln!(report, "## How to read shapes first")?;
-    writeln!(report, "1. ask what shape each input has")?;
-    writeln!(report, "2. ask which axes align, disappear, or remain")?;
-    writeln!(report, "3. read the output shape before reading values")?;
-    writeln!(report, "4. convert dynamic data before numeric computation")?;
+    for (index, step) in data.reading_steps.iter().enumerate() {
+        writeln!(report, "{}. {}", index + 1, step)?;
+    }
     writeln!(report)?;
 
     writeln!(report, "## Broadcasting")?;
     writeln!(
         report,
         "shape flow: {:?} + {:?} -> {:?}",
-        broadcast_left.shape(),
-        broadcast_right.shape(),
-        broadcast.shape()
+        data.broadcast.left_shape, data.broadcast.right_shape, data.broadcast.result_shape
     )?;
     writeln!(report, "axis 1: left repeats across 4 columns")?;
     writeln!(report, "axis 0: right repeats across 3 rows")?;
-    writeln!(report, "result values: {:?}", broadcast.as_slice())?;
+    writeln!(report, "result values: {:?}", data.broadcast.result_values)?;
     writeln!(report)?;
 
     writeln!(report, "## Reshape and transpose")?;
     writeln!(
         report,
         "reshape: {:?} -> {:?}",
-        shape_input.shape(),
-        reshaped.shape()
+        data.reshape_transpose.input_shape, data.reshape_transpose.reshape_shape
     )?;
-    writeln!(report, "reshape values: {:?}", reshaped.as_slice())?;
+    writeln!(
+        report,
+        "reshape values: {:?}",
+        data.reshape_transpose.reshape_values
+    )?;
     writeln!(
         report,
         "transpose: {:?} -> {:?}",
-        shape_input.shape(),
-        transposed.shape()
+        data.reshape_transpose.input_shape, data.reshape_transpose.transpose_shape
     )?;
-    writeln!(report, "transpose values: {:?}", transposed.as_slice())?;
+    writeln!(
+        report,
+        "transpose values: {:?}",
+        data.reshape_transpose.transpose_values
+    )?;
     writeln!(
         report,
         "meaning: reshape changes grouping; transpose changes coordinate meaning"
@@ -684,24 +802,22 @@ fn render_educational_path_report() -> Result<String, Box<dyn Error>> {
     writeln!(
         report,
         "mean_axis(0): {:?} -> {:?}",
-        shape_input.shape(),
-        mean_axis_0.shape()
+        data.axis_reductions.input_shape, data.axis_reductions.mean_axis_0_shape
     )?;
     writeln!(
         report,
         "mean_axis(0) keeps columns: {:?}",
-        mean_axis_0.as_slice()
+        data.axis_reductions.mean_axis_0_values
     )?;
     writeln!(
         report,
         "mean_axis(1): {:?} -> {:?}",
-        shape_input.shape(),
-        mean_axis_1.shape()
+        data.axis_reductions.input_shape, data.axis_reductions.mean_axis_1_shape
     )?;
     writeln!(
         report,
         "mean_axis(1) keeps rows: {:?}",
-        mean_axis_1.as_slice()
+        data.axis_reductions.mean_axis_1_values
     )?;
     writeln!(report)?;
 
@@ -709,21 +825,27 @@ fn render_educational_path_report() -> Result<String, Box<dyn Error>> {
     writeln!(
         report,
         "shape flow: {:?} @ {:?} -> {:?}",
-        matmul_left.shape(),
-        matmul_right.shape(),
-        matmul.shape()
+        data.matmul.left_shape, data.matmul.right_shape, data.matmul.result_shape
     )?;
-    writeln!(report, "shared inner dimension: 3")?;
-    writeln!(report, "result values: {:?}", matmul.as_slice())?;
+    writeln!(
+        report,
+        "shared inner dimension: {}",
+        data.matmul.shared_inner_dimension
+    )?;
+    writeln!(report, "result values: {:?}", data.matmul.result_values)?;
     writeln!(report)?;
 
     writeln!(report, "## Dynamic readiness")?;
-    writeln!(report, "dynamic shape: {:?}", dynamic.shape())?;
-    writeln!(report, "none mask: {:?}", none_mask.as_slice())?;
+    writeln!(report, "dynamic shape: {:?}", data.dynamic_readiness.shape)?;
+    writeln!(
+        report,
+        "none mask: {:?}",
+        data.dynamic_readiness.none_mask_values
+    )?;
     writeln!(
         report,
         "numeric mask: strict policy readiness {:?}",
-        numeric_mask.as_slice()
+        data.dynamic_readiness.numeric_mask_values
     )?;
     writeln!(
         report,
@@ -737,77 +859,40 @@ fn render_educational_path_report() -> Result<String, Box<dyn Error>> {
     writeln!(
         report,
         "shape flow: {:?} -> {:?}",
-        standardization_input.shape(),
-        standardized.shape()
+        data.standardization.input_shape, data.standardization.output_shape
     )?;
     writeln!(
         report,
         "before column mean: {}",
-        format_fixed_values(before_mean.as_slice())
+        format_fixed_values(&data.standardization.before_mean)
     )?;
     writeln!(
         report,
         "before column population std: {}",
-        format_fixed_values(before_std.as_slice())
+        format_fixed_values(&data.standardization.before_std)
     )?;
     writeln!(
         report,
         "after column mean: {}",
-        format_fixed_values(after_mean.as_slice())
+        format_fixed_values(&data.standardization.after_mean)
     )?;
     writeln!(
         report,
         "after column population std: {}",
-        format_fixed_values(after_std.as_slice())
+        format_fixed_values(&data.standardization.after_std)
     )?;
     writeln!(report)?;
 
     writeln!(report, "## What this report is not")?;
-    writeln!(report, "- not a public API")?;
-    writeln!(report, "- not source scanning")?;
-    writeln!(report, "- not a renderer")?;
-    writeln!(report, "- not model-quality analysis")?;
+    for non_goal in data.non_goals {
+        writeln!(report, "- {non_goal}")?;
+    }
 
     Ok(report)
 }
 
 fn render_educational_path_html_report() -> Result<String, Box<dyn Error>> {
-    let broadcast_left = Tensor::new(vec![1.0, 2.0, 3.0], &[3, 1]);
-    let broadcast_right = Tensor::new(vec![10.0, 20.0, 30.0, 40.0], &[1, 4]);
-    let broadcast = &broadcast_left + &broadcast_right;
-
-    let shape_input = Tensor::new(vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0], &[2, 3]);
-    let reshaped = shape_input.reshape(&[3, 2]);
-    let transposed = shape_input.transpose();
-    let mean_axis_0 = shape_input.mean_axis(0);
-    let mean_axis_1 = shape_input.mean_axis(1);
-
-    let matmul_left = Tensor::new((1..=6).map(|value| value as f64).collect(), &[2, 3]);
-    let matmul_right = Tensor::new((1..=12).map(|value| value as f64).collect(), &[3, 4]);
-    let matmul = matmul_left.matmul(&matmul_right);
-
-    let dynamic = Tensor::from_elements(
-        vec![
-            Element::Float(1.0),
-            Element::text("2.5"),
-            Element::None,
-            Element::Int(4),
-            Element::text("6.0"),
-            Element::Float(8.0),
-        ],
-        &[2, 3],
-    );
-    let none_mask = dynamic.none_mask();
-    let numeric_mask = dynamic.numeric_mask();
-
-    let standardization_input = Tensor::new(vec![8.0, 80.0, 10.0, 100.0, 12.0, 120.0], &[3, 2]);
-    let standardized =
-        standardize_columns(&standardization_input).map_err(Box::<dyn Error>::from)?;
-    let before_mean = standardization_input.mean_axis(0);
-    let before_std = standardization_input.std_axis(0);
-    let after_mean = standardized.mean_axis(0);
-    let after_std = standardized.std_axis(0);
-
+    let data = educational_path_report_data()?;
     let mut report = String::new();
     writeln!(report, "<!doctype html>")?;
     writeln!(report, "<html lang=\"en\">")?;
@@ -869,12 +954,7 @@ fn render_educational_path_html_report() -> Result<String, Box<dyn Error>> {
         html_escape("How to read shapes first")
     )?;
     writeln!(report, "<ol>")?;
-    for item in [
-        "ask what shape each input has",
-        "ask which axes align, disappear, or remain",
-        "read the output shape before reading values",
-        "convert dynamic data before numeric computation",
-    ] {
+    for item in data.reading_steps {
         writeln!(report, "<li>{}</li>", html_escape(item))?;
     }
     writeln!(report, "</ol>")?;
@@ -885,9 +965,9 @@ fn render_educational_path_html_report() -> Result<String, Box<dyn Error>> {
     write_shape_flow_table(
         &mut report,
         &[
-            ("left", format!("{:?}", broadcast_left.shape())),
-            ("right", format!("{:?}", broadcast_right.shape())),
-            ("result", format!("{:?}", broadcast.shape())),
+            ("left", format!("{:?}", data.broadcast.left_shape)),
+            ("right", format!("{:?}", data.broadcast.right_shape)),
+            ("result", format!("{:?}", data.broadcast.result_shape)),
         ],
     )?;
     writeln!(
@@ -897,7 +977,7 @@ fn render_educational_path_html_report() -> Result<String, Box<dyn Error>> {
     )?;
     write_html_pre(
         &mut report,
-        &format!("result values: {:?}", broadcast.as_slice()),
+        &format!("result values: {:?}", data.broadcast.result_values),
     )?;
     writeln!(report, "</section>")?;
 
@@ -906,17 +986,22 @@ fn render_educational_path_html_report() -> Result<String, Box<dyn Error>> {
     write_shape_flow_table(
         &mut report,
         &[
-            ("input", format!("{:?}", shape_input.shape())),
-            ("reshape", format!("{:?}", reshaped.shape())),
-            ("transpose", format!("{:?}", transposed.shape())),
+            ("input", format!("{:?}", data.reshape_transpose.input_shape)),
+            (
+                "reshape",
+                format!("{:?}", data.reshape_transpose.reshape_shape),
+            ),
+            (
+                "transpose",
+                format!("{:?}", data.reshape_transpose.transpose_shape),
+            ),
         ],
     )?;
     write_html_pre(
         &mut report,
         &format!(
             "reshape values: {:?}\ntranspose values: {:?}",
-            reshaped.as_slice(),
-            transposed.as_slice()
+            data.reshape_transpose.reshape_values, data.reshape_transpose.transpose_values
         ),
     )?;
     writeln!(
@@ -933,11 +1018,17 @@ fn render_educational_path_html_report() -> Result<String, Box<dyn Error>> {
         &[
             (
                 "mean_axis(0)",
-                format!("{:?} -> {:?}", shape_input.shape(), mean_axis_0.shape()),
+                format!(
+                    "{:?} -> {:?}",
+                    data.axis_reductions.input_shape, data.axis_reductions.mean_axis_0_shape
+                ),
             ),
             (
                 "mean_axis(1)",
-                format!("{:?} -> {:?}", shape_input.shape(), mean_axis_1.shape()),
+                format!(
+                    "{:?} -> {:?}",
+                    data.axis_reductions.input_shape, data.axis_reductions.mean_axis_1_shape
+                ),
             ),
         ],
     )?;
@@ -945,8 +1036,7 @@ fn render_educational_path_html_report() -> Result<String, Box<dyn Error>> {
         &mut report,
         &format!(
             "mean_axis(0) keeps columns: {:?}\nmean_axis(1) keeps rows: {:?}",
-            mean_axis_0.as_slice(),
-            mean_axis_1.as_slice()
+            data.axis_reductions.mean_axis_0_values, data.axis_reductions.mean_axis_1_values
         ),
     )?;
     writeln!(report, "</section>")?;
@@ -956,19 +1046,22 @@ fn render_educational_path_html_report() -> Result<String, Box<dyn Error>> {
     write_shape_flow_table(
         &mut report,
         &[
-            ("left", format!("{:?}", matmul_left.shape())),
-            ("right", format!("{:?}", matmul_right.shape())),
-            ("result", format!("{:?}", matmul.shape())),
+            ("left", format!("{:?}", data.matmul.left_shape)),
+            ("right", format!("{:?}", data.matmul.right_shape)),
+            ("result", format!("{:?}", data.matmul.result_shape)),
         ],
     )?;
     writeln!(
         report,
         "<p>{}</p>",
-        html_escape("shared inner dimension: 3")
+        html_escape(&format!(
+            "shared inner dimension: {}",
+            data.matmul.shared_inner_dimension
+        ))
     )?;
     write_html_pre(
         &mut report,
-        &format!("result values: {:?}", matmul.as_slice()),
+        &format!("result values: {:?}", data.matmul.result_values),
     )?;
     writeln!(report, "</section>")?;
 
@@ -977,11 +1070,20 @@ fn render_educational_path_html_report() -> Result<String, Box<dyn Error>> {
     write_shape_flow_table(
         &mut report,
         &[
-            ("dynamic shape", format!("{:?}", dynamic.shape())),
-            ("none mask", format!("{:?}", none_mask.as_slice())),
+            (
+                "dynamic shape",
+                format!("{:?}", data.dynamic_readiness.shape),
+            ),
+            (
+                "none mask",
+                format!("{:?}", data.dynamic_readiness.none_mask_values),
+            ),
             (
                 "numeric mask",
-                format!("strict policy readiness {:?}", numeric_mask.as_slice()),
+                format!(
+                    "strict policy readiness {:?}",
+                    data.dynamic_readiness.numeric_mask_values
+                ),
             ),
         ],
     )?;
@@ -1003,19 +1105,24 @@ fn render_educational_path_html_report() -> Result<String, Box<dyn Error>> {
                 "shape flow",
                 format!(
                     "{:?} -> {:?}",
-                    standardization_input.shape(),
-                    standardized.shape()
+                    data.standardization.input_shape, data.standardization.output_shape
                 ),
             ),
-            ("before mean", format_fixed_values(before_mean.as_slice())),
+            (
+                "before mean",
+                format_fixed_values(&data.standardization.before_mean),
+            ),
             (
                 "before population std",
-                format_fixed_values(before_std.as_slice()),
+                format_fixed_values(&data.standardization.before_std),
             ),
-            ("after mean", format_fixed_values(after_mean.as_slice())),
+            (
+                "after mean",
+                format_fixed_values(&data.standardization.after_mean),
+            ),
             (
                 "after population std",
-                format_fixed_values(after_std.as_slice()),
+                format_fixed_values(&data.standardization.after_std),
             ),
         ],
     )?;
@@ -1028,12 +1135,7 @@ fn render_educational_path_html_report() -> Result<String, Box<dyn Error>> {
         html_escape("What this report is not")
     )?;
     writeln!(report, "<ul>")?;
-    for item in [
-        "not a public API",
-        "not source scanning",
-        "not a renderer",
-        "not model-quality analysis",
-    ] {
+    for item in data.non_goals {
         writeln!(report, "<li>{}</li>", html_escape(item))?;
     }
     writeln!(report, "</ul>")?;
@@ -1727,6 +1829,135 @@ after column population std: [1.000, 1.000]
 - not source scanning
 - not a renderer
 - not model-quality analysis
+"
+        );
+    }
+
+    #[test]
+    fn educational_path_html_report_matches_expected_html() {
+        let report =
+            render_educational_path_html_report().expect("educational-path HTML should render");
+
+        assert_eq!(
+            report,
+            "\
+<!doctype html>
+<html lang=\"en\">
+<head>
+  <meta charset=\"utf-8\">
+  <title>matten educational-path report</title>
+  <style>
+    :root { color-scheme: light; font-family: system-ui, sans-serif; }
+    body { margin: 2rem auto; max-width: 920px; color: #17202a; background: #ffffff; line-height: 1.5; }
+    h1, h2 { color: #14324a; } section { border-top: 1px solid #d6dde5; padding: 1rem 0; }
+    table { width: 100%; border-collapse: collapse; margin: 0.75rem 0; } th, td { border: 1px solid #d6dde5; padding: 0.45rem 0.6rem; text-align: left; vertical-align: top; }
+    th { background: #eef4f8; } code, .shape { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .note { background: #f6f8fa; border-left: 4px solid #5b8fb9; padding: 0.75rem 1rem; }
+    .shape { display: inline-block; background: #eef4f8; border: 1px solid #cbd8e3; border-radius: 4px; padding: 0.1rem 0.35rem; }
+  </style>
+</head>
+<body>
+<main>
+<h1>matten educational-path report</h1>
+<p class=\"note\">Fixed educational demo report, not automatic expression tracing.</p>
+<section>
+<h2>How to read shapes first</h2>
+<ol>
+<li>ask what shape each input has</li>
+<li>ask which axes align, disappear, or remain</li>
+<li>read the output shape before reading values</li>
+<li>convert dynamic data before numeric computation</li>
+</ol>
+</section>
+<section>
+<h2>Broadcasting</h2>
+<table>
+<thead><tr><th>item</th><th>shape / value</th></tr></thead>
+<tbody>
+<tr><td>left</td><td><span class=\"shape\">[3, 1]</span></td></tr>
+<tr><td>right</td><td><span class=\"shape\">[1, 4]</span></td></tr>
+<tr><td>result</td><td><span class=\"shape\">[3, 4]</span></td></tr>
+</tbody>
+</table>
+<p>axis 1: left repeats across 4 columns; axis 0: right repeats across 3 rows</p>
+<pre><code>result values: [11.0, 21.0, 31.0, 41.0, 12.0, 22.0, 32.0, 42.0, 13.0, 23.0, 33.0, 43.0]</code></pre>
+</section>
+<section>
+<h2>Reshape and transpose</h2>
+<table>
+<thead><tr><th>item</th><th>shape / value</th></tr></thead>
+<tbody>
+<tr><td>input</td><td><span class=\"shape\">[2, 3]</span></td></tr>
+<tr><td>reshape</td><td><span class=\"shape\">[3, 2]</span></td></tr>
+<tr><td>transpose</td><td><span class=\"shape\">[3, 2]</span></td></tr>
+</tbody>
+</table>
+<pre><code>reshape values: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+transpose values: [1.0, 4.0, 2.0, 5.0, 3.0, 6.0]</code></pre>
+<p>reshape changes grouping; transpose changes coordinate meaning</p>
+</section>
+<section>
+<h2>Axis reductions</h2>
+<table>
+<thead><tr><th>item</th><th>shape / value</th></tr></thead>
+<tbody>
+<tr><td>mean_axis(0)</td><td><span class=\"shape\">[2, 3] -&gt; [3]</span></td></tr>
+<tr><td>mean_axis(1)</td><td><span class=\"shape\">[2, 3] -&gt; [2]</span></td></tr>
+</tbody>
+</table>
+<pre><code>mean_axis(0) keeps columns: [2.5, 3.5, 4.5]
+mean_axis(1) keeps rows: [2.0, 5.0]</code></pre>
+</section>
+<section>
+<h2>Matrix multiplication</h2>
+<table>
+<thead><tr><th>item</th><th>shape / value</th></tr></thead>
+<tbody>
+<tr><td>left</td><td><span class=\"shape\">[2, 3]</span></td></tr>
+<tr><td>right</td><td><span class=\"shape\">[3, 4]</span></td></tr>
+<tr><td>result</td><td><span class=\"shape\">[2, 4]</span></td></tr>
+</tbody>
+</table>
+<p>shared inner dimension: 3</p>
+<pre><code>result values: [38.0, 44.0, 50.0, 56.0, 83.0, 98.0, 113.0, 128.0]</code></pre>
+</section>
+<section>
+<h2>Dynamic readiness</h2>
+<table>
+<thead><tr><th>item</th><th>shape / value</th></tr></thead>
+<tbody>
+<tr><td>dynamic shape</td><td><span class=\"shape\">[2, 3]</span></td></tr>
+<tr><td>none mask</td><td><span class=\"shape\">[0.0, 0.0, 1.0, 0.0, 0.0, 0.0]</span></td></tr>
+<tr><td>numeric mask</td><td><span class=\"shape\">strict policy readiness [1.0, 0.0, 0.0, 1.0, 0.0, 1.0]</span></td></tr>
+</tbody>
+</table>
+<p>Text values are not numeric-ready under the strict mask; clean values, then call try_numeric().</p>
+</section>
+<section>
+<h2>Standardization</h2>
+<table>
+<thead><tr><th>item</th><th>shape / value</th></tr></thead>
+<tbody>
+<tr><td>shape flow</td><td><span class=\"shape\">[3, 2] -&gt; [3, 2]</span></td></tr>
+<tr><td>before mean</td><td><span class=\"shape\">[10.000, 100.000]</span></td></tr>
+<tr><td>before population std</td><td><span class=\"shape\">[1.633, 16.330]</span></td></tr>
+<tr><td>after mean</td><td><span class=\"shape\">[0.000, 0.000]</span></td></tr>
+<tr><td>after population std</td><td><span class=\"shape\">[1.000, 1.000]</span></td></tr>
+</tbody>
+</table>
+</section>
+<section>
+<h2>What this report is not</h2>
+<ul>
+<li>not a public API</li>
+<li>not source scanning</li>
+<li>not a renderer</li>
+<li>not model-quality analysis</li>
+</ul>
+</section>
+</main>
+</body>
+</html>
 "
         );
     }

@@ -3,7 +3,7 @@
 **Project:** `matten`
 **Related RFC:** RFC-068: Rich Local Visualization Artifacts
 **Document kind:** Compact local-tool refactor handoff
-**Status:** Proposed handoff; implementation not started
+**Status:** Implemented for review; review pending
 **Scope:** Behavior-neutral shared data extraction for `tools/matten-report --demo educational-path`
 
 ---
