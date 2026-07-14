@@ -9,6 +9,8 @@ It is the canonical gate referenced by RFC-015.
 
 ```bash
 cargo fmt --all --check
+cargo fmt --manifest-path tools/matten-report/Cargo.toml --check
+cargo fmt --manifest-path tools/matten-migrate/Cargo.toml --check
 bash scripts/check-core-dependency-boundary.sh   # RFC-022 core boundary gate
 bash scripts/check-published-dependency-isolation.sh  # RFC-049 §B1 per-crate peer-dep isolation
 bash scripts/check-matten-data-scope.sh          # RFC-042 matten-data anti-scope guard
@@ -67,6 +69,7 @@ cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo mlprep-standa
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo mlprep-standardization --output target/matten-report-mlprep-standardization.md
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo educational-path
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo educational-path --output target/matten-report-educational-path.md
+cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo educational-path --format html --output target/matten-report-educational-path.html
 cargo check --manifest-path tools/matten-migrate/Cargo.toml
 cargo test --manifest-path tools/matten-migrate/Cargo.toml
 cargo clippy --manifest-path tools/matten-migrate/Cargo.toml -- -D warnings

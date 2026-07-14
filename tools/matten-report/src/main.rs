@@ -26,12 +26,19 @@ struct Config {
     kind: String,
     select: Vec<String>,
     output: Option<PathBuf>,
+    format: OutputFormat,
 }
 
 #[derive(Debug)]
 enum Input {
     Demo { label: String },
     CsvPath { path: PathBuf },
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum OutputFormat {
+    Markdown,
+    Html,
 }
 
 #[derive(Debug)]
@@ -75,6 +82,7 @@ where
     let mut kind: Option<String> = None;
     let mut select: Option<Vec<String>> = None;
     let mut output: Option<PathBuf> = None;
+    let mut format = OutputFormat::Markdown;
 
     let mut args = args.into_iter();
     while let Some(arg) = args.next() {
@@ -94,12 +102,15 @@ where
             "--output" => {
                 output = Some(PathBuf::from(take_value(&mut args, "--output")?));
             }
+            "--format" => {
+                format = parse_format(&take_value(&mut args, "--format")?)?;
+            }
             "--help" | "-h" => return Ok(Action::Help),
             other => return Err(format!("unknown argument: {other}\n\n{}", usage())),
         }
     }
 
-    match (demo, input) {
+    let action = match (demo, input) {
         (Some(label), None) => {
             require_kind_or_demo_label(&label, kind.as_deref())?;
             if select.is_some() {
@@ -120,6 +131,7 @@ where
                 kind: label,
                 select,
                 output,
+                format,
             }))
         }
         (None, Some(path)) => {
@@ -137,6 +149,7 @@ where
                 kind,
                 select,
                 output,
+                format,
             }))
         }
         (Some(_), Some(_)) => Err(format!(
@@ -144,7 +157,13 @@ where
             usage()
         )),
         (None, None) => Err(usage()),
+    }?;
+
+    if let Action::Run(config) = &action {
+        validate_format_policy(config)?;
     }
+
+    Ok(action)
 }
 
 fn take_value<I>(args: &mut I, flag: &str) -> Result<String, String>
@@ -168,6 +187,36 @@ fn parse_select(value: &str) -> Result<Vec<String>, String> {
         Err("--select requires at least one column".to_string())
     } else {
         Ok(columns)
+    }
+}
+
+fn parse_format(value: &str) -> Result<OutputFormat, String> {
+    match value {
+        "markdown" => Ok(OutputFormat::Markdown),
+        "html" => Ok(OutputFormat::Html),
+        other => Err(format!(
+            "unsupported --format {other:?}; expected \"markdown\" or \"html\""
+        )),
+    }
+}
+
+fn validate_format_policy(config: &Config) -> Result<(), String> {
+    if config.format != OutputFormat::Html {
+        return Ok(());
+    }
+
+    if config.output.is_none() {
+        return Err("--format html requires --output <report.html>".to_string());
+    }
+
+    match &config.input {
+        Input::Demo { label } if label == KIND_EDUCATIONAL_PATH => Ok(()),
+        Input::Demo { label } => Err(format!(
+            "--format html is only supported for --demo {KIND_EDUCATIONAL_PATH:?}; got {label:?}"
+        )),
+        Input::CsvPath { .. } => Err(format!(
+            "--format html is only supported for --demo {KIND_EDUCATIONAL_PATH:?}"
+        )),
     }
 }
 
@@ -199,6 +248,22 @@ fn is_supported_demo(label: &str) -> bool {
 }
 
 fn render_report(config: &Config) -> Result<String, Box<dyn Error>> {
+    if config.format == OutputFormat::Html {
+        return match &config.input {
+            Input::Demo { label } if label == KIND_EDUCATIONAL_PATH => {
+                render_educational_path_html_report()
+            }
+            Input::Demo { label } => Err(format!(
+                "--format html is only supported for --demo {KIND_EDUCATIONAL_PATH:?}; got {label:?}"
+            )
+            .into()),
+            Input::CsvPath { .. } => Err(format!(
+                "--format html is only supported for --demo {KIND_EDUCATIONAL_PATH:?}"
+            )
+            .into()),
+        };
+    }
+
     match &config.input {
         Input::Demo { label } if label == KIND_SHAPE_FLOW => render_shape_flow_report(),
         Input::Demo { label } if label == KIND_DYNAMIC_READINESS => {
@@ -706,6 +771,324 @@ fn render_educational_path_report() -> Result<String, Box<dyn Error>> {
     Ok(report)
 }
 
+fn render_educational_path_html_report() -> Result<String, Box<dyn Error>> {
+    let broadcast_left = Tensor::new(vec![1.0, 2.0, 3.0], &[3, 1]);
+    let broadcast_right = Tensor::new(vec![10.0, 20.0, 30.0, 40.0], &[1, 4]);
+    let broadcast = &broadcast_left + &broadcast_right;
+
+    let shape_input = Tensor::new(vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0], &[2, 3]);
+    let reshaped = shape_input.reshape(&[3, 2]);
+    let transposed = shape_input.transpose();
+    let mean_axis_0 = shape_input.mean_axis(0);
+    let mean_axis_1 = shape_input.mean_axis(1);
+
+    let matmul_left = Tensor::new((1..=6).map(|value| value as f64).collect(), &[2, 3]);
+    let matmul_right = Tensor::new((1..=12).map(|value| value as f64).collect(), &[3, 4]);
+    let matmul = matmul_left.matmul(&matmul_right);
+
+    let dynamic = Tensor::from_elements(
+        vec![
+            Element::Float(1.0),
+            Element::text("2.5"),
+            Element::None,
+            Element::Int(4),
+            Element::text("6.0"),
+            Element::Float(8.0),
+        ],
+        &[2, 3],
+    );
+    let none_mask = dynamic.none_mask();
+    let numeric_mask = dynamic.numeric_mask();
+
+    let standardization_input = Tensor::new(vec![8.0, 80.0, 10.0, 100.0, 12.0, 120.0], &[3, 2]);
+    let standardized =
+        standardize_columns(&standardization_input).map_err(Box::<dyn Error>::from)?;
+    let before_mean = standardization_input.mean_axis(0);
+    let before_std = standardization_input.std_axis(0);
+    let after_mean = standardized.mean_axis(0);
+    let after_std = standardized.std_axis(0);
+
+    let mut report = String::new();
+    writeln!(report, "<!doctype html>")?;
+    writeln!(report, "<html lang=\"en\">")?;
+    writeln!(report, "<head>")?;
+    writeln!(report, "  <meta charset=\"utf-8\">")?;
+    writeln!(
+        report,
+        "  <title>{}</title>",
+        html_escape("matten educational-path report")
+    )?;
+    writeln!(report, "  <style>")?;
+    writeln!(
+        report,
+        "    :root {{ color-scheme: light; font-family: system-ui, sans-serif; }}"
+    )?;
+    writeln!(
+        report,
+        "    body {{ margin: 2rem auto; max-width: 920px; color: #17202a; background: #ffffff; line-height: 1.5; }}"
+    )?;
+    writeln!(
+        report,
+        "    h1, h2 {{ color: #14324a; }} section {{ border-top: 1px solid #d6dde5; padding: 1rem 0; }}"
+    )?;
+    writeln!(
+        report,
+        "    table {{ width: 100%; border-collapse: collapse; margin: 0.75rem 0; }} th, td {{ border: 1px solid #d6dde5; padding: 0.45rem 0.6rem; text-align: left; vertical-align: top; }}"
+    )?;
+    writeln!(
+        report,
+        "    th {{ background: #eef4f8; }} code, .shape {{ font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }}"
+    )?;
+    writeln!(
+        report,
+        "    .note {{ background: #f6f8fa; border-left: 4px solid #5b8fb9; padding: 0.75rem 1rem; }}"
+    )?;
+    writeln!(
+        report,
+        "    .shape {{ display: inline-block; background: #eef4f8; border: 1px solid #cbd8e3; border-radius: 4px; padding: 0.1rem 0.35rem; }}"
+    )?;
+    writeln!(report, "  </style>")?;
+    writeln!(report, "</head>")?;
+    writeln!(report, "<body>")?;
+    writeln!(report, "<main>")?;
+    writeln!(
+        report,
+        "<h1>{}</h1>",
+        html_escape("matten educational-path report")
+    )?;
+    writeln!(
+        report,
+        "<p class=\"note\">{}</p>",
+        html_escape("Fixed educational demo report, not automatic expression tracing.")
+    )?;
+
+    writeln!(report, "<section>")?;
+    writeln!(
+        report,
+        "<h2>{}</h2>",
+        html_escape("How to read shapes first")
+    )?;
+    writeln!(report, "<ol>")?;
+    for item in [
+        "ask what shape each input has",
+        "ask which axes align, disappear, or remain",
+        "read the output shape before reading values",
+        "convert dynamic data before numeric computation",
+    ] {
+        writeln!(report, "<li>{}</li>", html_escape(item))?;
+    }
+    writeln!(report, "</ol>")?;
+    writeln!(report, "</section>")?;
+
+    writeln!(report, "<section>")?;
+    writeln!(report, "<h2>{}</h2>", html_escape("Broadcasting"))?;
+    write_shape_flow_table(
+        &mut report,
+        &[
+            ("left", format!("{:?}", broadcast_left.shape())),
+            ("right", format!("{:?}", broadcast_right.shape())),
+            ("result", format!("{:?}", broadcast.shape())),
+        ],
+    )?;
+    writeln!(
+        report,
+        "<p>{}</p>",
+        html_escape("axis 1: left repeats across 4 columns; axis 0: right repeats across 3 rows")
+    )?;
+    write_html_pre(
+        &mut report,
+        &format!("result values: {:?}", broadcast.as_slice()),
+    )?;
+    writeln!(report, "</section>")?;
+
+    writeln!(report, "<section>")?;
+    writeln!(report, "<h2>{}</h2>", html_escape("Reshape and transpose"))?;
+    write_shape_flow_table(
+        &mut report,
+        &[
+            ("input", format!("{:?}", shape_input.shape())),
+            ("reshape", format!("{:?}", reshaped.shape())),
+            ("transpose", format!("{:?}", transposed.shape())),
+        ],
+    )?;
+    write_html_pre(
+        &mut report,
+        &format!(
+            "reshape values: {:?}\ntranspose values: {:?}",
+            reshaped.as_slice(),
+            transposed.as_slice()
+        ),
+    )?;
+    writeln!(
+        report,
+        "<p>{}</p>",
+        html_escape("reshape changes grouping; transpose changes coordinate meaning")
+    )?;
+    writeln!(report, "</section>")?;
+
+    writeln!(report, "<section>")?;
+    writeln!(report, "<h2>{}</h2>", html_escape("Axis reductions"))?;
+    write_shape_flow_table(
+        &mut report,
+        &[
+            (
+                "mean_axis(0)",
+                format!("{:?} -> {:?}", shape_input.shape(), mean_axis_0.shape()),
+            ),
+            (
+                "mean_axis(1)",
+                format!("{:?} -> {:?}", shape_input.shape(), mean_axis_1.shape()),
+            ),
+        ],
+    )?;
+    write_html_pre(
+        &mut report,
+        &format!(
+            "mean_axis(0) keeps columns: {:?}\nmean_axis(1) keeps rows: {:?}",
+            mean_axis_0.as_slice(),
+            mean_axis_1.as_slice()
+        ),
+    )?;
+    writeln!(report, "</section>")?;
+
+    writeln!(report, "<section>")?;
+    writeln!(report, "<h2>{}</h2>", html_escape("Matrix multiplication"))?;
+    write_shape_flow_table(
+        &mut report,
+        &[
+            ("left", format!("{:?}", matmul_left.shape())),
+            ("right", format!("{:?}", matmul_right.shape())),
+            ("result", format!("{:?}", matmul.shape())),
+        ],
+    )?;
+    writeln!(
+        report,
+        "<p>{}</p>",
+        html_escape("shared inner dimension: 3")
+    )?;
+    write_html_pre(
+        &mut report,
+        &format!("result values: {:?}", matmul.as_slice()),
+    )?;
+    writeln!(report, "</section>")?;
+
+    writeln!(report, "<section>")?;
+    writeln!(report, "<h2>{}</h2>", html_escape("Dynamic readiness"))?;
+    write_shape_flow_table(
+        &mut report,
+        &[
+            ("dynamic shape", format!("{:?}", dynamic.shape())),
+            ("none mask", format!("{:?}", none_mask.as_slice())),
+            (
+                "numeric mask",
+                format!("strict policy readiness {:?}", numeric_mask.as_slice()),
+            ),
+        ],
+    )?;
+    writeln!(
+        report,
+        "<p>{}</p>",
+        html_escape(
+            "Text values are not numeric-ready under the strict mask; clean values, then call try_numeric()."
+        )
+    )?;
+    writeln!(report, "</section>")?;
+
+    writeln!(report, "<section>")?;
+    writeln!(report, "<h2>{}</h2>", html_escape("Standardization"))?;
+    write_shape_flow_table(
+        &mut report,
+        &[
+            (
+                "shape flow",
+                format!(
+                    "{:?} -> {:?}",
+                    standardization_input.shape(),
+                    standardized.shape()
+                ),
+            ),
+            ("before mean", format_fixed_values(before_mean.as_slice())),
+            (
+                "before population std",
+                format_fixed_values(before_std.as_slice()),
+            ),
+            ("after mean", format_fixed_values(after_mean.as_slice())),
+            (
+                "after population std",
+                format_fixed_values(after_std.as_slice()),
+            ),
+        ],
+    )?;
+    writeln!(report, "</section>")?;
+
+    writeln!(report, "<section>")?;
+    writeln!(
+        report,
+        "<h2>{}</h2>",
+        html_escape("What this report is not")
+    )?;
+    writeln!(report, "<ul>")?;
+    for item in [
+        "not a public API",
+        "not source scanning",
+        "not a renderer",
+        "not model-quality analysis",
+    ] {
+        writeln!(report, "<li>{}</li>", html_escape(item))?;
+    }
+    writeln!(report, "</ul>")?;
+    writeln!(report, "</section>")?;
+
+    writeln!(report, "</main>")?;
+    writeln!(report, "</body>")?;
+    writeln!(report, "</html>")?;
+
+    Ok(report)
+}
+
+fn write_shape_flow_table(
+    report: &mut String,
+    rows: &[(&str, String)],
+) -> Result<(), std::fmt::Error> {
+    writeln!(report, "<table>")?;
+    writeln!(
+        report,
+        "<thead><tr><th>{}</th><th>{}</th></tr></thead>",
+        html_escape("item"),
+        html_escape("shape / value")
+    )?;
+    writeln!(report, "<tbody>")?;
+    for (label, value) in rows {
+        writeln!(
+            report,
+            "<tr><td>{}</td><td><span class=\"shape\">{}</span></td></tr>",
+            html_escape(label),
+            html_escape(value)
+        )?;
+    }
+    writeln!(report, "</tbody>")?;
+    writeln!(report, "</table>")
+}
+
+fn write_html_pre(report: &mut String, value: &str) -> Result<(), std::fmt::Error> {
+    writeln!(report, "<pre><code>{}</code></pre>", html_escape(value))
+}
+
+fn html_escape(value: &str) -> String {
+    let mut escaped = String::with_capacity(value.len());
+    for ch in value.chars() {
+        match ch {
+            '&' => escaped.push_str("&amp;"),
+            '<' => escaped.push_str("&lt;"),
+            '>' => escaped.push_str("&gt;"),
+            '"' => escaped.push_str("&quot;"),
+            '\'' => escaped.push_str("&#39;"),
+            _ => escaped.push(ch),
+        }
+    }
+    escaped
+}
+
 fn format_fixed_values(values: &[f64]) -> String {
     let values = values
         .iter()
@@ -820,10 +1203,12 @@ Usage:
   matten-report --demo shape-flow [--output <report.md>]
   matten-report --demo dynamic-readiness [--output <report.md>]
   matten-report --demo mlprep-standardization [--output <report.md>]
-  matten-report --demo educational-path [--output <report.md>]
+  matten-report --demo educational-path [--format markdown] [--output <report.md>]
+  matten-report --demo educational-path --format html --output <report.html>
   matten-report --input <csv-path> --kind data-readiness --select <col1,col2> [--output <report.md>]
 
-Demo reports are fixed examples. Input mode supports only data-readiness."
+Demo reports are fixed examples. Input mode supports only data-readiness.
+Markdown is the default format. HTML is local file output for educational-path only."
         .to_string()
 }
 
@@ -983,6 +1368,92 @@ mod tests {
             config.output,
             Some(PathBuf::from("target/matten-report-educational-path.md"))
         );
+        assert_eq!(config.format, OutputFormat::Markdown);
+    }
+
+    #[test]
+    fn educational_path_html_requires_output() {
+        let err =
+            parse_args(args(&["--demo", "educational-path", "--format", "html"])).unwrap_err();
+
+        assert!(err.contains("--format html requires --output <report.html>"));
+    }
+
+    #[test]
+    fn educational_path_html_allows_explicit_output() {
+        let action = parse_args(args(&[
+            "--demo",
+            "educational-path",
+            "--format",
+            "html",
+            "--output",
+            "target/matten-report-educational-path.html",
+        ]))
+        .expect("educational-path HTML with output should parse");
+
+        let Action::Run(config) = action else {
+            panic!("expected run action");
+        };
+        assert!(matches!(
+            config.input,
+            Input::Demo { ref label } if label == "educational-path"
+        ));
+        assert_eq!(config.format, OutputFormat::Html);
+        assert_eq!(
+            config.output,
+            Some(PathBuf::from("target/matten-report-educational-path.html"))
+        );
+    }
+
+    #[test]
+    fn html_format_is_limited_to_educational_path_demo() {
+        let err = parse_args(args(&[
+            "--demo",
+            "shape-flow",
+            "--format",
+            "html",
+            "--output",
+            "target/matten-report-shape-flow.html",
+        ]))
+        .unwrap_err();
+
+        assert!(err.contains(
+            "--format html is only supported for --demo \"educational-path\"; got \"shape-flow\""
+        ));
+    }
+
+    #[test]
+    fn input_mode_does_not_support_html_format() {
+        let err = parse_args(args(&[
+            "--input",
+            "fixtures/small.csv",
+            "--kind",
+            "data-readiness",
+            "--select",
+            "sales,cost",
+            "--format",
+            "html",
+            "--output",
+            "target/matten-report-data-readiness.html",
+        ]))
+        .unwrap_err();
+
+        assert!(err.contains("--format html is only supported for --demo \"educational-path\""));
+    }
+
+    #[test]
+    fn unknown_format_is_rejected() {
+        let err = parse_args(args(&[
+            "--demo",
+            "educational-path",
+            "--format",
+            "svg",
+            "--output",
+            "target/matten-report-educational-path.svg",
+        ]))
+        .unwrap_err();
+
+        assert!(err.contains("unsupported --format \"svg\"; expected \"markdown\" or \"html\""));
     }
 
     #[test]
@@ -1258,6 +1729,27 @@ after column population std: [1.000, 1.000]
 - not model-quality analysis
 "
         );
+    }
+
+    #[test]
+    fn educational_path_html_report_is_static_and_self_contained() {
+        let report =
+            render_educational_path_html_report().expect("educational-path HTML should render");
+
+        assert!(report.starts_with("<!doctype html>\n<html lang=\"en\">"));
+        assert!(report.contains("<title>matten educational-path report</title>"));
+        assert!(report.contains("<h1>matten educational-path report</h1>"));
+        assert!(report.contains("<h2>Broadcasting</h2>"));
+        assert!(report.contains("<span class=\"shape\">[3, 1]</span>"));
+        assert!(report.contains("<h2>Dynamic readiness</h2>"));
+        assert!(report.contains("strict policy readiness [1.0, 0.0, 0.0, 1.0, 0.0, 1.0]"));
+        assert!(report.contains("<h2>Standardization</h2>"));
+        assert!(report.contains("after population std"));
+        assert!(!report.contains("<script"));
+        assert!(!report.contains(" src="));
+        assert!(!report.contains(" href="));
+        assert!(!report.contains("data:"));
+        assert!(!report.contains("<svg"));
     }
 
     #[test]

@@ -3,7 +3,7 @@
 **Project:** `matten`
 **Related RFC:** RFC-068: Rich Local Visualization Artifacts
 **Document kind:** Compact local-tool implementation handoff
-**Status:** Proposed handoff; implementation not started
+**Status:** Implemented for review; review pending
 **Scope:** Local-only static HTML artifact for `tools/matten-report --demo educational-path`
 
 ---
@@ -178,6 +178,8 @@ Minimum implementation verification:
 
 ```bash
 cargo fmt --all --check
+cargo fmt --manifest-path tools/matten-report/Cargo.toml --check
+cargo fmt --manifest-path tools/matten-migrate/Cargo.toml --check
 cargo check --manifest-path tools/matten-report/Cargo.toml
 cargo test --manifest-path tools/matten-report/Cargo.toml
 cargo clippy --manifest-path tools/matten-report/Cargo.toml -- -D warnings

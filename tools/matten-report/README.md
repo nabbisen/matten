@@ -1,7 +1,8 @@
 # matten-report
 
 `matten-report` is a local-only, `publish = false` reporting tool for small
-plain-text readiness summaries.
+Markdown/plain-text readiness summaries and one local static HTML educational
+artifact.
 
 Current supported reports:
 
@@ -17,10 +18,12 @@ Scope:
 
 ```text
 local tool only
-Markdown/plain text output
+Markdown/plain text output by default
+static self-contained HTML output for educational-path only
 explicit input/output behavior
 no public API
 no published crate
+no JavaScript or external assets in HTML output
 no network
 no telemetry
 no project mutation
@@ -81,6 +84,19 @@ The educational-path report is a fixed guided walkthrough across shape-first
 reading, broadcasting, reshape/transpose, axis reductions, matmul, dynamic
 readiness, and standardization. It is not automatic expression tracing and does
 not accept input files.
+
+Write the educational-path report as a local static HTML artifact:
+
+```bash
+cargo run --manifest-path tools/matten-report/Cargo.toml -- \
+  --demo educational-path \
+  --format html \
+  --output target/matten-report-educational-path.html
+```
+
+HTML output is supported only for `educational-path` in this first local
+artifact slice. It requires `--output`, writes a self-contained static document,
+and uses no JavaScript, network access, or external assets.
 
 Run on a CSV file:
 

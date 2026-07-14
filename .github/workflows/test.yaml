@@ -18,7 +18,10 @@ jobs:
         with:
           components: rustfmt, clippy
       - name: Format
-        run: cargo fmt --all --check
+        run: |
+          cargo fmt --all --check
+          cargo fmt --manifest-path tools/matten-report/Cargo.toml --check
+          cargo fmt --manifest-path tools/matten-migrate/Cargo.toml --check
       - name: Core dependency boundary (RFC-022)
         run: bash scripts/check-core-dependency-boundary.sh
       - name: Published dependency isolation (RFC-049 §B1)
@@ -188,6 +191,7 @@ jobs:
       - run: cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo mlprep-standardization --output target/matten-report-mlprep-standardization.md
       - run: cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo educational-path
       - run: cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo educational-path --output target/matten-report-educational-path.md
+      - run: cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo educational-path --format html --output target/matten-report-educational-path.html
       - run: cargo check --manifest-path tools/matten-migrate/Cargo.toml
       - run: cargo test --manifest-path tools/matten-migrate/Cargo.toml
       - run: cargo clippy --manifest-path tools/matten-migrate/Cargo.toml -- -D warnings

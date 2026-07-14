@@ -34,63 +34,101 @@ const TARGETS: &[(&str, &str)] = &[
     ),
     ("Candle", "ML tensors, training, and device execution"),
     ("NumPy", "Python scientific ecosystem hand-off"),
-    ("stay with matten", "small work, ingestion, glue, and learning"),
+    (
+        "stay with matten",
+        "small work, ingestion, glue, and learning",
+    ),
 ];
 
 const API_CATALOG: &[ApiDoc] = &[
     construction_api(
         "Tensor::new",
         &["new"],
-        &["Constructs a numeric Tensor from row-major data and a runtime shape; panics on mismatch."],
-        &["shape order", "allocation size", "panic boundary versus Tensor::try_new"],
+        &[
+            "Constructs a numeric Tensor from row-major data and a runtime shape; panics on mismatch.",
+        ],
+        &[
+            "shape order",
+            "allocation size",
+            "panic boundary versus Tensor::try_new",
+        ],
     ),
     construction_api(
         "Tensor::try_new",
         &[],
-        &["Constructs a numeric Tensor from row-major data and a runtime shape with a Result boundary."],
+        &[
+            "Constructs a numeric Tensor from row-major data and a runtime shape with a Result boundary.",
+        ],
         &["shape order", "allocation errors", "caller error handling"],
     ),
     construction_api(
         "Tensor::from_vec",
         &[],
         &["Constructs a rank-1 numeric Tensor from a flat Vec."],
-        &["whether the target should stay rank-1", "when to reshape after construction"],
+        &[
+            "whether the target should stay rank-1",
+            "when to reshape after construction",
+        ],
     ),
     shape_api(
         "Tensor::reshape",
         &["reshape"],
-        &["Changes the Tensor shape over the same logical data; panics on mismatch or dynamic tensors."],
-        &["whether the target reshape is a view or a copy", "row-major logical order", "panic boundary versus Tensor::try_reshape"],
+        &[
+            "Changes the Tensor shape over the same logical data; panics on mismatch or dynamic tensors.",
+        ],
+        &[
+            "whether the target reshape is a view or a copy",
+            "row-major logical order",
+            "panic boundary versus Tensor::try_reshape",
+        ],
     ),
     shape_api(
         "Tensor::try_reshape",
         &[],
         &["Changes Tensor shape with a Result boundary; returns Unsupported on dynamic tensors."],
-        &["whether the target reshape is a view or a copy", "shape validation", "dynamic tensor rejection"],
+        &[
+            "whether the target reshape is a view or a copy",
+            "shape validation",
+            "dynamic tensor rejection",
+        ],
     ),
     shape_api(
         "Tensor::flatten",
         &[],
         &["Returns an owned rank-1 Tensor copy of the logical data; panics on dynamic tensors."],
-        &["row-major order", "whether flattening is a view or copy in the target"],
+        &[
+            "row-major order",
+            "whether flattening is a view or copy in the target",
+        ],
     ),
     shape_api(
         "Tensor::transpose",
         &[],
         &["Reverses Tensor axes for numeric tensors; panics on dynamic tensors."],
-        &["axis order", "whether the target transpose is lazy, a view, or a copy"],
+        &[
+            "axis order",
+            "whether the target transpose is lazy, a view, or a copy",
+        ],
     ),
     reduction_api(
         "Tensor::sum",
         &[],
         &["Reduces all numeric elements to one f64 value."],
-        &["NaN behavior", "whether a Result-form API is preferred", "profile before moving hot paths"],
+        &[
+            "NaN behavior",
+            "whether a Result-form API is preferred",
+            "profile before moving hot paths",
+        ],
     ),
     reduction_api(
         "Tensor::mean",
         &[],
         &["Computes the whole-Tensor arithmetic mean as one f64 value."],
-        &["NaN behavior", "empty-data assumptions", "whether a Result-form API is preferred"],
+        &[
+            "NaN behavior",
+            "empty-data assumptions",
+            "whether a Result-form API is preferred",
+        ],
     ),
     reduction_api(
         "Tensor::sum_axis",
@@ -108,79 +146,137 @@ const API_CATALOG: &[ApiDoc] = &[
         "Tensor::dot",
         &["dot"],
         &["Runs core-lite dense dot/matmul semantics over supported vector and matrix rank cases."],
-        &["rank/shape cases", "target dot semantics", "whether solver or decomposition APIs are needed"],
+        &[
+            "rank/shape cases",
+            "target dot semantics",
+            "whether solver or decomposition APIs are needed",
+        ],
     ),
     linalg_api(
         "Tensor::matmul",
         &["matmul"],
         &["Alias for Tensor::dot for supported dense vector and matrix rank cases."],
-        &["rank/shape cases", "whether matrix multiplication dominates real workloads", "target error model"],
+        &[
+            "rank/shape cases",
+            "whether matrix multiplication dominates real workloads",
+            "target error model",
+        ],
     ),
     linalg_api(
         "Tensor::norm",
         &[],
         &["Computes L2/Frobenius norm over all numeric elements; NaN propagates."],
-        &["norm convention", "NaN behavior", "whether target linalg semantics are clearer"],
+        &[
+            "norm convention",
+            "NaN behavior",
+            "whether target linalg semantics are clearer",
+        ],
     ),
     linalg_api(
         "Tensor::trace",
         &[],
         &["Computes the rank-2 trace, using the rectangular diagonal length when needed."],
-        &["rank-2 requirement", "rectangular matrices", "target trace behavior"],
+        &[
+            "rank-2 requirement",
+            "rectangular matrices",
+            "target trace behavior",
+        ],
     ),
     linalg_api(
         "Tensor::outer",
         &[],
         &["Computes an outer product for rank-1 numeric tensors."],
-        &["rank-1 requirement", "allocation size", "target vector/matrix semantics"],
+        &[
+            "rank-1 requirement",
+            "allocation size",
+            "target vector/matrix semantics",
+        ],
     ),
     dynamic_api(
         "Tensor::try_numeric",
         &[],
         &["Converts a dynamic Tensor to a numeric Tensor using the default numeric policy."],
-        &["conversion policy", "missing or text values", "whether cleanup belongs before target-library handoff"],
+        &[
+            "conversion policy",
+            "missing or text values",
+            "whether cleanup belongs before target-library handoff",
+        ],
     ),
     dynamic_api(
         "Tensor::from_json_dynamic",
         &[],
         &["Parses JSON into a dynamic Tensor when the json and dynamic features are enabled."],
-        &["feature requirements", "data cleanup", "conversion with Tensor::try_numeric"],
+        &[
+            "feature requirements",
+            "data cleanup",
+            "conversion with Tensor::try_numeric",
+        ],
     ),
     dynamic_api(
         "Tensor::from_csv_dynamic",
         &[],
         &["Parses CSV into a dynamic Tensor when the csv and dynamic features are enabled."],
-        &["feature requirements", "missing values", "conversion with Tensor::try_numeric"],
+        &[
+            "feature requirements",
+            "missing values",
+            "conversion with Tensor::try_numeric",
+        ],
     ),
     bridge_api(
         "matten_ndarray::to_arrayd",
         &["to_arrayd"],
-        &["Converts a numeric matten Tensor into an ndarray ArrayD<f64>; dynamic tensors are rejected."],
-        &["copy boundary", "dynamic rejection", "conversion outside hot loops"],
+        &[
+            "Converts a numeric matten Tensor into an ndarray ArrayD<f64>; dynamic tensors are rejected.",
+        ],
+        &[
+            "copy boundary",
+            "dynamic rejection",
+            "conversion outside hot loops",
+        ],
     ),
     bridge_api(
         "matten_ndarray::from_arrayd",
         &["from_arrayd"],
         &["Converts an ndarray ArrayD<f64> into a matten Tensor using logical element order."],
-        &["copy boundary", "non-standard ndarray layout", "zero-sized-axis rejection"],
+        &[
+            "copy boundary",
+            "non-standard ndarray layout",
+            "zero-sized-axis rejection",
+        ],
     ),
     data_api(
         "matten_data::Table",
         &["Table"],
-        &["Represents a small table-oriented ingestion boundary before explicit numeric conversion."],
-        &["whether table work remains simple ingestion", "whether dataframe analytics are real requirements"],
+        &[
+            "Represents a small table-oriented ingestion boundary before explicit numeric conversion.",
+        ],
+        &[
+            "whether table work remains simple ingestion",
+            "whether dataframe analytics are real requirements",
+        ],
     ),
     data_api(
         "matten_data::try_numeric",
         &[],
-        &["Access path: Table::try_numeric(); converts a Table into a NumericTable after explicit cleanup and numeric validation."],
-        &["missing values", "non-numeric cells", "conversion policy before to_tensor"],
+        &[
+            "Access path: Table::try_numeric(); converts a Table into a NumericTable after explicit cleanup and numeric validation.",
+        ],
+        &[
+            "missing values",
+            "non-numeric cells",
+            "conversion policy before to_tensor",
+        ],
     ),
     data_api(
         "matten_data::to_tensor",
         &[],
-        &["Access path: Table::try_numeric()?.to_tensor(); calls NumericTable::to_tensor to convert into a Tensor."],
-        &["the Table -> NumericTable -> Tensor boundary", "whether table analytics exceed matten-data scope"],
+        &[
+            "Access path: Table::try_numeric()?.to_tensor(); calls NumericTable::to_tensor to convert into a Tensor.",
+        ],
+        &[
+            "the Table -> NumericTable -> Tensor boundary",
+            "whether table analytics exceed matten-data scope",
+        ],
     ),
 ];
 
@@ -215,7 +311,9 @@ const fn shape_api(
         canonical,
         aliases,
         meaning,
-        relevance: &["This API usually matters when shape movement, layout, or axis semantics affect migration."],
+        relevance: &[
+            "This API usually matters when shape movement, layout, or axis semantics affect migration.",
+        ],
         playbooks: &["ndarray", "NumPy"],
         checks,
         docs: &[
@@ -237,7 +335,9 @@ const fn reduction_api(
         canonical,
         aliases,
         meaning,
-        relevance: &["This API usually maps to target axis-reduction APIs when reductions are real workload pressure."],
+        relevance: &[
+            "This API usually maps to target axis-reduction APIs when reductions are real workload pressure.",
+        ],
         playbooks: &["ndarray", "NumPy"],
         checks,
         docs: &[
@@ -259,7 +359,9 @@ const fn linalg_api(
         canonical,
         aliases,
         meaning,
-        relevance: &["This API usually points at ndarray or nalgebra only when dense numeric work dominates measured runtime."],
+        relevance: &[
+            "This API usually points at ndarray or nalgebra only when dense numeric work dominates measured runtime.",
+        ],
         playbooks: &["ndarray", "nalgebra", "NumPy", "Candle"],
         checks,
         docs: &[
@@ -281,7 +383,9 @@ const fn dynamic_api(
         canonical,
         aliases,
         meaning,
-        relevance: &["This API usually remains useful as explicit cleanup before handing numeric data to another ecosystem."],
+        relevance: &[
+            "This API usually remains useful as explicit cleanup before handing numeric data to another ecosystem.",
+        ],
         playbooks: &["stay with matten", "Polars / Pandas", "NumPy"],
         checks,
         docs: &[
@@ -302,7 +406,9 @@ const fn bridge_api(
         canonical,
         aliases,
         meaning,
-        relevance: &["This API is an explicit bridge boundary; convert at edges rather than inside hot loops."],
+        relevance: &[
+            "This API is an explicit bridge boundary; convert at edges rather than inside hot loops.",
+        ],
         playbooks: &["ndarray"],
         checks,
         docs: &[
@@ -323,7 +429,9 @@ const fn data_api(
         canonical,
         aliases,
         meaning,
-        relevance: &["This API usually belongs to the small table-to-Tensor ingestion boundary, not a dataframe engine."],
+        relevance: &[
+            "This API usually belongs to the small table-to-Tensor ingestion boundary, not a dataframe engine.",
+        ],
         playbooks: &["stay with matten", "Polars / Pandas"],
         checks,
         docs: &[
@@ -336,11 +444,23 @@ const fn data_api(
 
 #[derive(Debug)]
 enum Command {
-    Inspect { path: PathBuf },
-    Report { path: PathBuf, output: Option<PathBuf> },
-    Suggest { target: Target, path: PathBuf },
-    ExplainApi { api: &'static ApiDoc },
-    CheckBridges { path: PathBuf },
+    Inspect {
+        path: PathBuf,
+    },
+    Report {
+        path: PathBuf,
+        output: Option<PathBuf>,
+    },
+    Suggest {
+        target: Target,
+        path: PathBuf,
+    },
+    ExplainApi {
+        api: &'static ApiDoc,
+    },
+    CheckBridges {
+        path: PathBuf,
+    },
     ListTargets,
     Help,
 }
@@ -478,7 +598,10 @@ where
         "check-bridges" => parse_check_bridges_args(args),
         "list-targets" => {
             if !args.is_empty() {
-                return Err(format!("list-targets does not accept arguments\n\n{}", usage()));
+                return Err(format!(
+                    "list-targets does not accept arguments\n\n{}",
+                    usage()
+                ));
             }
             Ok(Command::ListTargets)
         }
@@ -554,14 +677,18 @@ fn parse_suggest_args(args: Vec<String>) -> Result<Command, String> {
             }
             value => {
                 if path.is_some() {
-                    return Err(format!("suggest accepts only one input path\n\n{}", usage()));
+                    return Err(format!(
+                        "suggest accepts only one input path\n\n{}",
+                        usage()
+                    ));
                 }
                 path = Some(PathBuf::from(value));
             }
         }
     }
 
-    let target = target.ok_or_else(|| format!("suggest requires --target <target>\n\n{}", usage()))?;
+    let target =
+        target.ok_or_else(|| format!("suggest requires --target <target>\n\n{}", usage()))?;
     let path = path.ok_or_else(|| format!("suggest expects a path\n\n{}", usage()))?;
     Ok(Command::Suggest { target, path })
 }
@@ -685,7 +812,9 @@ fn analyze_path(path: &Path) -> Result<Analysis, Box<dyn Error>> {
     let root = if metadata.is_dir() {
         path.to_path_buf()
     } else {
-        path.parent().unwrap_or_else(|| Path::new(".")).to_path_buf()
+        path.parent()
+            .unwrap_or_else(|| Path::new("."))
+            .to_path_buf()
     };
     let canonical_root = fs::canonicalize(&root)?;
     let mut analysis = Analysis {
@@ -944,7 +1073,13 @@ fn scan_rust_source(text: &str, path: &Path, root: &Path, analysis: &mut Analysi
             &evidence,
             analysis,
         );
-        scan_terms(line, DATAFRAME_TERMS, "dataframe pressure", &evidence, analysis);
+        scan_terms(
+            line,
+            DATAFRAME_TERMS,
+            "dataframe pressure",
+            &evidence,
+            analysis,
+        );
     }
 }
 
@@ -987,11 +1122,8 @@ fn has_token_boundaries(line: &str, idx: usize, term: &str) -> bool {
     let before = line[..idx].chars().next_back();
     let after = line[idx + term.len()..].chars().next();
     let before_matches = term.chars().next().is_some_and(is_term_delimiter) || is_boundary(before);
-    let after_matches = term
-        .chars()
-        .next_back()
-        .is_some_and(is_term_delimiter)
-        || is_boundary(after);
+    let after_matches =
+        term.chars().next_back().is_some_and(is_term_delimiter) || is_boundary(after);
     before_matches && after_matches
 }
 
@@ -1116,15 +1248,27 @@ fn render_report(analysis: &Analysis) -> String {
     writeln!(out, "## Risks").unwrap();
     writeln!(out).unwrap();
     writeln!(out, "- Heuristic detection can miss usage or report source-like text; verify every finding manually.").unwrap();
-    writeln!(out, "- Avoid converting inside hot loops; convert once at boundaries when using bridge crates.").unwrap();
-    writeln!(out, "- Treat target playbooks as reading suggestions, not migration decisions.").unwrap();
+    writeln!(
+        out,
+        "- Avoid converting inside hot loops; convert once at boundaries when using bridge crates."
+    )
+    .unwrap();
+    writeln!(
+        out,
+        "- Treat target playbooks as reading suggestions, not migration decisions."
+    )
+    .unwrap();
     writeln!(out).unwrap();
     writeln!(out, "## Next steps").unwrap();
     writeln!(out).unwrap();
     writeln!(out, "1. Review the detected usage manually.").unwrap();
     writeln!(out, "2. Read the suggested playbook sections.").unwrap();
     writeln!(out, "3. Profile real workloads before moving any hot path.").unwrap();
-    writeln!(out, "4. Keep `matten` where small, readable glue is still enough.").unwrap();
+    writeln!(
+        out,
+        "4. Keep `matten` where small, readable glue is still enough."
+    )
+    .unwrap();
     if !analysis.warnings.is_empty() {
         writeln!(out).unwrap();
         writeln!(out, "## Scan warnings").unwrap();
@@ -1160,15 +1304,33 @@ fn render_suggest(analysis: &Analysis, target: Target) -> String {
     writeln!(out).unwrap();
     writeln!(out, "## Risks").unwrap();
     writeln!(out).unwrap();
-    writeln!(out, "- Treat this as a reading aid for the `{}` playbook, not a migration decision.", target.display()).unwrap();
+    writeln!(
+        out,
+        "- Treat this as a reading aid for the `{}` playbook, not a migration decision.",
+        target.display()
+    )
+    .unwrap();
     writeln!(out, "- Heuristic detection can miss usage or report source-like text; verify every finding manually.").unwrap();
-    writeln!(out, "- Profile before moving hot paths or adding bridge conversions.").unwrap();
+    writeln!(
+        out,
+        "- Profile before moving hot paths or adding bridge conversions."
+    )
+    .unwrap();
     writeln!(out).unwrap();
     writeln!(out, "## Next steps").unwrap();
     writeln!(out).unwrap();
     writeln!(out, "1. Review the local evidence manually.").unwrap();
-    writeln!(out, "2. Read the `{}` playbook if the notes match real requirements.", target.display()).unwrap();
-    writeln!(out, "3. Keep `matten` where small, readable glue is enough.").unwrap();
+    writeln!(
+        out,
+        "2. Read the `{}` playbook if the notes match real requirements.",
+        target.display()
+    )
+    .unwrap();
+    writeln!(
+        out,
+        "3. Keep `matten` where small, readable glue is enough."
+    )
+    .unwrap();
     out
 }
 
@@ -1339,7 +1501,8 @@ fn write_unavailable_bridge_notes(out: &mut String, analysis: &Analysis) {
         writeln!(out, "- `nalgebra`: no approved matten bridge exists today; read the playbook for manual conversion or redesign.").unwrap();
         wrote = true;
     }
-    if direct_target_signal_contains(analysis, "Polars") || has_signal(analysis, "dataframe pressure")
+    if direct_target_signal_contains(analysis, "Polars")
+        || has_signal(analysis, "dataframe pressure")
     {
         writeln!(out, "- `Polars / Pandas`: no approved bridge crate exists today; enter dataframe tooling at the data-source or table boundary.").unwrap();
         wrote = true;
@@ -1423,7 +1586,11 @@ fn write_target_fit_notes(out: &mut String, analysis: &Analysis, target: Target)
             {
                 writeln!(out, "- `ndarray` may be relevant when dense N-D operations become measured hot paths.").unwrap();
             } else {
-                writeln!(out, "- No strong local `ndarray` pressure was detected by this scan.").unwrap();
+                writeln!(
+                    out,
+                    "- No strong local `ndarray` pressure was detected by this scan."
+                )
+                .unwrap();
             }
             writeln!(out, "- If bridge evidence appears, review copy boundaries and the `f64` conversion contract.").unwrap();
         }
@@ -1431,9 +1598,17 @@ fn write_target_fit_notes(out: &mut String, analysis: &Analysis, target: Target)
             if has_signal(analysis, "linear algebra") {
                 writeln!(out, "- `nalgebra` may be relevant for dense matrix/vector redesigns and solver needs.").unwrap();
             } else {
-                writeln!(out, "- No strong local `nalgebra` pressure was detected by this scan.").unwrap();
+                writeln!(
+                    out,
+                    "- No strong local `nalgebra` pressure was detected by this scan."
+                )
+                .unwrap();
             }
-            writeln!(out, "- Manual review should decide whether fixed or dynamic dimensions matter.").unwrap();
+            writeln!(
+                out,
+                "- Manual review should decide whether fixed or dynamic dimensions matter."
+            )
+            .unwrap();
         }
         Target::PolarsPandas => {
             if has_signal(analysis, "matten-data") && has_signal(analysis, "dataframe pressure") {
@@ -1441,13 +1616,25 @@ fn write_target_fit_notes(out: &mut String, analysis: &Analysis, target: Target)
             } else if has_signal(analysis, "matten-data") {
                 writeln!(out, "- `matten-data` appears, but dataframe pressure was not detected; do not treat ingestion alone as a Polars / Pandas reason.").unwrap();
             } else {
-                writeln!(out, "- No strong local Polars / Pandas pressure was detected by this scan.").unwrap();
+                writeln!(
+                    out,
+                    "- No strong local Polars / Pandas pressure was detected by this scan."
+                )
+                .unwrap();
             }
-            writeln!(out, "- Manual review should decide whether table work belongs outside `matten-data`.").unwrap();
+            writeln!(
+                out,
+                "- Manual review should decide whether table work belongs outside `matten-data`."
+            )
+            .unwrap();
         }
         Target::Candle => {
             writeln!(out, "- No strong local `Candle` evidence is detected in this slice unless explicit training, device, or model terms are added by a reviewed scanner refinement.").unwrap();
-            writeln!(out, "- Do not treat a single `matmul` or `dot` occurrence as ML pressure.").unwrap();
+            writeln!(
+                out,
+                "- Do not treat a single `matmul` or `dot` occurrence as ML pressure."
+            )
+            .unwrap();
         }
         Target::Numpy => {
             writeln!(out, "- No strong local `NumPy` evidence is detected unless the project explicitly shows a Python ecosystem handoff.").unwrap();
@@ -1462,7 +1649,11 @@ fn write_target_fit_notes(out: &mut String, analysis: &Analysis, target: Target)
             } else {
                 writeln!(out, "- Staying with `matten` can still be valid if the work remains small, readable, and not a measured hot path.").unwrap();
             }
-            writeln!(out, "- Dynamic ingestion can remain useful as cleanup before numeric conversion.").unwrap();
+            writeln!(
+                out,
+                "- Dynamic ingestion can remain useful as cleanup before numeric conversion."
+            )
+            .unwrap();
         }
     }
 }
@@ -1556,7 +1747,9 @@ fn has_signal(analysis: &Analysis, category: &str) -> bool {
 fn suggestions(analysis: &Analysis) -> Vec<&'static str> {
     let mut out = Vec::new();
     if has_signal(analysis, "matten-ndarray bridge") {
-        out.push("ndarray: read the bridge playbook; current code already mentions `matten-ndarray`.");
+        out.push(
+            "ndarray: read the bridge playbook; current code already mentions `matten-ndarray`.",
+        );
     } else if has_signal(analysis, "shape operations") || has_signal(analysis, "reductions") {
         out.push("ndarray: consider reading this playbook if dense N-D operations become a measured hot path.");
     }
@@ -1570,14 +1763,20 @@ fn suggestions(analysis: &Analysis) -> Vec<&'static str> {
         out.push("stay with matten: dynamic ingestion may still be appropriate for explicit cleanup before numeric conversion.");
     }
     if out.is_empty() {
-        out.push("stay with matten: no strong migration pressure was detected by this heuristic scan.");
+        out.push(
+            "stay with matten: no strong migration pressure was detected by this heuristic scan.",
+        );
     }
     out
 }
 
 fn write_direct_candidates(out: &mut String, analysis: &Analysis) {
     if has_signal(analysis, "matten-ndarray bridge") {
-        writeln!(out, "- Existing `to_arrayd` / `from_arrayd` mentions are direct bridge candidates.").unwrap();
+        writeln!(
+            out,
+            "- Existing `to_arrayd` / `from_arrayd` mentions are direct bridge candidates."
+        )
+        .unwrap();
     }
     if has_signal(analysis, "linear algebra") {
         writeln!(out, "- `matmul` / `dot` / core-lite linalg mentions may map to ndarray or nalgebra after manual review.").unwrap();
@@ -1607,10 +1806,18 @@ fn write_manual_redesign(out: &mut String, analysis: &Analysis) {
 
 fn write_bridge_tools(out: &mut String, analysis: &Analysis) {
     if has_signal(analysis, "matten-ndarray bridge") {
-        writeln!(out, "- `matten-ndarray`: use `to_arrayd` / `from_arrayd`; copies both ways and stays `f64`.").unwrap();
+        writeln!(
+            out,
+            "- `matten-ndarray`: use `to_arrayd` / `from_arrayd`; copies both ways and stays `f64`."
+        )
+        .unwrap();
     }
     if has_signal(analysis, "matten-data") {
-        writeln!(out, "- `matten-data`: keep as a small CSV/table-to-Tensor on-ramp, not a dataframe engine.").unwrap();
+        writeln!(
+            out,
+            "- `matten-data`: keep as a small CSV/table-to-Tensor on-ramp, not a dataframe engine."
+        )
+        .unwrap();
     }
     if !has_signal(analysis, "matten-ndarray bridge") && !has_signal(analysis, "matten-data") {
         writeln!(out, "- none detected").unwrap();
@@ -1725,9 +1932,11 @@ signals:
         let analysis = analyze_path(&fixture("data-project")).unwrap();
         assert!(has_signal(&analysis, "matten-data"));
         assert!(has_signal(&analysis, "dataframe pressure"));
-        assert!(suggestions(&analysis)
-            .iter()
-            .any(|suggestion| suggestion.starts_with("Polars / Pandas")));
+        assert!(
+            suggestions(&analysis)
+                .iter()
+                .any(|suggestion| suggestion.starts_with("Polars / Pandas"))
+        );
     }
 
     #[test]
@@ -1737,9 +1946,11 @@ signals:
         assert!(!has_signal(&analysis, "dataframe pressure"));
         assert!(!has_signal(&analysis, "reductions"));
         assert!(!has_signal(&analysis, "linear algebra"));
-        assert!(!suggestions(&analysis)
-            .iter()
-            .any(|suggestion| suggestion.starts_with("Polars / Pandas")));
+        assert!(
+            !suggestions(&analysis)
+                .iter()
+                .any(|suggestion| suggestion.starts_with("Polars / Pandas"))
+        );
     }
 
     #[test]
@@ -1747,18 +1958,22 @@ signals:
         let analysis = analyze_path(&fixture("receiver-method-project")).unwrap();
         assert!(has_signal(&analysis, "reductions"));
         assert!(has_signal(&analysis, "linear algebra"));
-        assert!(analysis
-            .signals
-            .get("reductions")
-            .unwrap()
-            .iter()
-            .any(|signal| signal.starts_with("sum ")));
-        assert!(analysis
-            .signals
-            .get("linear algebra")
-            .unwrap()
-            .iter()
-            .any(|signal| signal.starts_with("dot ")));
+        assert!(
+            analysis
+                .signals
+                .get("reductions")
+                .unwrap()
+                .iter()
+                .any(|signal| signal.starts_with("sum "))
+        );
+        assert!(
+            analysis
+                .signals
+                .get("linear algebra")
+                .unwrap()
+                .iter()
+                .any(|signal| signal.starts_with("dot "))
+        );
     }
 
     #[test]
@@ -2124,11 +2339,8 @@ matten migration target playbooks
         let err = parse_args(["explain-api".to_string(), "--all".to_string()]).unwrap_err();
         assert!(err.contains("not supported"));
 
-        let err = parse_args([
-            "explain-api".to_string(),
-            "Tensor::unknown".to_string(),
-        ])
-        .unwrap_err();
+        let err =
+            parse_args(["explain-api".to_string(), "Tensor::unknown".to_string()]).unwrap_err();
         assert!(err.contains("unsupported API"));
     }
 
