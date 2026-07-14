@@ -1,6 +1,6 @@
 # RFC-068: Rich Local Visualization Artifacts
 
-**Status:** Proposed; Phase 1 local HTML educational artifact implemented for review
+**Status:** Proposed; Phase 1 local HTML educational artifact implemented; shared educational report data handoff drafted
 **Target:** v0.32.0 local visualization-artifact phase
 **Theme:** Richer visual understanding through local, deterministic report artifacts
 **Depends on:** RFC-022, RFC-049, RFC-063, RFC-064, RFC-065
@@ -341,5 +341,9 @@ This RFC is accepted when:
 1. Should HTML stdout ever be allowed, or should HTML always require `--output`?
 2. Should later HTML reports share one renderer data model, or stay independent
    fixed report functions until duplication becomes painful?
+   Current answer for the next slice: extract a private shared data model for
+   the existing educational-path Markdown and HTML reports before adding another
+   HTML report family. See
+   `rfcs/handoffs/068-shared-educational-report-model-handoff.md`.
 3. Should static SVG be the next richer artifact after HTML, or should the
    project avoid SVG until a public visualization crate is seriously considered?

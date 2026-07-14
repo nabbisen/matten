@@ -119,9 +119,12 @@ handoffs cover target suggestions, static API explanations, bridge-readiness
 checks, and lifecycle closure. These RFCs add no core dependency: migration
 support lives in docs, bridge crates, and workspace-excluded tooling.
 
-The next visualization phase is tracked by RFC-068 and its first handoff,
-[`068-local-html-educational-artifact-handoff.md`](./handoffs/068-local-html-educational-artifact-handoff.md).
-It starts with a local-only static HTML artifact for the existing
-`tools/matten-report --demo educational-path` report. Public report/viz crates,
-SVG, Vega-Lite, expression tracing, and core visualization APIs remain outside
-that first slice.
+The next visualization phase is tracked by RFC-068 and its handoffs. The first
+slice,
+[`068-local-html-educational-artifact-handoff.md`](./handoffs/068-local-html-educational-artifact-handoff.md),
+starts with a local-only static HTML artifact for the existing
+`tools/matten-report --demo educational-path` report. The next proposed slice,
+[`068-shared-educational-report-model-handoff.md`](./handoffs/068-shared-educational-report-model-handoff.md),
+extracts shared fixed educational-path report data before adding another HTML
+report family. Public report/viz crates, SVG, Vega-Lite, expression tracing, and
+core visualization APIs remain outside these slices.
