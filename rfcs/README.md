@@ -86,7 +86,7 @@ The broader documentation ownership model is recorded in
 
 | ID | Title | Target |
 |---:|---|---|
-| N/A | N/A | No active proposed RFCs |
+| 068 | [Rich Local Visualization Artifacts](./proposed/068-rich-local-visualization-artifacts.md) | v0.32.0 local visualization-artifact phase |
 
 Implementation handoffs for the v0.20+ proposed set (RFC-033–042), the examples
 program (RFC-043–048), and the benchmarking program (RFC-049) live in
@@ -118,3 +118,10 @@ record the reviewed reopening and first local advisory tool slice. Later RFC-054
 handoffs cover target suggestions, static API explanations, bridge-readiness
 checks, and lifecycle closure. These RFCs add no core dependency: migration
 support lives in docs, bridge crates, and workspace-excluded tooling.
+
+The next visualization phase is tracked by RFC-068 and its first handoff,
+[`068-local-html-educational-artifact-handoff.md`](./handoffs/068-local-html-educational-artifact-handoff.md).
+It starts with a local-only static HTML artifact for the existing
+`tools/matten-report --demo educational-path` report. Public report/viz crates,
+SVG, Vega-Lite, expression tracing, and core visualization APIs remain outside
+that first slice.
