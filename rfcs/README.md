@@ -126,5 +126,8 @@ starts with a local-only static HTML artifact for the existing
 `tools/matten-report --demo educational-path` report. The next proposed slice,
 [`068-shared-educational-report-model-handoff.md`](./handoffs/068-shared-educational-report-model-handoff.md),
 extracts shared fixed educational-path report data before adding another HTML
-report family. Public report/viz crates, SVG, Vega-Lite, expression tracing, and
-core visualization APIs remain outside these slices.
+report family. The following proposed feature slice,
+[`068-shape-flow-html-artifact-handoff.md`](./handoffs/068-shape-flow-html-artifact-handoff.md),
+extends the same local static HTML pattern to `tools/matten-report --demo
+shape-flow` only. Public report/viz crates, SVG, Vega-Lite, expression tracing,
+and core visualization APIs remain outside these slices.

@@ -41,6 +41,7 @@ working documents for the implementation team and may be revised as work proceed
 | `065-phase-3-educational-path-report-handoff.md` | RFC-065 Educational Visualization and Tensor Learning Path — Phase 3 local educational-path report slice |
 | `068-local-html-educational-artifact-handoff.md` | RFC-068 Rich Local Visualization Artifacts — first local HTML educational artifact slice |
 | `068-shared-educational-report-model-handoff.md` | RFC-068 Rich Local Visualization Artifacts — shared educational-path report data refactor slice |
+| `068-shape-flow-html-artifact-handoff.md` | RFC-068 Rich Local Visualization Artifacts — shape-flow local HTML artifact slice |
 
 ## Documentation-governance handoffs
 
