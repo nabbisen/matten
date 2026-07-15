@@ -61,7 +61,7 @@ the lean core. Enabling `dynamic` does not rename or remove any numeric Tensor A
 
 The published crates are released as one lock-step family (RFC-030): matching
 crate versions are the supported, documented set. Downstream examples therefore
-show explicit matched pins such as `matten = "0.32.0"` plus a companion at the
+show explicit matched pins such as `matten = "0.33.0"` plus a companion at the
 same release.
 
 Inside the workspace, companion crates inherit the core dependency from
@@ -201,13 +201,14 @@ release RFC with candidate-labeled companions. This release does not authorize v
 preparation and does not change public API, published crate dependency graphs, runtime behavior,
 MSRV, feature flags, maturity labels, or companion scope.
 
-The **v0.32 release family** adds RFC-068 rich local visualization artifacts:
-`tools/matten-report` can write static self-contained HTML files for the existing
-`educational-path` and `shape-flow` demos. Markdown/plain text remains the
-default report output, HTML still requires explicit `--output`, and the generated
-artifacts remain local files rather than checked-in assets. This release does not
-change public API, published crate dependency graphs, runtime behavior, MSRV,
-feature flags, maturity labels, or companion scope. Public `matten-report` /
-`matten-viz` crates, core visualization APIs, expression tracing, autograd, SVG,
-Vega-Lite, JSON report output, notebook, GUI, and browser-app scope remain
-deferred.
+The **v0.33 release family** continues RFC-068 rich local visualization
+artifacts: `tools/matten-report` can write static self-contained HTML files for
+the existing `dynamic-readiness` demo, in addition to the `educational-path` and
+`shape-flow` HTML artifacts from v0.32. Markdown/plain text remains the default
+report output, HTML still requires explicit `--output`, and the generated
+artifacts remain local files rather than checked-in assets. This release does
+not change public API, published crate dependency graphs, runtime behavior,
+MSRV, feature flags, maturity labels, or companion scope. Public
+`matten-report` / `matten-viz` crates, core visualization APIs, expression
+tracing, autograd, SVG, Vega-Lite, JSON report output, notebook, GUI, and
+browser-app scope remain deferred.

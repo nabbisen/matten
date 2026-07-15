@@ -81,7 +81,7 @@ The broader documentation ownership model is recorded in
 | 065 | [Educational Visualization and Tensor Learning Path](./done/065-educational-visualization-and-tensor-learning-path.md) | 0.30.0 (educational positioning, learner docs path, local `educational-path` report; public report/viz crates deferred) |
 | 066 | [v1.0 Readiness Audit and Release Decision Gate](./done/066-v1-readiness-audit-and-release-decision-gate.md) | 0.31.0 (readiness audit and release-decision gate; no v1.0 release authorization) |
 | 067 | [v1.0 Family Maturity Policy](./done/067-v1-family-maturity-policy.md) | repository policy; resolves RFC-066 MD-1 without v1.0 release authorization |
-| 068 | [Rich Local Visualization Artifacts](./done/068-rich-local-visualization-artifacts.md) | 0.32.0 (local HTML artifacts for educational-path and shape-flow; public report/viz crates deferred) |
+| 068 | [Rich Local Visualization Artifacts](./done/068-rich-local-visualization-artifacts.md) | 0.32.0 (educational-path and shape-flow HTML); 0.33.0 (dynamic-readiness HTML; public report/viz crates deferred) |
 
 ## Proposed
 

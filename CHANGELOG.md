@@ -18,6 +18,48 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.33.0] - 2026-07-15
+
+RFC-068 rich local visualization continuation release. This release stops the
+current visualization feature work after adding one more local static HTML
+artifact for dynamic-readiness data meaning. Markdown/plain text remains the
+default. No public API, published crate dependency graph, core default feature,
+runtime behavior, MSRV, or maturity-label change.
+
+### Added
+
+- `tools/matten-report --demo dynamic-readiness --format html --output <path>`,
+  a local-only static HTML artifact for dynamic values, missing-value masks,
+  strict numeric readiness, strict conversion failure, and explicit policy
+  conversion.
+- Exact HTML snapshot and safety coverage for the dynamic-readiness local report.
+
+### Changed
+
+- Dynamic-readiness report rendering now uses a private shared fixed-data model
+  consumed by both Markdown and HTML output while preserving the Markdown output.
+- The local HTML policy now accepts `educational-path`, `shape-flow`, and
+  `dynamic-readiness`; HTML remains rejected for `data-readiness`,
+  `mlprep-standardization`, and input-mode reports.
+- Current-family documentation and install snippets retargeted from `0.32.0` to
+  `0.33.0`.
+
+### Version
+
+- Release bump `0.32.0` -> `0.33.0`. Lock-step family versioning still applies to
+  all workspace crates; `tools/matten-report` and `tools/matten-migrate` remain
+  local unpublished tools at their own tool versions.
+
+### Threat model
+
+Local-tool, docs, RFC, roadmap, and release-metadata updates only. No tag or
+publish is performed by this prep. No public API change, published dependency
+change, core default feature change, parser behavior change, runtime behavior
+change, MSRV change, maturity-label change, companion promotion, automatic
+project mutation, network, telemetry, generated checked-in artifact, JavaScript,
+external asset, SVG, Vega-Lite, JSON report format, plotting, notebook, GUI,
+browser app, expression tracing, autograd, or public tooling crate change.
+
 ## [0.32.0] - 2026-07-15
 
 RFC-068 rich local visualization-artifact release. This release makes the local
