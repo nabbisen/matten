@@ -42,6 +42,7 @@ working documents for the implementation team and may be revised as work proceed
 | `068-local-html-educational-artifact-handoff.md` | RFC-068 Rich Local Visualization Artifacts — first local HTML educational artifact slice |
 | `068-shared-educational-report-model-handoff.md` | RFC-068 Rich Local Visualization Artifacts — shared educational-path report data refactor slice |
 | `068-shape-flow-html-artifact-handoff.md` | RFC-068 Rich Local Visualization Artifacts — shape-flow local HTML artifact slice |
+| `068-post-032-visualization-continuation-audit.md` | RFC-068 post-0.32 visualization continuation audit and next-slice recommendation |
 
 ## Documentation-governance handoffs
 

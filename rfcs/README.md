@@ -130,3 +130,10 @@ report family. The latest implementation-review slice,
 extends the same local static HTML pattern to `tools/matten-report --demo
 shape-flow` only. Public report/viz crates, SVG, Vega-Lite, expression tracing,
 and core visualization APIs remain outside these slices.
+
+The post-0.32 continuation audit
+([`068-post-032-visualization-continuation-audit.md`](./handoffs/068-post-032-visualization-continuation-audit.md))
+records that RFC-068 is not ready for direct public visualization APIs or
+published report/viz crates. It recommends a reviewed follow-up handoff for one
+more local static HTML artifact, starting with `tools/matten-report --demo
+dynamic-readiness`.
