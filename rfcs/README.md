@@ -153,6 +153,7 @@ records that the next recommended local-only artifact candidate is
 report/viz crates or core visualization APIs. The mlprep-standardization local
 HTML handoff
 ([`068-mlprep-standardization-html-artifact-handoff.md`](./handoffs/068-mlprep-standardization-html-artifact-handoff.md))
-translates that recommendation into a reviewable implementation boundary and
-keeps `data-readiness`, input-mode HTML, public report/viz crates, SVG,
-Vega-Lite, and expression tracing out of scope.
+translates that recommendation into a reviewable implementation boundary. Its
+implementation-review slice extends local static HTML to `tools/matten-report
+--demo mlprep-standardization` only and keeps `data-readiness`, input-mode HTML,
+public report/viz crates, SVG, Vega-Lite, and expression tracing out of scope.

@@ -225,12 +225,15 @@ fn validate_format_policy(config: &Config) -> Result<(), String> {
 fn supports_html_demo(label: &str) -> bool {
     matches!(
         label,
-        KIND_EDUCATIONAL_PATH | KIND_SHAPE_FLOW | KIND_DYNAMIC_READINESS
+        KIND_EDUCATIONAL_PATH
+            | KIND_SHAPE_FLOW
+            | KIND_DYNAMIC_READINESS
+            | KIND_MLPREP_STANDARDIZATION
     )
 }
 
 fn supported_html_demos() -> &'static str {
-    "\"educational-path\", \"shape-flow\", or \"dynamic-readiness\""
+    "\"educational-path\", \"shape-flow\", \"dynamic-readiness\", or \"mlprep-standardization\""
 }
 
 fn require_kind_or_demo_label(label: &str, kind: Option<&str>) -> Result<(), String> {
@@ -269,6 +272,9 @@ fn render_report(config: &Config) -> Result<String, Box<dyn Error>> {
             Input::Demo { label } if label == KIND_SHAPE_FLOW => render_shape_flow_html_report(),
             Input::Demo { label } if label == KIND_DYNAMIC_READINESS => {
                 render_dynamic_readiness_html_report()
+            }
+            Input::Demo { label } if label == KIND_MLPREP_STANDARDIZATION => {
+                render_mlprep_standardization_html_report()
             }
             Input::Demo { label } => Err(format!(
                 "--format html is only supported for --demo {}; got {label:?}",
@@ -1018,7 +1024,18 @@ fn render_dynamic_readiness_html_report() -> Result<String, Box<dyn Error>> {
     Ok(report)
 }
 
-fn render_mlprep_standardization_report() -> Result<String, Box<dyn Error>> {
+struct MlprepStandardizationReportData {
+    input_shape: Vec<usize>,
+    input_values: Vec<f64>,
+    before_mean: Vec<f64>,
+    before_std: Vec<f64>,
+    output_shape: Vec<usize>,
+    output_values: Vec<f64>,
+    after_mean: Vec<f64>,
+    after_std: Vec<f64>,
+}
+
+fn mlprep_standardization_report_data() -> Result<MlprepStandardizationReportData, Box<dyn Error>> {
     let input = Tensor::new(vec![8.0, 80.0, 10.0, 100.0, 12.0, 120.0], &[3, 2]);
     let standardized = standardize_columns(&input).map_err(Box::<dyn Error>::from)?;
     let before_mean = input.mean_axis(0);
@@ -1026,6 +1043,20 @@ fn render_mlprep_standardization_report() -> Result<String, Box<dyn Error>> {
     let after_mean = standardized.mean_axis(0);
     let after_std = standardized.std_axis(0);
 
+    Ok(MlprepStandardizationReportData {
+        input_shape: input.shape().to_vec(),
+        input_values: input.as_slice().to_vec(),
+        before_mean: before_mean.as_slice().to_vec(),
+        before_std: before_std.as_slice().to_vec(),
+        output_shape: standardized.shape().to_vec(),
+        output_values: standardized.as_slice().to_vec(),
+        after_mean: after_mean.as_slice().to_vec(),
+        after_std: after_std.as_slice().to_vec(),
+    })
+}
+
+fn render_mlprep_standardization_report() -> Result<String, Box<dyn Error>> {
+    let data = mlprep_standardization_report_data()?;
     let mut report = String::new();
     writeln!(report, "# matten mlprep-standardization report")?;
     writeln!(report)?;
@@ -1047,40 +1078,40 @@ fn render_mlprep_standardization_report() -> Result<String, Box<dyn Error>> {
     writeln!(report)?;
 
     writeln!(report, "## Before")?;
-    writeln!(report, "shape: {:?}", input.shape())?;
+    writeln!(report, "shape: {:?}", data.input_shape)?;
     writeln!(
         report,
         "row-major values: {}",
-        format_fixed_values(input.as_slice())
+        format_fixed_values(&data.input_values)
     )?;
     writeln!(
         report,
         "column mean: {}",
-        format_fixed_values(before_mean.as_slice())
+        format_fixed_values(&data.before_mean)
     )?;
     writeln!(
         report,
         "column population std: {}",
-        format_fixed_values(before_std.as_slice())
+        format_fixed_values(&data.before_std)
     )?;
     writeln!(report)?;
 
     writeln!(report, "## After")?;
-    writeln!(report, "shape: {:?}", standardized.shape())?;
+    writeln!(report, "shape: {:?}", data.output_shape)?;
     writeln!(
         report,
         "row-major values: {}",
-        format_fixed_values(standardized.as_slice())
+        format_fixed_values(&data.output_values)
     )?;
     writeln!(
         report,
         "column mean: {}",
-        format_fixed_values(after_mean.as_slice())
+        format_fixed_values(&data.after_mean)
     )?;
     writeln!(
         report,
         "column population std: {}",
-        format_fixed_values(after_std.as_slice())
+        format_fixed_values(&data.after_std)
     )?;
     writeln!(report)?;
 
@@ -1088,11 +1119,146 @@ fn render_mlprep_standardization_report() -> Result<String, Box<dyn Error>> {
     writeln!(
         report,
         "shape flow: {:?} -> {:?}",
-        input.shape(),
-        standardized.shape()
+        data.input_shape, data.output_shape
     )?;
     writeln!(report, "rows: samples unchanged")?;
     writeln!(report, "columns: features unchanged")?;
+
+    Ok(report)
+}
+
+fn render_mlprep_standardization_html_report() -> Result<String, Box<dyn Error>> {
+    let data = mlprep_standardization_report_data()?;
+    let mut report = String::new();
+    writeln!(report, "<!doctype html>")?;
+    writeln!(report, "<html lang=\"en\">")?;
+    writeln!(report, "<head>")?;
+    writeln!(report, "  <meta charset=\"utf-8\">")?;
+    writeln!(
+        report,
+        "  <title>{}</title>",
+        html_escape("matten mlprep-standardization report")
+    )?;
+    writeln!(report, "  <style>")?;
+    writeln!(
+        report,
+        "    :root {{ color-scheme: light; font-family: system-ui, sans-serif; }}"
+    )?;
+    writeln!(
+        report,
+        "    body {{ margin: 2rem auto; max-width: 920px; color: #17202a; background: #ffffff; line-height: 1.5; }}"
+    )?;
+    writeln!(
+        report,
+        "    h1, h2 {{ color: #14324a; }} section {{ border-top: 1px solid #d6dde5; padding: 1rem 0; }}"
+    )?;
+    writeln!(
+        report,
+        "    table {{ width: 100%; border-collapse: collapse; margin: 0.75rem 0; }} th, td {{ border: 1px solid #d6dde5; padding: 0.45rem 0.6rem; text-align: left; vertical-align: top; }}"
+    )?;
+    writeln!(
+        report,
+        "    th {{ background: #eef4f8; }} code, .shape {{ font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }}"
+    )?;
+    writeln!(
+        report,
+        "    .note {{ background: #f6f8fa; border-left: 4px solid #5b8fb9; padding: 0.75rem 1rem; }}"
+    )?;
+    writeln!(
+        report,
+        "    .shape {{ display: inline-block; background: #eef4f8; border: 1px solid #cbd8e3; border-radius: 4px; padding: 0.1rem 0.35rem; }}"
+    )?;
+    writeln!(report, "  </style>")?;
+    writeln!(report, "</head>")?;
+    writeln!(report, "<body>")?;
+    writeln!(report, "<main>")?;
+    writeln!(
+        report,
+        "<h1>{}</h1>",
+        html_escape("matten mlprep-standardization report")
+    )?;
+    writeln!(
+        report,
+        "<p class=\"note\">{}</p>",
+        html_escape("Fixed demo report, not automatic model-quality analysis.")
+    )?;
+
+    writeln!(report, "<section>")?;
+    writeln!(report, "<h2>{}</h2>", html_escape("Input"))?;
+    write_shape_flow_table(
+        &mut report,
+        &[
+            ("demo", KIND_MLPREP_STANDARDIZATION.to_string()),
+            ("shape", format!("{:?}", data.input_shape)),
+            ("row-major values", format_fixed_values(&data.input_values)),
+        ],
+    )?;
+    writeln!(report, "</section>")?;
+
+    writeln!(report, "<section>")?;
+    writeln!(report, "<h2>{}</h2>", html_escape("Operation"))?;
+    write_shape_flow_table(
+        &mut report,
+        &[
+            ("operation", "standardize_columns(input)".to_string()),
+            (
+                "meaning",
+                "each column is centered to mean 0 and population standard deviation 1".to_string(),
+            ),
+        ],
+    )?;
+    writeln!(report, "</section>")?;
+
+    writeln!(report, "<section>")?;
+    writeln!(report, "<h2>{}</h2>", html_escape("Before"))?;
+    write_shape_flow_table(
+        &mut report,
+        &[
+            ("shape", format!("{:?}", data.input_shape)),
+            ("row-major values", format_fixed_values(&data.input_values)),
+            ("column mean", format_fixed_values(&data.before_mean)),
+            (
+                "column population std",
+                format_fixed_values(&data.before_std),
+            ),
+        ],
+    )?;
+    writeln!(report, "</section>")?;
+
+    writeln!(report, "<section>")?;
+    writeln!(report, "<h2>{}</h2>", html_escape("After"))?;
+    write_shape_flow_table(
+        &mut report,
+        &[
+            ("shape", format!("{:?}", data.output_shape)),
+            ("row-major values", format_fixed_values(&data.output_values)),
+            ("column mean", format_fixed_values(&data.after_mean)),
+            (
+                "column population std",
+                format_fixed_values(&data.after_std),
+            ),
+        ],
+    )?;
+    writeln!(report, "</section>")?;
+
+    writeln!(report, "<section>")?;
+    writeln!(report, "<h2>{}</h2>", html_escape("Shape meaning"))?;
+    write_shape_flow_table(
+        &mut report,
+        &[
+            (
+                "shape flow",
+                format!("{:?} -> {:?}", data.input_shape, data.output_shape),
+            ),
+            ("rows", "samples unchanged".to_string()),
+            ("columns", "features unchanged".to_string()),
+        ],
+    )?;
+    writeln!(report, "</section>")?;
+
+    writeln!(report, "</main>")?;
+    writeln!(report, "</body>")?;
+    writeln!(report, "</html>")?;
 
     Ok(report)
 }
@@ -1769,12 +1935,13 @@ Usage:
   matten-report --demo dynamic-readiness [--output <report.md>]
   matten-report --demo dynamic-readiness --format html --output <report.html>
   matten-report --demo mlprep-standardization [--output <report.md>]
+  matten-report --demo mlprep-standardization --format html --output <report.html>
   matten-report --demo educational-path [--format markdown] [--output <report.md>]
   matten-report --demo educational-path --format html --output <report.html>
   matten-report --input <csv-path> --kind data-readiness --select <col1,col2> [--output <report.md>]
 
 Demo reports are fixed examples. Input mode supports only data-readiness.
-Markdown is the default format. HTML is local file output for educational-path, shape-flow, and dynamic-readiness only."
+Markdown is the default format. HTML is local file output for educational-path, shape-flow, dynamic-readiness, and mlprep-standardization only."
         .to_string()
 }
 
@@ -2039,8 +2206,21 @@ mod tests {
     }
 
     #[test]
-    fn html_format_is_limited_to_accepted_html_demos() {
+    fn mlprep_standardization_html_requires_output() {
         let err = parse_args(args(&[
+            "--demo",
+            "mlprep-standardization",
+            "--format",
+            "html",
+        ]))
+        .unwrap_err();
+
+        assert!(err.contains("--format html requires --output <report.html>"));
+    }
+
+    #[test]
+    fn mlprep_standardization_html_allows_explicit_output() {
+        let action = parse_args(args(&[
             "--demo",
             "mlprep-standardization",
             "--format",
@@ -2048,10 +2228,38 @@ mod tests {
             "--output",
             "target/matten-report-mlprep-standardization.html",
         ]))
+        .expect("mlprep-standardization HTML with output should parse");
+
+        let Action::Run(config) = action else {
+            panic!("expected run action");
+        };
+        assert!(matches!(
+            config.input,
+            Input::Demo { ref label } if label == "mlprep-standardization"
+        ));
+        assert_eq!(config.format, OutputFormat::Html);
+        assert_eq!(
+            config.output,
+            Some(PathBuf::from(
+                "target/matten-report-mlprep-standardization.html"
+            ))
+        );
+    }
+
+    #[test]
+    fn html_format_is_limited_to_accepted_html_demos() {
+        let err = parse_args(args(&[
+            "--demo",
+            "data-readiness",
+            "--format",
+            "html",
+            "--output",
+            "target/matten-report-data-readiness.html",
+        ]))
         .unwrap_err();
 
         assert!(err.contains(
-            "--format html is only supported for --demo \"educational-path\", \"shape-flow\", or \"dynamic-readiness\"; got \"mlprep-standardization\""
+            "--format html is only supported for --demo \"educational-path\", \"shape-flow\", \"dynamic-readiness\", or \"mlprep-standardization\"; got \"data-readiness\""
         ));
     }
 
@@ -2072,7 +2280,7 @@ mod tests {
         .unwrap_err();
 
         assert!(err.contains(
-            "--format html is only supported for --demo \"educational-path\", \"shape-flow\", or \"dynamic-readiness\""
+            "--format html is only supported for --demo \"educational-path\", \"shape-flow\", \"dynamic-readiness\", or \"mlprep-standardization\""
         ));
     }
 
@@ -2520,6 +2728,124 @@ rows: samples unchanged
 columns: features unchanged
 "
         );
+    }
+
+    #[test]
+    fn mlprep_standardization_html_report_matches_expected_html() {
+        let report = render_mlprep_standardization_html_report()
+            .expect("mlprep-standardization HTML should render");
+
+        assert_eq!(
+            report,
+            "\
+<!doctype html>
+<html lang=\"en\">
+<head>
+  <meta charset=\"utf-8\">
+  <title>matten mlprep-standardization report</title>
+  <style>
+    :root { color-scheme: light; font-family: system-ui, sans-serif; }
+    body { margin: 2rem auto; max-width: 920px; color: #17202a; background: #ffffff; line-height: 1.5; }
+    h1, h2 { color: #14324a; } section { border-top: 1px solid #d6dde5; padding: 1rem 0; }
+    table { width: 100%; border-collapse: collapse; margin: 0.75rem 0; } th, td { border: 1px solid #d6dde5; padding: 0.45rem 0.6rem; text-align: left; vertical-align: top; }
+    th { background: #eef4f8; } code, .shape { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .note { background: #f6f8fa; border-left: 4px solid #5b8fb9; padding: 0.75rem 1rem; }
+    .shape { display: inline-block; background: #eef4f8; border: 1px solid #cbd8e3; border-radius: 4px; padding: 0.1rem 0.35rem; }
+  </style>
+</head>
+<body>
+<main>
+<h1>matten mlprep-standardization report</h1>
+<p class=\"note\">Fixed demo report, not automatic model-quality analysis.</p>
+<section>
+<h2>Input</h2>
+<table>
+<thead><tr><th>item</th><th>shape / value</th></tr></thead>
+<tbody>
+<tr><td>demo</td><td><span class=\"shape\">mlprep-standardization</span></td></tr>
+<tr><td>shape</td><td><span class=\"shape\">[3, 2]</span></td></tr>
+<tr><td>row-major values</td><td><span class=\"shape\">[8.000, 80.000, 10.000, 100.000, 12.000, 120.000]</span></td></tr>
+</tbody>
+</table>
+</section>
+<section>
+<h2>Operation</h2>
+<table>
+<thead><tr><th>item</th><th>shape / value</th></tr></thead>
+<tbody>
+<tr><td>operation</td><td><span class=\"shape\">standardize_columns(input)</span></td></tr>
+<tr><td>meaning</td><td><span class=\"shape\">each column is centered to mean 0 and population standard deviation 1</span></td></tr>
+</tbody>
+</table>
+</section>
+<section>
+<h2>Before</h2>
+<table>
+<thead><tr><th>item</th><th>shape / value</th></tr></thead>
+<tbody>
+<tr><td>shape</td><td><span class=\"shape\">[3, 2]</span></td></tr>
+<tr><td>row-major values</td><td><span class=\"shape\">[8.000, 80.000, 10.000, 100.000, 12.000, 120.000]</span></td></tr>
+<tr><td>column mean</td><td><span class=\"shape\">[10.000, 100.000]</span></td></tr>
+<tr><td>column population std</td><td><span class=\"shape\">[1.633, 16.330]</span></td></tr>
+</tbody>
+</table>
+</section>
+<section>
+<h2>After</h2>
+<table>
+<thead><tr><th>item</th><th>shape / value</th></tr></thead>
+<tbody>
+<tr><td>shape</td><td><span class=\"shape\">[3, 2]</span></td></tr>
+<tr><td>row-major values</td><td><span class=\"shape\">[-1.225, -1.225, 0.000, 0.000, 1.225, 1.225]</span></td></tr>
+<tr><td>column mean</td><td><span class=\"shape\">[0.000, 0.000]</span></td></tr>
+<tr><td>column population std</td><td><span class=\"shape\">[1.000, 1.000]</span></td></tr>
+</tbody>
+</table>
+</section>
+<section>
+<h2>Shape meaning</h2>
+<table>
+<thead><tr><th>item</th><th>shape / value</th></tr></thead>
+<tbody>
+<tr><td>shape flow</td><td><span class=\"shape\">[3, 2] -&gt; [3, 2]</span></td></tr>
+<tr><td>rows</td><td><span class=\"shape\">samples unchanged</span></td></tr>
+<tr><td>columns</td><td><span class=\"shape\">features unchanged</span></td></tr>
+</tbody>
+</table>
+</section>
+</main>
+</body>
+</html>
+"
+        );
+    }
+
+    #[test]
+    fn mlprep_standardization_html_report_is_static_and_self_contained() {
+        let report = render_mlprep_standardization_html_report()
+            .expect("mlprep-standardization HTML should render");
+
+        assert!(report.starts_with("<!doctype html>\n<html lang=\"en\">"));
+        assert!(report.contains("<title>matten mlprep-standardization report</title>"));
+        assert!(report.contains("<h1>matten mlprep-standardization report</h1>"));
+        assert!(report.contains("not automatic model-quality analysis"));
+        assert!(report.contains("<h2>Input</h2>"));
+        assert!(report.contains("<h2>Operation</h2>"));
+        assert!(report.contains("standardize_columns(input)"));
+        assert!(report.contains("<h2>Before</h2>"));
+        assert!(report.contains("[10.000, 100.000]"));
+        assert!(report.contains("[1.633, 16.330]"));
+        assert!(report.contains("<h2>After</h2>"));
+        assert!(report.contains("[-1.225, -1.225, 0.000, 0.000, 1.225, 1.225]"));
+        assert!(report.contains("[0.000, 0.000]"));
+        assert!(report.contains("[1.000, 1.000]"));
+        assert!(report.contains("<h2>Shape meaning</h2>"));
+        assert!(report.contains("[3, 2] -&gt; [3, 2]"));
+        assert!(!report.contains("<script"));
+        assert!(!report.contains(" src="));
+        assert!(!report.contains(" href="));
+        assert!(!report.contains("data:"));
+        assert!(!report.contains("<svg"));
     }
 
     #[test]

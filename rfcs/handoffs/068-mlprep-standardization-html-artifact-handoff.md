@@ -3,7 +3,7 @@
 **Project:** `matten`
 **Related RFC:** RFC-068: Rich Local Visualization Artifacts
 **Document kind:** Compact local-tool implementation handoff
-**Status:** Draft for review; does not authorize implementation until accepted
+**Status:** Implemented for review; review pending
 **Scope:** Local-only static HTML artifact for `tools/matten-report --demo mlprep-standardization`
 
 ---
@@ -227,7 +227,7 @@ cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo mlprep-standa
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo mlprep-standardization --output target/matten-report-mlprep-standardization.md
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo mlprep-standardization --format html --output target/matten-report-mlprep-standardization.html
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo data-readiness --format html --output target/matten-report-data-readiness.html
-cargo run --manifest-path tools/matten-report/Cargo.toml -- --input tools/matten-report/fixtures/small.csv --kind data-readiness --format html --output target/matten-report-input.html
+cargo run --manifest-path tools/matten-report/Cargo.toml -- --input tools/matten-report/fixtures/small.csv --kind data-readiness --select sales,cost --format html --output target/matten-report-input.html
 ```
 
 Expected failures:
@@ -235,7 +235,7 @@ Expected failures:
 ```text
 --demo mlprep-standardization --format html without --output
 --demo data-readiness --format html --output target/matten-report-data-readiness.html
---input tools/matten-report/fixtures/small.csv --kind data-readiness --format html --output target/matten-report-input.html
+--input tools/matten-report/fixtures/small.csv --kind data-readiness --select sales,cost --format html --output target/matten-report-input.html
 ```
 
 If full workspace verification is requested for release prep later, run the

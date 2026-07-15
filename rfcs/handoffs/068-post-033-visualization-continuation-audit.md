@@ -3,7 +3,7 @@
 **Project:** `matten`
 **Related RFCs:** RFC-063, RFC-065, RFC-068
 **Document kind:** Readiness audit and next-slice recommendation
-**Status:** Draft for review; does not authorize implementation
+**Status:** Reviewed GO; retained as pre-implementation decision record
 **Date:** 2026-07-15
 
 ---
@@ -47,7 +47,7 @@ Do not implement directly from this audit; require handoff review first.
 
 ---
 
-## 2. Current Repository State
+## 2. Pre-Implementation Repository State
 
 The repository records RFC-068 as implemented for:
 
@@ -56,7 +56,7 @@ The repository records RFC-068 as implemented for:
 0.33.0: dynamic-readiness HTML
 ```
 
-Current local `tools/matten-report` report families:
+At audit time, local `tools/matten-report` report families were:
 
 ```text
 data-readiness
@@ -66,7 +66,7 @@ mlprep-standardization
 educational-path
 ```
 
-Current HTML support:
+At audit time, HTML support was:
 
 ```text
 educational-path: supported

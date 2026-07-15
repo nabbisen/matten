@@ -20,8 +20,8 @@ workflows, not for dashboarding or large-data visualization.
 ## Local report tool
 
 `tools/matten-report` is a workspace-excluded, `publish = false` local tool for
-deterministic Markdown/plain-text reports. It is not a published crate and not a
-public API.
+deterministic Markdown/plain-text reports and selected local static HTML
+artifacts. It is not a published crate and not a public API.
 
 ```bash
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo data-readiness
@@ -29,6 +29,13 @@ cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo shape-flow
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo dynamic-readiness
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo mlprep-standardization
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo educational-path
+```
+
+Selected fixed demos can also write self-contained local HTML files with
+explicit `--output`:
+
+```bash
+cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo mlprep-standardization --format html --output target/matten-report-mlprep-standardization.html
 ```
 
 Input mode is currently accepted only for `data-readiness`:

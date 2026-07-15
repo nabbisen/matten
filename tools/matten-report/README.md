@@ -19,7 +19,7 @@ Scope:
 ```text
 local tool only
 Markdown/plain text output by default
-static self-contained HTML output for educational-path, shape-flow, and dynamic-readiness only
+static self-contained HTML output for educational-path, shape-flow, dynamic-readiness, and mlprep-standardization only
 explicit input/output behavior
 no public API
 no published crate
@@ -92,6 +92,15 @@ The mlprep-standardization report is a fixed demo for `standardize_columns`,
 before/after values, column means, population standard deviations, and unchanged
 shape. It is not model-quality analysis and does not accept input files.
 
+Write the mlprep-standardization report as a local static HTML artifact:
+
+```bash
+cargo run --manifest-path tools/matten-report/Cargo.toml -- \
+  --demo mlprep-standardization \
+  --format html \
+  --output target/matten-report-mlprep-standardization.html
+```
+
 Run the educational-path demo report:
 
 ```bash
@@ -112,10 +121,10 @@ cargo run --manifest-path tools/matten-report/Cargo.toml -- \
   --output target/matten-report-educational-path.html
 ```
 
-HTML output is supported only for `educational-path`, `shape-flow`, and
-`dynamic-readiness` in the current local artifact slices. It requires `--output`,
-writes a self-contained static document, and uses no JavaScript, network access,
-or external assets.
+HTML output is supported only for `educational-path`, `shape-flow`,
+`dynamic-readiness`, and `mlprep-standardization` in the current local artifact
+slices. It requires `--output`, writes a self-contained static document, and
+uses no JavaScript, network access, or external assets.
 
 Run on a CSV file:
 

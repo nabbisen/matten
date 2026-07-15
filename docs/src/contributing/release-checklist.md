@@ -71,6 +71,7 @@ cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo dynamic-readi
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo dynamic-readiness --format html --output target/matten-report-dynamic-readiness.html
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo mlprep-standardization
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo mlprep-standardization --output target/matten-report-mlprep-standardization.md
+cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo mlprep-standardization --format html --output target/matten-report-mlprep-standardization.html
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo educational-path
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo educational-path --output target/matten-report-educational-path.md
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo educational-path --format html --output target/matten-report-educational-path.html
