@@ -137,3 +137,10 @@ records that RFC-068 is not ready for direct public visualization APIs or
 published report/viz crates. It recommends a reviewed follow-up handoff for one
 more local static HTML artifact, starting with `tools/matten-report --demo
 dynamic-readiness`.
+
+The dynamic-readiness local HTML handoff
+([`068-dynamic-readiness-html-artifact-handoff.md`](./handoffs/068-dynamic-readiness-html-artifact-handoff.md))
+translates that audit into a reviewable implementation boundary. It remains
+planning-only until accepted and keeps `data-readiness`, `mlprep-standardization`,
+input-mode HTML, public report/viz crates, and core visualization APIs out of
+scope.
