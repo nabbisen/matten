@@ -44,6 +44,8 @@ working documents for the implementation team and may be revised as work proceed
 | `068-shape-flow-html-artifact-handoff.md` | RFC-068 Rich Local Visualization Artifacts — shape-flow local HTML artifact slice |
 | `068-post-032-visualization-continuation-audit.md` | RFC-068 post-0.32 visualization continuation audit and next-slice recommendation |
 | `068-dynamic-readiness-html-artifact-handoff.md` | RFC-068 Rich Local Visualization Artifacts — dynamic-readiness local HTML artifact handoff |
+| `068-post-033-visualization-continuation-audit.md` | RFC-068 post-0.33 visualization continuation audit and next-slice recommendation |
+| `068-mlprep-standardization-html-artifact-handoff.md` | RFC-068 Rich Local Visualization Artifacts — mlprep-standardization local HTML artifact handoff |
 
 ## Documentation-governance handoffs
 

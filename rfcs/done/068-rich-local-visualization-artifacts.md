@@ -350,5 +350,9 @@ This RFC is accepted when:
    Post-0.32 continuation: dynamic-readiness HTML is implemented in 0.33.0 as
    the final fixed-demo HTML artifact for the current release family. See
    `rfcs/handoffs/068-dynamic-readiness-html-artifact-handoff.md`.
+   Post-0.33 continuation planning: mlprep-standardization HTML is recommended
+   as the next fixed-demo local artifact candidate. See
+   `rfcs/handoffs/068-post-033-visualization-continuation-audit.md` and
+   `rfcs/handoffs/068-mlprep-standardization-html-artifact-handoff.md`.
 3. Should static SVG be the next richer artifact after HTML, or should the
    project avoid SVG until a public visualization crate is seriously considered?

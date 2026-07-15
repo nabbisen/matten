@@ -141,7 +141,18 @@ dynamic-readiness`, which shipped in `0.33.0`.
 The dynamic-readiness local HTML handoff
 ([`068-dynamic-readiness-html-artifact-handoff.md`](./handoffs/068-dynamic-readiness-html-artifact-handoff.md))
 translates that audit into a reviewable implementation boundary. Its
-implementation-review slice extends local static HTML to `tools/matten-report
+implementation slice extends local static HTML to `tools/matten-report
 --demo dynamic-readiness` only and keeps `data-readiness`,
 `mlprep-standardization`, input-mode HTML, public report/viz crates, and core
 visualization APIs out of scope.
+
+The post-0.33 continuation audit
+([`068-post-033-visualization-continuation-audit.md`](./handoffs/068-post-033-visualization-continuation-audit.md))
+records that the next recommended local-only artifact candidate is
+`tools/matten-report --demo mlprep-standardization`, still without public
+report/viz crates or core visualization APIs. The mlprep-standardization local
+HTML handoff
+([`068-mlprep-standardization-html-artifact-handoff.md`](./handoffs/068-mlprep-standardization-html-artifact-handoff.md))
+translates that recommendation into a reviewable implementation boundary and
+keeps `data-readiness`, input-mode HTML, public report/viz crates, SVG,
+Vega-Lite, and expression tracing out of scope.
