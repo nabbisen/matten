@@ -63,6 +63,7 @@ cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo data-readines
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --input tools/matten-report/fixtures/small.csv --kind data-readiness --select sales,cost
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo shape-flow
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo shape-flow --output target/matten-report-shape-flow.md
+cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo shape-flow --format html --output target/matten-report-shape-flow.html
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo dynamic-readiness
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo dynamic-readiness --output target/matten-report-dynamic-readiness.md
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo mlprep-standardization

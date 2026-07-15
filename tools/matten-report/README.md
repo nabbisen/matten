@@ -1,8 +1,8 @@
 # matten-report
 
 `matten-report` is a local-only, `publish = false` reporting tool for small
-Markdown/plain-text readiness summaries and one local static HTML educational
-artifact.
+Markdown/plain-text readiness summaries and local static HTML educational
+artifacts.
 
 Current supported reports:
 
@@ -19,7 +19,7 @@ Scope:
 ```text
 local tool only
 Markdown/plain text output by default
-static self-contained HTML output for educational-path only
+static self-contained HTML output for educational-path and shape-flow only
 explicit input/output behavior
 no public API
 no published crate
@@ -53,6 +53,15 @@ cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo shape-flow
 
 The shape-flow report is a fixed demo for common shape transformations. It is
 not automatic expression tracing and does not inspect source files.
+
+Write the shape-flow report as a local static HTML artifact:
+
+```bash
+cargo run --manifest-path tools/matten-report/Cargo.toml -- \
+  --demo shape-flow \
+  --format html \
+  --output target/matten-report-shape-flow.html
+```
 
 Run the dynamic-readiness demo report:
 
@@ -94,9 +103,9 @@ cargo run --manifest-path tools/matten-report/Cargo.toml -- \
   --output target/matten-report-educational-path.html
 ```
 
-HTML output is supported only for `educational-path` in this first local
-artifact slice. It requires `--output`, writes a self-contained static document,
-and uses no JavaScript, network access, or external assets.
+HTML output is supported only for `educational-path` and `shape-flow` in the
+current local artifact slices. It requires `--output`, writes a self-contained
+static document, and uses no JavaScript, network access, or external assets.
 
 Run on a CSV file:
 

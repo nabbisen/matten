@@ -123,10 +123,10 @@ The next visualization phase is tracked by RFC-068 and its handoffs. The first
 slice,
 [`068-local-html-educational-artifact-handoff.md`](./handoffs/068-local-html-educational-artifact-handoff.md),
 starts with a local-only static HTML artifact for the existing
-`tools/matten-report --demo educational-path` report. The next proposed slice,
+`tools/matten-report --demo educational-path` report. The follow-up slice,
 [`068-shared-educational-report-model-handoff.md`](./handoffs/068-shared-educational-report-model-handoff.md),
 extracts shared fixed educational-path report data before adding another HTML
-report family. The following proposed feature slice,
+report family. The latest implementation-review slice,
 [`068-shape-flow-html-artifact-handoff.md`](./handoffs/068-shape-flow-html-artifact-handoff.md),
 extends the same local static HTML pattern to `tools/matten-report --demo
 shape-flow` only. Public report/viz crates, SVG, Vega-Lite, expression tracing,

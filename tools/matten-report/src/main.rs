@@ -210,14 +210,24 @@ fn validate_format_policy(config: &Config) -> Result<(), String> {
     }
 
     match &config.input {
-        Input::Demo { label } if label == KIND_EDUCATIONAL_PATH => Ok(()),
+        Input::Demo { label } if supports_html_demo(label) => Ok(()),
         Input::Demo { label } => Err(format!(
-            "--format html is only supported for --demo {KIND_EDUCATIONAL_PATH:?}; got {label:?}"
+            "--format html is only supported for --demo {}; got {label:?}",
+            supported_html_demos()
         )),
         Input::CsvPath { .. } => Err(format!(
-            "--format html is only supported for --demo {KIND_EDUCATIONAL_PATH:?}"
+            "--format html is only supported for --demo {}",
+            supported_html_demos()
         )),
     }
+}
+
+fn supports_html_demo(label: &str) -> bool {
+    matches!(label, KIND_EDUCATIONAL_PATH | KIND_SHAPE_FLOW)
+}
+
+fn supported_html_demos() -> &'static str {
+    "\"educational-path\" or \"shape-flow\""
 }
 
 fn require_kind_or_demo_label(label: &str, kind: Option<&str>) -> Result<(), String> {
@@ -253,12 +263,15 @@ fn render_report(config: &Config) -> Result<String, Box<dyn Error>> {
             Input::Demo { label } if label == KIND_EDUCATIONAL_PATH => {
                 render_educational_path_html_report()
             }
+            Input::Demo { label } if label == KIND_SHAPE_FLOW => render_shape_flow_html_report(),
             Input::Demo { label } => Err(format!(
-                "--format html is only supported for --demo {KIND_EDUCATIONAL_PATH:?}; got {label:?}"
+                "--format html is only supported for --demo {}; got {label:?}",
+                supported_html_demos()
             )
             .into()),
             Input::CsvPath { .. } => Err(format!(
-                "--format html is only supported for --demo {KIND_EDUCATIONAL_PATH:?}"
+                "--format html is only supported for --demo {}",
+                supported_html_demos()
             )
             .into()),
         };
@@ -354,16 +367,7 @@ fn render_table_report(
 }
 
 fn render_shape_flow_report() -> Result<String, Box<dyn Error>> {
-    let a = Tensor::new(vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0], &[2, 3]);
-    let b = Tensor::new(vec![10.0, 20.0, 30.0], &[3]);
-    let broadcast = &a + &b;
-    let reshaped = a.reshape(&[3, 2]);
-    let mean_axis_0 = a.mean_axis(0);
-    let mean_axis_1 = a.mean_axis(1);
-    let left = Tensor::new(vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0], &[2, 3]);
-    let right = Tensor::new(vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0], &[3, 2]);
-    let product = left.matmul(&right);
-
+    let data = shape_flow_report_data();
     let mut report = String::new();
     writeln!(report, "# matten shape-flow report")?;
     writeln!(report)?;
@@ -377,61 +381,298 @@ fn render_shape_flow_report() -> Result<String, Box<dyn Error>> {
     writeln!(report)?;
 
     writeln!(report, "## Broadcast add")?;
-    writeln!(report, "input a: shape {:?}", a.shape())?;
-    writeln!(report, "input b: shape {:?}", b.shape())?;
-    writeln!(report, "operation: a + b")?;
+    writeln!(report, "input a: shape {:?}", data.broadcast.input_a_shape)?;
+    writeln!(report, "input b: shape {:?}", data.broadcast.input_b_shape)?;
+    writeln!(report, "operation: {}", data.broadcast.operation)?;
     writeln!(
         report,
         "shape flow: {:?} + {:?} -> {:?}",
-        a.shape(),
-        b.shape(),
-        broadcast.shape()
+        data.broadcast.input_a_shape, data.broadcast.input_b_shape, data.broadcast.result_shape
     )?;
-    writeln!(report, "result values: {:?}", broadcast.as_slice())?;
+    writeln!(report, "result values: {:?}", data.broadcast.result_values)?;
     writeln!(report)?;
 
     writeln!(report, "## Reshape")?;
-    writeln!(report, "input: shape {:?}", a.shape())?;
-    writeln!(report, "operation: reshape([3, 2])")?;
+    writeln!(report, "input: shape {:?}", data.reshape.input_shape)?;
+    writeln!(report, "operation: {}", data.reshape.operation)?;
     writeln!(
         report,
         "shape flow: {:?} -> {:?}",
-        a.shape(),
-        reshaped.shape()
+        data.reshape.input_shape, data.reshape.result_shape
     )?;
-    writeln!(report, "result values: {:?}", reshaped.as_slice())?;
+    writeln!(report, "result values: {:?}", data.reshape.result_values)?;
     writeln!(report)?;
 
     writeln!(report, "## Axis reductions")?;
-    writeln!(report, "input: shape {:?}", a.shape())?;
+    writeln!(report, "input: shape {:?}", data.axis.input_shape)?;
     writeln!(
         report,
         "mean_axis(0): {:?} -> {:?}",
-        a.shape(),
-        mean_axis_0.shape()
+        data.axis.input_shape, data.axis.mean_axis_0_shape
     )?;
-    writeln!(report, "mean_axis(0) values: {:?}", mean_axis_0.as_slice())?;
+    writeln!(
+        report,
+        "mean_axis(0) values: {:?}",
+        data.axis.mean_axis_0_values
+    )?;
     writeln!(
         report,
         "mean_axis(1): {:?} -> {:?}",
-        a.shape(),
-        mean_axis_1.shape()
+        data.axis.input_shape, data.axis.mean_axis_1_shape
     )?;
-    writeln!(report, "mean_axis(1) values: {:?}", mean_axis_1.as_slice())?;
+    writeln!(
+        report,
+        "mean_axis(1) values: {:?}",
+        data.axis.mean_axis_1_values
+    )?;
     writeln!(report)?;
 
     writeln!(report, "## Matrix multiplication")?;
-    writeln!(report, "left: shape {:?}", left.shape())?;
-    writeln!(report, "right: shape {:?}", right.shape())?;
-    writeln!(report, "operation: left.matmul(right)")?;
+    writeln!(report, "left: shape {:?}", data.matmul.left_shape)?;
+    writeln!(report, "right: shape {:?}", data.matmul.right_shape)?;
+    writeln!(report, "operation: {}", data.matmul.operation)?;
     writeln!(
         report,
         "shape flow: {:?} @ {:?} -> {:?}",
-        left.shape(),
-        right.shape(),
-        product.shape()
+        data.matmul.left_shape, data.matmul.right_shape, data.matmul.result_shape
     )?;
-    writeln!(report, "result values: {:?}", product.as_slice())?;
+    writeln!(report, "result values: {:?}", data.matmul.result_values)?;
+
+    Ok(report)
+}
+
+struct ShapeFlowReportData {
+    broadcast: ShapeFlowBroadcastData,
+    reshape: ShapeFlowReshapeData,
+    axis: ShapeFlowAxisData,
+    matmul: ShapeFlowMatmulData,
+}
+
+struct ShapeFlowBroadcastData {
+    input_a_shape: Vec<usize>,
+    input_b_shape: Vec<usize>,
+    result_shape: Vec<usize>,
+    operation: &'static str,
+    result_values: Vec<f64>,
+}
+
+struct ShapeFlowReshapeData {
+    input_shape: Vec<usize>,
+    result_shape: Vec<usize>,
+    operation: &'static str,
+    result_values: Vec<f64>,
+}
+
+struct ShapeFlowAxisData {
+    input_shape: Vec<usize>,
+    mean_axis_0_shape: Vec<usize>,
+    mean_axis_0_values: Vec<f64>,
+    mean_axis_1_shape: Vec<usize>,
+    mean_axis_1_values: Vec<f64>,
+}
+
+struct ShapeFlowMatmulData {
+    left_shape: Vec<usize>,
+    right_shape: Vec<usize>,
+    result_shape: Vec<usize>,
+    operation: &'static str,
+    result_values: Vec<f64>,
+}
+
+fn shape_flow_report_data() -> ShapeFlowReportData {
+    let a = Tensor::new(vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0], &[2, 3]);
+    let b = Tensor::new(vec![10.0, 20.0, 30.0], &[3]);
+    let broadcast = &a + &b;
+    let reshaped = a.reshape(&[3, 2]);
+    let mean_axis_0 = a.mean_axis(0);
+    let mean_axis_1 = a.mean_axis(1);
+    let left = Tensor::new(vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0], &[2, 3]);
+    let right = Tensor::new(vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0], &[3, 2]);
+    let product = left.matmul(&right);
+
+    ShapeFlowReportData {
+        broadcast: ShapeFlowBroadcastData {
+            input_a_shape: a.shape().to_vec(),
+            input_b_shape: b.shape().to_vec(),
+            result_shape: broadcast.shape().to_vec(),
+            operation: "a + b",
+            result_values: broadcast.as_slice().to_vec(),
+        },
+        reshape: ShapeFlowReshapeData {
+            input_shape: a.shape().to_vec(),
+            result_shape: reshaped.shape().to_vec(),
+            operation: "reshape([3, 2])",
+            result_values: reshaped.as_slice().to_vec(),
+        },
+        axis: ShapeFlowAxisData {
+            input_shape: a.shape().to_vec(),
+            mean_axis_0_shape: mean_axis_0.shape().to_vec(),
+            mean_axis_0_values: mean_axis_0.as_slice().to_vec(),
+            mean_axis_1_shape: mean_axis_1.shape().to_vec(),
+            mean_axis_1_values: mean_axis_1.as_slice().to_vec(),
+        },
+        matmul: ShapeFlowMatmulData {
+            left_shape: left.shape().to_vec(),
+            right_shape: right.shape().to_vec(),
+            result_shape: product.shape().to_vec(),
+            operation: "left.matmul(right)",
+            result_values: product.as_slice().to_vec(),
+        },
+    }
+}
+
+fn render_shape_flow_html_report() -> Result<String, Box<dyn Error>> {
+    let data = shape_flow_report_data();
+    let mut report = String::new();
+    writeln!(report, "<!doctype html>")?;
+    writeln!(report, "<html lang=\"en\">")?;
+    writeln!(report, "<head>")?;
+    writeln!(report, "  <meta charset=\"utf-8\">")?;
+    writeln!(
+        report,
+        "  <title>{}</title>",
+        html_escape("matten shape-flow report")
+    )?;
+    writeln!(report, "  <style>")?;
+    writeln!(
+        report,
+        "    :root {{ color-scheme: light; font-family: system-ui, sans-serif; }}"
+    )?;
+    writeln!(
+        report,
+        "    body {{ margin: 2rem auto; max-width: 920px; color: #17202a; background: #ffffff; line-height: 1.5; }}"
+    )?;
+    writeln!(
+        report,
+        "    h1, h2 {{ color: #14324a; }} section {{ border-top: 1px solid #d6dde5; padding: 1rem 0; }}"
+    )?;
+    writeln!(
+        report,
+        "    table {{ width: 100%; border-collapse: collapse; margin: 0.75rem 0; }} th, td {{ border: 1px solid #d6dde5; padding: 0.45rem 0.6rem; text-align: left; vertical-align: top; }}"
+    )?;
+    writeln!(
+        report,
+        "    th {{ background: #eef4f8; }} code, .shape {{ font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }}"
+    )?;
+    writeln!(
+        report,
+        "    .note {{ background: #f6f8fa; border-left: 4px solid #5b8fb9; padding: 0.75rem 1rem; }}"
+    )?;
+    writeln!(
+        report,
+        "    .shape {{ display: inline-block; background: #eef4f8; border: 1px solid #cbd8e3; border-radius: 4px; padding: 0.1rem 0.35rem; }}"
+    )?;
+    writeln!(report, "  </style>")?;
+    writeln!(report, "</head>")?;
+    writeln!(report, "<body>")?;
+    writeln!(report, "<main>")?;
+    writeln!(
+        report,
+        "<h1>{}</h1>",
+        html_escape("matten shape-flow report")
+    )?;
+    writeln!(
+        report,
+        "<p class=\"note\">{}</p>",
+        html_escape("Fixed demo report, not automatic expression tracing.")
+    )?;
+
+    writeln!(report, "<section>")?;
+    writeln!(report, "<h2>{}</h2>", html_escape("Broadcast add"))?;
+    write_shape_flow_table(
+        &mut report,
+        &[
+            ("input a", format!("{:?}", data.broadcast.input_a_shape)),
+            ("input b", format!("{:?}", data.broadcast.input_b_shape)),
+            ("result", format!("{:?}", data.broadcast.result_shape)),
+        ],
+    )?;
+    writeln!(
+        report,
+        "<p>{}</p>",
+        html_escape(&format!("operation: {}", data.broadcast.operation))
+    )?;
+    write_html_pre(
+        &mut report,
+        &format!("result values: {:?}", data.broadcast.result_values),
+    )?;
+    writeln!(report, "</section>")?;
+
+    writeln!(report, "<section>")?;
+    writeln!(report, "<h2>{}</h2>", html_escape("Reshape"))?;
+    write_shape_flow_table(
+        &mut report,
+        &[
+            ("input", format!("{:?}", data.reshape.input_shape)),
+            ("result", format!("{:?}", data.reshape.result_shape)),
+        ],
+    )?;
+    writeln!(
+        report,
+        "<p>{}</p>",
+        html_escape(&format!("operation: {}", data.reshape.operation))
+    )?;
+    write_html_pre(
+        &mut report,
+        &format!("result values: {:?}", data.reshape.result_values),
+    )?;
+    writeln!(report, "</section>")?;
+
+    writeln!(report, "<section>")?;
+    writeln!(report, "<h2>{}</h2>", html_escape("Axis reductions"))?;
+    write_shape_flow_table(
+        &mut report,
+        &[
+            ("input", format!("{:?}", data.axis.input_shape)),
+            (
+                "mean_axis(0)",
+                format!(
+                    "{:?} -> {:?}",
+                    data.axis.input_shape, data.axis.mean_axis_0_shape
+                ),
+            ),
+            (
+                "mean_axis(1)",
+                format!(
+                    "{:?} -> {:?}",
+                    data.axis.input_shape, data.axis.mean_axis_1_shape
+                ),
+            ),
+        ],
+    )?;
+    write_html_pre(
+        &mut report,
+        &format!(
+            "mean_axis(0) values: {:?}\nmean_axis(1) values: {:?}",
+            data.axis.mean_axis_0_values, data.axis.mean_axis_1_values
+        ),
+    )?;
+    writeln!(report, "</section>")?;
+
+    writeln!(report, "<section>")?;
+    writeln!(report, "<h2>{}</h2>", html_escape("Matrix multiplication"))?;
+    write_shape_flow_table(
+        &mut report,
+        &[
+            ("left", format!("{:?}", data.matmul.left_shape)),
+            ("right", format!("{:?}", data.matmul.right_shape)),
+            ("result", format!("{:?}", data.matmul.result_shape)),
+        ],
+    )?;
+    writeln!(
+        report,
+        "<p>{}</p>",
+        html_escape(&format!("operation: {}", data.matmul.operation))
+    )?;
+    write_html_pre(
+        &mut report,
+        &format!("result values: {:?}", data.matmul.result_values),
+    )?;
+    writeln!(report, "</section>")?;
+
+    writeln!(report, "</main>")?;
+    writeln!(report, "</body>")?;
+    writeln!(report, "</html>")?;
 
     Ok(report)
 }
@@ -1303,6 +1544,7 @@ fn usage() -> String {
 Usage:
   matten-report --demo data-readiness [--output <report.md>]
   matten-report --demo shape-flow [--output <report.md>]
+  matten-report --demo shape-flow --format html --output <report.html>
   matten-report --demo dynamic-readiness [--output <report.md>]
   matten-report --demo mlprep-standardization [--output <report.md>]
   matten-report --demo educational-path [--format markdown] [--output <report.md>]
@@ -1310,7 +1552,7 @@ Usage:
   matten-report --input <csv-path> --kind data-readiness --select <col1,col2> [--output <report.md>]
 
 Demo reports are fixed examples. Input mode supports only data-readiness.
-Markdown is the default format. HTML is local file output for educational-path only."
+Markdown is the default format. HTML is local file output for educational-path and shape-flow only."
         .to_string()
 }
 
@@ -1508,8 +1750,15 @@ mod tests {
     }
 
     #[test]
-    fn html_format_is_limited_to_educational_path_demo() {
-        let err = parse_args(args(&[
+    fn shape_flow_html_requires_output() {
+        let err = parse_args(args(&["--demo", "shape-flow", "--format", "html"])).unwrap_err();
+
+        assert!(err.contains("--format html requires --output <report.html>"));
+    }
+
+    #[test]
+    fn shape_flow_html_allows_explicit_output() {
+        let action = parse_args(args(&[
             "--demo",
             "shape-flow",
             "--format",
@@ -1517,10 +1766,36 @@ mod tests {
             "--output",
             "target/matten-report-shape-flow.html",
         ]))
+        .expect("shape-flow HTML with output should parse");
+
+        let Action::Run(config) = action else {
+            panic!("expected run action");
+        };
+        assert!(matches!(
+            config.input,
+            Input::Demo { ref label } if label == "shape-flow"
+        ));
+        assert_eq!(config.format, OutputFormat::Html);
+        assert_eq!(
+            config.output,
+            Some(PathBuf::from("target/matten-report-shape-flow.html"))
+        );
+    }
+
+    #[test]
+    fn html_format_is_limited_to_accepted_html_demos() {
+        let err = parse_args(args(&[
+            "--demo",
+            "dynamic-readiness",
+            "--format",
+            "html",
+            "--output",
+            "target/matten-report-dynamic-readiness.html",
+        ]))
         .unwrap_err();
 
         assert!(err.contains(
-            "--format html is only supported for --demo \"educational-path\"; got \"shape-flow\""
+            "--format html is only supported for --demo \"educational-path\" or \"shape-flow\"; got \"dynamic-readiness\""
         ));
     }
 
@@ -1540,7 +1815,9 @@ mod tests {
         ]))
         .unwrap_err();
 
-        assert!(err.contains("--format html is only supported for --demo \"educational-path\""));
+        assert!(err.contains(
+            "--format html is only supported for --demo \"educational-path\" or \"shape-flow\""
+        ));
     }
 
     #[test]
@@ -1680,6 +1957,110 @@ shape flow: [2, 3] @ [3, 2] -> [2, 2]
 result values: [22.0, 28.0, 49.0, 64.0]
 "
         );
+    }
+
+    #[test]
+    fn shape_flow_html_report_matches_expected_html() {
+        let report = render_shape_flow_html_report().expect("shape-flow HTML should render");
+
+        assert_eq!(
+            report,
+            "\
+<!doctype html>
+<html lang=\"en\">
+<head>
+  <meta charset=\"utf-8\">
+  <title>matten shape-flow report</title>
+  <style>
+    :root { color-scheme: light; font-family: system-ui, sans-serif; }
+    body { margin: 2rem auto; max-width: 920px; color: #17202a; background: #ffffff; line-height: 1.5; }
+    h1, h2 { color: #14324a; } section { border-top: 1px solid #d6dde5; padding: 1rem 0; }
+    table { width: 100%; border-collapse: collapse; margin: 0.75rem 0; } th, td { border: 1px solid #d6dde5; padding: 0.45rem 0.6rem; text-align: left; vertical-align: top; }
+    th { background: #eef4f8; } code, .shape { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .note { background: #f6f8fa; border-left: 4px solid #5b8fb9; padding: 0.75rem 1rem; }
+    .shape { display: inline-block; background: #eef4f8; border: 1px solid #cbd8e3; border-radius: 4px; padding: 0.1rem 0.35rem; }
+  </style>
+</head>
+<body>
+<main>
+<h1>matten shape-flow report</h1>
+<p class=\"note\">Fixed demo report, not automatic expression tracing.</p>
+<section>
+<h2>Broadcast add</h2>
+<table>
+<thead><tr><th>item</th><th>shape / value</th></tr></thead>
+<tbody>
+<tr><td>input a</td><td><span class=\"shape\">[2, 3]</span></td></tr>
+<tr><td>input b</td><td><span class=\"shape\">[3]</span></td></tr>
+<tr><td>result</td><td><span class=\"shape\">[2, 3]</span></td></tr>
+</tbody>
+</table>
+<p>operation: a + b</p>
+<pre><code>result values: [11.0, 22.0, 33.0, 14.0, 25.0, 36.0]</code></pre>
+</section>
+<section>
+<h2>Reshape</h2>
+<table>
+<thead><tr><th>item</th><th>shape / value</th></tr></thead>
+<tbody>
+<tr><td>input</td><td><span class=\"shape\">[2, 3]</span></td></tr>
+<tr><td>result</td><td><span class=\"shape\">[3, 2]</span></td></tr>
+</tbody>
+</table>
+<p>operation: reshape([3, 2])</p>
+<pre><code>result values: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]</code></pre>
+</section>
+<section>
+<h2>Axis reductions</h2>
+<table>
+<thead><tr><th>item</th><th>shape / value</th></tr></thead>
+<tbody>
+<tr><td>input</td><td><span class=\"shape\">[2, 3]</span></td></tr>
+<tr><td>mean_axis(0)</td><td><span class=\"shape\">[2, 3] -&gt; [3]</span></td></tr>
+<tr><td>mean_axis(1)</td><td><span class=\"shape\">[2, 3] -&gt; [2]</span></td></tr>
+</tbody>
+</table>
+<pre><code>mean_axis(0) values: [2.5, 3.5, 4.5]
+mean_axis(1) values: [2.0, 5.0]</code></pre>
+</section>
+<section>
+<h2>Matrix multiplication</h2>
+<table>
+<thead><tr><th>item</th><th>shape / value</th></tr></thead>
+<tbody>
+<tr><td>left</td><td><span class=\"shape\">[2, 3]</span></td></tr>
+<tr><td>right</td><td><span class=\"shape\">[3, 2]</span></td></tr>
+<tr><td>result</td><td><span class=\"shape\">[2, 2]</span></td></tr>
+</tbody>
+</table>
+<p>operation: left.matmul(right)</p>
+<pre><code>result values: [22.0, 28.0, 49.0, 64.0]</code></pre>
+</section>
+</main>
+</body>
+</html>
+"
+        );
+    }
+
+    #[test]
+    fn shape_flow_html_report_is_static_and_self_contained() {
+        let report = render_shape_flow_html_report().expect("shape-flow HTML should render");
+
+        assert!(report.starts_with("<!doctype html>\n<html lang=\"en\">"));
+        assert!(report.contains("<title>matten shape-flow report</title>"));
+        assert!(report.contains("<h1>matten shape-flow report</h1>"));
+        assert!(report.contains("<h2>Broadcast add</h2>"));
+        assert!(report.contains("<span class=\"shape\">[2, 3]</span>"));
+        assert!(report.contains("<h2>Axis reductions</h2>"));
+        assert!(report.contains("[2, 3] -&gt; [3]"));
+        assert!(report.contains("<h2>Matrix multiplication</h2>"));
+        assert!(report.contains("result values: [22.0, 28.0, 49.0, 64.0]"));
+        assert!(!report.contains("<script"));
+        assert!(!report.contains(" src="));
+        assert!(!report.contains(" href="));
+        assert!(!report.contains("data:"));
+        assert!(!report.contains("<svg"));
     }
 
     #[test]

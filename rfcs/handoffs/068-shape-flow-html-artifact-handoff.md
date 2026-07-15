@@ -3,7 +3,7 @@
 **Project:** `matten`
 **Related RFC:** RFC-068: Rich Local Visualization Artifacts
 **Document kind:** Compact local-tool implementation handoff
-**Status:** Proposed handoff; implementation not started
+**Status:** Implemented for review; review pending
 **Scope:** Local-only static HTML artifact for `tools/matten-report --demo shape-flow`
 
 ---
