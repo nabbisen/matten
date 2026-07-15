@@ -223,11 +223,14 @@ fn validate_format_policy(config: &Config) -> Result<(), String> {
 }
 
 fn supports_html_demo(label: &str) -> bool {
-    matches!(label, KIND_EDUCATIONAL_PATH | KIND_SHAPE_FLOW)
+    matches!(
+        label,
+        KIND_EDUCATIONAL_PATH | KIND_SHAPE_FLOW | KIND_DYNAMIC_READINESS
+    )
 }
 
 fn supported_html_demos() -> &'static str {
-    "\"educational-path\" or \"shape-flow\""
+    "\"educational-path\", \"shape-flow\", or \"dynamic-readiness\""
 }
 
 fn require_kind_or_demo_label(label: &str, kind: Option<&str>) -> Result<(), String> {
@@ -264,6 +267,9 @@ fn render_report(config: &Config) -> Result<String, Box<dyn Error>> {
                 render_educational_path_html_report()
             }
             Input::Demo { label } if label == KIND_SHAPE_FLOW => render_shape_flow_html_report(),
+            Input::Demo { label } if label == KIND_DYNAMIC_READINESS => {
+                render_dynamic_readiness_html_report()
+            }
             Input::Demo { label } => Err(format!(
                 "--format html is only supported for --demo {}; got {label:?}",
                 supported_html_demos()
@@ -678,6 +684,93 @@ fn render_shape_flow_html_report() -> Result<String, Box<dyn Error>> {
 }
 
 fn render_dynamic_readiness_report() -> Result<String, Box<dyn Error>> {
+    let data = dynamic_readiness_report_data()?;
+    let mut report = String::new();
+    writeln!(report, "# matten dynamic-readiness report")?;
+    writeln!(report)?;
+
+    writeln!(report, "## Input")?;
+    writeln!(report, "demo: {KIND_DYNAMIC_READINESS}")?;
+    writeln!(
+        report,
+        "note: fixed demo report, not automatic data profiling"
+    )?;
+    writeln!(report)?;
+
+    writeln!(report, "## Dynamic values")?;
+    writeln!(report, "shape: {:?}", data.shape)?;
+    writeln!(report, "row-major values:")?;
+    for value in &data.values {
+        writeln!(
+            report,
+            "- [{}, {}] {}",
+            value.row, value.column, value.element
+        )?;
+    }
+    writeln!(report, "schema summary:")?;
+    for row in &data.schema_summary {
+        writeln!(report, "- {}: {}", row.label, row.count)?;
+    }
+    writeln!(report)?;
+
+    writeln!(report, "## Readiness masks")?;
+    writeln!(report, "none mask: {:?}", data.none_mask_values)?;
+    writeln!(
+        report,
+        "numeric mask: strict policy readiness {:?}",
+        data.numeric_mask_values
+    )?;
+    writeln!(
+        report,
+        "strict numeric-ready: {}",
+        data.strict_numeric_ready
+    )?;
+    writeln!(report)?;
+
+    writeln!(report, "## Strict conversion")?;
+    writeln!(report, "result: {}", data.strict_conversion_result)?;
+    writeln!(report)?;
+
+    writeln!(report, "## Explicit policy conversion")?;
+    writeln!(report, "policy: {}", data.explicit_policy)?;
+    writeln!(report, "converted shape: {:?}", data.converted_shape)?;
+    writeln!(
+        report,
+        "converted row-major values: {:?}",
+        data.converted_values
+    )?;
+
+    Ok(report)
+}
+
+#[derive(Debug)]
+struct DynamicReadinessReportData {
+    shape: Vec<usize>,
+    values: Vec<DynamicValueData>,
+    schema_summary: Vec<DynamicSchemaSummaryRow>,
+    none_mask_values: Vec<f64>,
+    numeric_mask_values: Vec<f64>,
+    strict_numeric_ready: bool,
+    strict_conversion_result: &'static str,
+    explicit_policy: &'static str,
+    converted_shape: Vec<usize>,
+    converted_values: Vec<f64>,
+}
+
+#[derive(Debug)]
+struct DynamicValueData {
+    row: usize,
+    column: usize,
+    element: String,
+}
+
+#[derive(Debug)]
+struct DynamicSchemaSummaryRow {
+    label: &'static str,
+    count: usize,
+}
+
+fn dynamic_readiness_report_data() -> Result<DynamicReadinessReportData, Box<dyn Error>> {
     let dynamic = Tensor::from_elements(
         vec![
             Element::Float(1.0),
@@ -695,59 +788,232 @@ fn render_dynamic_readiness_report() -> Result<String, Box<dyn Error>> {
         .try_numeric_with(NumericPolicy::default().none_as(0.0).allow_text_parse())
         .map_err(Box::<dyn Error>::from)?;
 
-    let mut report = String::new();
-    writeln!(report, "# matten dynamic-readiness report")?;
-    writeln!(report)?;
-
-    writeln!(report, "## Input")?;
-    writeln!(report, "demo: {KIND_DYNAMIC_READINESS}")?;
-    writeln!(
-        report,
-        "note: fixed demo report, not automatic data profiling"
-    )?;
-    writeln!(report)?;
-
-    writeln!(report, "## Dynamic values")?;
-    writeln!(report, "shape: {:?}", dynamic.shape())?;
-    writeln!(report, "row-major values:")?;
-    write_dynamic_values(&mut report, &dynamic)?;
-    writeln!(report, "schema summary:")?;
-    write_dynamic_schema_summary(&mut report, &dynamic)?;
-    writeln!(report)?;
-
-    writeln!(report, "## Readiness masks")?;
-    writeln!(report, "none mask: {:?}", none_mask.as_slice())?;
-    writeln!(
-        report,
-        "numeric mask: strict policy readiness {:?}",
-        numeric_mask.as_slice()
-    )?;
-    writeln!(
-        report,
-        "strict numeric-ready: {}",
-        dynamic.is_numeric_convertible()
-    )?;
-    writeln!(report)?;
-
-    writeln!(report, "## Strict conversion")?;
-    if dynamic.try_numeric().is_err() {
-        writeln!(
-            report,
-            "result: error: strict conversion rejects Text and None values"
-        )?;
-    } else {
+    if dynamic.try_numeric().is_ok() {
         return Err("strict dynamic conversion unexpectedly succeeded".into());
     }
-    writeln!(report)?;
 
-    writeln!(report, "## Explicit policy conversion")?;
-    writeln!(report, "policy: none_as(0.0) + allow_text_parse()")?;
-    writeln!(report, "converted shape: {:?}", converted.shape())?;
+    let shape = dynamic.shape().to_vec();
+    let columns = shape.get(1).copied().unwrap_or(1);
+    let values = dynamic
+        .to_elements()
+        .iter()
+        .enumerate()
+        .map(|(index, element)| DynamicValueData {
+            row: index / columns,
+            column: index % columns,
+            element: format_dynamic_element(element),
+        })
+        .collect();
+
+    Ok(DynamicReadinessReportData {
+        shape,
+        values,
+        schema_summary: dynamic_schema_summary_rows(&dynamic),
+        none_mask_values: none_mask.as_slice().to_vec(),
+        numeric_mask_values: numeric_mask.as_slice().to_vec(),
+        strict_numeric_ready: dynamic.is_numeric_convertible(),
+        strict_conversion_result: "error: strict conversion rejects Text and None values",
+        explicit_policy: "none_as(0.0) + allow_text_parse()",
+        converted_shape: converted.shape().to_vec(),
+        converted_values: converted.as_slice().to_vec(),
+    })
+}
+
+fn dynamic_schema_summary_rows(tensor: &Tensor) -> Vec<DynamicSchemaSummaryRow> {
+    let mut floats = 0;
+    let mut ints = 0;
+    let mut texts = 0;
+    let mut bools = 0;
+    let mut none = 0;
+
+    for element in tensor.to_elements() {
+        match element {
+            Element::Float(_) => floats += 1,
+            Element::Int(_) => ints += 1,
+            Element::Text(_) => texts += 1,
+            Element::Bool(_) => bools += 1,
+            Element::None => none += 1,
+        }
+    }
+
+    let mut rows = vec![
+        DynamicSchemaSummaryRow {
+            label: "Float",
+            count: floats,
+        },
+        DynamicSchemaSummaryRow {
+            label: "Int",
+            count: ints,
+        },
+        DynamicSchemaSummaryRow {
+            label: "Text",
+            count: texts,
+        },
+    ];
+    if bools > 0 {
+        rows.push(DynamicSchemaSummaryRow {
+            label: "Bool",
+            count: bools,
+        });
+    }
+    rows.push(DynamicSchemaSummaryRow {
+        label: "None",
+        count: none,
+    });
+    rows
+}
+
+fn render_dynamic_readiness_html_report() -> Result<String, Box<dyn Error>> {
+    let data = dynamic_readiness_report_data()?;
+    let mut report = String::new();
+    writeln!(report, "<!doctype html>")?;
+    writeln!(report, "<html lang=\"en\">")?;
+    writeln!(report, "<head>")?;
+    writeln!(report, "  <meta charset=\"utf-8\">")?;
     writeln!(
         report,
-        "converted row-major values: {:?}",
-        converted.as_slice()
+        "  <title>{}</title>",
+        html_escape("matten dynamic-readiness report")
     )?;
+    writeln!(report, "  <style>")?;
+    writeln!(
+        report,
+        "    :root {{ color-scheme: light; font-family: system-ui, sans-serif; }}"
+    )?;
+    writeln!(
+        report,
+        "    body {{ margin: 2rem auto; max-width: 920px; color: #17202a; background: #ffffff; line-height: 1.5; }}"
+    )?;
+    writeln!(
+        report,
+        "    h1, h2 {{ color: #14324a; }} section {{ border-top: 1px solid #d6dde5; padding: 1rem 0; }}"
+    )?;
+    writeln!(
+        report,
+        "    table {{ width: 100%; border-collapse: collapse; margin: 0.75rem 0; }} th, td {{ border: 1px solid #d6dde5; padding: 0.45rem 0.6rem; text-align: left; vertical-align: top; }}"
+    )?;
+    writeln!(
+        report,
+        "    th {{ background: #eef4f8; }} code, .shape {{ font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }}"
+    )?;
+    writeln!(
+        report,
+        "    .note {{ background: #f6f8fa; border-left: 4px solid #5b8fb9; padding: 0.75rem 1rem; }}"
+    )?;
+    writeln!(
+        report,
+        "    .shape {{ display: inline-block; background: #eef4f8; border: 1px solid #cbd8e3; border-radius: 4px; padding: 0.1rem 0.35rem; }}"
+    )?;
+    writeln!(report, "  </style>")?;
+    writeln!(report, "</head>")?;
+    writeln!(report, "<body>")?;
+    writeln!(report, "<main>")?;
+    writeln!(
+        report,
+        "<h1>{}</h1>",
+        html_escape("matten dynamic-readiness report")
+    )?;
+    writeln!(
+        report,
+        "<p class=\"note\">{}</p>",
+        html_escape("Fixed demo report, not automatic data profiling.")
+    )?;
+
+    writeln!(report, "<section>")?;
+    writeln!(report, "<h2>{}</h2>", html_escape("Dynamic values"))?;
+    write_shape_flow_table(&mut report, &[("shape", format!("{:?}", data.shape))])?;
+    writeln!(report, "<table>")?;
+    writeln!(
+        report,
+        "<thead><tr><th>{}</th><th>{}</th><th>{}</th></tr></thead>",
+        html_escape("row"),
+        html_escape("column"),
+        html_escape("value")
+    )?;
+    writeln!(report, "<tbody>")?;
+    for value in &data.values {
+        writeln!(
+            report,
+            "<tr><td>{}</td><td>{}</td><td><span class=\"shape\">{}</span></td></tr>",
+            value.row,
+            value.column,
+            html_escape(&value.element)
+        )?;
+    }
+    writeln!(report, "</tbody>")?;
+    writeln!(report, "</table>")?;
+    writeln!(report, "</section>")?;
+
+    writeln!(report, "<section>")?;
+    writeln!(report, "<h2>{}</h2>", html_escape("Schema summary"))?;
+    writeln!(report, "<table>")?;
+    writeln!(
+        report,
+        "<thead><tr><th>{}</th><th>{}</th></tr></thead>",
+        html_escape("element kind"),
+        html_escape("count")
+    )?;
+    writeln!(report, "<tbody>")?;
+    for row in &data.schema_summary {
+        writeln!(
+            report,
+            "<tr><td>{}</td><td><span class=\"shape\">{}</span></td></tr>",
+            html_escape(row.label),
+            row.count
+        )?;
+    }
+    writeln!(report, "</tbody>")?;
+    writeln!(report, "</table>")?;
+    writeln!(report, "</section>")?;
+
+    writeln!(report, "<section>")?;
+    writeln!(report, "<h2>{}</h2>", html_escape("Readiness masks"))?;
+    write_shape_flow_table(
+        &mut report,
+        &[
+            ("none mask", format!("{:?}", data.none_mask_values)),
+            (
+                "numeric mask",
+                format!("strict policy readiness {:?}", data.numeric_mask_values),
+            ),
+            (
+                "strict numeric-ready",
+                data.strict_numeric_ready.to_string(),
+            ),
+        ],
+    )?;
+    writeln!(report, "</section>")?;
+
+    writeln!(report, "<section>")?;
+    writeln!(report, "<h2>{}</h2>", html_escape("Strict conversion"))?;
+    write_shape_flow_table(
+        &mut report,
+        &[("result", data.strict_conversion_result.to_string())],
+    )?;
+    writeln!(report, "</section>")?;
+
+    writeln!(report, "<section>")?;
+    writeln!(
+        report,
+        "<h2>{}</h2>",
+        html_escape("Explicit policy conversion")
+    )?;
+    write_shape_flow_table(
+        &mut report,
+        &[
+            ("policy", data.explicit_policy.to_string()),
+            ("converted shape", format!("{:?}", data.converted_shape)),
+            (
+                "converted row-major values",
+                format!("{:?}", data.converted_values),
+            ),
+        ],
+    )?;
+    writeln!(report, "</section>")?;
+
+    writeln!(report, "</main>")?;
+    writeln!(report, "</body>")?;
+    writeln!(report, "</html>")?;
 
     Ok(report)
 }
@@ -1446,51 +1712,6 @@ fn format_fixed_value(value: f64) -> String {
     format!("{stable:.3}")
 }
 
-fn write_dynamic_values(report: &mut String, tensor: &Tensor) -> Result<(), std::fmt::Error> {
-    let shape = tensor.shape();
-    let columns = shape.get(1).copied().unwrap_or(1);
-    for (index, element) in tensor.to_elements().iter().enumerate() {
-        let row = index / columns;
-        let column = index % columns;
-        writeln!(
-            report,
-            "- [{row}, {column}] {}",
-            format_dynamic_element(element)
-        )?;
-    }
-    Ok(())
-}
-
-fn write_dynamic_schema_summary(
-    report: &mut String,
-    tensor: &Tensor,
-) -> Result<(), std::fmt::Error> {
-    let mut floats = 0;
-    let mut ints = 0;
-    let mut texts = 0;
-    let mut bools = 0;
-    let mut none = 0;
-
-    for element in tensor.to_elements() {
-        match element {
-            Element::Float(_) => floats += 1,
-            Element::Int(_) => ints += 1,
-            Element::Text(_) => texts += 1,
-            Element::Bool(_) => bools += 1,
-            Element::None => none += 1,
-        }
-    }
-
-    writeln!(report, "- Float: {floats}")?;
-    writeln!(report, "- Int: {ints}")?;
-    writeln!(report, "- Text: {texts}")?;
-    if bools > 0 {
-        writeln!(report, "- Bool: {bools}")?;
-    }
-    writeln!(report, "- None: {none}")?;
-    Ok(())
-}
-
 fn format_dynamic_element(element: &Element) -> String {
     match element {
         Element::Float(value) => format!("Float({value:?})"),
@@ -1546,13 +1767,14 @@ Usage:
   matten-report --demo shape-flow [--output <report.md>]
   matten-report --demo shape-flow --format html --output <report.html>
   matten-report --demo dynamic-readiness [--output <report.md>]
+  matten-report --demo dynamic-readiness --format html --output <report.html>
   matten-report --demo mlprep-standardization [--output <report.md>]
   matten-report --demo educational-path [--format markdown] [--output <report.md>]
   matten-report --demo educational-path --format html --output <report.html>
   matten-report --input <csv-path> --kind data-readiness --select <col1,col2> [--output <report.md>]
 
 Demo reports are fixed examples. Input mode supports only data-readiness.
-Markdown is the default format. HTML is local file output for educational-path and shape-flow only."
+Markdown is the default format. HTML is local file output for educational-path, shape-flow, and dynamic-readiness only."
         .to_string()
 }
 
@@ -1783,8 +2005,16 @@ mod tests {
     }
 
     #[test]
-    fn html_format_is_limited_to_accepted_html_demos() {
-        let err = parse_args(args(&[
+    fn dynamic_readiness_html_requires_output() {
+        let err =
+            parse_args(args(&["--demo", "dynamic-readiness", "--format", "html"])).unwrap_err();
+
+        assert!(err.contains("--format html requires --output <report.html>"));
+    }
+
+    #[test]
+    fn dynamic_readiness_html_allows_explicit_output() {
+        let action = parse_args(args(&[
             "--demo",
             "dynamic-readiness",
             "--format",
@@ -1792,10 +2022,36 @@ mod tests {
             "--output",
             "target/matten-report-dynamic-readiness.html",
         ]))
+        .expect("dynamic-readiness HTML with output should parse");
+
+        let Action::Run(config) = action else {
+            panic!("expected run action");
+        };
+        assert!(matches!(
+            config.input,
+            Input::Demo { ref label } if label == "dynamic-readiness"
+        ));
+        assert_eq!(config.format, OutputFormat::Html);
+        assert_eq!(
+            config.output,
+            Some(PathBuf::from("target/matten-report-dynamic-readiness.html"))
+        );
+    }
+
+    #[test]
+    fn html_format_is_limited_to_accepted_html_demos() {
+        let err = parse_args(args(&[
+            "--demo",
+            "mlprep-standardization",
+            "--format",
+            "html",
+            "--output",
+            "target/matten-report-mlprep-standardization.html",
+        ]))
         .unwrap_err();
 
         assert!(err.contains(
-            "--format html is only supported for --demo \"educational-path\" or \"shape-flow\"; got \"dynamic-readiness\""
+            "--format html is only supported for --demo \"educational-path\", \"shape-flow\", or \"dynamic-readiness\"; got \"mlprep-standardization\""
         ));
     }
 
@@ -1816,7 +2072,7 @@ mod tests {
         .unwrap_err();
 
         assert!(err.contains(
-            "--format html is only supported for --demo \"educational-path\" or \"shape-flow\""
+            "--format html is only supported for --demo \"educational-path\", \"shape-flow\", or \"dynamic-readiness\""
         ));
     }
 
@@ -2106,6 +2362,126 @@ converted shape: [2, 3]
 converted row-major values: [1.0, 2.5, 0.0, 4.0, 6.0, 8.0]
 "
         );
+    }
+
+    #[test]
+    fn dynamic_readiness_html_report_matches_expected_html() {
+        let report =
+            render_dynamic_readiness_html_report().expect("dynamic-readiness HTML should render");
+
+        assert_eq!(
+            report,
+            "\
+<!doctype html>
+<html lang=\"en\">
+<head>
+  <meta charset=\"utf-8\">
+  <title>matten dynamic-readiness report</title>
+  <style>
+    :root { color-scheme: light; font-family: system-ui, sans-serif; }
+    body { margin: 2rem auto; max-width: 920px; color: #17202a; background: #ffffff; line-height: 1.5; }
+    h1, h2 { color: #14324a; } section { border-top: 1px solid #d6dde5; padding: 1rem 0; }
+    table { width: 100%; border-collapse: collapse; margin: 0.75rem 0; } th, td { border: 1px solid #d6dde5; padding: 0.45rem 0.6rem; text-align: left; vertical-align: top; }
+    th { background: #eef4f8; } code, .shape { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .note { background: #f6f8fa; border-left: 4px solid #5b8fb9; padding: 0.75rem 1rem; }
+    .shape { display: inline-block; background: #eef4f8; border: 1px solid #cbd8e3; border-radius: 4px; padding: 0.1rem 0.35rem; }
+  </style>
+</head>
+<body>
+<main>
+<h1>matten dynamic-readiness report</h1>
+<p class=\"note\">Fixed demo report, not automatic data profiling.</p>
+<section>
+<h2>Dynamic values</h2>
+<table>
+<thead><tr><th>item</th><th>shape / value</th></tr></thead>
+<tbody>
+<tr><td>shape</td><td><span class=\"shape\">[2, 3]</span></td></tr>
+</tbody>
+</table>
+<table>
+<thead><tr><th>row</th><th>column</th><th>value</th></tr></thead>
+<tbody>
+<tr><td>0</td><td>0</td><td><span class=\"shape\">Float(1.0)</span></td></tr>
+<tr><td>0</td><td>1</td><td><span class=\"shape\">Text(&quot;2.5&quot;)</span></td></tr>
+<tr><td>0</td><td>2</td><td><span class=\"shape\">None</span></td></tr>
+<tr><td>1</td><td>0</td><td><span class=\"shape\">Int(4)</span></td></tr>
+<tr><td>1</td><td>1</td><td><span class=\"shape\">Text(&quot;6.0&quot;)</span></td></tr>
+<tr><td>1</td><td>2</td><td><span class=\"shape\">Float(8.0)</span></td></tr>
+</tbody>
+</table>
+</section>
+<section>
+<h2>Schema summary</h2>
+<table>
+<thead><tr><th>element kind</th><th>count</th></tr></thead>
+<tbody>
+<tr><td>Float</td><td><span class=\"shape\">2</span></td></tr>
+<tr><td>Int</td><td><span class=\"shape\">1</span></td></tr>
+<tr><td>Text</td><td><span class=\"shape\">2</span></td></tr>
+<tr><td>None</td><td><span class=\"shape\">1</span></td></tr>
+</tbody>
+</table>
+</section>
+<section>
+<h2>Readiness masks</h2>
+<table>
+<thead><tr><th>item</th><th>shape / value</th></tr></thead>
+<tbody>
+<tr><td>none mask</td><td><span class=\"shape\">[0.0, 0.0, 1.0, 0.0, 0.0, 0.0]</span></td></tr>
+<tr><td>numeric mask</td><td><span class=\"shape\">strict policy readiness [1.0, 0.0, 0.0, 1.0, 0.0, 1.0]</span></td></tr>
+<tr><td>strict numeric-ready</td><td><span class=\"shape\">false</span></td></tr>
+</tbody>
+</table>
+</section>
+<section>
+<h2>Strict conversion</h2>
+<table>
+<thead><tr><th>item</th><th>shape / value</th></tr></thead>
+<tbody>
+<tr><td>result</td><td><span class=\"shape\">error: strict conversion rejects Text and None values</span></td></tr>
+</tbody>
+</table>
+</section>
+<section>
+<h2>Explicit policy conversion</h2>
+<table>
+<thead><tr><th>item</th><th>shape / value</th></tr></thead>
+<tbody>
+<tr><td>policy</td><td><span class=\"shape\">none_as(0.0) + allow_text_parse()</span></td></tr>
+<tr><td>converted shape</td><td><span class=\"shape\">[2, 3]</span></td></tr>
+<tr><td>converted row-major values</td><td><span class=\"shape\">[1.0, 2.5, 0.0, 4.0, 6.0, 8.0]</span></td></tr>
+</tbody>
+</table>
+</section>
+</main>
+</body>
+</html>
+"
+        );
+    }
+
+    #[test]
+    fn dynamic_readiness_html_report_is_static_and_self_contained() {
+        let report =
+            render_dynamic_readiness_html_report().expect("dynamic-readiness HTML should render");
+
+        assert!(report.starts_with("<!doctype html>\n<html lang=\"en\">"));
+        assert!(report.contains("<title>matten dynamic-readiness report</title>"));
+        assert!(report.contains("<h1>matten dynamic-readiness report</h1>"));
+        assert!(report.contains("<h2>Dynamic values</h2>"));
+        assert!(report.contains("<span class=\"shape\">Text(&quot;2.5&quot;)</span>"));
+        assert!(report.contains("<h2>Readiness masks</h2>"));
+        assert!(report.contains("strict policy readiness [1.0, 0.0, 0.0, 1.0, 0.0, 1.0]"));
+        assert!(report.contains("<h2>Strict conversion</h2>"));
+        assert!(report.contains("error: strict conversion rejects Text and None values"));
+        assert!(report.contains("<h2>Explicit policy conversion</h2>"));
+        assert!(report.contains("[1.0, 2.5, 0.0, 4.0, 6.0, 8.0]"));
+        assert!(!report.contains("<script"));
+        assert!(!report.contains(" src="));
+        assert!(!report.contains(" href="));
+        assert!(!report.contains("data:"));
+        assert!(!report.contains("<svg"));
     }
 
     #[test]

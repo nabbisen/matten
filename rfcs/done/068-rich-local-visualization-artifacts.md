@@ -1,6 +1,6 @@
 # RFC-068: Rich Local Visualization Artifacts
 
-**Status:** Implemented (0.32.0); local HTML artifacts for educational-path and shape-flow, public report/viz crates deferred
+**Status:** Implemented (0.32.0); post-0.32 dynamic-readiness HTML implementation prepared for review; public report/viz crates deferred
 **Target:** v0.32.0 local visualization-artifact phase
 **Theme:** Richer visual understanding through local, deterministic report artifacts
 **Depends on:** RFC-022, RFC-049, RFC-063, RFC-064, RFC-065

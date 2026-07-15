@@ -3,7 +3,7 @@
 **Project:** `matten`
 **Related RFC:** RFC-068: Rich Local Visualization Artifacts
 **Document kind:** Compact local-tool implementation handoff
-**Status:** Draft for review; does not authorize implementation until accepted
+**Status:** Implemented for review; review pending
 **Scope:** Local-only static HTML artifact for `tools/matten-report --demo dynamic-readiness`
 
 ---

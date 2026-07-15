@@ -19,7 +19,7 @@ Scope:
 ```text
 local tool only
 Markdown/plain text output by default
-static self-contained HTML output for educational-path and shape-flow only
+static self-contained HTML output for educational-path, shape-flow, and dynamic-readiness only
 explicit input/output behavior
 no public API
 no published crate
@@ -73,6 +73,15 @@ The dynamic-readiness report is a fixed demo for dynamic values, missing-value
 masks, strict numeric readiness, and explicit policy conversion. It is not
 automatic data profiling and does not accept input files.
 
+Write the dynamic-readiness report as a local static HTML artifact:
+
+```bash
+cargo run --manifest-path tools/matten-report/Cargo.toml -- \
+  --demo dynamic-readiness \
+  --format html \
+  --output target/matten-report-dynamic-readiness.html
+```
+
 Run the mlprep-standardization demo report:
 
 ```bash
@@ -103,9 +112,10 @@ cargo run --manifest-path tools/matten-report/Cargo.toml -- \
   --output target/matten-report-educational-path.html
 ```
 
-HTML output is supported only for `educational-path` and `shape-flow` in the
-current local artifact slices. It requires `--output`, writes a self-contained
-static document, and uses no JavaScript, network access, or external assets.
+HTML output is supported only for `educational-path`, `shape-flow`, and
+`dynamic-readiness` in the current local artifact slices. It requires `--output`,
+writes a self-contained static document, and uses no JavaScript, network access,
+or external assets.
 
 Run on a CSV file:
 

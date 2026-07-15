@@ -188,6 +188,7 @@ jobs:
       - run: cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo shape-flow --format html --output target/matten-report-shape-flow.html
       - run: cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo dynamic-readiness
       - run: cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo dynamic-readiness --output target/matten-report-dynamic-readiness.md
+      - run: cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo dynamic-readiness --format html --output target/matten-report-dynamic-readiness.html
       - run: cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo mlprep-standardization
       - run: cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo mlprep-standardization --output target/matten-report-mlprep-standardization.md
       - run: cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo educational-path
