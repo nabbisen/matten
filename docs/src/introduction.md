@@ -14,4 +14,4 @@ This book is organized by reader:
 - **Reference** — the rules that shape the public API.
 - **Contributors** — project layout, milestones, and process.
 
-> This documentation tracks the current 0.31 release family, an RFC-066/RFC-067 policy-cleanup release that records the v1.0 readiness audit and family-maturity rule without authorizing v1.0 release preparation.
+> This documentation tracks the current 0.32 release family, an RFC-068 local visualization-artifact release that adds static HTML output to selected `matten-report` demos without changing public APIs, published dependencies, runtime behavior, or maturity labels.

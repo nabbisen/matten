@@ -1,6 +1,6 @@
 # RFC-068: Rich Local Visualization Artifacts
 
-**Status:** Proposed; educational-path HTML implemented; shape-flow HTML implemented for review
+**Status:** Implemented (0.32.0); local HTML artifacts for educational-path and shape-flow, public report/viz crates deferred
 **Target:** v0.32.0 local visualization-artifact phase
 **Theme:** Richer visual understanding through local, deterministic report artifacts
 **Depends on:** RFC-022, RFC-049, RFC-063, RFC-064, RFC-065
@@ -231,7 +231,6 @@ Later phases require separate handoffs or RFC amendments.
 Candidate follow-ups:
 
 ```text
-HTML output for shape-flow (implemented for review)
 HTML output for dynamic-readiness
 HTML output for data-readiness
 HTML output for mlprep-standardization
@@ -331,7 +330,7 @@ This RFC is accepted when:
 [ ] no expression tracing or autograd scope is authorized
 [ ] output safety and escaping requirements are recorded
 [ ] the implementation handoff is small enough for direct review
-[ ] rfcs/README.md and ROADMAP.md track RFC-068 as the active proposed RFC
+[ ] rfcs/README.md and ROADMAP.md track RFC-068 through implementation
 ```
 
 ---
@@ -345,7 +344,7 @@ This RFC is accepted when:
    the existing educational-path Markdown and HTML reports before adding another
    HTML report family. See
    `rfcs/handoffs/068-shared-educational-report-model-handoff.md`.
-   Follow-up after that refactor: shape-flow HTML is implemented for review as
+   Follow-up after that refactor: shape-flow HTML is implemented in 0.32.0 as
    exactly one additional fixed report family. See
    `rfcs/handoffs/068-shape-flow-html-artifact-handoff.md`.
 3. Should static SVG be the next richer artifact after HTML, or should the

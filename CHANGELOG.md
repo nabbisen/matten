@@ -18,6 +18,49 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.32.0] - 2026-07-15
+
+RFC-068 rich local visualization-artifact release. This release makes the local
+`tools/matten-report` educational reports easier to inspect visually by adding
+static self-contained HTML artifacts for the educational-path and shape-flow
+demos. Markdown/plain text remains the default. No public API, published crate
+dependency graph, core default feature, runtime behavior, MSRV, or maturity-label
+change.
+
+### Added
+
+- `tools/matten-report --demo educational-path --format html --output <path>`, a
+  local-only static HTML artifact for the learner path.
+- `tools/matten-report --demo shape-flow --format html --output <path>`, a second
+  local-only static HTML artifact for broadcasting, reshape, axis-reduction, and
+  matmul shape flow.
+- Exact HTML snapshot and safety coverage for the local report tool.
+
+### Changed
+
+- Educational-path report rendering now uses a private shared fixed-data model
+  consumed by both Markdown and HTML output.
+- RFC-068 moved to implemented status for the local HTML-artifact scope; public
+  `matten-report` / `matten-viz` crates remain deferred.
+- Current-family documentation and install snippets retargeted from `0.31.0` to
+  `0.32.0`.
+
+### Version
+
+- Release bump `0.31.0` -> `0.32.0`. Lock-step family versioning still applies to
+  all workspace crates; `tools/matten-report` and `tools/matten-migrate` remain
+  local unpublished tools at their own tool versions.
+
+### Threat model
+
+Local-tool, docs, RFC, roadmap, and release-metadata updates only. No tag or
+publish is performed by this prep. No public API change, published dependency
+change, core default feature change, parser behavior change, runtime behavior
+change, MSRV change, maturity-label change, companion promotion, automatic
+project mutation, network, telemetry, generated checked-in artifact, JavaScript,
+external asset, SVG, Vega-Lite, JSON report format, plotting, notebook, GUI,
+browser app, expression tracing, autograd, or public tooling crate change.
+
 ## [0.31.0] - 2026-07-13
 
 RFC-066/RFC-067 policy-cleanup release. This release records the reviewed v1.0 readiness audit,

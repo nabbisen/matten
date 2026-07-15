@@ -81,12 +81,11 @@ The broader documentation ownership model is recorded in
 | 065 | [Educational Visualization and Tensor Learning Path](./done/065-educational-visualization-and-tensor-learning-path.md) | 0.30.0 (educational positioning, learner docs path, local `educational-path` report; public report/viz crates deferred) |
 | 066 | [v1.0 Readiness Audit and Release Decision Gate](./done/066-v1-readiness-audit-and-release-decision-gate.md) | 0.31.0 (readiness audit and release-decision gate; no v1.0 release authorization) |
 | 067 | [v1.0 Family Maturity Policy](./done/067-v1-family-maturity-policy.md) | repository policy; resolves RFC-066 MD-1 without v1.0 release authorization |
+| 068 | [Rich Local Visualization Artifacts](./done/068-rich-local-visualization-artifacts.md) | 0.32.0 (local HTML artifacts for educational-path and shape-flow; public report/viz crates deferred) |
 
 ## Proposed
 
-| ID | Title | Target |
-|---:|---|---|
-| 068 | [Rich Local Visualization Artifacts](./proposed/068-rich-local-visualization-artifacts.md) | v0.32.0 local visualization-artifact phase |
+No active proposed RFCs.
 
 Implementation handoffs for the v0.20+ proposed set (RFC-033–042), the examples
 program (RFC-043–048), and the benchmarking program (RFC-049) live in
@@ -119,7 +118,7 @@ handoffs cover target suggestions, static API explanations, bridge-readiness
 checks, and lifecycle closure. These RFCs add no core dependency: migration
 support lives in docs, bridge crates, and workspace-excluded tooling.
 
-The next visualization phase is tracked by RFC-068 and its handoffs. The first
+The RFC-068 visualization phase is tracked by its handoffs. The first
 slice,
 [`068-local-html-educational-artifact-handoff.md`](./handoffs/068-local-html-educational-artifact-handoff.md),
 starts with a local-only static HTML artifact for the existing
