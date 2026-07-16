@@ -18,6 +18,54 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.34.0] - 2026-07-15
+
+RFC-068 rich local visualization continuation release. This release stops the
+current visualization feature work after adding one more local static HTML
+artifact for mlprep-standardization before/after understanding. Markdown/plain
+text remains the default. No public API, published crate dependency graph, core
+default feature, runtime behavior, MSRV, or maturity-label change.
+
+### Added
+
+- `tools/matten-report --demo mlprep-standardization --format html --output <path>`,
+  a local-only static HTML artifact for input values, before/after column means,
+  before/after population standard deviations, standardized output values, and
+  unchanged shape.
+- Exact HTML snapshot and safety coverage for the mlprep-standardization local
+  report.
+
+### Changed
+
+- MLPREP-standardization report rendering now uses a private shared fixed-data
+  model consumed by both Markdown and HTML output while preserving the Markdown
+  output.
+- The local HTML policy now accepts `educational-path`, `shape-flow`,
+  `dynamic-readiness`, and `mlprep-standardization`; HTML remains rejected for
+  `data-readiness` and input-mode reports.
+- Current-family documentation and install snippets retargeted from `0.33.0` to
+  `0.34.0`.
+- RFC-068 tracking records the fixed-demo HTML series as complete for this
+  release; `data-readiness` HTML and input-mode HTML remain deferred design
+  questions, not automatic follow-up scope.
+
+### Version
+
+- Release bump `0.33.0` -> `0.34.0`. Lock-step family versioning still applies to
+  all workspace crates; `tools/matten-report` and `tools/matten-migrate` remain
+  local unpublished tools at their own tool versions.
+
+### Threat model
+
+Local-tool, docs, RFC, roadmap, and release-metadata updates only. No public API
+change, published dependency change, core default feature change, parser
+behavior change outside the accepted local report command, runtime behavior
+change, MSRV change, maturity-label change, companion promotion, automatic
+project mutation, network, telemetry, generated checked-in artifact, JavaScript,
+external asset, SVG, Vega-Lite, JSON report format, plotting, notebook, GUI,
+browser app, expression tracing, autograd, public tooling crate change, or
+`data-readiness` / input-mode HTML support.
+
 ## [0.33.0] - 2026-07-15
 
 RFC-068 rich local visualization continuation release. This release stops the

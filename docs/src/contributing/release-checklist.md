@@ -5,7 +5,7 @@ It is the canonical gate referenced by RFC-015.
 
 ## Before every release
 
-Release tags use bare SemVer with no `v` prefix, for example `0.33.0`.
+Release tags use bare SemVer with no `v` prefix, for example `0.34.0`.
 
 ### 1. Source verification
 
