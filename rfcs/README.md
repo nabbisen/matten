@@ -85,7 +85,9 @@ The broader documentation ownership model is recorded in
 
 ## Proposed
 
-No active proposed RFCs.
+| ID | Title | Target |
+|---:|---|---|
+| 069 | [Input-Mode HTML Report Policy](./proposed/069-input-mode-html-report-policy.md) | post-0.35 policy audit; no implementation authorized |
 
 Implementation handoffs for the v0.20+ proposed set (RFC-033–042), the examples
 program (RFC-043–048), and the benchmarking program (RFC-049) live in
@@ -183,3 +185,11 @@ audit recommends closing the RFC-068 fixed-demo HTML line rather than continuing
 visualization work automatically. Input-mode HTML, public report/viz crates,
 SVG, Vega-Lite, JSON output, expression tracing, autograd, and core
 visualization APIs remain separate future RFC or handoff decisions.
+
+RFC-069 starts that separate input-mode HTML decision path. Its policy audit
+([`069-input-mode-html-policy-audit.md`](./handoffs/069-input-mode-html-policy-audit.md))
+keeps implementation unauthorized while asking whether `tools/matten-report
+--input <csv> --kind data-readiness --select <cols> --format html --output
+<path>` should become a narrow, summary-only, bounded, escaped local artifact in
+a later reviewed slice. It does not reopen RFC-068 fixed-demo work and does not
+authorize public report/viz crates or core visualization APIs.
