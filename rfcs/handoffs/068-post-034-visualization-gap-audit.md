@@ -3,7 +3,7 @@
 **Project:** `matten`
 **Related RFCs:** RFC-063, RFC-065, RFC-068
 **Document kind:** Gap audit and next-decision recommendation
-**Status:** Drafted for review; no implementation authorized
+**Status:** Reviewed GO; retained as pre-handoff decision record
 **Date:** 2026-07-16
 
 ---
@@ -256,4 +256,10 @@ Next action if this audit is accepted:
 ```text
 Either close the local fixed-demo HTML line as complete for now, or draft a
 dedicated RFC-068 data-readiness demo-only HTML handoff for review.
+```
+
+Accepted follow-up:
+
+```text
+Draft RFC-068 data-readiness demo-only HTML handoff for review.
 ```
