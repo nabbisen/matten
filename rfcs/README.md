@@ -174,3 +174,12 @@ boundary. Its reviewed implementation adds demo-only HTML for
 completes the fixed-demo local HTML line, keeps input-mode HTML rejected, and
 does not authorize public report/viz crates, SVG, Vega-Lite, JSON output, or
 core visualization APIs.
+
+The post-0.35 closure audit
+([`068-post-035-fixed-demo-html-closure-audit.md`](./handoffs/068-post-035-fixed-demo-html-closure-audit.md))
+records the recommended closure point after the `0.35.0` release. All fixed
+`tools/matten-report --demo ...` families now support local static HTML, so the
+audit recommends closing the RFC-068 fixed-demo HTML line rather than continuing
+visualization work automatically. Input-mode HTML, public report/viz crates,
+SVG, Vega-Lite, JSON output, expression tracing, autograd, and core
+visualization APIs remain separate future RFC or handoff decisions.
