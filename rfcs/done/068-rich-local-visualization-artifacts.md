@@ -1,7 +1,7 @@
 # RFC-068: Rich Local Visualization Artifacts
 
-**Status:** Implemented (0.32.0; 0.33.0 continuation; 0.34.0 mlprep-standardization continuation; post-0.34 data-readiness implementation for review); local HTML artifacts for all fixed demos; input-mode HTML and public report/viz crates deferred
-**Target:** v0.32.0 local visualization-artifact phase; v0.33.0 dynamic-readiness continuation; v0.34.0 mlprep-standardization continuation; post-0.34 data-readiness demo-only implementation review
+**Status:** Implemented (0.32.0; 0.33.0 continuation; 0.34.0 mlprep-standardization continuation; 0.35.0 data-readiness continuation); local HTML artifacts for all fixed demos; input-mode HTML and public report/viz crates deferred
+**Target:** v0.32.0 local visualization-artifact phase; v0.33.0 dynamic-readiness continuation; v0.34.0 mlprep-standardization continuation; v0.35.0 data-readiness demo-only continuation
 **Theme:** Richer visual understanding through local, deterministic report artifacts
 **Depends on:** RFC-022, RFC-049, RFC-063, RFC-064, RFC-065
 **Related:** RFC-050, RFC-053, RFC-054, RFC-066, RFC-067
@@ -358,8 +358,8 @@ This RFC is accepted when:
    HTML line or draft a separate demo-only data-readiness HTML handoff. Input-mode
    HTML remains deferred. See
    `rfcs/handoffs/068-post-034-visualization-gap-audit.md`.
-   Follow-up: data-readiness demo-only HTML is implemented for review. It keeps
-   input-mode HTML deferred. See
+   Follow-up: data-readiness demo-only HTML is implemented in 0.35.0. It keeps
+   input-mode HTML deferred and completes the fixed-demo local HTML line. See
    `rfcs/handoffs/068-data-readiness-html-artifact-handoff.md`.
 3. Should static SVG be the next richer artifact after HTML, or should the
    project avoid SVG until a public visualization crate is seriously considered?

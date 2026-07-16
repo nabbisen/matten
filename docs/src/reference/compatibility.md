@@ -61,7 +61,7 @@ the lean core. Enabling `dynamic` does not rename or remove any numeric Tensor A
 
 The published crates are released as one lock-step family (RFC-030): matching
 crate versions are the supported, documented set. Downstream examples therefore
-show explicit matched pins such as `matten = "0.34.0"` plus a companion at the
+show explicit matched pins such as `matten = "0.35.0"` plus a companion at the
 same release.
 
 Inside the workspace, companion crates inherit the core dependency from
@@ -201,15 +201,16 @@ release RFC with candidate-labeled companions. This release does not authorize v
 preparation and does not change public API, published crate dependency graphs, runtime behavior,
 MSRV, feature flags, maturity labels, or companion scope.
 
-The **v0.34 release family** continues RFC-068 rich local visualization
-artifacts: `tools/matten-report` can write a static self-contained HTML file for
-the existing `mlprep-standardization` demo, in addition to the `educational-path`
-and `shape-flow` HTML artifacts from v0.32 and the `dynamic-readiness` HTML
-artifact from v0.33. Markdown/plain text remains the default report output, HTML
-still requires explicit `--output`, and the generated artifacts remain local
-files rather than checked-in assets. This release does not change public API,
-published crate dependency graphs, runtime behavior, MSRV, feature flags,
-maturity labels, or companion scope. Public `matten-report` / `matten-viz`
-crates, core visualization APIs, expression tracing, autograd, `data-readiness`
-HTML, input-mode HTML, SVG, Vega-Lite, JSON report output, notebook, GUI, and
-browser-app scope remain deferred.
+The **v0.35 release family** completes the RFC-068 fixed-demo local HTML line:
+`tools/matten-report` can write static self-contained HTML files for all fixed
+demos (`educational-path`, `shape-flow`, `dynamic-readiness`,
+`mlprep-standardization`, and `data-readiness`). Markdown/plain text remains the
+default report output, HTML still requires explicit `--output`, and the
+generated artifacts remain local files rather than checked-in assets.
+Input-mode HTML for user-provided CSV remains rejected and requires a separate
+policy review. This release does not change public API, published crate
+dependency graphs, runtime behavior, MSRV, feature flags, maturity labels, or
+companion scope. Public `matten-report` / `matten-viz` crates, core
+visualization APIs, expression tracing, autograd, input-mode HTML, SVG,
+Vega-Lite, JSON report output, notebook, GUI, and browser-app scope remain
+deferred.

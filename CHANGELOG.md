@@ -18,6 +18,54 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.35.0] - 2026-07-16
+
+RFC-068 rich local visualization continuation release. This release stops
+feature work after completing local static HTML coverage for the fixed
+`tools/matten-report` demos with a demo-only `data-readiness` artifact.
+Markdown/plain text remains the default. No public API, published crate
+dependency graph, core default feature, runtime behavior, MSRV, or
+maturity-label change.
+
+### Added
+
+- `tools/matten-report --demo data-readiness --format html --output <path>`,
+  a local-only static HTML artifact for the fixed data-readiness success-path
+  demo: source columns, selected columns, columns left out, missing counts,
+  strict numeric conversion success, tensor shape, and row-major preview.
+- Exact Markdown demo coverage, exact HTML snapshot coverage, and static
+  self-contained HTML safety coverage for the data-readiness local report.
+
+### Changed
+
+- The local HTML policy now accepts all fixed demos: `educational-path`,
+  `shape-flow`, `dynamic-readiness`, `mlprep-standardization`, and
+  `data-readiness`.
+- Input-mode HTML remains rejected and is now the remaining negative HTML
+  policy case; it requires a separate user-controlled-data policy review.
+- Current-family documentation and install snippets retargeted from `0.34.0` to
+  `0.35.0`.
+- RFC-068 tracking records the fixed-demo HTML series as complete for this
+  release; public report/viz crates, core visualization APIs, SVG/Vega-Lite/JSON
+  output, expression tracing, autograd, and input-mode HTML remain deferred.
+
+### Version
+
+- Release bump `0.34.0` -> `0.35.0`. Lock-step family versioning still applies to
+  all workspace crates; `tools/matten-report` and `tools/matten-migrate` remain
+  local unpublished tools at their own tool versions.
+
+### Threat model
+
+Local-tool, docs, RFC, roadmap, and release-metadata updates only. No public API
+change, published dependency change, core default feature change, parser
+behavior change outside the accepted local report command, runtime behavior
+change, MSRV change, maturity-label change, companion promotion, automatic
+project mutation, network, telemetry, generated checked-in artifact, JavaScript,
+external asset, SVG, Vega-Lite, JSON report format, plotting, notebook, GUI,
+browser app, expression tracing, autograd, public tooling crate change, or
+input-mode HTML support.
+
 ## [0.34.0] - 2026-07-15
 
 RFC-068 rich local visualization continuation release. This release stops the

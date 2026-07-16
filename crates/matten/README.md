@@ -53,7 +53,7 @@ assert!(matches!(bad, Err(MattenError::Shape { .. })));
 Lean install (smallest dependency footprint):
 
 ```toml
-matten = { version = "0.34.0", default-features = false }
+matten = { version = "0.35.0", default-features = false }
 ```
 
 ## Design notes
