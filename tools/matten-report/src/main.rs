@@ -225,7 +225,8 @@ fn validate_format_policy(config: &Config) -> Result<(), String> {
 fn supports_html_demo(label: &str) -> bool {
     matches!(
         label,
-        KIND_EDUCATIONAL_PATH
+        KIND_DATA_READINESS
+            | KIND_EDUCATIONAL_PATH
             | KIND_SHAPE_FLOW
             | KIND_DYNAMIC_READINESS
             | KIND_MLPREP_STANDARDIZATION
@@ -233,7 +234,7 @@ fn supports_html_demo(label: &str) -> bool {
 }
 
 fn supported_html_demos() -> &'static str {
-    "\"educational-path\", \"shape-flow\", \"dynamic-readiness\", or \"mlprep-standardization\""
+    "\"data-readiness\", \"shape-flow\", \"dynamic-readiness\", \"mlprep-standardization\", or \"educational-path\""
 }
 
 fn require_kind_or_demo_label(label: &str, kind: Option<&str>) -> Result<(), String> {
@@ -266,6 +267,9 @@ fn is_supported_demo(label: &str) -> bool {
 fn render_report(config: &Config) -> Result<String, Box<dyn Error>> {
     if config.format == OutputFormat::Html {
         return match &config.input {
+            Input::Demo { label } if label == KIND_DATA_READINESS => {
+                render_data_readiness_html_report()
+            }
             Input::Demo { label } if label == KIND_EDUCATIONAL_PATH => {
                 render_educational_path_html_report()
             }
@@ -374,6 +378,173 @@ fn render_table_report(
             )?;
         }
     }
+
+    Ok(report)
+}
+
+struct DataReadinessReportData {
+    input_label: &'static str,
+    source_columns: Vec<String>,
+    selected_columns: Vec<String>,
+    left_out_columns: Vec<String>,
+    missing_counts: Vec<DataReadinessMissingCount>,
+    conversion_status: &'static str,
+    tensor_shape: Vec<usize>,
+    tensor_values: Vec<f64>,
+}
+
+struct DataReadinessMissingCount {
+    column: String,
+    missing: usize,
+}
+
+fn data_readiness_demo_report_data() -> Result<DataReadinessReportData, Box<dyn Error>> {
+    let table = Table::from_csv_str(DEMO_CSV).map_err(Box::<dyn Error>::from)?;
+    let selected_columns = vec!["sales".to_string(), "cost".to_string()];
+    let selected = table
+        .select_columns(selected_columns.iter().map(String::as_str))
+        .map_err(Box::<dyn Error>::from)?;
+    let selected_summary = selected.schema_summary();
+    let missing_counts = selected_summary
+        .column_summaries()
+        .iter()
+        .map(|column| DataReadinessMissingCount {
+            column: column.name.clone(),
+            missing: column.missing,
+        })
+        .collect();
+    let numeric = selected.try_numeric().map_err(Box::<dyn Error>::from)?;
+    let tensor = numeric.to_tensor().map_err(Box::<dyn Error>::from)?;
+
+    Ok(DataReadinessReportData {
+        input_label: "demo: data-readiness",
+        source_columns: table.column_names().to_vec(),
+        left_out_columns: left_out_columns(table.column_names(), &selected_columns),
+        selected_columns,
+        missing_counts,
+        conversion_status: "success",
+        tensor_shape: tensor.shape().to_vec(),
+        tensor_values: tensor.as_slice().to_vec(),
+    })
+}
+
+fn render_data_readiness_html_report() -> Result<String, Box<dyn Error>> {
+    let data = data_readiness_demo_report_data()?;
+    let mut report = String::new();
+    writeln!(report, "<!doctype html>")?;
+    writeln!(report, "<html lang=\"en\">")?;
+    writeln!(report, "<head>")?;
+    writeln!(report, "  <meta charset=\"utf-8\">")?;
+    writeln!(
+        report,
+        "  <title>{}</title>",
+        html_escape("matten data-readiness report")
+    )?;
+    writeln!(report, "  <style>")?;
+    writeln!(
+        report,
+        "    :root {{ color-scheme: light; font-family: system-ui, sans-serif; }}"
+    )?;
+    writeln!(
+        report,
+        "    body {{ margin: 2rem auto; max-width: 920px; color: #17202a; background: #ffffff; line-height: 1.5; }}"
+    )?;
+    writeln!(
+        report,
+        "    h1, h2 {{ color: #14324a; }} section {{ border-top: 1px solid #d6dde5; padding: 1rem 0; }}"
+    )?;
+    writeln!(
+        report,
+        "    table {{ width: 100%; border-collapse: collapse; margin: 0.75rem 0; }} th, td {{ border: 1px solid #d6dde5; padding: 0.45rem 0.6rem; text-align: left; vertical-align: top; }}"
+    )?;
+    writeln!(
+        report,
+        "    th {{ background: #eef4f8; }} code, .shape {{ font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }}"
+    )?;
+    writeln!(
+        report,
+        "    .note {{ background: #f6f8fa; border-left: 4px solid #5b8fb9; padding: 0.75rem 1rem; }}"
+    )?;
+    writeln!(
+        report,
+        "    .shape {{ display: inline-block; background: #eef4f8; border: 1px solid #cbd8e3; border-radius: 4px; padding: 0.1rem 0.35rem; }}"
+    )?;
+    writeln!(report, "  </style>")?;
+    writeln!(report, "</head>")?;
+    writeln!(report, "<body>")?;
+    writeln!(report, "<main>")?;
+    writeln!(
+        report,
+        "<h1>{}</h1>",
+        html_escape("matten data-readiness report")
+    )?;
+    writeln!(
+        report,
+        "<p class=\"note\">{}</p>",
+        html_escape("Fixed demo report, not arbitrary CSV profiling.")
+    )?;
+
+    writeln!(report, "<section>")?;
+    writeln!(report, "<h2>{}</h2>", html_escape("Input"))?;
+    write_shape_flow_table(&mut report, &[("input", data.input_label.to_string())])?;
+    writeln!(report, "</section>")?;
+
+    writeln!(report, "<section>")?;
+    writeln!(report, "<h2>{}</h2>", html_escape("Columns"))?;
+    write_shape_flow_table(
+        &mut report,
+        &[
+            ("source columns", data.source_columns.join(", ")),
+            ("selected columns", data.selected_columns.join(", ")),
+            ("columns left out", data.left_out_columns.join(", ")),
+        ],
+    )?;
+    writeln!(report, "</section>")?;
+
+    writeln!(report, "<section>")?;
+    writeln!(report, "<h2>{}</h2>", html_escape("Missing values"))?;
+    writeln!(report, "<table>")?;
+    writeln!(
+        report,
+        "<thead><tr><th>{}</th><th>{}</th></tr></thead>",
+        html_escape("column"),
+        html_escape("missing")
+    )?;
+    writeln!(report, "<tbody>")?;
+    for row in &data.missing_counts {
+        writeln!(
+            report,
+            "<tr><td>{}</td><td><span class=\"shape\">{}</span></td></tr>",
+            html_escape(&row.column),
+            row.missing
+        )?;
+    }
+    writeln!(report, "</tbody>")?;
+    writeln!(report, "</table>")?;
+    writeln!(report, "</section>")?;
+
+    writeln!(report, "<section>")?;
+    writeln!(report, "<h2>{}</h2>", html_escape("Numeric conversion"))?;
+    write_shape_flow_table(
+        &mut report,
+        &[("strict conversion", data.conversion_status.to_string())],
+    )?;
+    writeln!(report, "</section>")?;
+
+    writeln!(report, "<section>")?;
+    writeln!(report, "<h2>{}</h2>", html_escape("Tensor preview"))?;
+    write_shape_flow_table(
+        &mut report,
+        &[
+            ("shape", format!("{:?}", data.tensor_shape)),
+            ("row-major values", format!("{:?}", data.tensor_values)),
+        ],
+    )?;
+    writeln!(report, "</section>")?;
+
+    writeln!(report, "</main>")?;
+    writeln!(report, "</body>")?;
+    writeln!(report, "</html>")?;
 
     Ok(report)
 }
@@ -1930,6 +2101,7 @@ fn usage() -> String {
     "\
 Usage:
   matten-report --demo data-readiness [--output <report.md>]
+  matten-report --demo data-readiness --format html --output <report.html>
   matten-report --demo shape-flow [--output <report.md>]
   matten-report --demo shape-flow --format html --output <report.html>
   matten-report --demo dynamic-readiness [--output <report.md>]
@@ -1941,7 +2113,7 @@ Usage:
   matten-report --input <csv-path> --kind data-readiness --select <col1,col2> [--output <report.md>]
 
 Demo reports are fixed examples. Input mode supports only data-readiness.
-Markdown is the default format. HTML is local file output for educational-path, shape-flow, dynamic-readiness, and mlprep-standardization only."
+Markdown is the default format. HTML is local file output for fixed demos only."
         .to_string()
 }
 
@@ -2139,6 +2311,39 @@ mod tests {
     }
 
     #[test]
+    fn data_readiness_html_requires_output() {
+        let err = parse_args(args(&["--demo", "data-readiness", "--format", "html"])).unwrap_err();
+
+        assert!(err.contains("--format html requires --output <report.html>"));
+    }
+
+    #[test]
+    fn data_readiness_html_allows_explicit_output() {
+        let action = parse_args(args(&[
+            "--demo",
+            "data-readiness",
+            "--format",
+            "html",
+            "--output",
+            "target/matten-report-data-readiness.html",
+        ]))
+        .expect("data-readiness HTML with output should parse");
+
+        let Action::Run(config) = action else {
+            panic!("expected run action");
+        };
+        assert!(matches!(
+            config.input,
+            Input::Demo { ref label } if label == "data-readiness"
+        ));
+        assert_eq!(config.format, OutputFormat::Html);
+        assert_eq!(
+            config.output,
+            Some(PathBuf::from("target/matten-report-data-readiness.html"))
+        );
+    }
+
+    #[test]
     fn shape_flow_html_requires_output() {
         let err = parse_args(args(&["--demo", "shape-flow", "--format", "html"])).unwrap_err();
 
@@ -2247,23 +2452,6 @@ mod tests {
     }
 
     #[test]
-    fn html_format_is_limited_to_accepted_html_demos() {
-        let err = parse_args(args(&[
-            "--demo",
-            "data-readiness",
-            "--format",
-            "html",
-            "--output",
-            "target/matten-report-data-readiness.html",
-        ]))
-        .unwrap_err();
-
-        assert!(err.contains(
-            "--format html is only supported for --demo \"educational-path\", \"shape-flow\", \"dynamic-readiness\", or \"mlprep-standardization\"; got \"data-readiness\""
-        ));
-    }
-
-    #[test]
     fn input_mode_does_not_support_html_format() {
         let err = parse_args(args(&[
             "--input",
@@ -2280,7 +2468,7 @@ mod tests {
         .unwrap_err();
 
         assert!(err.contains(
-            "--format html is only supported for --demo \"educational-path\", \"shape-flow\", \"dynamic-readiness\", or \"mlprep-standardization\""
+            "--format html is only supported for --demo \"data-readiness\", \"shape-flow\", \"dynamic-readiness\", \"mlprep-standardization\", or \"educational-path\""
         ));
     }
 
@@ -3106,6 +3294,168 @@ shape: [3, 2]
 row-major values: [100.0, 40.0, 150.0, 45.0, 120.0, 55.0]
 "
         );
+    }
+
+    #[test]
+    fn data_readiness_demo_report_matches_expected_markdown() {
+        let report = render_report(&Config {
+            input: Input::Demo {
+                label: KIND_DATA_READINESS.to_string(),
+            },
+            kind: KIND_DATA_READINESS.to_string(),
+            select: selected(&["sales", "cost"]),
+            output: None,
+            format: OutputFormat::Markdown,
+        })
+        .expect("data-readiness demo report should render");
+
+        assert_eq!(
+            report,
+            "\
+# matten data-readiness report
+
+## Input
+demo: data-readiness
+
+## Source columns
+- region
+- sales
+- cost
+- note
+
+## Selected columns
+- sales
+- cost
+
+## Columns left out
+- region
+- note
+
+## Missing values
+| column | missing |
+|---|---:|
+| sales | 0 |
+| cost | 0 |
+
+## Numeric conversion
+strict conversion: success
+
+## Tensor preview
+shape: [3, 2]
+row-major values: [100.0, 40.0, 150.0, 45.0, 120.0, 55.0]
+"
+        );
+    }
+
+    #[test]
+    fn data_readiness_html_report_matches_expected_html() {
+        let report =
+            render_data_readiness_html_report().expect("data-readiness HTML should render");
+
+        assert_eq!(
+            report,
+            "\
+<!doctype html>
+<html lang=\"en\">
+<head>
+  <meta charset=\"utf-8\">
+  <title>matten data-readiness report</title>
+  <style>
+    :root { color-scheme: light; font-family: system-ui, sans-serif; }
+    body { margin: 2rem auto; max-width: 920px; color: #17202a; background: #ffffff; line-height: 1.5; }
+    h1, h2 { color: #14324a; } section { border-top: 1px solid #d6dde5; padding: 1rem 0; }
+    table { width: 100%; border-collapse: collapse; margin: 0.75rem 0; } th, td { border: 1px solid #d6dde5; padding: 0.45rem 0.6rem; text-align: left; vertical-align: top; }
+    th { background: #eef4f8; } code, .shape { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .note { background: #f6f8fa; border-left: 4px solid #5b8fb9; padding: 0.75rem 1rem; }
+    .shape { display: inline-block; background: #eef4f8; border: 1px solid #cbd8e3; border-radius: 4px; padding: 0.1rem 0.35rem; }
+  </style>
+</head>
+<body>
+<main>
+<h1>matten data-readiness report</h1>
+<p class=\"note\">Fixed demo report, not arbitrary CSV profiling.</p>
+<section>
+<h2>Input</h2>
+<table>
+<thead><tr><th>item</th><th>shape / value</th></tr></thead>
+<tbody>
+<tr><td>input</td><td><span class=\"shape\">demo: data-readiness</span></td></tr>
+</tbody>
+</table>
+</section>
+<section>
+<h2>Columns</h2>
+<table>
+<thead><tr><th>item</th><th>shape / value</th></tr></thead>
+<tbody>
+<tr><td>source columns</td><td><span class=\"shape\">region, sales, cost, note</span></td></tr>
+<tr><td>selected columns</td><td><span class=\"shape\">sales, cost</span></td></tr>
+<tr><td>columns left out</td><td><span class=\"shape\">region, note</span></td></tr>
+</tbody>
+</table>
+</section>
+<section>
+<h2>Missing values</h2>
+<table>
+<thead><tr><th>column</th><th>missing</th></tr></thead>
+<tbody>
+<tr><td>sales</td><td><span class=\"shape\">0</span></td></tr>
+<tr><td>cost</td><td><span class=\"shape\">0</span></td></tr>
+</tbody>
+</table>
+</section>
+<section>
+<h2>Numeric conversion</h2>
+<table>
+<thead><tr><th>item</th><th>shape / value</th></tr></thead>
+<tbody>
+<tr><td>strict conversion</td><td><span class=\"shape\">success</span></td></tr>
+</tbody>
+</table>
+</section>
+<section>
+<h2>Tensor preview</h2>
+<table>
+<thead><tr><th>item</th><th>shape / value</th></tr></thead>
+<tbody>
+<tr><td>shape</td><td><span class=\"shape\">[3, 2]</span></td></tr>
+<tr><td>row-major values</td><td><span class=\"shape\">[100.0, 40.0, 150.0, 45.0, 120.0, 55.0]</span></td></tr>
+</tbody>
+</table>
+</section>
+</main>
+</body>
+</html>
+"
+        );
+    }
+
+    #[test]
+    fn data_readiness_html_report_is_static_and_self_contained() {
+        let report =
+            render_data_readiness_html_report().expect("data-readiness HTML should render");
+
+        assert!(report.starts_with("<!doctype html>\n<html lang=\"en\">"));
+        assert!(report.contains("<title>matten data-readiness report</title>"));
+        assert!(report.contains("<h1>matten data-readiness report</h1>"));
+        assert!(report.contains("Fixed demo report, not arbitrary CSV profiling."));
+        assert!(report.contains("<h2>Columns</h2>"));
+        assert!(report.contains("region, sales, cost, note"));
+        assert!(report.contains("sales, cost"));
+        assert!(report.contains("region, note"));
+        assert!(report.contains("<h2>Missing values</h2>"));
+        assert!(report.contains("<tr><td>sales</td><td><span class=\"shape\">0</span></td></tr>"));
+        assert!(report.contains("<tr><td>cost</td><td><span class=\"shape\">0</span></td></tr>"));
+        assert!(report.contains("<h2>Numeric conversion</h2>"));
+        assert!(report.contains("<span class=\"shape\">success</span>"));
+        assert!(report.contains("<h2>Tensor preview</h2>"));
+        assert!(report.contains("<span class=\"shape\">[3, 2]</span>"));
+        assert!(report.contains("[100.0, 40.0, 150.0, 45.0, 120.0, 55.0]"));
+        assert!(!report.contains("<script"));
+        assert!(!report.contains(" src="));
+        assert!(!report.contains(" href="));
+        assert!(!report.contains("data:"));
+        assert!(!report.contains("<svg"));
     }
 
     #[test]

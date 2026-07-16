@@ -62,6 +62,7 @@ cargo test --manifest-path tools/matten-report/Cargo.toml
 cargo clippy --manifest-path tools/matten-report/Cargo.toml -- -D warnings
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo data-readiness
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo data-readiness --output target/matten-report-demo.md
+cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo data-readiness --format html --output target/matten-report-data-readiness.html
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --input tools/matten-report/fixtures/small.csv --kind data-readiness --select sales,cost
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo shape-flow
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo shape-flow --output target/matten-report-shape-flow.md

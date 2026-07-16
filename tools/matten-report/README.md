@@ -19,7 +19,7 @@ Scope:
 ```text
 local tool only
 Markdown/plain text output by default
-static self-contained HTML output for educational-path, shape-flow, dynamic-readiness, and mlprep-standardization only
+static self-contained HTML output for fixed demos only
 explicit input/output behavior
 no public API
 no published crate
@@ -43,7 +43,18 @@ Run the data-readiness demo report:
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo data-readiness
 ```
 
-Demo mode uses the fixed `sales,cost` selection.
+Demo mode uses the fixed `sales,cost` selection. It shows the strict numeric
+conversion success path for the embedded demo data and does not accept input
+files.
+
+Write the data-readiness report as a local static HTML artifact:
+
+```bash
+cargo run --manifest-path tools/matten-report/Cargo.toml -- \
+  --demo data-readiness \
+  --format html \
+  --output target/matten-report-data-readiness.html
+```
 
 Run the shape-flow demo report:
 
@@ -121,10 +132,10 @@ cargo run --manifest-path tools/matten-report/Cargo.toml -- \
   --output target/matten-report-educational-path.html
 ```
 
-HTML output is supported only for `educational-path`, `shape-flow`,
-`dynamic-readiness`, and `mlprep-standardization` in the current local artifact
-slices. It requires `--output`, writes a self-contained static document, and
-uses no JavaScript, network access, or external assets.
+HTML output is supported only for fixed demo reports in the current local
+artifact slices. It requires `--output`, writes a self-contained static
+document, and uses no JavaScript, network access, or external assets. Input-mode
+HTML remains unsupported.
 
 Run on a CSV file:
 
@@ -141,6 +152,13 @@ Write to an explicit output file:
 cargo run --manifest-path tools/matten-report/Cargo.toml -- \
   --demo data-readiness \
   --output target/matten-report-demo.md
+```
+
+```bash
+cargo run --manifest-path tools/matten-report/Cargo.toml -- \
+  --demo data-readiness \
+  --format html \
+  --output target/matten-report-data-readiness.html
 ```
 
 ```bash

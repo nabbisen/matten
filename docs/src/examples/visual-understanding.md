@@ -31,10 +31,11 @@ cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo mlprep-standa
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo educational-path
 ```
 
-Selected fixed demos can also write self-contained local HTML files with
-explicit `--output`:
+All fixed demos can also write self-contained local HTML files with explicit
+`--output`. For example:
 
 ```bash
+cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo data-readiness --format html --output target/matten-report-data-readiness.html
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo mlprep-standardization --format html --output target/matten-report-mlprep-standardization.html
 ```
 

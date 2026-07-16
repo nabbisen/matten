@@ -81,7 +81,7 @@ The broader documentation ownership model is recorded in
 | 065 | [Educational Visualization and Tensor Learning Path](./done/065-educational-visualization-and-tensor-learning-path.md) | 0.30.0 (educational positioning, learner docs path, local `educational-path` report; public report/viz crates deferred) |
 | 066 | [v1.0 Readiness Audit and Release Decision Gate](./done/066-v1-readiness-audit-and-release-decision-gate.md) | 0.31.0 (readiness audit and release-decision gate; no v1.0 release authorization) |
 | 067 | [v1.0 Family Maturity Policy](./done/067-v1-family-maturity-policy.md) | repository policy; resolves RFC-066 MD-1 without v1.0 release authorization |
-| 068 | [Rich Local Visualization Artifacts](./done/068-rich-local-visualization-artifacts.md) | 0.32.0 (educational-path and shape-flow HTML); 0.33.0 (dynamic-readiness HTML); 0.34.0 (mlprep-standardization HTML); post-0.34 data-readiness demo-only HTML handoff drafted; input-mode HTML and public report/viz crates deferred |
+| 068 | [Rich Local Visualization Artifacts](./done/068-rich-local-visualization-artifacts.md) | 0.32.0 (educational-path and shape-flow HTML); 0.33.0 (dynamic-readiness HTML); 0.34.0 (mlprep-standardization HTML); post-0.34 data-readiness demo-only HTML implementation for review; input-mode HTML and public report/viz crates deferred |
 
 ## Proposed
 
@@ -169,6 +169,7 @@ Vega-Lite, JSON output, and core visualization APIs remain deferred.
 The data-readiness local HTML handoff
 ([`068-data-readiness-html-artifact-handoff.md`](./handoffs/068-data-readiness-html-artifact-handoff.md))
 translates the accepted post-0.34 audit path into a reviewable implementation
-boundary. It proposes demo-only HTML for `tools/matten-report --demo
-data-readiness`, keeps input-mode HTML rejected, and does not authorize public
-report/viz crates, SVG, Vega-Lite, JSON output, or core visualization APIs.
+boundary. Its implementation-review slice adds demo-only HTML for
+`tools/matten-report --demo data-readiness`, keeps input-mode HTML rejected, and
+does not authorize public report/viz crates, SVG, Vega-Lite, JSON output, or
+core visualization APIs.
