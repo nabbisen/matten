@@ -1,7 +1,7 @@
 # RFC-068: Rich Local Visualization Artifacts
 
-**Status:** Implemented (0.32.0; 0.33.0 continuation; 0.34.0 mlprep-standardization continuation); local HTML artifacts for educational-path, shape-flow, dynamic-readiness, and mlprep-standardization; data-readiness/input-mode HTML and public report/viz crates deferred
-**Target:** v0.32.0 local visualization-artifact phase; v0.33.0 dynamic-readiness continuation; v0.34.0 mlprep-standardization continuation
+**Status:** Implemented (0.32.0; 0.33.0 continuation; 0.34.0 mlprep-standardization continuation); local HTML artifacts for educational-path, shape-flow, dynamic-readiness, and mlprep-standardization; post-0.34 gap audit drafted for data-readiness/input-mode decision; public report/viz crates deferred
+**Target:** v0.32.0 local visualization-artifact phase; v0.33.0 dynamic-readiness continuation; v0.34.0 mlprep-standardization continuation; post-0.34 gap audit only
 **Theme:** Richer visual understanding through local, deterministic report artifacts
 **Depends on:** RFC-022, RFC-049, RFC-063, RFC-064, RFC-065
 **Related:** RFC-050, RFC-053, RFC-054, RFC-066, RFC-067
@@ -348,11 +348,15 @@ This RFC is accepted when:
    exactly one additional fixed report family. See
    `rfcs/handoffs/068-shape-flow-html-artifact-handoff.md`.
    Post-0.32 continuation: dynamic-readiness HTML is implemented in 0.33.0 as
-   the final fixed-demo HTML artifact for the current release family. See
+   the third fixed-demo HTML artifact. See
    `rfcs/handoffs/068-dynamic-readiness-html-artifact-handoff.md`.
    Post-0.33 continuation: mlprep-standardization HTML is implemented in 0.34.0
    as the fourth fixed-demo local artifact. See
    `rfcs/handoffs/068-post-033-visualization-continuation-audit.md` and
    `rfcs/handoffs/068-mlprep-standardization-html-artifact-handoff.md`.
+   Post-0.34 audit: the remaining decision is whether to close the fixed-demo
+   HTML line or draft a separate demo-only data-readiness HTML handoff. Input-mode
+   HTML remains deferred. See
+   `rfcs/handoffs/068-post-034-visualization-gap-audit.md`.
 3. Should static SVG be the next richer artifact after HTML, or should the
    project avoid SVG until a public visualization crate is seriously considered?

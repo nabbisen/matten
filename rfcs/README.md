@@ -81,7 +81,7 @@ The broader documentation ownership model is recorded in
 | 065 | [Educational Visualization and Tensor Learning Path](./done/065-educational-visualization-and-tensor-learning-path.md) | 0.30.0 (educational positioning, learner docs path, local `educational-path` report; public report/viz crates deferred) |
 | 066 | [v1.0 Readiness Audit and Release Decision Gate](./done/066-v1-readiness-audit-and-release-decision-gate.md) | 0.31.0 (readiness audit and release-decision gate; no v1.0 release authorization) |
 | 067 | [v1.0 Family Maturity Policy](./done/067-v1-family-maturity-policy.md) | repository policy; resolves RFC-066 MD-1 without v1.0 release authorization |
-| 068 | [Rich Local Visualization Artifacts](./done/068-rich-local-visualization-artifacts.md) | 0.32.0 (educational-path and shape-flow HTML); 0.33.0 (dynamic-readiness HTML); 0.34.0 (mlprep-standardization HTML; data-readiness/input-mode HTML and public report/viz crates deferred) |
+| 068 | [Rich Local Visualization Artifacts](./done/068-rich-local-visualization-artifacts.md) | 0.32.0 (educational-path and shape-flow HTML); 0.33.0 (dynamic-readiness HTML); 0.34.0 (mlprep-standardization HTML; post-0.34 gap audit for data-readiness/input-mode decision; public report/viz crates deferred) |
 
 ## Proposed
 
@@ -157,3 +157,11 @@ translated that recommendation into the `0.34.0` review scope. Its implementatio
 extends local static HTML to `tools/matten-report --demo mlprep-standardization`
 only and keeps `data-readiness`, input-mode HTML, public report/viz crates, SVG,
 Vega-Lite, and expression tracing out of scope.
+
+The post-0.34 gap audit
+([`068-post-034-visualization-gap-audit.md`](./handoffs/068-post-034-visualization-gap-audit.md))
+records the next decision point after the `0.34.0` release. It does not
+authorize implementation. It asks review to choose whether the fixed-demo local
+HTML line should close now or whether a separate demo-only `data-readiness` HTML
+handoff should be drafted. Input-mode HTML, public report/viz crates, SVG,
+Vega-Lite, JSON output, and core visualization APIs remain deferred.

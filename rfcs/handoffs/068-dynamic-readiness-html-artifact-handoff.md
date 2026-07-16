@@ -262,6 +262,7 @@ Remove generated `docs/book` afterward if created.
 Do not continue from this handoff directly into additional HTML report families,
 input-mode HTML, SVG, Vega-Lite, public crates, source scanning, or expression
 tracing. After this slice is reviewed, the next RFC-068 decision should choose
-whether `mlprep-standardization` merits the final fixed-demo HTML artifact,
-whether `data-readiness` needs a separate input-mode HTML policy audit, or
-whether the local HTML experiment is sufficient for the current release family.
+whether `mlprep-standardization` merits another fixed-demo HTML artifact,
+whether `data-readiness` needs a separate demo-only or input-mode HTML policy
+audit, or whether the local HTML experiment is sufficient for the current
+release family.
