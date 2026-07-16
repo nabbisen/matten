@@ -87,7 +87,7 @@ The broader documentation ownership model is recorded in
 
 | ID | Title | Target |
 |---:|---|---|
-| 069 | [Input-Mode HTML Report Policy](./proposed/069-input-mode-html-report-policy.md) | post-0.35 policy audit; no implementation authorized |
+| 069 | [Input-Mode HTML Report Policy](./proposed/069-input-mode-html-report-policy.md) | post-0.35 policy audit; implementation handoff drafted; no implementation authorized until handoff review |
 
 Implementation handoffs for the v0.20+ proposed set (RFC-033–042), the examples
 program (RFC-043–048), and the benchmarking program (RFC-049) live in
@@ -193,3 +193,10 @@ keeps implementation unauthorized while asking whether `tools/matten-report
 <path>` should become a narrow, summary-only, bounded, escaped local artifact in
 a later reviewed slice. It does not reopen RFC-068 fixed-demo work and does not
 authorize public report/viz crates or core visualization APIs.
+
+The RFC-069 implementation handoff
+([`069-input-mode-html-implementation-handoff.md`](./handoffs/069-input-mode-html-implementation-handoff.md))
+turns the accepted policy direction into a concrete review target, including
+explicit display bounds for tensor previews, wide column lists, long paths,
+long headers, and conversion errors. It still does not authorize code until the
+handoff itself is reviewed and accepted.

@@ -1,7 +1,7 @@
 # RFC-069: Input-Mode HTML Report Policy
 
-**Status:** Proposed
-**Target:** post-0.35 reviewed policy decision; no implementation authorized
+**Status:** Proposed; policy audit reviewed; implementation handoff drafted for review
+**Target:** post-0.35 reviewed policy decision and implementation handoff; no implementation authorized until handoff review accepts it
 **Theme:** Safe local HTML reporting for user-provided `matten-report` CSV input
 **Depends on:** RFC-001, RFC-037, RFC-063, RFC-065, RFC-068
 **Related:** RFC-023, RFC-034, RFC-035, RFC-066, RFC-067

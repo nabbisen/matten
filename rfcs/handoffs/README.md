@@ -50,6 +50,7 @@ working documents for the implementation team and may be revised as work proceed
 | `068-data-readiness-html-artifact-handoff.md` | RFC-068 Rich Local Visualization Artifacts — data-readiness demo-only local HTML artifact handoff |
 | `068-post-035-fixed-demo-html-closure-audit.md` | RFC-068 post-0.35 fixed-demo local HTML closure audit |
 | `069-input-mode-html-policy-audit.md` | RFC-069 input-mode HTML report policy audit |
+| `069-input-mode-html-implementation-handoff.md` | RFC-069 input-mode HTML report implementation handoff |
 
 ## Documentation-governance handoffs
 
