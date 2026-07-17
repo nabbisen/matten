@@ -2,10 +2,10 @@
 
 **Project:** `matten`  
 **Document Kind:** Canonical Project Roadmap  
-**Document Version:** `1.84.0`
+**Document Version:** `1.85.0`
 **Date:** 2026-07-17
-**Status:** Canonical roadmap updated with the post-0.36 RFC-069 input-mode HTML closure audit. The audit recommends closing RFC-069 for the reviewed data-readiness input-mode local HTML scope rather than continuing input-mode HTML automatically. More input-mode HTML paths, public report/viz crates, core visualization APIs, expression tracing, autograd, dependency changes in published crates, SVG/Vega-Lite/JSON/notebook/browser scope, general raw CSV HTML rendering, or companion maturity changes require separate future review.
-**Planning Baseline:** core `matten` completed RFC-015 through RFC-021 (shipped through v0.15.3); RFC-022 boundary confirmation shipped in v0.16.0; v0.17.0 introduced the Cargo workspace and the `matten-ndarray` companion crate under the family version (RFC-025, RFC-027); v0.18.0 introduced the `matten-mlprep` companion crate under the family version (RFC-024, RFC-028); v0.19.0 promoted `matten-ndarray` to production-ready candidate status and `matten-mlprep` to beta status under lock-step family versioning (RFC-029); v0.19.1 shipped feature-robust dynamic rejection (RFC-031); v0.19.2 confirmed the companion dependency/import convention (RFC-032); v0.19.3 added the RFC-033-042 v0.20+ design set; v0.20.0 shipped the matten-data experimental scaffold (RFC-033); v0.20.1 shipped the matten-data table/CSV-to-Tensor API (RFC-034, RFC-035, Experimental). Under lock-step family versioning (RFC-030), every crate shares the family version (e.g. `0.19.2`); maturity is expressed by per-crate Status labels, not by separate version numbers. Next: v0.20+ materialization phase. RFC-032 is consumed by the companion dependency/import convention; v0.20+ planning starts at RFC-033. The first v0.20+ branch is `matten-data` decision/materialization; the second is small NumPy-inspired core comfort APIs that preserve the `matten` philosophy; the third is the examples program (RFC-043–048), which demonstrates famous small math/numerical problems and companion workflows without expanding product scope.
+**Status:** Canonical roadmap audited after the post-0.36 RFC-069 closure record. There are no active proposed RFCs. Remaining themes are candidate work only until a new RFC or reviewed handoff opens them: public report/viz readiness, JSON/SVG/Vega-Lite/report-output policy, streaming/large CSV, `matten-nalgebra`, `matten-candle`, benchmark hard gates, companion full-production decisions, and any broader stats/linalg scope beyond the small helpers already shipped.
+**Planning Baseline:** core `matten` completed RFC-015 through RFC-021 (shipped through v0.15.3); RFC-022 through RFC-030 established the companion-crate and lock-step family model; RFC-033 through RFC-042 materialized the v0.20+ data, comfort-API, statistics, linalg-lite, and guard work; RFC-043 through RFC-048 completed the additive examples program; RFC-049 implemented benchmarking Phases 1-3 and extracted hard gates to future policy ownership; RFC-050 through RFC-054 completed production-migration documentation and local advisory tooling; RFC-055 through RFC-062 completed result-form APIs, companion maturity promotions, benchmark-doc surfacing, and the ndarray 0.17 update; RFC-063 through RFC-069 completed the reviewed local visualization/reporting line through `0.36.0`. Under lock-step family versioning (RFC-030), every crate shares the family version; maturity is expressed by per-crate Status labels, not by separate version numbers. Next work must choose one remaining theme explicitly and open a fresh RFC or reviewed handoff before implementation.
 
 ---
 
@@ -144,8 +144,8 @@ matten -> datafusion
 | **v0.34.0** | Visualization continuation release | RFC-068 continuation implemented: static local HTML artifact for `tools/matten-report --demo mlprep-standardization`, preserving Markdown default and deferring data-readiness/input-mode HTML, public crates, SVG/Vega-Lite, and expression tracing | Local-tool visualization artifact |
 | **v0.35.0** | Visualization continuation release | RFC-068 continuation implemented: static local HTML artifact for `tools/matten-report --demo data-readiness`, completing fixed-demo HTML coverage while preserving Markdown default and deferring input-mode HTML, public crates, SVG/Vega-Lite, and expression tracing | Local-tool visualization artifact |
 | **v0.36.0** | Input-mode HTML release | RFC-069 implemented: static local HTML artifact for `tools/matten-report --input ... --kind data-readiness`, preserving Markdown default and keeping output summary-only, bounded, escaped, and explicit-file-only | Local-tool visualization artifact |
-| **v0.21+** | Selective production readiness | `matten-data` maturity decision **resolved → Beta in v0.22.0** (RFC-023/RFC-036); remaining companion maturity decisions; harder numerical/ML-like examples as APIs mature; benchmarking & positioning (RFC-049 — **Phase 1 internal baseline accepted/shipped in v0.22.1**; Phases 2–4 deferred) | Per-crate decisions |
-| **Later** | Streaming / large CSV, `nalgebra`, `candle`, stats/linalg companions | Separate RFCs required | Design-only until reopened |
+| **v0.21+** | Selective production readiness | `matten-ndarray` promoted to production-ready (RFC-057); `matten-mlprep` and `matten-data` promoted to production-ready candidate (RFC-058/RFC-059); remaining full-production companion decisions require separate review. RFC-049 Phases 1-3 are implemented; Phase 4 hard gates are extracted to future policy/RFC ownership | Per-crate decisions |
+| **Later** | Public report/viz readiness, JSON/SVG/Vega-Lite output, streaming / large CSV, `nalgebra`, `candle`, broader stats/linalg companions | Separate RFCs or reviewed handoffs required | Design-only until reopened |
 
 > **Performance-watch (P2, not a release blocker).** The RFC-049 Phase 1 internal baseline
 > showed `sum_mean_axis` (~1.31 ms on 64×64) is the most expensive core path by a wide
@@ -752,20 +752,20 @@ must not pull benchmark tooling into core `matten` or any companion.
 
 #### Posture and sequencing
 
-RFC-049 is **planning now / implementation v0.21+ maturity hardening**. Methodology
-docs and the harness skeleton may begin in v0.20.x; the bulk lands during v0.21+
-hardening, and peer/reference comparisons follow only after an internal baseline is
-stable. Scenario benchmarks track the examples program: they cover only shipped
-examples (today `pairwise_distance`, `26_cosine_similarity`, and `30_`–`34_`), and
-grow as RFC-046/047 bands land.
+RFC-049 Phases 1-3 are implemented and accepted: internal baseline, Rust peer
+comparison, and code-shape-first NumPy/Pandas reference comparison. Phase 4 hard
+gates remain outside RFC-049's closed scope and require a separate future RFC or
+explicit release-policy decision. Scenario benchmarks should continue to track
+shipped examples and companion workflows without turning benchmark results into
+marketing claims or release-blocking speed thresholds by default.
 
 #### Phases
 
 ```text
-Phase 1: internal baseline (matten only) — core micro + scenario + companion workloads
-Phase 2: Rust peer comparison (ndarray, nalgebra) — "peer comparison" wording
-Phase 3: ecosystem reference (NumPy, Pandas table-to-Tensor only) — "reference comparison" wording
-Phase 4: regression tracking — record/trend first; soft warnings, then thresholds via a later RFC
+Phase 1: internal baseline (matten only) — implemented and accepted
+Phase 2: Rust peer comparison (ndarray, nalgebra) — implemented and accepted
+Phase 3: ecosystem reference (NumPy, Pandas table-to-Tensor only) — implemented and accepted
+Phase 4: regression tracking / hard gates — extracted to future policy/RFC ownership
 ```
 
 SciPy and Candle are deferred references; they are out of scope until a separate,
@@ -816,6 +816,21 @@ Borrow ergonomic ideas, not ecosystem scope.
 
 ## 10. Later themes
 
+### Public reporting / visualization readiness
+
+RFC-063 through RFC-069 prove local, static, tool-owned reporting artifacts.
+They do not prove a stable public report model, renderer API, dependency policy,
+or published `matten-report` / `matten-viz` crate. The next visualization step
+should be an audit-only RFC unless maintainers choose a more concrete theme
+first.
+
+### JSON / SVG / Vega-Lite report output
+
+Deferred after RFC-068/RFC-069. JSON may be useful for review automation and
+tests; SVG/Vega-Lite may be useful for richer visuals. Each changes product,
+dependency, security, and compatibility expectations and therefore requires a
+separate RFC or reviewed handoff.
+
 ### `matten-nalgebra`
 
 Deferred until after `matten-ndarray` proves the bridge pattern. Requires a separate RFC. RFC-025 is considered implemented for `matten-ndarray`; future `nalgebra` work must not rely on implied acceptance.
@@ -830,7 +845,11 @@ Design-only until batch lifecycle, schema drift, malformed-row policy, memory bu
 
 ### `matten-stats`
 
-Possible later companion or small-core extension area. Requires RFC-040 before implementation. Candidate topics include variance, standard deviation, covariance, correlation, quantile, and histogram. These APIs have policy traps (`ddof`, NaN behavior, interpolation), so they must not be rushed into core.
+Possible later companion or small-core extension area beyond RFC-040. Core
+already shipped population `var`/`std` and axis variants in v0.21.2. Remaining
+topics such as sample variance, covariance, correlation, quantile, percentile,
+histogram, and z-score require a separate RFC because they carry policy traps
+(`ddof`, NaN behavior, interpolation, binning, and shape semantics).
 
 ### Examples program continuation
 
@@ -838,7 +857,11 @@ The examples program may continue after RFC-043 through RFC-048, but only as dem
 
 ### `matten-linalg-lite`
 
-Possible later boundary topic. Requires RFC-041 before implementation. Core may keep only small obvious helpers such as `norm`, `trace`, or `outer` if accepted. Serious linear algebra such as inverse, determinant, eigenvalues, SVD, QR, and Cholesky should remain outside core or be delegated through external crates.
+RFC-041 shipped the accepted core-lite helpers: `norm`, `trace`, and `outer`.
+Any broader linear algebra such as inverse, determinant, eigenvalues, SVD, QR,
+Cholesky, BLAS/LAPACK integration, sparse tensors, or a dedicated linalg
+companion requires a separate RFC and should normally be delegated through
+external crates or bridges.
 
 ---
 
@@ -1118,3 +1141,4 @@ dependency gated by a non-default feature would not appear, producing a false pa
 | 1.82.0 | 2026-07-17 | RFC-069 input-mode HTML implementation prepared for review. Added `tools/matten-report --input <csv> --kind data-readiness --select <cols> --format html --output <path>` as a local static HTML artifact for data-readiness input mode, keeping Markdown/plain text as default and requiring explicit `--output`. The implementation renders summary-only success and numeric-conversion-error reports, uses hostile-input escaping tests, bounds source/selected/left-out column displays, long paths/headers/errors, and row-major tensor previews, and adds README, CI, and release-checklist smoke coverage. No public report/viz crate, core visualization API, expression tracing, autograd, dependency change in published crates, SVG, Vega-Lite, JSON report, notebook, GUI, version bump, tag, publish, release prep, or companion maturity change is authorized. |
 | 1.83.0 | 2026-07-17 | Released 0.36.0 as an RFC-069 input-mode HTML release. Stopped feature work after the reviewed input-mode data-readiness local HTML artifact, retargeted current-family documentation to 0.36.0, moved RFC-069 to implemented status, and added release notes for the local-tool visualization scope. Markdown/plain text remains default, HTML requires explicit `--output`, and no public report/viz crate, public API, published dependency, runtime behavior outside the reviewed local-tool command, MSRV, feature-flag, maturity-label, companion-promotion, SVG, Vega-Lite, JSON report, notebook, GUI, expression tracing, autograd, tag, publish, or general raw CSV HTML rendering scope is authorized. |
 | 1.84.0 | 2026-07-17 | Drafted the post-0.36 RFC-069 input-mode HTML closure audit. The audit records that data-readiness input-mode local HTML shipped in 0.36.0 and recommends closing RFC-069 for that reviewed scope rather than adding more input-mode HTML automatically. More input-mode HTML paths, public report/viz crates, JSON/SVG/Vega-Lite output, notebook/browser integration, expression tracing, autograd, core visualization APIs, dependency changes in published crates, version bump, tag, publish, release prep, and companion maturity changes remain out of scope unless a separate future RFC or handoff is reviewed. |
+| 1.85.0 | 2026-07-17 | Audited remaining RFC/theme tracking after RFC-069 closure. Confirmed there are no active proposed RFCs, refreshed stale roadmap baseline text that still pointed at v0.20+ materialization, updated RFC-049 roadmap posture to Phases 1-3 implemented with Phase 4 hard gates extracted, refreshed later-theme notes for public visualization/report readiness, JSON/SVG/Vega-Lite output, streaming/large CSV, broader stats/linalg scope, `matten-nalgebra`, `matten-candle`, and companion full-production decisions. No new RFC, implementation, version bump, release prep, public API, dependency, tag, publish, or generated artifact is authorized. |
