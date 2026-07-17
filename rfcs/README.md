@@ -236,3 +236,13 @@ scope rather than continuing input-mode HTML automatically. More input-mode HTML
 paths, public report/viz crates, JSON/SVG/Vega-Lite output, notebook/browser
 integration, expression tracing, autograd, and core visualization APIs remain
 separate future RFC or handoff decisions.
+
+RFC-070 opens the public visualization/report readiness question as an audit-only
+proposed RFC. Its readiness audit
+([`070-public-visualization-report-readiness-audit.md`](./handoffs/070-public-visualization-report-readiness-audit.md))
+records the current verdict: local `tools/matten-report` artifacts are useful
+and maintained, but not ready to become public `matten-report` / `matten-viz`
+crates or public renderer APIs. The audit recommends keeping renderers private,
+keeping core `matten` visualization-free, and considering a separate JSON
+report-schema policy audit or private report-model extraction before any public
+crate work.
