@@ -87,7 +87,7 @@ The broader documentation ownership model is recorded in
 
 | ID | Title | Target |
 |---:|---|---|
-| 069 | [Input-Mode HTML Report Policy](./proposed/069-input-mode-html-report-policy.md) | post-0.35 policy audit; implementation handoff drafted; no implementation authorized until handoff review |
+| 069 | [Input-Mode HTML Report Policy](./proposed/069-input-mode-html-report-policy.md) | post-0.35 policy audit and handoff reviewed; implementation prepared for review; no release authorized |
 
 Implementation handoffs for the v0.20+ proposed set (RFC-033–042), the examples
 program (RFC-043–048), and the benchmarking program (RFC-049) live in
@@ -200,3 +200,11 @@ turns the accepted policy direction into a concrete review target, including
 explicit display bounds for tensor previews, wide column lists, long paths,
 long headers, and conversion errors. It still does not authorize code until the
 handoff itself is reviewed and accepted.
+
+The first RFC-069 implementation prepares local static HTML output for
+`tools/matten-report --input <csv> --kind data-readiness --select <cols>
+--format html --output <path>`. The implementation keeps Markdown/plain text as
+default, keeps HTML explicit-file-only, covers success and numeric-conversion
+error reports, escapes hostile input, and display-bounds column lists, long
+fields, conversion errors, and tensor previews. It is pending implementation
+review and does not authorize release metadata changes.

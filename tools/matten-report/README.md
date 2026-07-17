@@ -19,7 +19,7 @@ Scope:
 ```text
 local tool only
 Markdown/plain text output by default
-static self-contained HTML output for fixed demos only
+static self-contained HTML output for fixed demos and data-readiness input mode
 explicit input/output behavior
 no public API
 no published crate
@@ -132,10 +132,10 @@ cargo run --manifest-path tools/matten-report/Cargo.toml -- \
   --output target/matten-report-educational-path.html
 ```
 
-HTML output is supported only for fixed demo reports in the current local
-artifact slices. It requires `--output`, writes a self-contained static
-document, and uses no JavaScript, network access, or external assets. Input-mode
-HTML remains unsupported.
+HTML output requires `--output`, writes a self-contained static document, and
+uses no JavaScript, network access, or external assets. Input-mode HTML is
+limited to `--kind data-readiness`; it renders a bounded summary of the provided
+CSV file, not a full raw table.
 
 Run on a CSV file:
 
@@ -144,6 +144,17 @@ cargo run --manifest-path tools/matten-report/Cargo.toml -- \
   --input tools/matten-report/fixtures/small.csv \
   --kind data-readiness \
   --select sales,cost
+```
+
+Write a bounded local static HTML summary for a CSV file:
+
+```bash
+cargo run --manifest-path tools/matten-report/Cargo.toml -- \
+  --input tools/matten-report/fixtures/small.csv \
+  --kind data-readiness \
+  --select sales,cost \
+  --format html \
+  --output target/matten-report-input.html
 ```
 
 Write to an explicit output file:

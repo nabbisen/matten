@@ -19,6 +19,10 @@ const KIND_SHAPE_FLOW: &str = "shape-flow";
 const KIND_DYNAMIC_READINESS: &str = "dynamic-readiness";
 const KIND_MLPREP_STANDARDIZATION: &str = "mlprep-standardization";
 const KIND_EDUCATIONAL_PATH: &str = "educational-path";
+const MAX_DISPLAY_COLUMNS: usize = 12;
+const MAX_DISPLAY_CHARS: usize = 120;
+const MAX_ERROR_CHARS: usize = 240;
+const MAX_TENSOR_PREVIEW_VALUES: usize = 12;
 
 #[derive(Debug)]
 struct Config {
@@ -215,9 +219,9 @@ fn validate_format_policy(config: &Config) -> Result<(), String> {
             "--format html is only supported for --demo {}; got {label:?}",
             supported_html_demos()
         )),
+        Input::CsvPath { .. } if config.kind == KIND_DATA_READINESS => Ok(()),
         Input::CsvPath { .. } => Err(format!(
-            "--format html is only supported for --demo {}",
-            supported_html_demos()
+            "--format html is only supported for --input <csv-path> --kind {KIND_DATA_READINESS}"
         )),
     }
 }
@@ -285,11 +289,21 @@ fn render_report(config: &Config) -> Result<String, Box<dyn Error>> {
                 supported_html_demos()
             )
             .into()),
-            Input::CsvPath { .. } => Err(format!(
-                "--format html is only supported for --demo {}",
-                supported_html_demos()
-            )
-            .into()),
+            Input::CsvPath { path } => {
+                if config.kind != KIND_DATA_READINESS {
+                    return Err(format!(
+                        "unsupported report kind {:?}; expected {KIND_DATA_READINESS:?}",
+                        config.kind
+                    )
+                    .into());
+                }
+                let table = Table::from_csv_path(path).map_err(Box::<dyn Error>::from)?;
+                render_input_data_readiness_html_report(
+                    &format!("path: {}", path.display()),
+                    &table,
+                    &config.select,
+                )
+            }
         };
     }
 
@@ -547,6 +561,261 @@ fn render_data_readiness_html_report() -> Result<String, Box<dyn Error>> {
     writeln!(report, "</html>")?;
 
     Ok(report)
+}
+
+struct InputDataReadinessReportData {
+    input_label: String,
+    source_columns: Vec<String>,
+    selected_columns: Vec<String>,
+    left_out_columns: Vec<String>,
+    missing_counts: Vec<DataReadinessMissingCount>,
+    conversion: InputDataReadinessConversion,
+}
+
+enum InputDataReadinessConversion {
+    Success {
+        tensor_shape: Vec<usize>,
+        tensor_values: Vec<f64>,
+    },
+    Error {
+        message: String,
+    },
+}
+
+fn input_data_readiness_report_data(
+    input_label: &str,
+    table: &Table,
+    select: &[String],
+) -> Result<InputDataReadinessReportData, Box<dyn Error>> {
+    let selected = table
+        .select_columns(select.iter().map(String::as_str))
+        .map_err(Box::<dyn Error>::from)?;
+    let selected_summary = selected.schema_summary();
+    let missing_counts = selected_summary
+        .column_summaries()
+        .iter()
+        .map(|column| DataReadinessMissingCount {
+            column: column.name.clone(),
+            missing: column.missing,
+        })
+        .collect();
+    let conversion = match selected.try_numeric() {
+        Ok(numeric) => {
+            let tensor = numeric.to_tensor().map_err(Box::<dyn Error>::from)?;
+            InputDataReadinessConversion::Success {
+                tensor_shape: tensor.shape().to_vec(),
+                tensor_values: tensor.as_slice().to_vec(),
+            }
+        }
+        Err(err) => InputDataReadinessConversion::Error {
+            message: describe_data_error(&err),
+        },
+    };
+
+    Ok(InputDataReadinessReportData {
+        input_label: input_label.to_string(),
+        source_columns: table.column_names().to_vec(),
+        selected_columns: select.to_vec(),
+        left_out_columns: left_out_columns(table.column_names(), select),
+        missing_counts,
+        conversion,
+    })
+}
+
+fn render_input_data_readiness_html_report(
+    input_label: &str,
+    table: &Table,
+    select: &[String],
+) -> Result<String, Box<dyn Error>> {
+    let data = input_data_readiness_report_data(input_label, table, select)?;
+    let mut report = String::new();
+    writeln!(report, "<!doctype html>")?;
+    writeln!(report, "<html lang=\"en\">")?;
+    writeln!(report, "<head>")?;
+    writeln!(report, "  <meta charset=\"utf-8\">")?;
+    writeln!(
+        report,
+        "  <title>{}</title>",
+        html_escape("matten data-readiness report")
+    )?;
+    writeln!(report, "  <style>")?;
+    writeln!(
+        report,
+        "    :root {{ color-scheme: light; font-family: system-ui, sans-serif; }}"
+    )?;
+    writeln!(
+        report,
+        "    body {{ margin: 2rem auto; max-width: 920px; color: #17202a; background: #ffffff; line-height: 1.5; }}"
+    )?;
+    writeln!(
+        report,
+        "    h1, h2 {{ color: #14324a; }} section {{ border-top: 1px solid #d6dde5; padding: 1rem 0; }}"
+    )?;
+    writeln!(
+        report,
+        "    table {{ width: 100%; border-collapse: collapse; margin: 0.75rem 0; }} th, td {{ border: 1px solid #d6dde5; padding: 0.45rem 0.6rem; text-align: left; vertical-align: top; }}"
+    )?;
+    writeln!(
+        report,
+        "    th {{ background: #eef4f8; }} code, .shape {{ font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }}"
+    )?;
+    writeln!(
+        report,
+        "    .note {{ background: #f6f8fa; border-left: 4px solid #5b8fb9; padding: 0.75rem 1rem; }}"
+    )?;
+    writeln!(
+        report,
+        "    .shape {{ display: inline-block; background: #eef4f8; border: 1px solid #cbd8e3; border-radius: 4px; padding: 0.1rem 0.35rem; }}"
+    )?;
+    writeln!(report, "  </style>")?;
+    writeln!(report, "</head>")?;
+    writeln!(report, "<body>")?;
+    writeln!(report, "<main>")?;
+    writeln!(
+        report,
+        "<h1>{}</h1>",
+        html_escape("matten data-readiness report")
+    )?;
+    writeln!(
+        report,
+        "<p class=\"note\">{}</p>",
+        html_escape("Bounded summary of the provided CSV file; not a full raw table rendering.")
+    )?;
+
+    writeln!(report, "<section>")?;
+    writeln!(report, "<h2>{}</h2>", html_escape("Input"))?;
+    write_shape_flow_table(
+        &mut report,
+        &[("input", cap_display(&data.input_label, MAX_DISPLAY_CHARS))],
+    )?;
+    writeln!(report, "</section>")?;
+
+    writeln!(report, "<section>")?;
+    writeln!(report, "<h2>{}</h2>", html_escape("Columns"))?;
+    write_shape_flow_table(
+        &mut report,
+        &[
+            ("source columns", format_display_list(&data.source_columns)),
+            (
+                "selected columns",
+                format_display_list(&data.selected_columns),
+            ),
+            (
+                "columns left out",
+                format_display_list(&data.left_out_columns),
+            ),
+        ],
+    )?;
+    writeln!(report, "</section>")?;
+
+    writeln!(report, "<section>")?;
+    writeln!(report, "<h2>{}</h2>", html_escape("Missing values"))?;
+    writeln!(report, "<table>")?;
+    writeln!(
+        report,
+        "<thead><tr><th>{}</th><th>{}</th></tr></thead>",
+        html_escape("column"),
+        html_escape("missing")
+    )?;
+    writeln!(report, "<tbody>")?;
+    for row in data.missing_counts.iter().take(MAX_DISPLAY_COLUMNS) {
+        writeln!(
+            report,
+            "<tr><td>{}</td><td><span class=\"shape\">{}</span></td></tr>",
+            html_escape(&cap_display(&row.column, MAX_DISPLAY_CHARS)),
+            row.missing
+        )?;
+    }
+    if data.missing_counts.len() > MAX_DISPLAY_COLUMNS {
+        writeln!(
+            report,
+            "<tr><td>{}</td><td><span class=\"shape\">{}</span></td></tr>",
+            html_escape(&format!(
+                "... {} more",
+                data.missing_counts.len() - MAX_DISPLAY_COLUMNS
+            )),
+            html_escape("not shown")
+        )?;
+    }
+    writeln!(report, "</tbody>")?;
+    writeln!(report, "</table>")?;
+    writeln!(report, "</section>")?;
+
+    writeln!(report, "<section>")?;
+    writeln!(report, "<h2>{}</h2>", html_escape("Numeric conversion"))?;
+    match &data.conversion {
+        InputDataReadinessConversion::Success {
+            tensor_shape,
+            tensor_values,
+        } => {
+            write_shape_flow_table(&mut report, &[("strict conversion", "success".to_string())])?;
+            writeln!(report, "</section>")?;
+
+            writeln!(report, "<section>")?;
+            writeln!(report, "<h2>{}</h2>", html_escape("Tensor preview"))?;
+            write_shape_flow_table(
+                &mut report,
+                &[
+                    ("shape", format!("{tensor_shape:?}")),
+                    ("row-major values", format_tensor_preview(tensor_values)),
+                ],
+            )?;
+        }
+        InputDataReadinessConversion::Error { message } => {
+            write_shape_flow_table(
+                &mut report,
+                &[
+                    ("strict conversion", "error".to_string()),
+                    ("error", cap_display(message, MAX_ERROR_CHARS)),
+                ],
+            )?;
+        }
+    }
+    writeln!(report, "</section>")?;
+
+    writeln!(report, "</main>")?;
+    writeln!(report, "</body>")?;
+    writeln!(report, "</html>")?;
+
+    Ok(report)
+}
+
+fn cap_display(value: &str, max_chars: usize) -> String {
+    if value.chars().count() <= max_chars {
+        return value.to_string();
+    }
+
+    let keep = max_chars.saturating_sub(3);
+    let mut capped: String = value.chars().take(keep).collect();
+    capped.push_str("...");
+    capped
+}
+
+fn format_display_list(values: &[String]) -> String {
+    let mut parts: Vec<String> = values
+        .iter()
+        .take(MAX_DISPLAY_COLUMNS)
+        .map(|value| cap_display(value, MAX_DISPLAY_CHARS))
+        .collect();
+    if values.len() > MAX_DISPLAY_COLUMNS {
+        parts.push(format!("... {} more", values.len() - MAX_DISPLAY_COLUMNS));
+    }
+    parts.join(", ")
+}
+
+fn format_tensor_preview(values: &[f64]) -> String {
+    let mut parts: Vec<String> = values
+        .iter()
+        .take(MAX_TENSOR_PREVIEW_VALUES)
+        .map(|value| format!("{value:?}"))
+        .collect();
+    if values.len() > MAX_TENSOR_PREVIEW_VALUES {
+        parts.push(format!(
+            "... {} more",
+            values.len() - MAX_TENSOR_PREVIEW_VALUES
+        ));
+    }
+    format!("[{}]", parts.join(", "))
 }
 
 fn render_shape_flow_report() -> Result<String, Box<dyn Error>> {
@@ -2111,9 +2380,10 @@ Usage:
   matten-report --demo educational-path [--format markdown] [--output <report.md>]
   matten-report --demo educational-path --format html --output <report.html>
   matten-report --input <csv-path> --kind data-readiness --select <col1,col2> [--output <report.md>]
+  matten-report --input <csv-path> --kind data-readiness --select <col1,col2> --format html --output <report.html>
 
 Demo reports are fixed examples. Input mode supports only data-readiness.
-Markdown is the default format. HTML is local file output for fixed demos only."
+Markdown is the default format. HTML is local file output and requires --output."
         .to_string()
 }
 
@@ -2452,8 +2722,25 @@ mod tests {
     }
 
     #[test]
-    fn input_mode_does_not_support_html_format() {
+    fn input_mode_html_requires_output() {
         let err = parse_args(args(&[
+            "--input",
+            "fixtures/small.csv",
+            "--kind",
+            "data-readiness",
+            "--select",
+            "sales,cost",
+            "--format",
+            "html",
+        ]))
+        .unwrap_err();
+
+        assert!(err.contains("--format html requires --output <report.html>"));
+    }
+
+    #[test]
+    fn input_mode_html_allows_explicit_output() {
+        let action = parse_args(args(&[
             "--input",
             "fixtures/small.csv",
             "--kind",
@@ -2465,11 +2752,19 @@ mod tests {
             "--output",
             "target/matten-report-data-readiness.html",
         ]))
-        .unwrap_err();
+        .expect("input-mode data-readiness HTML with output should parse");
 
-        assert!(err.contains(
-            "--format html is only supported for --demo \"data-readiness\", \"shape-flow\", \"dynamic-readiness\", \"mlprep-standardization\", or \"educational-path\""
-        ));
+        let Action::Run(config) = action else {
+            panic!("expected run action");
+        };
+        assert!(matches!(config.input, Input::CsvPath { .. }));
+        assert_eq!(config.kind, "data-readiness");
+        assert_eq!(config.select, selected(&["sales", "cost"]));
+        assert_eq!(config.format, OutputFormat::Html);
+        assert_eq!(
+            config.output,
+            Some(PathBuf::from("target/matten-report-data-readiness.html"))
+        );
     }
 
     #[test]
@@ -3456,6 +3751,199 @@ row-major values: [100.0, 40.0, 150.0, 45.0, 120.0, 55.0]
         assert!(!report.contains(" href="));
         assert!(!report.contains("data:"));
         assert!(!report.contains("<svg"));
+    }
+
+    #[test]
+    fn input_data_readiness_html_success_matches_expected_html() {
+        let table = Table::from_csv_str(SMALL_CSV).expect("fixture CSV should parse");
+        let report = render_input_data_readiness_html_report(
+            "path: tools/matten-report/fixtures/small.csv",
+            &table,
+            &selected(&["sales", "cost"]),
+        )
+        .expect("input-mode data-readiness HTML should render");
+
+        assert_eq!(
+            report,
+            "\
+<!doctype html>
+<html lang=\"en\">
+<head>
+  <meta charset=\"utf-8\">
+  <title>matten data-readiness report</title>
+  <style>
+    :root { color-scheme: light; font-family: system-ui, sans-serif; }
+    body { margin: 2rem auto; max-width: 920px; color: #17202a; background: #ffffff; line-height: 1.5; }
+    h1, h2 { color: #14324a; } section { border-top: 1px solid #d6dde5; padding: 1rem 0; }
+    table { width: 100%; border-collapse: collapse; margin: 0.75rem 0; } th, td { border: 1px solid #d6dde5; padding: 0.45rem 0.6rem; text-align: left; vertical-align: top; }
+    th { background: #eef4f8; } code, .shape { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .note { background: #f6f8fa; border-left: 4px solid #5b8fb9; padding: 0.75rem 1rem; }
+    .shape { display: inline-block; background: #eef4f8; border: 1px solid #cbd8e3; border-radius: 4px; padding: 0.1rem 0.35rem; }
+  </style>
+</head>
+<body>
+<main>
+<h1>matten data-readiness report</h1>
+<p class=\"note\">Bounded summary of the provided CSV file; not a full raw table rendering.</p>
+<section>
+<h2>Input</h2>
+<table>
+<thead><tr><th>item</th><th>shape / value</th></tr></thead>
+<tbody>
+<tr><td>input</td><td><span class=\"shape\">path: tools/matten-report/fixtures/small.csv</span></td></tr>
+</tbody>
+</table>
+</section>
+<section>
+<h2>Columns</h2>
+<table>
+<thead><tr><th>item</th><th>shape / value</th></tr></thead>
+<tbody>
+<tr><td>source columns</td><td><span class=\"shape\">region, sales, cost, note</span></td></tr>
+<tr><td>selected columns</td><td><span class=\"shape\">sales, cost</span></td></tr>
+<tr><td>columns left out</td><td><span class=\"shape\">region, note</span></td></tr>
+</tbody>
+</table>
+</section>
+<section>
+<h2>Missing values</h2>
+<table>
+<thead><tr><th>column</th><th>missing</th></tr></thead>
+<tbody>
+<tr><td>sales</td><td><span class=\"shape\">0</span></td></tr>
+<tr><td>cost</td><td><span class=\"shape\">0</span></td></tr>
+</tbody>
+</table>
+</section>
+<section>
+<h2>Numeric conversion</h2>
+<table>
+<thead><tr><th>item</th><th>shape / value</th></tr></thead>
+<tbody>
+<tr><td>strict conversion</td><td><span class=\"shape\">success</span></td></tr>
+</tbody>
+</table>
+</section>
+<section>
+<h2>Tensor preview</h2>
+<table>
+<thead><tr><th>item</th><th>shape / value</th></tr></thead>
+<tbody>
+<tr><td>shape</td><td><span class=\"shape\">[3, 2]</span></td></tr>
+<tr><td>row-major values</td><td><span class=\"shape\">[100.0, 40.0, 150.0, 45.0, 120.0, 55.0]</span></td></tr>
+</tbody>
+</table>
+</section>
+</main>
+</body>
+</html>
+"
+        );
+    }
+
+    #[test]
+    fn input_data_readiness_html_error_is_bounded_summary() {
+        let table = Table::from_csv_str(NON_NUMERIC_CSV).expect("fixture CSV should parse");
+        let report = render_input_data_readiness_html_report(
+            "path: tools/matten-report/fixtures/non_numeric.csv",
+            &table,
+            &selected(&["sales", "cost"]),
+        )
+        .expect("input-mode data-readiness error HTML should render");
+
+        assert!(report.contains("<h1>matten data-readiness report</h1>"));
+        assert!(report.contains("Bounded summary of the provided CSV file"));
+        assert!(report.contains("<h2>Numeric conversion</h2>"));
+        assert!(report.contains("<span class=\"shape\">error</span>"));
+        assert!(report.contains(
+            "non-numeric value &quot;oops&quot; in column &quot;sales&quot;, CSV line 3"
+        ));
+        assert!(!report.contains("<h2>Tensor preview</h2>"));
+        assert!(!report.contains("Fixed demo report, not arbitrary CSV profiling."));
+    }
+
+    #[test]
+    fn input_data_readiness_html_is_static_self_contained_and_escaped() {
+        let csv = "\
+region,<script>alert(1)</script>,cost,note
+north,<b>oops</b>,40,ok
+";
+        let table = Table::from_csv_str(csv).expect("hostile fixture CSV should parse");
+        let report = render_input_data_readiness_html_report(
+            "path: <script>/tmp/hostile.csv</script>",
+            &table,
+            &selected(&["<script>alert(1)</script>", "cost"]),
+        )
+        .expect("hostile input HTML should render");
+
+        assert!(report.starts_with("<!doctype html>\n<html lang=\"en\">"));
+        assert!(report.contains("path: &lt;script&gt;/tmp/hostile.csv&lt;/script&gt;"));
+        assert!(report.contains("&lt;script&gt;alert(1)&lt;/script&gt;"));
+        assert!(report.contains("&lt;b&gt;oops&lt;/b&gt;"));
+        assert!(!report.contains("<script>alert(1)</script>"));
+        assert!(!report.contains("<b>oops</b>"));
+        assert!(!report.contains("<script"));
+        assert!(!report.contains(" src="));
+        assert!(!report.contains(" href="));
+        assert!(!report.contains("data:"));
+        assert!(!report.contains("<svg"));
+    }
+
+    #[test]
+    fn input_data_readiness_html_bounds_wide_and_long_fields() {
+        let headers: Vec<String> = (0..15)
+            .map(|index| {
+                if index == 1 {
+                    format!("selected_{}", "x".repeat(180))
+                } else {
+                    format!("col{index}")
+                }
+            })
+            .collect();
+        let values: Vec<String> = (0..15).map(|index| index.to_string()).collect();
+        let csv = format!("{}\n{}\n", headers.join(","), values.join(","));
+        let table = Table::from_csv_str(&csv).expect("wide fixture CSV should parse");
+        let report = render_input_data_readiness_html_report(
+            &format!("path: {}", "p".repeat(180)),
+            &table,
+            &selected(&[&headers[1], "col2"]),
+        )
+        .expect("wide input HTML should render");
+
+        assert!(report.contains("... 3 more"));
+        assert!(report.contains("path: ppppp"));
+        assert!(report.contains("...</span>"));
+        assert!(report.contains("selected_xxxxxxxxx"));
+        assert!(!report.contains(&"p".repeat(180)));
+        assert!(!report.contains(&headers[1]));
+    }
+
+    #[test]
+    fn input_data_readiness_html_bounds_tensor_preview_values() {
+        let csv = "\
+sales,cost
+1,2
+3,4
+5,6
+7,8
+9,10
+11,12
+13,14
+";
+        let table = Table::from_csv_str(csv).expect("long numeric fixture CSV should parse");
+        let report = render_input_data_readiness_html_report(
+            "path: long.csv",
+            &table,
+            &selected(&["sales", "cost"]),
+        )
+        .expect("long numeric input HTML should render");
+
+        assert!(report.contains(
+            "[1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, ... 2 more]"
+        ));
+        assert!(!report.contains(
+            "[1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.0, 14.0]"
+        ));
     }
 
     #[test]

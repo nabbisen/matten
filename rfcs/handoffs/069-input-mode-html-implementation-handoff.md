@@ -3,7 +3,7 @@
 **Project:** `matten`
 **Related RFC:** RFC-069: Input-Mode HTML Report Policy
 **Document kind:** Compact local-tool implementation handoff
-**Status:** Drafted for review; no implementation authorized until review accepts this handoff
+**Status:** Implemented in working tree; pending implementation review
 **Scope:** Local-only static HTML artifact for `tools/matten-report --input ... --kind data-readiness`
 
 ---
