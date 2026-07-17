@@ -246,3 +246,12 @@ crates or public renderer APIs. The audit recommends keeping renderers private,
 keeping core `matten` visualization-free, and considering a separate JSON
 report-schema policy audit or private report-model extraction before any public
 crate work.
+
+The private report-model extraction handoff
+([`070-private-report-model-extraction-handoff.md`](./handoffs/070-private-report-model-extraction-handoff.md))
+is the first proposed post-audit prerequisite. It is a behavior-neutral
+local-tool refactor candidate for `tools/matten-report` only: private helpers or
+private model extraction may reduce renderer duplication, but public report
+schemas, reusable renderer APIs, public `matten-report` / `matten-viz` crates,
+JSON/SVG/Vega-Lite output, dependency changes, and release work remain separate
+future decisions.

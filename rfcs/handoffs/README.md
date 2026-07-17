@@ -53,6 +53,7 @@ working documents for the implementation team and may be revised as work proceed
 | `069-input-mode-html-implementation-handoff.md` | RFC-069 input-mode HTML report implementation handoff |
 | `069-post-036-input-mode-html-closure-audit.md` | RFC-069 post-0.36 input-mode HTML closure audit |
 | `070-public-visualization-report-readiness-audit.md` | RFC-070 public visualization/report readiness audit |
+| `070-private-report-model-extraction-handoff.md` | RFC-070 private report-model extraction handoff |
 
 ## Documentation-governance handoffs
 
