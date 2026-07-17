@@ -86,17 +86,19 @@ The broader documentation ownership model is recorded in
 
 ## Proposed
 
-No active proposed RFCs.
+| ID | Title | Scope |
+|---:|---|---|
+| 070 | [Public Visualization and Report Readiness Audit](./proposed/070-public-visualization-report-readiness-audit.md) | Audit-only decision gate for public `matten-report` / `matten-viz`; no implementation authorized |
 
 ## Remaining Themes And Issues
 
-The empty `rfcs/proposed/` directory means no active RFC is currently open. It
-does not mean the project has no remaining candidate themes. The current
+`rfcs/proposed/` currently contains RFC-070, an audit-only RFC. The remaining
+themes below are not authorized unless their current status says so. The current
 post-0.36 backlog is:
 
 | Theme | Current authority | Current status |
 |---|---|---|
-| Public `matten-report` / `matten-viz` readiness | RFC-063, RFC-065, RFC-068, RFC-069, post-0.36 RFC-069 closure audit | Candidate audit-only RFC; no public crate or API authorized |
+| Public `matten-report` / `matten-viz` readiness | RFC-070, RFC-063, RFC-065, RFC-068, RFC-069, post-0.36 RFC-069 closure audit | Proposed audit-only RFC; no public crate or API authorized |
 | More input-mode HTML paths | RFC-069, post-0.36 RFC-069 closure audit | Deferred until a concrete report path is reviewed |
 | JSON / SVG / Vega-Lite report output | RFC-063, RFC-068, RFC-069 | Deferred; separate RFC or reviewed handoff required |
 | Streaming / large CSV | RFC-026, RFC-037 | Deferred; future implementation RFC must answer batch/schema/malformed-row/memory/sync-vs-async policy |
