@@ -206,3 +206,12 @@ default, keeps HTML explicit-file-only, covers success and numeric-conversion
 error reports, escapes hostile input, and bounds column lists, long
 fields, conversion errors, and tensor previews. The scope is released in
 `0.36.0`; release metadata changes are limited to that scope.
+
+The post-0.36 closure audit
+([`069-post-036-input-mode-html-closure-audit.md`](./handoffs/069-post-036-input-mode-html-closure-audit.md))
+records the recommended closure point after the `0.36.0` release. The audit
+recommends closing RFC-069 for the reviewed data-readiness input-mode local HTML
+scope rather than continuing input-mode HTML automatically. More input-mode HTML
+paths, public report/viz crates, JSON/SVG/Vega-Lite output, notebook/browser
+integration, expression tracing, autograd, and core visualization APIs remain
+separate future RFC or handoff decisions.

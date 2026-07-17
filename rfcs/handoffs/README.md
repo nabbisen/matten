@@ -51,6 +51,7 @@ working documents for the implementation team and may be revised as work proceed
 | `068-post-035-fixed-demo-html-closure-audit.md` | RFC-068 post-0.35 fixed-demo local HTML closure audit |
 | `069-input-mode-html-policy-audit.md` | RFC-069 input-mode HTML report policy audit |
 | `069-input-mode-html-implementation-handoff.md` | RFC-069 input-mode HTML report implementation handoff |
+| `069-post-036-input-mode-html-closure-audit.md` | RFC-069 post-0.36 input-mode HTML closure audit |
 
 ## Documentation-governance handoffs
 
