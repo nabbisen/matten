@@ -249,10 +249,10 @@ crate work.
 
 The private report-model extraction handoff
 ([`070-private-report-model-extraction-handoff.md`](./handoffs/070-private-report-model-extraction-handoff.md))
-is the first post-audit prerequisite. Its implementation is prepared for review
-as a behavior-neutral local-tool refactor for `tools/matten-report` only: the
-repeated static HTML document shell is now shared by private helpers, while
-report-family data models remain private and family-specific. Public report
-schemas, reusable renderer APIs, public `matten-report` / `matten-viz` crates,
-JSON/SVG/Vega-Lite output, dependency changes, and release work remain separate
-future decisions.
+is the first post-audit prerequisite. Its implementation was reviewed and
+committed in `783d757` as a behavior-neutral local-tool refactor for
+`tools/matten-report` only: the repeated static HTML document shell is now
+shared by private helpers, while report-family data models remain private and
+family-specific. Public report schemas, reusable renderer APIs, public
+`matten-report` / `matten-viz` crates, JSON/SVG/Vega-Lite output, dependency
+changes, and release work remain separate future decisions.

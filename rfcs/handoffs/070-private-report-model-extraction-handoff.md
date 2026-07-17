@@ -3,7 +3,7 @@
 **Project:** `matten`
 **Related RFCs:** RFC-063, RFC-065, RFC-068, RFC-069, RFC-070
 **Document kind:** Local-tool refactor handoff
-**Status:** Implemented; prepared for review
+**Status:** Implemented and reviewed; committed in `783d757`
 **Date:** 2026-07-17
 
 ---
