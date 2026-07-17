@@ -3,7 +3,7 @@
 **Project:** `matten`
 **Related RFC:** RFC-069: Input-Mode HTML Report Policy
 **Document kind:** Compact local-tool implementation handoff
-**Status:** Implemented in working tree; pending implementation review
+**Status:** Implemented and reviewed; 0.36.0 release scope
 **Scope:** Local-only static HTML artifact for `tools/matten-report --input ... --kind data-readiness`
 
 ---
@@ -276,7 +276,7 @@ docs/src/contributing/release-checklist.md
 Expected tracking files:
 
 ```text
-rfcs/proposed/069-input-mode-html-report-policy.md
+rfcs/done/069-input-mode-html-report-policy.md
 rfcs/handoffs/069-input-mode-html-policy-audit.md
 rfcs/handoffs/069-input-mode-html-implementation-handoff.md
 rfcs/handoffs/README.md

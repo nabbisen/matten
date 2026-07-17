@@ -1,7 +1,7 @@
 # RFC-069: Input-Mode HTML Report Policy
 
-**Status:** Proposed; policy audit and implementation handoff reviewed; first implementation prepared for review
-**Target:** post-0.35 reviewed policy decision and input-mode HTML implementation; no release authorized
+**Status:** Implemented (0.36.0 input-mode data-readiness HTML); public report/viz crates and broader visualization scope deferred
+**Target:** v0.36.0 local input-mode HTML artifact for data-readiness reports
 **Theme:** Safe local HTML reporting for user-provided `matten-report` CSV input
 **Depends on:** RFC-001, RFC-037, RFC-063, RFC-065, RFC-068
 **Related:** RFC-023, RFC-034, RFC-035, RFC-066, RFC-067
@@ -10,8 +10,8 @@
 
 ## 1. Summary
 
-This RFC proposes the policy boundary for possibly allowing local static HTML
-output from `tools/matten-report` input mode:
+This RFC records the policy boundary for local static HTML output from
+`tools/matten-report` input mode:
 
 ```bash
 cargo run --manifest-path tools/matten-report/Cargo.toml -- \
@@ -22,11 +22,10 @@ cargo run --manifest-path tools/matten-report/Cargo.toml -- \
   --output target/matten-report-input.html
 ```
 
-Today this command is rejected. That rejection is correct until this RFC, its
-handoff, and a later implementation review explicitly accept the user-controlled
-data policy.
+This command is accepted as of `0.36.0` after the RFC-069 policy audit, handoff,
+and implementation review accepted the user-controlled data policy.
 
-The proposed direction is conservative:
+The accepted direction is conservative:
 
 ```text
 local tool only
@@ -40,8 +39,9 @@ no external assets
 no public crate or core API
 ```
 
-This RFC does not itself authorize implementation. It defines what review must
-accept before input-mode HTML can be implemented.
+This RFC authorized only the reviewed local-tool input-mode HTML slice that
+shipped in `0.36.0`. It does not authorize public report/viz crates or broader
+visualization scope.
 
 ---
 
@@ -118,8 +118,7 @@ This RFC does not authorize:
 
 ### 5.1 Accepted command shape
 
-If implementation is later authorized, the accepted input-mode HTML command
-should be:
+The accepted input-mode HTML command is:
 
 ```bash
 cargo run --manifest-path tools/matten-report/Cargo.toml -- \
@@ -186,8 +185,8 @@ unbounded lists of failing cells
 source file contents outside the existing report summary
 ```
 
-The future implementation handoff should choose explicit preview limits before
-coding starts.
+The implementation uses explicit display bounds for column lists, long
+path/header/error strings, and tensor previews.
 
 ### 5.4 Escaping policy
 
@@ -232,5 +231,6 @@ Review should decide:
 [ ] Are public report/viz crates, core visualization APIs, SVG/Vega-Lite/JSON, expression tracing, and autograd still correctly deferred?
 ```
 
-If this RFC is accepted, the next step should be a compact implementation
-handoff. No implementation should start directly from this RFC alone.
+This RFC is implemented for the narrow `tools/matten-report` input-mode
+data-readiness HTML scope. Any broader visualization work still requires a
+separate reviewed RFC or handoff.

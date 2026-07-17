@@ -82,12 +82,11 @@ The broader documentation ownership model is recorded in
 | 066 | [v1.0 Readiness Audit and Release Decision Gate](./done/066-v1-readiness-audit-and-release-decision-gate.md) | 0.31.0 (readiness audit and release-decision gate; no v1.0 release authorization) |
 | 067 | [v1.0 Family Maturity Policy](./done/067-v1-family-maturity-policy.md) | repository policy; resolves RFC-066 MD-1 without v1.0 release authorization |
 | 068 | [Rich Local Visualization Artifacts](./done/068-rich-local-visualization-artifacts.md) | 0.32.0 (educational-path and shape-flow HTML); 0.33.0 (dynamic-readiness HTML); 0.34.0 (mlprep-standardization HTML); 0.35.0 (data-readiness HTML; fixed-demo HTML line complete; input-mode HTML and public report/viz crates deferred) |
+| 069 | [Input-Mode HTML Report Policy](./done/069-input-mode-html-report-policy.md) | 0.36.0 (`tools/matten-report` data-readiness input-mode HTML; public report/viz crates deferred) |
 
 ## Proposed
 
-| ID | Title | Target |
-|---:|---|---|
-| 069 | [Input-Mode HTML Report Policy](./proposed/069-input-mode-html-report-policy.md) | post-0.35 policy audit and handoff reviewed; implementation prepared for review; no release authorized |
+No active proposed RFCs.
 
 Implementation handoffs for the v0.20+ proposed set (RFC-033–042), the examples
 program (RFC-043–048), and the benchmarking program (RFC-049) live in
@@ -188,23 +187,22 @@ visualization APIs remain separate future RFC or handoff decisions.
 
 RFC-069 starts that separate input-mode HTML decision path. Its policy audit
 ([`069-input-mode-html-policy-audit.md`](./handoffs/069-input-mode-html-policy-audit.md))
-keeps implementation unauthorized while asking whether `tools/matten-report
---input <csv> --kind data-readiness --select <cols> --format html --output
-<path>` should become a narrow, summary-only, bounded, escaped local artifact in
-a later reviewed slice. It does not reopen RFC-068 fixed-demo work and does not
-authorize public report/viz crates or core visualization APIs.
+opened review for whether `tools/matten-report --input <csv> --kind
+data-readiness --select <cols> --format html --output <path>` should become a
+narrow, summary-only, bounded, escaped local artifact. It did not reopen
+RFC-068 fixed-demo work and did not authorize public report/viz crates or core
+visualization APIs.
 
 The RFC-069 implementation handoff
 ([`069-input-mode-html-implementation-handoff.md`](./handoffs/069-input-mode-html-implementation-handoff.md))
-turns the accepted policy direction into a concrete review target, including
-explicit display bounds for tensor previews, wide column lists, long paths,
-long headers, and conversion errors. It still does not authorize code until the
-handoff itself is reviewed and accepted.
+translated the accepted policy direction into the reviewed implementation
+target, including explicit display bounds for tensor previews, wide column
+lists, long paths, long headers, and conversion errors.
 
-The first RFC-069 implementation prepares local static HTML output for
+The first RFC-069 implementation added local static HTML output for
 `tools/matten-report --input <csv> --kind data-readiness --select <cols>
 --format html --output <path>`. The implementation keeps Markdown/plain text as
 default, keeps HTML explicit-file-only, covers success and numeric-conversion
-error reports, escapes hostile input, and display-bounds column lists, long
-fields, conversion errors, and tensor previews. It is pending implementation
-review and does not authorize release metadata changes.
+error reports, escapes hostile input, and bounds column lists, long
+fields, conversion errors, and tensor previews. The scope is released in
+`0.36.0`; release metadata changes are limited to that scope.

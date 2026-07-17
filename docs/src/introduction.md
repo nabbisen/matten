@@ -14,7 +14,7 @@ This book is organized by reader:
 - **Reference** — the rules that shape the public API.
 - **Contributors** — project layout, milestones, and process.
 
-> This documentation tracks the current 0.35 release family, an RFC-068 local
-> visualization-artifact release that completes static HTML output for fixed
-> `matten-report` demos without changing public APIs, published dependencies,
-> runtime behavior, or maturity labels.
+> This documentation tracks the current 0.36 release family, an RFC-069 local
+> visualization-artifact release that adds bounded static HTML output for
+> `matten-report` data-readiness input mode without changing public APIs,
+> published dependencies, core runtime behavior, or maturity labels.

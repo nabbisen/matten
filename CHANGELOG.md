@@ -18,6 +18,55 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.36.0] - 2026-07-17
+
+RFC-069 input-mode visualization release. This release stops feature work after
+adding local static HTML output for `tools/matten-report` data-readiness input
+mode. Markdown/plain text remains the default. No public API, published crate
+dependency graph, core default feature, runtime behavior, MSRV, or
+maturity-label change.
+
+### Added
+
+- `tools/matten-report --input <csv> --kind data-readiness --select <cols>
+  --format html --output <path>`, a local-only static HTML artifact for
+  user-provided CSV data-readiness summaries.
+- Summary-only input-mode HTML for both strict numeric conversion success and
+  numeric-conversion-error reports.
+- HTML escaping tests for hostile input plus display bounds for source,
+  selected, and left-out column lists; long path/header/error strings; and
+  row-major tensor previews.
+- CI and release-checklist smoke commands for success and conversion-error
+  input-mode HTML artifacts.
+
+### Changed
+
+- Current-family documentation and install snippets retargeted from `0.35.0` to
+  `0.36.0`.
+- RFC-069 moved to implemented status for the reviewed input-mode HTML scope.
+  Public report/viz crates, core visualization APIs, SVG/Vega-Lite/JSON output,
+  expression tracing, autograd, notebook/browser/GUI scope, and general raw CSV
+  HTML rendering remain deferred.
+
+### Version
+
+- Release bump `0.35.0` -> `0.36.0`. Lock-step family versioning still applies
+  to all workspace crates; `tools/matten-report` and `tools/matten-migrate`
+  remain local unpublished tools at their own tool versions.
+
+### Threat model
+
+Local-tool, docs, RFC, roadmap, and release-metadata updates only. The new HTML
+path accepts user-controlled CSV input but remains local-file-only, requires
+explicit `--output`, renders summary-only content, escapes user-controlled
+strings, and bounds column lists, long fields, error text, and tensor
+previews. No public API change, published dependency change, core default
+feature change, MSRV change, maturity-label change, companion promotion,
+automatic project mutation, network, telemetry, generated checked-in artifact,
+JavaScript, external asset, SVG, Vega-Lite, JSON report format, plotting,
+notebook, GUI, browser app, expression tracing, autograd, public tooling crate
+change, or tag/publish action.
+
 ## [0.35.0] - 2026-07-16
 
 RFC-068 rich local visualization continuation release. This release stops
