@@ -3,7 +3,7 @@
 **Project:** `matten`
 **Related RFCs:** RFC-063, RFC-065, RFC-068, RFC-069, RFC-070
 **Document kind:** Local-tool refactor handoff
-**Status:** Drafted for review; no implementation authorized
+**Status:** Implemented; prepared for review
 **Date:** 2026-07-17
 
 ---
@@ -261,3 +261,29 @@ Likely follow-up candidates:
 | Public `matten-viz` crate | Still deferred |
 | Core visualization APIs | Still deferred |
 | Additional local HTML feature work | Requires a separate handoff or RFC |
+
+---
+
+## 10. Implementation Record
+
+Implemented for review as a behavior-neutral private helper extraction inside
+`tools/matten-report/src/main.rs`.
+
+The implementation extracts the repeated static HTML document shell into private
+helpers:
+
+```text
+render_html_document()
+write_html_document_start()
+write_html_document_end()
+```
+
+All report-specific data models remain private and family-specific. Markdown
+renderers are unchanged. HTML report bodies still render through the existing
+private body/table/pre helpers, but now share one document wrapper for title,
+style, top-level heading, note, and closing tags.
+
+No CLI behavior, output format, public API, public crate, workspace membership,
+dependency, JSON/SVG/Vega-Lite output, core visualization API, expression
+tracing, autograd, release prep, tag, publish, or generated checked-in artifact
+is included.

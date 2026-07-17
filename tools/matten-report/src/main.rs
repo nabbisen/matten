@@ -444,123 +444,69 @@ fn data_readiness_demo_report_data() -> Result<DataReadinessReportData, Box<dyn 
 
 fn render_data_readiness_html_report() -> Result<String, Box<dyn Error>> {
     let data = data_readiness_demo_report_data()?;
-    let mut report = String::new();
-    writeln!(report, "<!doctype html>")?;
-    writeln!(report, "<html lang=\"en\">")?;
-    writeln!(report, "<head>")?;
-    writeln!(report, "  <meta charset=\"utf-8\">")?;
-    writeln!(
-        report,
-        "  <title>{}</title>",
-        html_escape("matten data-readiness report")
-    )?;
-    writeln!(report, "  <style>")?;
-    writeln!(
-        report,
-        "    :root {{ color-scheme: light; font-family: system-ui, sans-serif; }}"
-    )?;
-    writeln!(
-        report,
-        "    body {{ margin: 2rem auto; max-width: 920px; color: #17202a; background: #ffffff; line-height: 1.5; }}"
-    )?;
-    writeln!(
-        report,
-        "    h1, h2 {{ color: #14324a; }} section {{ border-top: 1px solid #d6dde5; padding: 1rem 0; }}"
-    )?;
-    writeln!(
-        report,
-        "    table {{ width: 100%; border-collapse: collapse; margin: 0.75rem 0; }} th, td {{ border: 1px solid #d6dde5; padding: 0.45rem 0.6rem; text-align: left; vertical-align: top; }}"
-    )?;
-    writeln!(
-        report,
-        "    th {{ background: #eef4f8; }} code, .shape {{ font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }}"
-    )?;
-    writeln!(
-        report,
-        "    .note {{ background: #f6f8fa; border-left: 4px solid #5b8fb9; padding: 0.75rem 1rem; }}"
-    )?;
-    writeln!(
-        report,
-        "    .shape {{ display: inline-block; background: #eef4f8; border: 1px solid #cbd8e3; border-radius: 4px; padding: 0.1rem 0.35rem; }}"
-    )?;
-    writeln!(report, "  </style>")?;
-    writeln!(report, "</head>")?;
-    writeln!(report, "<body>")?;
-    writeln!(report, "<main>")?;
-    writeln!(
-        report,
-        "<h1>{}</h1>",
-        html_escape("matten data-readiness report")
-    )?;
-    writeln!(
-        report,
-        "<p class=\"note\">{}</p>",
-        html_escape("Fixed demo report, not arbitrary CSV profiling.")
-    )?;
+    render_html_document(
+        "matten data-readiness report",
+        "Fixed demo report, not arbitrary CSV profiling.",
+        |report| {
+            writeln!(report, "<section>")?;
+            writeln!(report, "<h2>{}</h2>", html_escape("Input"))?;
+            write_shape_flow_table(report, &[("input", data.input_label.to_string())])?;
+            writeln!(report, "</section>")?;
 
-    writeln!(report, "<section>")?;
-    writeln!(report, "<h2>{}</h2>", html_escape("Input"))?;
-    write_shape_flow_table(&mut report, &[("input", data.input_label.to_string())])?;
-    writeln!(report, "</section>")?;
+            writeln!(report, "<section>")?;
+            writeln!(report, "<h2>{}</h2>", html_escape("Columns"))?;
+            write_shape_flow_table(
+                report,
+                &[
+                    ("source columns", data.source_columns.join(", ")),
+                    ("selected columns", data.selected_columns.join(", ")),
+                    ("columns left out", data.left_out_columns.join(", ")),
+                ],
+            )?;
+            writeln!(report, "</section>")?;
 
-    writeln!(report, "<section>")?;
-    writeln!(report, "<h2>{}</h2>", html_escape("Columns"))?;
-    write_shape_flow_table(
-        &mut report,
-        &[
-            ("source columns", data.source_columns.join(", ")),
-            ("selected columns", data.selected_columns.join(", ")),
-            ("columns left out", data.left_out_columns.join(", ")),
-        ],
-    )?;
-    writeln!(report, "</section>")?;
+            writeln!(report, "<section>")?;
+            writeln!(report, "<h2>{}</h2>", html_escape("Missing values"))?;
+            writeln!(report, "<table>")?;
+            writeln!(
+                report,
+                "<thead><tr><th>{}</th><th>{}</th></tr></thead>",
+                html_escape("column"),
+                html_escape("missing")
+            )?;
+            writeln!(report, "<tbody>")?;
+            for row in &data.missing_counts {
+                writeln!(
+                    report,
+                    "<tr><td>{}</td><td><span class=\"shape\">{}</span></td></tr>",
+                    html_escape(&row.column),
+                    row.missing
+                )?;
+            }
+            writeln!(report, "</tbody>")?;
+            writeln!(report, "</table>")?;
+            writeln!(report, "</section>")?;
 
-    writeln!(report, "<section>")?;
-    writeln!(report, "<h2>{}</h2>", html_escape("Missing values"))?;
-    writeln!(report, "<table>")?;
-    writeln!(
-        report,
-        "<thead><tr><th>{}</th><th>{}</th></tr></thead>",
-        html_escape("column"),
-        html_escape("missing")
-    )?;
-    writeln!(report, "<tbody>")?;
-    for row in &data.missing_counts {
-        writeln!(
-            report,
-            "<tr><td>{}</td><td><span class=\"shape\">{}</span></td></tr>",
-            html_escape(&row.column),
-            row.missing
-        )?;
-    }
-    writeln!(report, "</tbody>")?;
-    writeln!(report, "</table>")?;
-    writeln!(report, "</section>")?;
+            writeln!(report, "<section>")?;
+            writeln!(report, "<h2>{}</h2>", html_escape("Numeric conversion"))?;
+            write_shape_flow_table(
+                report,
+                &[("strict conversion", data.conversion_status.to_string())],
+            )?;
+            writeln!(report, "</section>")?;
 
-    writeln!(report, "<section>")?;
-    writeln!(report, "<h2>{}</h2>", html_escape("Numeric conversion"))?;
-    write_shape_flow_table(
-        &mut report,
-        &[("strict conversion", data.conversion_status.to_string())],
-    )?;
-    writeln!(report, "</section>")?;
-
-    writeln!(report, "<section>")?;
-    writeln!(report, "<h2>{}</h2>", html_escape("Tensor preview"))?;
-    write_shape_flow_table(
-        &mut report,
-        &[
-            ("shape", format!("{:?}", data.tensor_shape)),
-            ("row-major values", format!("{:?}", data.tensor_values)),
-        ],
-    )?;
-    writeln!(report, "</section>")?;
-
-    writeln!(report, "</main>")?;
-    writeln!(report, "</body>")?;
-    writeln!(report, "</html>")?;
-
-    Ok(report)
+            writeln!(report, "<section>")?;
+            writeln!(report, "<h2>{}</h2>", html_escape("Tensor preview"))?;
+            write_shape_flow_table(
+                report,
+                &[
+                    ("shape", format!("{:?}", data.tensor_shape)),
+                    ("row-major values", format!("{:?}", data.tensor_values)),
+                ],
+            )?;
+            writeln!(report, "</section>")
+        },
+    )
 }
 
 struct InputDataReadinessReportData {
@@ -628,156 +574,105 @@ fn render_input_data_readiness_html_report(
     select: &[String],
 ) -> Result<String, Box<dyn Error>> {
     let data = input_data_readiness_report_data(input_label, table, select)?;
-    let mut report = String::new();
-    writeln!(report, "<!doctype html>")?;
-    writeln!(report, "<html lang=\"en\">")?;
-    writeln!(report, "<head>")?;
-    writeln!(report, "  <meta charset=\"utf-8\">")?;
-    writeln!(
-        report,
-        "  <title>{}</title>",
-        html_escape("matten data-readiness report")
-    )?;
-    writeln!(report, "  <style>")?;
-    writeln!(
-        report,
-        "    :root {{ color-scheme: light; font-family: system-ui, sans-serif; }}"
-    )?;
-    writeln!(
-        report,
-        "    body {{ margin: 2rem auto; max-width: 920px; color: #17202a; background: #ffffff; line-height: 1.5; }}"
-    )?;
-    writeln!(
-        report,
-        "    h1, h2 {{ color: #14324a; }} section {{ border-top: 1px solid #d6dde5; padding: 1rem 0; }}"
-    )?;
-    writeln!(
-        report,
-        "    table {{ width: 100%; border-collapse: collapse; margin: 0.75rem 0; }} th, td {{ border: 1px solid #d6dde5; padding: 0.45rem 0.6rem; text-align: left; vertical-align: top; }}"
-    )?;
-    writeln!(
-        report,
-        "    th {{ background: #eef4f8; }} code, .shape {{ font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }}"
-    )?;
-    writeln!(
-        report,
-        "    .note {{ background: #f6f8fa; border-left: 4px solid #5b8fb9; padding: 0.75rem 1rem; }}"
-    )?;
-    writeln!(
-        report,
-        "    .shape {{ display: inline-block; background: #eef4f8; border: 1px solid #cbd8e3; border-radius: 4px; padding: 0.1rem 0.35rem; }}"
-    )?;
-    writeln!(report, "  </style>")?;
-    writeln!(report, "</head>")?;
-    writeln!(report, "<body>")?;
-    writeln!(report, "<main>")?;
-    writeln!(
-        report,
-        "<h1>{}</h1>",
-        html_escape("matten data-readiness report")
-    )?;
-    writeln!(
-        report,
-        "<p class=\"note\">{}</p>",
-        html_escape("Bounded summary of the provided CSV file; not a full raw table rendering.")
-    )?;
-
-    writeln!(report, "<section>")?;
-    writeln!(report, "<h2>{}</h2>", html_escape("Input"))?;
-    write_shape_flow_table(
-        &mut report,
-        &[("input", cap_display(&data.input_label, MAX_DISPLAY_CHARS))],
-    )?;
-    writeln!(report, "</section>")?;
-
-    writeln!(report, "<section>")?;
-    writeln!(report, "<h2>{}</h2>", html_escape("Columns"))?;
-    write_shape_flow_table(
-        &mut report,
-        &[
-            ("source columns", format_display_list(&data.source_columns)),
-            (
-                "selected columns",
-                format_display_list(&data.selected_columns),
-            ),
-            (
-                "columns left out",
-                format_display_list(&data.left_out_columns),
-            ),
-        ],
-    )?;
-    writeln!(report, "</section>")?;
-
-    writeln!(report, "<section>")?;
-    writeln!(report, "<h2>{}</h2>", html_escape("Missing values"))?;
-    writeln!(report, "<table>")?;
-    writeln!(
-        report,
-        "<thead><tr><th>{}</th><th>{}</th></tr></thead>",
-        html_escape("column"),
-        html_escape("missing")
-    )?;
-    writeln!(report, "<tbody>")?;
-    for row in data.missing_counts.iter().take(MAX_DISPLAY_COLUMNS) {
-        writeln!(
-            report,
-            "<tr><td>{}</td><td><span class=\"shape\">{}</span></td></tr>",
-            html_escape(&cap_display(&row.column, MAX_DISPLAY_CHARS)),
-            row.missing
-        )?;
-    }
-    if data.missing_counts.len() > MAX_DISPLAY_COLUMNS {
-        writeln!(
-            report,
-            "<tr><td>{}</td><td><span class=\"shape\">{}</span></td></tr>",
-            html_escape(&format!(
-                "... {} more",
-                data.missing_counts.len() - MAX_DISPLAY_COLUMNS
-            )),
-            html_escape("not shown")
-        )?;
-    }
-    writeln!(report, "</tbody>")?;
-    writeln!(report, "</table>")?;
-    writeln!(report, "</section>")?;
-
-    writeln!(report, "<section>")?;
-    writeln!(report, "<h2>{}</h2>", html_escape("Numeric conversion"))?;
-    match &data.conversion {
-        InputDataReadinessConversion::Success {
-            tensor_shape,
-            tensor_values,
-        } => {
-            write_shape_flow_table(&mut report, &[("strict conversion", "success".to_string())])?;
+    render_html_document(
+        "matten data-readiness report",
+        "Bounded summary of the provided CSV file; not a full raw table rendering.",
+        |report| {
+            writeln!(report, "<section>")?;
+            writeln!(report, "<h2>{}</h2>", html_escape("Input"))?;
+            write_shape_flow_table(
+                report,
+                &[("input", cap_display(&data.input_label, MAX_DISPLAY_CHARS))],
+            )?;
             writeln!(report, "</section>")?;
 
             writeln!(report, "<section>")?;
-            writeln!(report, "<h2>{}</h2>", html_escape("Tensor preview"))?;
+            writeln!(report, "<h2>{}</h2>", html_escape("Columns"))?;
             write_shape_flow_table(
-                &mut report,
+                report,
                 &[
-                    ("shape", format!("{tensor_shape:?}")),
-                    ("row-major values", format_tensor_preview(tensor_values)),
+                    ("source columns", format_display_list(&data.source_columns)),
+                    (
+                        "selected columns",
+                        format_display_list(&data.selected_columns),
+                    ),
+                    (
+                        "columns left out",
+                        format_display_list(&data.left_out_columns),
+                    ),
                 ],
             )?;
-        }
-        InputDataReadinessConversion::Error { message } => {
-            write_shape_flow_table(
-                &mut report,
-                &[
-                    ("strict conversion", "error".to_string()),
-                    ("error", cap_display(message, MAX_ERROR_CHARS)),
-                ],
+            writeln!(report, "</section>")?;
+
+            writeln!(report, "<section>")?;
+            writeln!(report, "<h2>{}</h2>", html_escape("Missing values"))?;
+            writeln!(report, "<table>")?;
+            writeln!(
+                report,
+                "<thead><tr><th>{}</th><th>{}</th></tr></thead>",
+                html_escape("column"),
+                html_escape("missing")
             )?;
-        }
-    }
-    writeln!(report, "</section>")?;
+            writeln!(report, "<tbody>")?;
+            for row in data.missing_counts.iter().take(MAX_DISPLAY_COLUMNS) {
+                writeln!(
+                    report,
+                    "<tr><td>{}</td><td><span class=\"shape\">{}</span></td></tr>",
+                    html_escape(&cap_display(&row.column, MAX_DISPLAY_CHARS)),
+                    row.missing
+                )?;
+            }
+            if data.missing_counts.len() > MAX_DISPLAY_COLUMNS {
+                writeln!(
+                    report,
+                    "<tr><td>{}</td><td><span class=\"shape\">{}</span></td></tr>",
+                    html_escape(&format!(
+                        "... {} more",
+                        data.missing_counts.len() - MAX_DISPLAY_COLUMNS
+                    )),
+                    html_escape("not shown")
+                )?;
+            }
+            writeln!(report, "</tbody>")?;
+            writeln!(report, "</table>")?;
+            writeln!(report, "</section>")?;
 
-    writeln!(report, "</main>")?;
-    writeln!(report, "</body>")?;
-    writeln!(report, "</html>")?;
+            writeln!(report, "<section>")?;
+            writeln!(report, "<h2>{}</h2>", html_escape("Numeric conversion"))?;
+            match &data.conversion {
+                InputDataReadinessConversion::Success {
+                    tensor_shape,
+                    tensor_values,
+                } => {
+                    write_shape_flow_table(
+                        report,
+                        &[("strict conversion", "success".to_string())],
+                    )?;
+                    writeln!(report, "</section>")?;
 
-    Ok(report)
+                    writeln!(report, "<section>")?;
+                    writeln!(report, "<h2>{}</h2>", html_escape("Tensor preview"))?;
+                    write_shape_flow_table(
+                        report,
+                        &[
+                            ("shape", format!("{tensor_shape:?}")),
+                            ("row-major values", format_tensor_preview(tensor_values)),
+                        ],
+                    )?;
+                }
+                InputDataReadinessConversion::Error { message } => {
+                    write_shape_flow_table(
+                        report,
+                        &[
+                            ("strict conversion", "error".to_string()),
+                            ("error", cap_display(message, MAX_ERROR_CHARS)),
+                        ],
+                    )?;
+                }
+            }
+            writeln!(report, "</section>")
+        },
+    )
 }
 
 fn cap_display(value: &str, max_chars: usize) -> String {
@@ -975,158 +870,104 @@ fn shape_flow_report_data() -> ShapeFlowReportData {
 
 fn render_shape_flow_html_report() -> Result<String, Box<dyn Error>> {
     let data = shape_flow_report_data();
-    let mut report = String::new();
-    writeln!(report, "<!doctype html>")?;
-    writeln!(report, "<html lang=\"en\">")?;
-    writeln!(report, "<head>")?;
-    writeln!(report, "  <meta charset=\"utf-8\">")?;
-    writeln!(
-        report,
-        "  <title>{}</title>",
-        html_escape("matten shape-flow report")
-    )?;
-    writeln!(report, "  <style>")?;
-    writeln!(
-        report,
-        "    :root {{ color-scheme: light; font-family: system-ui, sans-serif; }}"
-    )?;
-    writeln!(
-        report,
-        "    body {{ margin: 2rem auto; max-width: 920px; color: #17202a; background: #ffffff; line-height: 1.5; }}"
-    )?;
-    writeln!(
-        report,
-        "    h1, h2 {{ color: #14324a; }} section {{ border-top: 1px solid #d6dde5; padding: 1rem 0; }}"
-    )?;
-    writeln!(
-        report,
-        "    table {{ width: 100%; border-collapse: collapse; margin: 0.75rem 0; }} th, td {{ border: 1px solid #d6dde5; padding: 0.45rem 0.6rem; text-align: left; vertical-align: top; }}"
-    )?;
-    writeln!(
-        report,
-        "    th {{ background: #eef4f8; }} code, .shape {{ font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }}"
-    )?;
-    writeln!(
-        report,
-        "    .note {{ background: #f6f8fa; border-left: 4px solid #5b8fb9; padding: 0.75rem 1rem; }}"
-    )?;
-    writeln!(
-        report,
-        "    .shape {{ display: inline-block; background: #eef4f8; border: 1px solid #cbd8e3; border-radius: 4px; padding: 0.1rem 0.35rem; }}"
-    )?;
-    writeln!(report, "  </style>")?;
-    writeln!(report, "</head>")?;
-    writeln!(report, "<body>")?;
-    writeln!(report, "<main>")?;
-    writeln!(
-        report,
-        "<h1>{}</h1>",
-        html_escape("matten shape-flow report")
-    )?;
-    writeln!(
-        report,
-        "<p class=\"note\">{}</p>",
-        html_escape("Fixed demo report, not automatic expression tracing.")
-    )?;
+    render_html_document(
+        "matten shape-flow report",
+        "Fixed demo report, not automatic expression tracing.",
+        |report| {
+            writeln!(report, "<section>")?;
+            writeln!(report, "<h2>{}</h2>", html_escape("Broadcast add"))?;
+            write_shape_flow_table(
+                report,
+                &[
+                    ("input a", format!("{:?}", data.broadcast.input_a_shape)),
+                    ("input b", format!("{:?}", data.broadcast.input_b_shape)),
+                    ("result", format!("{:?}", data.broadcast.result_shape)),
+                ],
+            )?;
+            writeln!(
+                report,
+                "<p>{}</p>",
+                html_escape(&format!("operation: {}", data.broadcast.operation))
+            )?;
+            write_html_pre(
+                report,
+                &format!("result values: {:?}", data.broadcast.result_values),
+            )?;
+            writeln!(report, "</section>")?;
 
-    writeln!(report, "<section>")?;
-    writeln!(report, "<h2>{}</h2>", html_escape("Broadcast add"))?;
-    write_shape_flow_table(
-        &mut report,
-        &[
-            ("input a", format!("{:?}", data.broadcast.input_a_shape)),
-            ("input b", format!("{:?}", data.broadcast.input_b_shape)),
-            ("result", format!("{:?}", data.broadcast.result_shape)),
-        ],
-    )?;
-    writeln!(
-        report,
-        "<p>{}</p>",
-        html_escape(&format!("operation: {}", data.broadcast.operation))
-    )?;
-    write_html_pre(
-        &mut report,
-        &format!("result values: {:?}", data.broadcast.result_values),
-    )?;
-    writeln!(report, "</section>")?;
+            writeln!(report, "<section>")?;
+            writeln!(report, "<h2>{}</h2>", html_escape("Reshape"))?;
+            write_shape_flow_table(
+                report,
+                &[
+                    ("input", format!("{:?}", data.reshape.input_shape)),
+                    ("result", format!("{:?}", data.reshape.result_shape)),
+                ],
+            )?;
+            writeln!(
+                report,
+                "<p>{}</p>",
+                html_escape(&format!("operation: {}", data.reshape.operation))
+            )?;
+            write_html_pre(
+                report,
+                &format!("result values: {:?}", data.reshape.result_values),
+            )?;
+            writeln!(report, "</section>")?;
 
-    writeln!(report, "<section>")?;
-    writeln!(report, "<h2>{}</h2>", html_escape("Reshape"))?;
-    write_shape_flow_table(
-        &mut report,
-        &[
-            ("input", format!("{:?}", data.reshape.input_shape)),
-            ("result", format!("{:?}", data.reshape.result_shape)),
-        ],
-    )?;
-    writeln!(
-        report,
-        "<p>{}</p>",
-        html_escape(&format!("operation: {}", data.reshape.operation))
-    )?;
-    write_html_pre(
-        &mut report,
-        &format!("result values: {:?}", data.reshape.result_values),
-    )?;
-    writeln!(report, "</section>")?;
-
-    writeln!(report, "<section>")?;
-    writeln!(report, "<h2>{}</h2>", html_escape("Axis reductions"))?;
-    write_shape_flow_table(
-        &mut report,
-        &[
-            ("input", format!("{:?}", data.axis.input_shape)),
-            (
-                "mean_axis(0)",
-                format!(
-                    "{:?} -> {:?}",
-                    data.axis.input_shape, data.axis.mean_axis_0_shape
+            writeln!(report, "<section>")?;
+            writeln!(report, "<h2>{}</h2>", html_escape("Axis reductions"))?;
+            write_shape_flow_table(
+                report,
+                &[
+                    ("input", format!("{:?}", data.axis.input_shape)),
+                    (
+                        "mean_axis(0)",
+                        format!(
+                            "{:?} -> {:?}",
+                            data.axis.input_shape, data.axis.mean_axis_0_shape
+                        ),
+                    ),
+                    (
+                        "mean_axis(1)",
+                        format!(
+                            "{:?} -> {:?}",
+                            data.axis.input_shape, data.axis.mean_axis_1_shape
+                        ),
+                    ),
+                ],
+            )?;
+            write_html_pre(
+                report,
+                &format!(
+                    "mean_axis(0) values: {:?}\nmean_axis(1) values: {:?}",
+                    data.axis.mean_axis_0_values, data.axis.mean_axis_1_values
                 ),
-            ),
-            (
-                "mean_axis(1)",
-                format!(
-                    "{:?} -> {:?}",
-                    data.axis.input_shape, data.axis.mean_axis_1_shape
-                ),
-            ),
-        ],
-    )?;
-    write_html_pre(
-        &mut report,
-        &format!(
-            "mean_axis(0) values: {:?}\nmean_axis(1) values: {:?}",
-            data.axis.mean_axis_0_values, data.axis.mean_axis_1_values
-        ),
-    )?;
-    writeln!(report, "</section>")?;
+            )?;
+            writeln!(report, "</section>")?;
 
-    writeln!(report, "<section>")?;
-    writeln!(report, "<h2>{}</h2>", html_escape("Matrix multiplication"))?;
-    write_shape_flow_table(
-        &mut report,
-        &[
-            ("left", format!("{:?}", data.matmul.left_shape)),
-            ("right", format!("{:?}", data.matmul.right_shape)),
-            ("result", format!("{:?}", data.matmul.result_shape)),
-        ],
-    )?;
-    writeln!(
-        report,
-        "<p>{}</p>",
-        html_escape(&format!("operation: {}", data.matmul.operation))
-    )?;
-    write_html_pre(
-        &mut report,
-        &format!("result values: {:?}", data.matmul.result_values),
-    )?;
-    writeln!(report, "</section>")?;
-
-    writeln!(report, "</main>")?;
-    writeln!(report, "</body>")?;
-    writeln!(report, "</html>")?;
-
-    Ok(report)
+            writeln!(report, "<section>")?;
+            writeln!(report, "<h2>{}</h2>", html_escape("Matrix multiplication"))?;
+            write_shape_flow_table(
+                report,
+                &[
+                    ("left", format!("{:?}", data.matmul.left_shape)),
+                    ("right", format!("{:?}", data.matmul.right_shape)),
+                    ("result", format!("{:?}", data.matmul.result_shape)),
+                ],
+            )?;
+            writeln!(
+                report,
+                "<p>{}</p>",
+                html_escape(&format!("operation: {}", data.matmul.operation))
+            )?;
+            write_html_pre(
+                report,
+                &format!("result values: {:?}", data.matmul.result_values),
+            )?;
+            writeln!(report, "</section>")
+        },
+    )
 }
 
 fn render_dynamic_readiness_report() -> Result<String, Box<dyn Error>> {
@@ -1311,157 +1152,103 @@ fn dynamic_schema_summary_rows(tensor: &Tensor) -> Vec<DynamicSchemaSummaryRow> 
 
 fn render_dynamic_readiness_html_report() -> Result<String, Box<dyn Error>> {
     let data = dynamic_readiness_report_data()?;
-    let mut report = String::new();
-    writeln!(report, "<!doctype html>")?;
-    writeln!(report, "<html lang=\"en\">")?;
-    writeln!(report, "<head>")?;
-    writeln!(report, "  <meta charset=\"utf-8\">")?;
-    writeln!(
-        report,
-        "  <title>{}</title>",
-        html_escape("matten dynamic-readiness report")
-    )?;
-    writeln!(report, "  <style>")?;
-    writeln!(
-        report,
-        "    :root {{ color-scheme: light; font-family: system-ui, sans-serif; }}"
-    )?;
-    writeln!(
-        report,
-        "    body {{ margin: 2rem auto; max-width: 920px; color: #17202a; background: #ffffff; line-height: 1.5; }}"
-    )?;
-    writeln!(
-        report,
-        "    h1, h2 {{ color: #14324a; }} section {{ border-top: 1px solid #d6dde5; padding: 1rem 0; }}"
-    )?;
-    writeln!(
-        report,
-        "    table {{ width: 100%; border-collapse: collapse; margin: 0.75rem 0; }} th, td {{ border: 1px solid #d6dde5; padding: 0.45rem 0.6rem; text-align: left; vertical-align: top; }}"
-    )?;
-    writeln!(
-        report,
-        "    th {{ background: #eef4f8; }} code, .shape {{ font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }}"
-    )?;
-    writeln!(
-        report,
-        "    .note {{ background: #f6f8fa; border-left: 4px solid #5b8fb9; padding: 0.75rem 1rem; }}"
-    )?;
-    writeln!(
-        report,
-        "    .shape {{ display: inline-block; background: #eef4f8; border: 1px solid #cbd8e3; border-radius: 4px; padding: 0.1rem 0.35rem; }}"
-    )?;
-    writeln!(report, "  </style>")?;
-    writeln!(report, "</head>")?;
-    writeln!(report, "<body>")?;
-    writeln!(report, "<main>")?;
-    writeln!(
-        report,
-        "<h1>{}</h1>",
-        html_escape("matten dynamic-readiness report")
-    )?;
-    writeln!(
-        report,
-        "<p class=\"note\">{}</p>",
-        html_escape("Fixed demo report, not automatic data profiling.")
-    )?;
+    render_html_document(
+        "matten dynamic-readiness report",
+        "Fixed demo report, not automatic data profiling.",
+        |report| {
+            writeln!(report, "<section>")?;
+            writeln!(report, "<h2>{}</h2>", html_escape("Dynamic values"))?;
+            write_shape_flow_table(report, &[("shape", format!("{:?}", data.shape))])?;
+            writeln!(report, "<table>")?;
+            writeln!(
+                report,
+                "<thead><tr><th>{}</th><th>{}</th><th>{}</th></tr></thead>",
+                html_escape("row"),
+                html_escape("column"),
+                html_escape("value")
+            )?;
+            writeln!(report, "<tbody>")?;
+            for value in &data.values {
+                writeln!(
+                    report,
+                    "<tr><td>{}</td><td>{}</td><td><span class=\"shape\">{}</span></td></tr>",
+                    value.row,
+                    value.column,
+                    html_escape(&value.element)
+                )?;
+            }
+            writeln!(report, "</tbody>")?;
+            writeln!(report, "</table>")?;
+            writeln!(report, "</section>")?;
 
-    writeln!(report, "<section>")?;
-    writeln!(report, "<h2>{}</h2>", html_escape("Dynamic values"))?;
-    write_shape_flow_table(&mut report, &[("shape", format!("{:?}", data.shape))])?;
-    writeln!(report, "<table>")?;
-    writeln!(
-        report,
-        "<thead><tr><th>{}</th><th>{}</th><th>{}</th></tr></thead>",
-        html_escape("row"),
-        html_escape("column"),
-        html_escape("value")
-    )?;
-    writeln!(report, "<tbody>")?;
-    for value in &data.values {
-        writeln!(
-            report,
-            "<tr><td>{}</td><td>{}</td><td><span class=\"shape\">{}</span></td></tr>",
-            value.row,
-            value.column,
-            html_escape(&value.element)
-        )?;
-    }
-    writeln!(report, "</tbody>")?;
-    writeln!(report, "</table>")?;
-    writeln!(report, "</section>")?;
+            writeln!(report, "<section>")?;
+            writeln!(report, "<h2>{}</h2>", html_escape("Schema summary"))?;
+            writeln!(report, "<table>")?;
+            writeln!(
+                report,
+                "<thead><tr><th>{}</th><th>{}</th></tr></thead>",
+                html_escape("element kind"),
+                html_escape("count")
+            )?;
+            writeln!(report, "<tbody>")?;
+            for row in &data.schema_summary {
+                writeln!(
+                    report,
+                    "<tr><td>{}</td><td><span class=\"shape\">{}</span></td></tr>",
+                    html_escape(row.label),
+                    row.count
+                )?;
+            }
+            writeln!(report, "</tbody>")?;
+            writeln!(report, "</table>")?;
+            writeln!(report, "</section>")?;
 
-    writeln!(report, "<section>")?;
-    writeln!(report, "<h2>{}</h2>", html_escape("Schema summary"))?;
-    writeln!(report, "<table>")?;
-    writeln!(
-        report,
-        "<thead><tr><th>{}</th><th>{}</th></tr></thead>",
-        html_escape("element kind"),
-        html_escape("count")
-    )?;
-    writeln!(report, "<tbody>")?;
-    for row in &data.schema_summary {
-        writeln!(
-            report,
-            "<tr><td>{}</td><td><span class=\"shape\">{}</span></td></tr>",
-            html_escape(row.label),
-            row.count
-        )?;
-    }
-    writeln!(report, "</tbody>")?;
-    writeln!(report, "</table>")?;
-    writeln!(report, "</section>")?;
+            writeln!(report, "<section>")?;
+            writeln!(report, "<h2>{}</h2>", html_escape("Readiness masks"))?;
+            write_shape_flow_table(
+                report,
+                &[
+                    ("none mask", format!("{:?}", data.none_mask_values)),
+                    (
+                        "numeric mask",
+                        format!("strict policy readiness {:?}", data.numeric_mask_values),
+                    ),
+                    (
+                        "strict numeric-ready",
+                        data.strict_numeric_ready.to_string(),
+                    ),
+                ],
+            )?;
+            writeln!(report, "</section>")?;
 
-    writeln!(report, "<section>")?;
-    writeln!(report, "<h2>{}</h2>", html_escape("Readiness masks"))?;
-    write_shape_flow_table(
-        &mut report,
-        &[
-            ("none mask", format!("{:?}", data.none_mask_values)),
-            (
-                "numeric mask",
-                format!("strict policy readiness {:?}", data.numeric_mask_values),
-            ),
-            (
-                "strict numeric-ready",
-                data.strict_numeric_ready.to_string(),
-            ),
-        ],
-    )?;
-    writeln!(report, "</section>")?;
+            writeln!(report, "<section>")?;
+            writeln!(report, "<h2>{}</h2>", html_escape("Strict conversion"))?;
+            write_shape_flow_table(
+                report,
+                &[("result", data.strict_conversion_result.to_string())],
+            )?;
+            writeln!(report, "</section>")?;
 
-    writeln!(report, "<section>")?;
-    writeln!(report, "<h2>{}</h2>", html_escape("Strict conversion"))?;
-    write_shape_flow_table(
-        &mut report,
-        &[("result", data.strict_conversion_result.to_string())],
-    )?;
-    writeln!(report, "</section>")?;
-
-    writeln!(report, "<section>")?;
-    writeln!(
-        report,
-        "<h2>{}</h2>",
-        html_escape("Explicit policy conversion")
-    )?;
-    write_shape_flow_table(
-        &mut report,
-        &[
-            ("policy", data.explicit_policy.to_string()),
-            ("converted shape", format!("{:?}", data.converted_shape)),
-            (
-                "converted row-major values",
-                format!("{:?}", data.converted_values),
-            ),
-        ],
-    )?;
-    writeln!(report, "</section>")?;
-
-    writeln!(report, "</main>")?;
-    writeln!(report, "</body>")?;
-    writeln!(report, "</html>")?;
-
-    Ok(report)
+            writeln!(report, "<section>")?;
+            writeln!(
+                report,
+                "<h2>{}</h2>",
+                html_escape("Explicit policy conversion")
+            )?;
+            write_shape_flow_table(
+                report,
+                &[
+                    ("policy", data.explicit_policy.to_string()),
+                    ("converted shape", format!("{:?}", data.converted_shape)),
+                    (
+                        "converted row-major values",
+                        format!("{:?}", data.converted_values),
+                    ),
+                ],
+            )?;
+            writeln!(report, "</section>")
+        },
+    )
 }
 
 struct MlprepStandardizationReportData {
@@ -1569,138 +1356,85 @@ fn render_mlprep_standardization_report() -> Result<String, Box<dyn Error>> {
 
 fn render_mlprep_standardization_html_report() -> Result<String, Box<dyn Error>> {
     let data = mlprep_standardization_report_data()?;
-    let mut report = String::new();
-    writeln!(report, "<!doctype html>")?;
-    writeln!(report, "<html lang=\"en\">")?;
-    writeln!(report, "<head>")?;
-    writeln!(report, "  <meta charset=\"utf-8\">")?;
-    writeln!(
-        report,
-        "  <title>{}</title>",
-        html_escape("matten mlprep-standardization report")
-    )?;
-    writeln!(report, "  <style>")?;
-    writeln!(
-        report,
-        "    :root {{ color-scheme: light; font-family: system-ui, sans-serif; }}"
-    )?;
-    writeln!(
-        report,
-        "    body {{ margin: 2rem auto; max-width: 920px; color: #17202a; background: #ffffff; line-height: 1.5; }}"
-    )?;
-    writeln!(
-        report,
-        "    h1, h2 {{ color: #14324a; }} section {{ border-top: 1px solid #d6dde5; padding: 1rem 0; }}"
-    )?;
-    writeln!(
-        report,
-        "    table {{ width: 100%; border-collapse: collapse; margin: 0.75rem 0; }} th, td {{ border: 1px solid #d6dde5; padding: 0.45rem 0.6rem; text-align: left; vertical-align: top; }}"
-    )?;
-    writeln!(
-        report,
-        "    th {{ background: #eef4f8; }} code, .shape {{ font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }}"
-    )?;
-    writeln!(
-        report,
-        "    .note {{ background: #f6f8fa; border-left: 4px solid #5b8fb9; padding: 0.75rem 1rem; }}"
-    )?;
-    writeln!(
-        report,
-        "    .shape {{ display: inline-block; background: #eef4f8; border: 1px solid #cbd8e3; border-radius: 4px; padding: 0.1rem 0.35rem; }}"
-    )?;
-    writeln!(report, "  </style>")?;
-    writeln!(report, "</head>")?;
-    writeln!(report, "<body>")?;
-    writeln!(report, "<main>")?;
-    writeln!(
-        report,
-        "<h1>{}</h1>",
-        html_escape("matten mlprep-standardization report")
-    )?;
-    writeln!(
-        report,
-        "<p class=\"note\">{}</p>",
-        html_escape("Fixed demo report, not automatic model-quality analysis.")
-    )?;
+    render_html_document(
+        "matten mlprep-standardization report",
+        "Fixed demo report, not automatic model-quality analysis.",
+        |report| {
+            writeln!(report, "<section>")?;
+            writeln!(report, "<h2>{}</h2>", html_escape("Input"))?;
+            write_shape_flow_table(
+                report,
+                &[
+                    ("demo", KIND_MLPREP_STANDARDIZATION.to_string()),
+                    ("shape", format!("{:?}", data.input_shape)),
+                    ("row-major values", format_fixed_values(&data.input_values)),
+                ],
+            )?;
+            writeln!(report, "</section>")?;
 
-    writeln!(report, "<section>")?;
-    writeln!(report, "<h2>{}</h2>", html_escape("Input"))?;
-    write_shape_flow_table(
-        &mut report,
-        &[
-            ("demo", KIND_MLPREP_STANDARDIZATION.to_string()),
-            ("shape", format!("{:?}", data.input_shape)),
-            ("row-major values", format_fixed_values(&data.input_values)),
-        ],
-    )?;
-    writeln!(report, "</section>")?;
+            writeln!(report, "<section>")?;
+            writeln!(report, "<h2>{}</h2>", html_escape("Operation"))?;
+            write_shape_flow_table(
+                report,
+                &[
+                    ("operation", "standardize_columns(input)".to_string()),
+                    (
+                        "meaning",
+                        "each column is centered to mean 0 and population standard deviation 1"
+                            .to_string(),
+                    ),
+                ],
+            )?;
+            writeln!(report, "</section>")?;
 
-    writeln!(report, "<section>")?;
-    writeln!(report, "<h2>{}</h2>", html_escape("Operation"))?;
-    write_shape_flow_table(
-        &mut report,
-        &[
-            ("operation", "standardize_columns(input)".to_string()),
-            (
-                "meaning",
-                "each column is centered to mean 0 and population standard deviation 1".to_string(),
-            ),
-        ],
-    )?;
-    writeln!(report, "</section>")?;
+            writeln!(report, "<section>")?;
+            writeln!(report, "<h2>{}</h2>", html_escape("Before"))?;
+            write_shape_flow_table(
+                report,
+                &[
+                    ("shape", format!("{:?}", data.input_shape)),
+                    ("row-major values", format_fixed_values(&data.input_values)),
+                    ("column mean", format_fixed_values(&data.before_mean)),
+                    (
+                        "column population std",
+                        format_fixed_values(&data.before_std),
+                    ),
+                ],
+            )?;
+            writeln!(report, "</section>")?;
 
-    writeln!(report, "<section>")?;
-    writeln!(report, "<h2>{}</h2>", html_escape("Before"))?;
-    write_shape_flow_table(
-        &mut report,
-        &[
-            ("shape", format!("{:?}", data.input_shape)),
-            ("row-major values", format_fixed_values(&data.input_values)),
-            ("column mean", format_fixed_values(&data.before_mean)),
-            (
-                "column population std",
-                format_fixed_values(&data.before_std),
-            ),
-        ],
-    )?;
-    writeln!(report, "</section>")?;
+            writeln!(report, "<section>")?;
+            writeln!(report, "<h2>{}</h2>", html_escape("After"))?;
+            write_shape_flow_table(
+                report,
+                &[
+                    ("shape", format!("{:?}", data.output_shape)),
+                    ("row-major values", format_fixed_values(&data.output_values)),
+                    ("column mean", format_fixed_values(&data.after_mean)),
+                    (
+                        "column population std",
+                        format_fixed_values(&data.after_std),
+                    ),
+                ],
+            )?;
+            writeln!(report, "</section>")?;
 
-    writeln!(report, "<section>")?;
-    writeln!(report, "<h2>{}</h2>", html_escape("After"))?;
-    write_shape_flow_table(
-        &mut report,
-        &[
-            ("shape", format!("{:?}", data.output_shape)),
-            ("row-major values", format_fixed_values(&data.output_values)),
-            ("column mean", format_fixed_values(&data.after_mean)),
-            (
-                "column population std",
-                format_fixed_values(&data.after_std),
-            ),
-        ],
-    )?;
-    writeln!(report, "</section>")?;
-
-    writeln!(report, "<section>")?;
-    writeln!(report, "<h2>{}</h2>", html_escape("Shape meaning"))?;
-    write_shape_flow_table(
-        &mut report,
-        &[
-            (
-                "shape flow",
-                format!("{:?} -> {:?}", data.input_shape, data.output_shape),
-            ),
-            ("rows", "samples unchanged".to_string()),
-            ("columns", "features unchanged".to_string()),
-        ],
-    )?;
-    writeln!(report, "</section>")?;
-
-    writeln!(report, "</main>")?;
-    writeln!(report, "</body>")?;
-    writeln!(report, "</html>")?;
-
-    Ok(report)
+            writeln!(report, "<section>")?;
+            writeln!(report, "<h2>{}</h2>", html_escape("Shape meaning"))?;
+            write_shape_flow_table(
+                report,
+                &[
+                    (
+                        "shape flow",
+                        format!("{:?} -> {:?}", data.input_shape, data.output_shape),
+                    ),
+                    ("rows", "samples unchanged".to_string()),
+                    ("columns", "features unchanged".to_string()),
+                ],
+            )?;
+            writeln!(report, "</section>")
+        },
+    )
 }
 
 struct EducationalPathReportData {
@@ -2006,16 +1740,259 @@ fn render_educational_path_report() -> Result<String, Box<dyn Error>> {
 
 fn render_educational_path_html_report() -> Result<String, Box<dyn Error>> {
     let data = educational_path_report_data()?;
+    render_html_document(
+        "matten educational-path report",
+        "Fixed educational demo report, not automatic expression tracing.",
+        |report| {
+            writeln!(report, "<section>")?;
+            writeln!(
+                report,
+                "<h2>{}</h2>",
+                html_escape("How to read shapes first")
+            )?;
+            writeln!(report, "<ol>")?;
+            for item in data.reading_steps {
+                writeln!(report, "<li>{}</li>", html_escape(item))?;
+            }
+            writeln!(report, "</ol>")?;
+            writeln!(report, "</section>")?;
+
+            writeln!(report, "<section>")?;
+            writeln!(report, "<h2>{}</h2>", html_escape("Broadcasting"))?;
+            write_shape_flow_table(
+                report,
+                &[
+                    ("left", format!("{:?}", data.broadcast.left_shape)),
+                    ("right", format!("{:?}", data.broadcast.right_shape)),
+                    ("result", format!("{:?}", data.broadcast.result_shape)),
+                ],
+            )?;
+            writeln!(
+                report,
+                "<p>{}</p>",
+                html_escape(
+                    "axis 1: left repeats across 4 columns; axis 0: right repeats across 3 rows"
+                )
+            )?;
+            write_html_pre(
+                report,
+                &format!("result values: {:?}", data.broadcast.result_values),
+            )?;
+            writeln!(report, "</section>")?;
+
+            writeln!(report, "<section>")?;
+            writeln!(report, "<h2>{}</h2>", html_escape("Reshape and transpose"))?;
+            write_shape_flow_table(
+                report,
+                &[
+                    ("input", format!("{:?}", data.reshape_transpose.input_shape)),
+                    (
+                        "reshape",
+                        format!("{:?}", data.reshape_transpose.reshape_shape),
+                    ),
+                    (
+                        "transpose",
+                        format!("{:?}", data.reshape_transpose.transpose_shape),
+                    ),
+                ],
+            )?;
+            write_html_pre(
+                report,
+                &format!(
+                    "reshape values: {:?}\ntranspose values: {:?}",
+                    data.reshape_transpose.reshape_values, data.reshape_transpose.transpose_values
+                ),
+            )?;
+            writeln!(
+                report,
+                "<p>{}</p>",
+                html_escape("reshape changes grouping; transpose changes coordinate meaning")
+            )?;
+            writeln!(report, "</section>")?;
+
+            writeln!(report, "<section>")?;
+            writeln!(report, "<h2>{}</h2>", html_escape("Axis reductions"))?;
+            write_shape_flow_table(
+                report,
+                &[
+                    (
+                        "mean_axis(0)",
+                        format!(
+                            "{:?} -> {:?}",
+                            data.axis_reductions.input_shape,
+                            data.axis_reductions.mean_axis_0_shape
+                        ),
+                    ),
+                    (
+                        "mean_axis(1)",
+                        format!(
+                            "{:?} -> {:?}",
+                            data.axis_reductions.input_shape,
+                            data.axis_reductions.mean_axis_1_shape
+                        ),
+                    ),
+                ],
+            )?;
+            write_html_pre(
+                report,
+                &format!(
+                    "mean_axis(0) keeps columns: {:?}\nmean_axis(1) keeps rows: {:?}",
+                    data.axis_reductions.mean_axis_0_values,
+                    data.axis_reductions.mean_axis_1_values
+                ),
+            )?;
+            writeln!(report, "</section>")?;
+
+            writeln!(report, "<section>")?;
+            writeln!(report, "<h2>{}</h2>", html_escape("Matrix multiplication"))?;
+            write_shape_flow_table(
+                report,
+                &[
+                    ("left", format!("{:?}", data.matmul.left_shape)),
+                    ("right", format!("{:?}", data.matmul.right_shape)),
+                    ("result", format!("{:?}", data.matmul.result_shape)),
+                ],
+            )?;
+            writeln!(
+                report,
+                "<p>{}</p>",
+                html_escape(&format!(
+                    "shared inner dimension: {}",
+                    data.matmul.shared_inner_dimension
+                ))
+            )?;
+            write_html_pre(
+                report,
+                &format!("result values: {:?}", data.matmul.result_values),
+            )?;
+            writeln!(report, "</section>")?;
+
+            writeln!(report, "<section>")?;
+            writeln!(report, "<h2>{}</h2>", html_escape("Dynamic readiness"))?;
+            write_shape_flow_table(
+                report,
+                &[
+                    (
+                        "dynamic shape",
+                        format!("{:?}", data.dynamic_readiness.shape),
+                    ),
+                    (
+                        "none mask",
+                        format!("{:?}", data.dynamic_readiness.none_mask_values),
+                    ),
+                    (
+                        "numeric mask",
+                        format!(
+                            "strict policy readiness {:?}",
+                            data.dynamic_readiness.numeric_mask_values
+                        ),
+                    ),
+                ],
+            )?;
+            writeln!(
+                report,
+                "<p>{}</p>",
+                html_escape(
+                    "Text values are not numeric-ready under the strict mask; clean values, then call try_numeric()."
+                )
+            )?;
+            writeln!(report, "</section>")?;
+
+            writeln!(report, "<section>")?;
+            writeln!(report, "<h2>{}</h2>", html_escape("Standardization"))?;
+            write_shape_flow_table(
+                report,
+                &[
+                    (
+                        "shape flow",
+                        format!(
+                            "{:?} -> {:?}",
+                            data.standardization.input_shape, data.standardization.output_shape
+                        ),
+                    ),
+                    (
+                        "before mean",
+                        format_fixed_values(&data.standardization.before_mean),
+                    ),
+                    (
+                        "before population std",
+                        format_fixed_values(&data.standardization.before_std),
+                    ),
+                    (
+                        "after mean",
+                        format_fixed_values(&data.standardization.after_mean),
+                    ),
+                    (
+                        "after population std",
+                        format_fixed_values(&data.standardization.after_std),
+                    ),
+                ],
+            )?;
+            writeln!(report, "</section>")?;
+
+            writeln!(report, "<section>")?;
+            writeln!(
+                report,
+                "<h2>{}</h2>",
+                html_escape("What this report is not")
+            )?;
+            writeln!(report, "<ul>")?;
+            for item in data.non_goals {
+                writeln!(report, "<li>{}</li>", html_escape(item))?;
+            }
+            writeln!(report, "</ul>")?;
+            writeln!(report, "</section>")?;
+
+            Ok(())
+        },
+    )
+}
+
+fn write_shape_flow_table(
+    report: &mut String,
+    rows: &[(&str, String)],
+) -> Result<(), std::fmt::Error> {
+    writeln!(report, "<table>")?;
+    writeln!(
+        report,
+        "<thead><tr><th>{}</th><th>{}</th></tr></thead>",
+        html_escape("item"),
+        html_escape("shape / value")
+    )?;
+    writeln!(report, "<tbody>")?;
+    for (label, value) in rows {
+        writeln!(
+            report,
+            "<tr><td>{}</td><td><span class=\"shape\">{}</span></td></tr>",
+            html_escape(label),
+            html_escape(value)
+        )?;
+    }
+    writeln!(report, "</tbody>")?;
+    writeln!(report, "</table>")
+}
+
+fn render_html_document<F>(title: &str, note: &str, write_body: F) -> Result<String, Box<dyn Error>>
+where
+    F: FnOnce(&mut String) -> Result<(), std::fmt::Error>,
+{
     let mut report = String::new();
+    write_html_document_start(&mut report, title, note)?;
+    write_body(&mut report)?;
+    write_html_document_end(&mut report)?;
+    Ok(report)
+}
+
+fn write_html_document_start(
+    report: &mut String,
+    title: &str,
+    note: &str,
+) -> Result<(), std::fmt::Error> {
     writeln!(report, "<!doctype html>")?;
     writeln!(report, "<html lang=\"en\">")?;
     writeln!(report, "<head>")?;
     writeln!(report, "  <meta charset=\"utf-8\">")?;
-    writeln!(
-        report,
-        "  <title>{}</title>",
-        html_escape("matten educational-path report")
-    )?;
+    writeln!(report, "  <title>{}</title>", html_escape(title))?;
     writeln!(report, "  <style>")?;
     writeln!(
         report,
@@ -2049,240 +2026,14 @@ fn render_educational_path_html_report() -> Result<String, Box<dyn Error>> {
     writeln!(report, "</head>")?;
     writeln!(report, "<body>")?;
     writeln!(report, "<main>")?;
-    writeln!(
-        report,
-        "<h1>{}</h1>",
-        html_escape("matten educational-path report")
-    )?;
-    writeln!(
-        report,
-        "<p class=\"note\">{}</p>",
-        html_escape("Fixed educational demo report, not automatic expression tracing.")
-    )?;
-
-    writeln!(report, "<section>")?;
-    writeln!(
-        report,
-        "<h2>{}</h2>",
-        html_escape("How to read shapes first")
-    )?;
-    writeln!(report, "<ol>")?;
-    for item in data.reading_steps {
-        writeln!(report, "<li>{}</li>", html_escape(item))?;
-    }
-    writeln!(report, "</ol>")?;
-    writeln!(report, "</section>")?;
-
-    writeln!(report, "<section>")?;
-    writeln!(report, "<h2>{}</h2>", html_escape("Broadcasting"))?;
-    write_shape_flow_table(
-        &mut report,
-        &[
-            ("left", format!("{:?}", data.broadcast.left_shape)),
-            ("right", format!("{:?}", data.broadcast.right_shape)),
-            ("result", format!("{:?}", data.broadcast.result_shape)),
-        ],
-    )?;
-    writeln!(
-        report,
-        "<p>{}</p>",
-        html_escape("axis 1: left repeats across 4 columns; axis 0: right repeats across 3 rows")
-    )?;
-    write_html_pre(
-        &mut report,
-        &format!("result values: {:?}", data.broadcast.result_values),
-    )?;
-    writeln!(report, "</section>")?;
-
-    writeln!(report, "<section>")?;
-    writeln!(report, "<h2>{}</h2>", html_escape("Reshape and transpose"))?;
-    write_shape_flow_table(
-        &mut report,
-        &[
-            ("input", format!("{:?}", data.reshape_transpose.input_shape)),
-            (
-                "reshape",
-                format!("{:?}", data.reshape_transpose.reshape_shape),
-            ),
-            (
-                "transpose",
-                format!("{:?}", data.reshape_transpose.transpose_shape),
-            ),
-        ],
-    )?;
-    write_html_pre(
-        &mut report,
-        &format!(
-            "reshape values: {:?}\ntranspose values: {:?}",
-            data.reshape_transpose.reshape_values, data.reshape_transpose.transpose_values
-        ),
-    )?;
-    writeln!(
-        report,
-        "<p>{}</p>",
-        html_escape("reshape changes grouping; transpose changes coordinate meaning")
-    )?;
-    writeln!(report, "</section>")?;
-
-    writeln!(report, "<section>")?;
-    writeln!(report, "<h2>{}</h2>", html_escape("Axis reductions"))?;
-    write_shape_flow_table(
-        &mut report,
-        &[
-            (
-                "mean_axis(0)",
-                format!(
-                    "{:?} -> {:?}",
-                    data.axis_reductions.input_shape, data.axis_reductions.mean_axis_0_shape
-                ),
-            ),
-            (
-                "mean_axis(1)",
-                format!(
-                    "{:?} -> {:?}",
-                    data.axis_reductions.input_shape, data.axis_reductions.mean_axis_1_shape
-                ),
-            ),
-        ],
-    )?;
-    write_html_pre(
-        &mut report,
-        &format!(
-            "mean_axis(0) keeps columns: {:?}\nmean_axis(1) keeps rows: {:?}",
-            data.axis_reductions.mean_axis_0_values, data.axis_reductions.mean_axis_1_values
-        ),
-    )?;
-    writeln!(report, "</section>")?;
-
-    writeln!(report, "<section>")?;
-    writeln!(report, "<h2>{}</h2>", html_escape("Matrix multiplication"))?;
-    write_shape_flow_table(
-        &mut report,
-        &[
-            ("left", format!("{:?}", data.matmul.left_shape)),
-            ("right", format!("{:?}", data.matmul.right_shape)),
-            ("result", format!("{:?}", data.matmul.result_shape)),
-        ],
-    )?;
-    writeln!(
-        report,
-        "<p>{}</p>",
-        html_escape(&format!(
-            "shared inner dimension: {}",
-            data.matmul.shared_inner_dimension
-        ))
-    )?;
-    write_html_pre(
-        &mut report,
-        &format!("result values: {:?}", data.matmul.result_values),
-    )?;
-    writeln!(report, "</section>")?;
-
-    writeln!(report, "<section>")?;
-    writeln!(report, "<h2>{}</h2>", html_escape("Dynamic readiness"))?;
-    write_shape_flow_table(
-        &mut report,
-        &[
-            (
-                "dynamic shape",
-                format!("{:?}", data.dynamic_readiness.shape),
-            ),
-            (
-                "none mask",
-                format!("{:?}", data.dynamic_readiness.none_mask_values),
-            ),
-            (
-                "numeric mask",
-                format!(
-                    "strict policy readiness {:?}",
-                    data.dynamic_readiness.numeric_mask_values
-                ),
-            ),
-        ],
-    )?;
-    writeln!(
-        report,
-        "<p>{}</p>",
-        html_escape(
-            "Text values are not numeric-ready under the strict mask; clean values, then call try_numeric()."
-        )
-    )?;
-    writeln!(report, "</section>")?;
-
-    writeln!(report, "<section>")?;
-    writeln!(report, "<h2>{}</h2>", html_escape("Standardization"))?;
-    write_shape_flow_table(
-        &mut report,
-        &[
-            (
-                "shape flow",
-                format!(
-                    "{:?} -> {:?}",
-                    data.standardization.input_shape, data.standardization.output_shape
-                ),
-            ),
-            (
-                "before mean",
-                format_fixed_values(&data.standardization.before_mean),
-            ),
-            (
-                "before population std",
-                format_fixed_values(&data.standardization.before_std),
-            ),
-            (
-                "after mean",
-                format_fixed_values(&data.standardization.after_mean),
-            ),
-            (
-                "after population std",
-                format_fixed_values(&data.standardization.after_std),
-            ),
-        ],
-    )?;
-    writeln!(report, "</section>")?;
-
-    writeln!(report, "<section>")?;
-    writeln!(
-        report,
-        "<h2>{}</h2>",
-        html_escape("What this report is not")
-    )?;
-    writeln!(report, "<ul>")?;
-    for item in data.non_goals {
-        writeln!(report, "<li>{}</li>", html_escape(item))?;
-    }
-    writeln!(report, "</ul>")?;
-    writeln!(report, "</section>")?;
-
-    writeln!(report, "</main>")?;
-    writeln!(report, "</body>")?;
-    writeln!(report, "</html>")?;
-
-    Ok(report)
+    writeln!(report, "<h1>{}</h1>", html_escape(title))?;
+    writeln!(report, "<p class=\"note\">{}</p>", html_escape(note))
 }
 
-fn write_shape_flow_table(
-    report: &mut String,
-    rows: &[(&str, String)],
-) -> Result<(), std::fmt::Error> {
-    writeln!(report, "<table>")?;
-    writeln!(
-        report,
-        "<thead><tr><th>{}</th><th>{}</th></tr></thead>",
-        html_escape("item"),
-        html_escape("shape / value")
-    )?;
-    writeln!(report, "<tbody>")?;
-    for (label, value) in rows {
-        writeln!(
-            report,
-            "<tr><td>{}</td><td><span class=\"shape\">{}</span></td></tr>",
-            html_escape(label),
-            html_escape(value)
-        )?;
-    }
-    writeln!(report, "</tbody>")?;
-    writeln!(report, "</table>")
+fn write_html_document_end(report: &mut String) -> Result<(), std::fmt::Error> {
+    writeln!(report, "</main>")?;
+    writeln!(report, "</body>")?;
+    writeln!(report, "</html>")
 }
 
 fn write_html_pre(report: &mut String, value: &str) -> Result<(), std::fmt::Error> {
