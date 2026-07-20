@@ -256,3 +256,11 @@ shared by private helpers, while report-family data models remain private and
 family-specific. Public report schemas, reusable renderer APIs, public
 `matten-report` / `matten-viz` crates, JSON/SVG/Vega-Lite output, dependency
 changes, and release work remain separate future decisions.
+
+The JSON report-schema policy audit handoff
+([`070-json-report-schema-policy-audit-handoff.md`](./handoffs/070-json-report-schema-policy-audit-handoff.md))
+is the next RFC-070 planning candidate. It asks whether JSON report data should
+be considered at all, and if so whether it should remain private local-tool
+output or become future public-contract material. It is audit/design-only: no
+`--format json`, public schema, public renderer API, public crate, dependency,
+release work, or generated artifact is authorized.

@@ -54,6 +54,7 @@ working documents for the implementation team and may be revised as work proceed
 | `069-post-036-input-mode-html-closure-audit.md` | RFC-069 post-0.36 input-mode HTML closure audit |
 | `070-public-visualization-report-readiness-audit.md` | RFC-070 public visualization/report readiness audit |
 | `070-private-report-model-extraction-handoff.md` | RFC-070 private report-model extraction handoff |
+| `070-json-report-schema-policy-audit-handoff.md` | RFC-070 JSON report-schema policy audit handoff |
 
 ## Documentation-governance handoffs
 
