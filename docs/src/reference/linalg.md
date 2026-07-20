@@ -15,6 +15,7 @@
 
 ```rust
 Tensor::norm(&self) -> f64
+Tensor::try_norm(&self) -> Result<f64, MattenError>
 ```
 
 The L2 / Frobenius norm over **all** elements: `sqrt(sum(x_i^2))`. It works at any
@@ -22,8 +23,8 @@ rank — for a matrix this is the Frobenius norm. `NaN` propagates (any `NaN` el
 yields `NaN`). No overflow-avoidance scaling is applied, so extreme magnitudes may
 overflow to infinity.
 
-Like the other value reductions (`sum`, `mean`), `norm` has no `try_*` form; it
-panics on a dynamic tensor (convert with `try_numeric()` first).
+`try_norm` returns `MattenError::Unsupported` on a dynamic tensor; `norm` panics
+in that case. Convert with `try_numeric()` first when working from dynamic data.
 
 ```text
 norm([3, 4])          = 5            // sqrt(9 + 16)
