@@ -53,7 +53,7 @@ Primary code and policy evidence:
 
 ```text
 tools/matten-report/src/main.rs
-rfcs/proposed/070-public-visualization-report-readiness-audit.md
+rfcs/done/070-public-visualization-report-readiness-audit.md
 rfcs/handoffs/070-public-visualization-report-readiness-audit.md
 rfcs/handoffs/070-private-report-model-extraction-handoff.md
 rfcs/done/068-rich-local-visualization-artifacts.md

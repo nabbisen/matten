@@ -3,7 +3,7 @@
 **Project:** `matten`
 **Related RFCs:** RFC-063, RFC-065, RFC-068, RFC-069, RFC-070, RFC-071
 **Document kind:** Local-tool implementation handoff
-**Status:** Implemented and reviewed under RFC-071; committed in `d0ef169`; release-prep candidate only
+**Status:** Implemented and reviewed under RFC-071; committed in `d0ef169`; released in `0.37.0`
 **Date:** 2026-07-21
 
 ---

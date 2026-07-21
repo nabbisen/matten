@@ -1,6 +1,6 @@
 # RFC-071: Private Fixed-Demo JSON Report Artifacts
 
-**Status:** Implemented (d0ef169; targeted for 0.37.0)
+**Status:** Implemented (0.37.0)
 **Target:** 0.37.0
 **Theme:** Add private fixed-demo JSON artifacts to `tools/matten-report`
 **Depends on:** RFC-063, RFC-065, RFC-068, RFC-069, RFC-070
@@ -35,7 +35,7 @@ readiness work, not a public schema.
 
 ## 2. Background
 
-RFC-070 remains the public visualization/report readiness audit. It asks whether
+RFC-070 is the completed public visualization/report readiness audit. It asks whether
 local `tools/matten-report` artifacts are mature enough to justify a future
 public product surface.
 
@@ -51,7 +51,7 @@ fixed demos is useful as a prerequisite:
   are designed.
 
 This RFC records that private prerequisite as the normative authority for the
-0.37.0 candidate, so RFC-070 can remain audit-only for public surfaces.
+0.37.0 release, so RFC-070 can remain audit-only for public surfaces.
 
 ## 3. Goals
 
@@ -162,13 +162,10 @@ For 0.37.0, the accepted business decision is:
 - Exact or deterministic JSON tests cover all five fixed demos.
 - Published crates receive no dependency change.
 - Tracked docs and release notes describe the scope as private local-tool JSON.
-- RFC-070 remains open only for public visualization/report readiness.
+- RFC-070 remains audit-only for public visualization/report readiness and is
+  closed without public implementation after its accepted post-0.37 audit.
 
 ## 8. Release Status
 
-The implementation was reviewed and committed before release prep. The 0.37.0
-release prep retargets lock-step family metadata and documentation to this
-RFC-071 scope.
-
-Tag and publish actions remain separate maintainer actions and must use the
-bare SemVer tag format, for example `0.37.0`.
+The implementation was reviewed and committed before release prep. The project
+owner confirmed the lock-step `0.37.0` release with this RFC-071 scope.

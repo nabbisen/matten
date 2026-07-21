@@ -2,10 +2,10 @@
 
 **Project:** `matten`  
 **Document Kind:** Canonical Project Roadmap  
-**Document Version:** `1.97.0`
+**Document Version:** `1.99.0`
 **Date:** 2026-07-21
-**Status:** Canonical roadmap prepared for the `0.37.0` RFC-071 fixed-demo private JSON report release. Release prep retargets the lock-step family version and current-family docs from `0.36.0` to `0.37.0`, adds the changelog entry, and records the reviewed private `tools/matten-report --demo ... --format json --output <path>` slice as the release scope. No public schema, public renderer API, public crate, input-mode JSON, dependency change in published crates, extra feature work, tag, or publish is authorized.
-**Planning Baseline:** core `matten` completed RFC-015 through RFC-021 (shipped through v0.15.3); RFC-022 through RFC-030 established the companion-crate and lock-step family model; RFC-033 through RFC-042 materialized the v0.20+ data, comfort-API, statistics, linalg-lite, and guard work; RFC-043 through RFC-048 completed the additive examples program; RFC-049 implemented benchmarking Phases 1-3 and extracted hard gates to future policy ownership; RFC-050 through RFC-054 completed production-migration documentation and local advisory tooling; RFC-055 through RFC-062 completed result-form APIs, companion maturity promotions, benchmark-doc surfacing, and the ndarray 0.17 update; RFC-063 through RFC-069 completed the reviewed local visualization/reporting line through `0.36.0`; RFC-070 remains the active proposed audit-only public visualization/report readiness RFC; RFC-071 records the reviewed fixed-demo private JSON report slice prepared for `0.37.0`. Under lock-step family versioning (RFC-030), every crate shares the family version; maturity is expressed by per-crate Status labels, not by separate version numbers.
+**Status:** `0.37.0` is released with the RFC-071 fixed-demo private JSON report slice. RFC-070 is closed as an accepted post-0.37 audit decision without a public report/viz crate or API. The next ordered action is to draft a new RFC for behavior-preserving `matten-report` modularization. No modularization implementation, input-mode JSON, broader mathematics, ecosystem bridge, public schema, public renderer API, or public crate is authorized.
+**Planning Baseline:** core `matten` completed RFC-015 through RFC-021 (shipped through v0.15.3); RFC-022 through RFC-030 established the companion-crate and lock-step family model; RFC-033 through RFC-042 materialized the v0.20+ data, comfort-API, statistics, linalg-lite, and guard work; RFC-043 through RFC-048 completed the additive examples program; RFC-049 implemented benchmarking Phases 1-3 and extracted hard gates to future policy ownership; RFC-050 through RFC-054 completed production-migration documentation and local advisory tooling; RFC-055 through RFC-062 completed result-form APIs, companion maturity promotions, benchmark-doc surfacing, and the ndarray 0.17 update; RFC-063 through RFC-069 completed the reviewed local visualization/reporting line through `0.36.0`; RFC-071 shipped private fixed-demo JSON in `0.37.0`; RFC-070 completed its public visualization/report readiness audit after `0.37.0` and closed without public implementation. Under lock-step family versioning (RFC-030), every crate shares the family version; maturity is expressed by per-crate Status labels, not by separate version numbers.
 
 ---
 
@@ -144,8 +144,8 @@ matten -> datafusion
 | **v0.34.0** | Visualization continuation release | RFC-068 continuation implemented: static local HTML artifact for `tools/matten-report --demo mlprep-standardization`, preserving Markdown default and deferring data-readiness/input-mode HTML, public crates, SVG/Vega-Lite, and expression tracing | Local-tool visualization artifact |
 | **v0.35.0** | Visualization continuation release | RFC-068 continuation implemented: static local HTML artifact for `tools/matten-report --demo data-readiness`, completing fixed-demo HTML coverage while preserving Markdown default and deferring input-mode HTML, public crates, SVG/Vega-Lite, and expression tracing | Local-tool visualization artifact |
 | **v0.36.0** | Input-mode HTML release | RFC-069 implemented: static local HTML artifact for `tools/matten-report --input ... --kind data-readiness`, preserving Markdown default and keeping output summary-only, bounded, escaped, and explicit-file-only | Local-tool visualization artifact |
-| **v0.37.0** | Fixed-demo private JSON reports | RFC-071 local-tool JSON slice implemented/reviewed/committed: private `tools/matten-report --demo ... --format json --output <path>` artifacts for the five fixed demos, preserving Markdown default and deferring input-mode JSON, public schemas, public crates, SVG/Vega-Lite, and expression tracing | Local-tool visualization artifact |
-| **Post-v0.37.0** | Public visualization/report readiness | RFC-070 remains proposed/open for public `matten-report` / `matten-viz` readiness; input-mode JSON, public schemas, SVG/Vega-Lite, and core visualization APIs require separate future review | Audit / planning |
+| **v0.37.0** | Fixed-demo private JSON reports | RFC-071 released: private `tools/matten-report --demo ... --format json --output <path>` artifacts for the five fixed demos, preserving Markdown default and deferring input-mode JSON, public schemas, public crates, SVG/Vega-Lite, and expression tracing | Local-tool visualization artifact |
+| **Post-v0.37.0** | RFC-070 closure and report-tool maintainability | RFC-070 closed without a public report/viz surface; next action is a new RFC governing behavior-preserving `matten-report` modularization before implementation | Audit / planning |
 | **v0.21+** | Selective production readiness | `matten-ndarray` promoted to production-ready (RFC-057); `matten-mlprep` and `matten-data` promoted to production-ready candidate (RFC-058/RFC-059); remaining full-production companion decisions require separate review. RFC-049 Phases 1-3 are implemented; Phase 4 hard gates are extracted to future policy/RFC ownership | Per-crate decisions |
 | **Later** | Public report/viz implementation follow-up, JSON/SVG/Vega-Lite output, streaming / large CSV, `nalgebra`, `candle`, broader stats/linalg companions | Separate RFCs or reviewed handoffs required | Design-only until reopened |
 
@@ -820,15 +820,23 @@ Borrow ergonomic ideas, not ecosystem scope.
 
 ### Public reporting / visualization readiness
 
-RFC-063 through RFC-069 prove local, static, tool-owned reporting artifacts.
-They do not prove a stable public report model, renderer API, dependency policy,
-or published `matten-report` / `matten-viz` crate. The next visualization step
-should be an audit-only RFC unless maintainers choose a more concrete theme
-first.
+RFC-063 through RFC-069 prove local, static, tool-owned reporting artifacts,
+and RFC-071 adds private fixed-demo JSON released in `0.37.0`. This evidence
+still does not prove a stable public report model, renderer API, dependency
+policy, or published `matten-report` / `matten-viz` crate. The RFC-070
+post-0.37 closure audit therefore closes the public-readiness audit without
+public implementation.
+
+The next ordered theme is a new RFC for behavior-preserving
+`tools/matten-report` modularization. The current binary is 5,023 lines and
+combines CLI policy, report data, input handling, Markdown/HTML/JSON rendering,
+file output, and tests. That RFC must define module ownership, dependency
+direction, test placement, migration sequence, and exact behavior-preservation
+gates before code is moved.
 
 ### JSON / SVG / Vega-Lite report output
 
-RFC-071 fixed-demo private JSON is prepared for the 0.37.0 local-tool release.
+RFC-071 fixed-demo private JSON shipped in the 0.37.0 local-tool release.
 Input-mode JSON, public JSON schemas, SVG, and Vega-Lite remain deferred. Each
 changes product, dependency, security, and compatibility expectations and
 therefore requires a separate RFC or reviewed handoff.
@@ -1156,3 +1164,5 @@ dependency gated by a non-default feature would not appear, producing a false pa
 | 1.95.0 | 2026-07-21 | Aligned roadmap truth after the RFC-070 fixed-demo private JSON report implementation review and commit `d0ef169`. The private `tools/matten-report --demo ... --format json --output <path>` slice is now recorded as implemented, reviewed, and committed for the five fixed demos only. Input-mode JSON, public schemas, public renderer APIs, public `matten-report` / `matten-viz` crates, dependency changes in published crates, release prep, version bump, tag, publish, generated artifacts, SVG/Vega-Lite/browser/notebook output, expression tracing, autograd, and broader linalg scope remain separate future review decisions. |
 | 1.96.0 | 2026-07-21 | Prepared `0.37.0` as an RFC-071 fixed-demo private JSON report release. Retargeted the lock-step family version and current-family documentation from `0.36.0` to `0.37.0`, added release notes, and recorded the reviewed `tools/matten-report --demo ... --format json --output <path>` slice as the release scope. RFC-070 remains proposed/open for public visualization/report readiness; input-mode JSON, public schemas, public renderer APIs, public `matten-report` / `matten-viz` crates, dependency changes in published crates, extra feature work, tag, publish, generated artifacts, SVG/Vega-Lite/browser/notebook output, expression tracing, autograd, and broader linalg scope remain unauthorized. |
 | 1.97.0 | 2026-07-21 | Addressed 0.37.0 release-prep review blockers: moved private fixed-demo JSON release authority into RFC-071 while keeping RFC-070 audit-only for public visualization/report readiness; retargeted stale rendered docs from the 0.36 current family to 0.37; hardened `scripts/check-release-docs.sh` so `current 0.N release family` wording cannot evade stale-family checks; and recorded the business decision that private-tool visualization milestones may be lock-step public family checkpoints when the changelog explicitly states no published-crate API/runtime/dependency change. |
+| 1.98.0 | 2026-07-21 | Drafted the RFC-070 post-0.37 closure audit and aligned release truth after the owner-confirmed 0.37.0 release. The audit recommends closing RFC-070 without a public report/viz crate or API, then opening a new RFC for behavior-preserving `tools/matten-report` modularization before further feature work. After modularization, the next theme remains a separate choice among private input-mode JSON, broader mathematics, and a new ecosystem bridge. No implementation, public API, dependency, version, release-prep, tag, or publish action is authorized. |
+| 1.99.0 | 2026-07-21 | Applied the accepted RFC-070 post-0.37 lifecycle closure. Moved RFC-070 from proposed to done with status explicitly identifying an audit decision rather than public implementation; aligned roadmap/RFC/handoff indexes and inbound links; and made a new behavior-preserving `matten-report` modularization RFC the next ordered design action. Private input-mode JSON, broader mathematics, and new ecosystem bridges remain later RFC choices. No implementation, public API, dependency, version, release-prep, tag, or publish action is authorized. |

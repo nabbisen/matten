@@ -3,7 +3,7 @@
 **Project:** `matten`
 **Related RFCs:** RFC-022, RFC-030, RFC-063, RFC-065, RFC-068, RFC-069, RFC-070
 **Document kind:** Readiness audit and next-step recommendation
-**Status:** Drafted for review; no implementation authorized
+**Status:** Accepted readiness audit; retained as pre-0.37 evidence
 **Date:** 2026-07-17
 
 ---
@@ -35,7 +35,7 @@ Primary evidence:
 
 ```text
 tools/matten-report/src/main.rs
-rfcs/proposed/070-public-visualization-report-readiness-audit.md
+rfcs/done/070-public-visualization-report-readiness-audit.md
 rfcs/done/063-visual-understanding-and-reporting.md
 rfcs/done/065-educational-visualization-and-tensor-learning-path.md
 rfcs/done/068-rich-local-visualization-artifacts.md

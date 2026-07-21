@@ -1,9 +1,9 @@
 # RFC-070: Public Visualization and Report Readiness Audit
 
-**Status:** Proposed; audit-only for public visualization/report surface; no public implementation authorized
-**Target:** Post-0.36 readiness decision for public reporting / visualization scope
+**Status:** Implemented (post-0.37 audit decision after 0.37.0; no public implementation authorized)
+**Target:** Post-0.37 closure decision for public reporting / visualization scope
 **Theme:** Decide whether `matten-report` / `matten-viz` is ready to become a public product surface
-**Depends on:** RFC-022, RFC-030, RFC-063, RFC-065, RFC-068, RFC-069
+**Depends on:** RFC-022, RFC-030, RFC-063, RFC-065, RFC-068, RFC-069, RFC-071
 **Related:** RFC-049, RFC-054, RFC-066, RFC-067
 
 ---
@@ -38,6 +38,20 @@ Expected initial posture:
 ```text
 Not ready for public crates yet.
 Ready for an evidence-based readiness audit.
+```
+
+Post-0.37 evidence now includes private fixed-demo JSON under RFC-071. The
+closure audit still finds no stable public report or renderer contract. It
+recommends resolving this RFC as a completed audit without public
+implementation, then treating behavior-preserving `matten-report`
+modularization as a separate RFC-first maintainability theme.
+
+Final decision after the accepted post-0.37 closure audit:
+
+```text
+RFC-070 is complete as an audit decision.
+No public report/viz crate, report model, renderer API, or JSON schema is authorized.
+The next theme is a separate RFC for behavior-preserving matten-report modularization.
 ```
 
 ---

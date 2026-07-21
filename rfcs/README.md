@@ -83,25 +83,27 @@ The broader documentation ownership model is recorded in
 | 067 | [v1.0 Family Maturity Policy](./done/067-v1-family-maturity-policy.md) | repository policy; resolves RFC-066 MD-1 without v1.0 release authorization |
 | 068 | [Rich Local Visualization Artifacts](./done/068-rich-local-visualization-artifacts.md) | 0.32.0 (educational-path and shape-flow HTML); 0.33.0 (dynamic-readiness HTML); 0.34.0 (mlprep-standardization HTML); 0.35.0 (data-readiness HTML; fixed-demo HTML line complete; input-mode HTML and public report/viz crates deferred) |
 | 069 | [Input-Mode HTML Report Policy](./done/069-input-mode-html-report-policy.md) | 0.36.0 (`tools/matten-report` data-readiness input-mode HTML; public report/viz crates deferred) |
-| 071 | [Private Fixed-Demo JSON Report Artifacts](./done/071-private-fixed-demo-json-report-artifacts.md) | 0.37.0 candidate (`tools/matten-report` fixed-demo private JSON; public schema/crates deferred) |
+| 070 | [Public Visualization and Report Readiness Audit](./done/070-public-visualization-report-readiness-audit.md) | post-0.37 audit decision; closed without public implementation |
+| 071 | [Private Fixed-Demo JSON Report Artifacts](./done/071-private-fixed-demo-json-report-artifacts.md) | 0.37.0 (`tools/matten-report` fixed-demo private JSON; public schema/crates deferred) |
 
 ## Proposed
 
-| ID | Title | Scope |
-|---:|---|---|
-| 070 | [Public Visualization and Report Readiness Audit](./proposed/070-public-visualization-report-readiness-audit.md) | Audit-only decision gate for public `matten-report` / `matten-viz`; no public implementation authorized |
+None. The next ordered action is to draft a new RFC for behavior-preserving
+`matten-report` modularization.
 
 ## Remaining Themes And Issues
 
-`rfcs/proposed/` currently contains RFC-070, an audit-only public-surface RFC.
-The remaining themes below are not authorized unless their current status says
-so. The current post-0.37 backlog is:
+RFC-070 is closed as an audit decision without public implementation. The next
+ordered action is to draft a separate modularization RFC. The remaining themes
+below are not authorized unless their current status says so. The current
+post-0.37 backlog is:
 
 | Theme | Current authority | Current status |
 |---|---|---|
-| Public `matten-report` / `matten-viz` readiness | RFC-070, RFC-063, RFC-065, RFC-068, RFC-069, post-0.36 RFC-069 closure audit | Proposed audit-only RFC; no public crate or API authorized |
+| Public `matten-report` / `matten-viz` readiness | RFC-070, RFC-063, RFC-065, RFC-068, RFC-069, RFC-071 | RFC-070 closed after audit; no public crate or API authorized |
+| `matten-report` modularization | RFC-070 post-0.37 closure audit; new RFC required | Next ordered theme; design only until its RFC and handoff are reviewed |
 | More input-mode HTML paths | RFC-069, post-0.36 RFC-069 closure audit | Deferred until a concrete report path is reviewed |
-| JSON / SVG / Vega-Lite report output | RFC-063, RFC-068, RFC-069, RFC-070 JSON policy audit, RFC-071 | Fixed-demo private JSON prepared for 0.37.0 under RFC-071; input-mode JSON, public JSON schemas, SVG, and Vega-Lite remain deferred |
+| JSON / SVG / Vega-Lite report output | RFC-063, RFC-068, RFC-069, RFC-070 JSON policy audit, RFC-071 | Fixed-demo private JSON released in 0.37.0 under RFC-071; input-mode JSON, public JSON schemas, SVG, and Vega-Lite remain deferred |
 | Streaming / large CSV | RFC-026, RFC-037 | Deferred; future implementation RFC must answer batch/schema/malformed-row/memory/sync-vs-async policy |
 | `matten-nalgebra` bridge | RFC-025, RFC-041, RFC-054 bridge-readiness handoff | Deferred; per-crate RFC required |
 | `matten-candle` bridge | RFC-025, RFC-049, RFC-054 bridge-readiness handoff | Deferred; per-crate RFC required |
@@ -238,8 +240,8 @@ paths, public report/viz crates, JSON/SVG/Vega-Lite output, notebook/browser
 integration, expression tracing, autograd, and core visualization APIs remain
 separate future RFC or handoff decisions.
 
-RFC-070 opens the public visualization/report readiness question as an audit-only
-proposed RFC. Its readiness audit
+RFC-070 resolved the public visualization/report readiness question as an
+audit-only decision. Its readiness audit
 ([`070-public-visualization-report-readiness-audit.md`](./handoffs/070-public-visualization-report-readiness-audit.md))
 records the current verdict: local `tools/matten-report` artifacts are useful
 and maintained, but not ready to become public `matten-report` / `matten-viz`
@@ -277,7 +279,7 @@ dependency change.
 RFC-071
 ([`071-private-fixed-demo-json-report-artifacts.md`](./done/071-private-fixed-demo-json-report-artifacts.md))
 records the private fixed-demo JSON prerequisite as the normative authority for
-the `0.37.0` candidate. It also records the project decision that selected
+the `0.37.0` release. It also records the project decision that selected
 private-tool visualization milestones may be released as lock-step public family
 checkpoints when release notes clearly state that published crates have no API,
 runtime, dependency, feature, or maturity-label change.
@@ -290,5 +292,13 @@ five fixed demos only, with deterministic `schema_version: 0` snapshots and
 direct `serde` / `serde_json` dependencies confined to the workspace-excluded
 local tool. It does not authorize input-mode JSON, public schemas, public
 crates, public renderer APIs, generated artifacts, or any dependency change in
-published crates. The slice is prepared as the RFC-071 `0.37.0` release scope; tag and
-publish actions remain separate maintainer actions.
+published crates. The slice shipped as the RFC-071 `0.37.0` release scope.
+
+The post-0.37 closure audit
+([`070-post-037-public-visualization-closure-audit.md`](./handoffs/070-post-037-public-visualization-closure-audit.md))
+reassesses RFC-070 using the private report-model and fixed-demo JSON evidence.
+It closes RFC-070 without a public report/viz crate, public report model,
+renderer API, or JSON schema. Its next ordered theme is a separate,
+behavior-preserving `matten-report` modularization RFC. Private input-mode JSON,
+broader mathematics, and new ecosystem bridges remain later candidates that
+require their own RFC decisions.
