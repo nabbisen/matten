@@ -60,6 +60,8 @@ cargo run -p matten-mlprep --example mlprep_visual_standardize_summary
 cargo check --manifest-path tools/matten-report/Cargo.toml
 cargo test --manifest-path tools/matten-report/Cargo.toml
 bash tools/matten-report/tests/process-boundary.sh
+bash tools/matten-report/tests/module-boundaries.sh
+bash tools/matten-report/tests/module-boundaries.sh --self-test
 cargo clippy --manifest-path tools/matten-report/Cargo.toml -- -D warnings
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo data-readiness
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo data-readiness --output target/matten-report-demo.md

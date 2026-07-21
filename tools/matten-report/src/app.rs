@@ -1,0 +1,89 @@
+use std::env;
+use std::error::Error;
+
+use matten_data::Table;
+
+use crate::cli::{self, Action};
+use crate::output;
+use crate::render;
+use crate::request::{Config, Input, OutputFormat, ReportKind};
+
+pub(crate) fn run() -> Result<(), Box<dyn Error>> {
+    let config = match cli::parse_args(env::args().skip(1))? {
+        Action::Run(config) => config,
+        Action::Help => {
+            println!("{}", cli::usage());
+            return Ok(());
+        }
+    };
+    let report = render_report(&config)?;
+    output::write(&report, config.output.as_deref())
+}
+
+fn render_report(config: &Config) -> Result<String, Box<dyn Error>> {
+    if config.format == OutputFormat::Json {
+        return match config.input {
+            Input::Demo => render::render_fixed_demo_json_report(config.kind.as_str()),
+            Input::CsvPath { .. } => Err("--format json is not supported for --input yet".into()),
+        };
+    }
+
+    if config.format == OutputFormat::Html {
+        return match (&config.input, config.kind) {
+            (Input::Demo, ReportKind::DataReadiness) => render::render_data_readiness_html_report(),
+            (Input::Demo, ReportKind::EducationalPath) => {
+                render::render_educational_path_html_report()
+            }
+            (Input::Demo, ReportKind::ShapeFlow) => render::render_shape_flow_html_report(),
+            (Input::Demo, ReportKind::DynamicReadiness) => {
+                render::render_dynamic_readiness_html_report()
+            }
+            (Input::Demo, ReportKind::MlprepStandardization) => {
+                render::render_mlprep_standardization_html_report()
+            }
+            (Input::CsvPath { path }, ReportKind::DataReadiness) => {
+                let table = Table::from_csv_path(path).map_err(Box::<dyn Error>::from)?;
+                render::render_input_data_readiness_html_report(
+                    &format!("path: {}", path.display()),
+                    &table,
+                    &config.select,
+                )
+            }
+            (Input::CsvPath { .. }, kind) => Err(format!(
+                "unsupported report kind {:?}; expected {:?}",
+                kind.as_str(),
+                ReportKind::DataReadiness.as_str()
+            )
+            .into()),
+        };
+    }
+
+    match (&config.input, config.kind) {
+        (Input::Demo, ReportKind::ShapeFlow) => render::render_shape_flow_report(),
+        (Input::Demo, ReportKind::DynamicReadiness) => render::render_dynamic_readiness_report(),
+        (Input::Demo, ReportKind::MlprepStandardization) => {
+            render::render_mlprep_standardization_report()
+        }
+        (Input::Demo, ReportKind::EducationalPath) => render::render_educational_path_report(),
+        (Input::Demo, ReportKind::DataReadiness) => {
+            render::render_data_readiness_markdown_report(&config.select)
+        }
+        (Input::CsvPath { path }, ReportKind::DataReadiness) => {
+            let table = Table::from_csv_path(path).map_err(Box::<dyn Error>::from)?;
+            render::render_table_report(
+                &format!("path: {}", path.display()),
+                &table,
+                &config.select,
+            )
+        }
+        (Input::CsvPath { .. }, kind) => Err(format!(
+            "unsupported report kind {:?}; expected {:?}",
+            kind.as_str(),
+            ReportKind::DataReadiness.as_str()
+        )
+        .into()),
+    }
+}
+
+#[cfg(test)]
+mod tests;

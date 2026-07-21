@@ -1,6 +1,6 @@
 # RFC-072: Behavior-Preserving `matten-report` Modularization
 
-**Status:** Proposed; design and detailed handoff accepted; Slice 0 process baseline implemented and prepared for review; no Rust source movement authorized
+**Status:** Proposed; Slice 0 reviewed and committed; Slice 1 nested-group/visibility remediation prepared for rereview; later extraction unauthorized
 **Target:** Post-0.37 maintainability work; release family undecided
 **Theme:** Split the local report tool into explicit internal ownership boundaries
 **Depends on:** RFC-063, RFC-065, RFC-068, RFC-069, RFC-070, RFC-071

@@ -90,7 +90,7 @@ The broader documentation ownership model is recorded in
 
 | ID | Title | Scope |
 |---:|---|---|
-| 072 | [Behavior-Preserving `matten-report` Modularization](./proposed/072-matten-report-modularization.md) | Design/handoff accepted; Slice 0 process baseline implemented and prepared for review; no Rust movement authorized |
+| 072 | [Behavior-Preserving `matten-report` Modularization](./proposed/072-matten-report-modularization.md) | Slice 0 committed; Slice 1 nested-group/visibility remediation prepared for rereview |
 
 ## Remaining Themes And Issues
 
@@ -102,7 +102,7 @@ is:
 | Theme | Current authority | Current status |
 |---|---|---|
 | Public `matten-report` / `matten-viz` readiness | RFC-070, RFC-063, RFC-065, RFC-068, RFC-069, RFC-071 | RFC-070 closed after audit; no public crate or API authorized |
-| `matten-report` modularization | RFC-072, RFC-070 post-0.37 closure audit | Slice 0 process baseline implemented and prepared for review; no Rust movement until its review and commit |
+| `matten-report` modularization | RFC-072, RFC-070 post-0.37 closure audit | Slice 0 committed; Slice 1 second remediation prepared for rereview; report-family extraction remains unauthorized |
 | More input-mode HTML paths | RFC-069, post-0.36 RFC-069 closure audit | Deferred until a concrete report path is reviewed |
 | JSON / SVG / Vega-Lite report output | RFC-063, RFC-068, RFC-069, RFC-070 JSON policy audit, RFC-071 | Fixed-demo private JSON released in 0.37.0 under RFC-071; input-mode JSON, public JSON schemas, SVG, and Vega-Lite remain deferred |
 | Streaming / large CSV | RFC-026, RFC-037 | Deferred; future implementation RFC must answer batch/schema/malformed-row/memory/sync-vs-async policy |
@@ -306,12 +306,11 @@ require their own RFC decisions.
 
 RFC-072
 ([`072-matten-report-modularization.md`](./proposed/072-matten-report-modularization.md))
-is the next design-first theme. It proposes a behavior-preserving internal split
-of the 5,023-line local report binary into request, CLI, orchestration,
-report-family, renderer, output, and separated-test ownership boundaries. It
-does not authorize code movement until the RFC and a detailed implementation
-handoff are reviewed, and it does not add features, dependencies, public APIs,
-or release scope.
+is the active design-first theme. Its original 5,023-line local report binary
+now has a reviewed/committed process baseline, and Slice 1 separates the entry,
+request, CLI, orchestration, transitional renderer, output, and owned-test
+boundaries for review. It adds no features, dependencies, public APIs, or
+release scope.
 
 The detailed RFC-072 handoff
 ([`072-matten-report-modularization-implementation-handoff.md`](./handoffs/072-matten-report-modularization-implementation-handoff.md))
@@ -319,6 +318,7 @@ defines the distinct process-baseline checkpoint, exact byte fingerprints,
 module dependency guard, family/format-sized movement units, test placement,
 and final gates. The accepted handoff also makes `app` construct report-owned
 family values before renderer dispatch and assigns every normalization/helper
-to a dependency-safe owner. Slice 0 process-baseline implementation is
-prepared for review; Rust source movement remains unauthorized until that
-baseline is reviewed and committed.
+to a dependency-safe owner. Slice 0 is reviewed and committed. Slice 1 nested
+grouped-import and visibility-guard remediation is prepared for focused rereview;
+report-family extraction remains unauthorized until this checkpoint is
+accepted and committed.

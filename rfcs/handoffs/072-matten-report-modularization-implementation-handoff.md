@@ -3,7 +3,7 @@
 **Project:** `matten`
 **Related RFCs:** RFC-013, RFC-022, RFC-043, RFC-063, RFC-068, RFC-069, RFC-070, RFC-071, RFC-072
 **Document kind:** Detailed implementation handoff
-**Status:** Accepted; Slice 0 process baseline implemented and prepared for review; no Rust source movement authorized
+**Status:** Accepted; Slice 0 reviewed and committed; Slice 1 nested-group/visibility remediation prepared for rereview; later extraction unauthorized
 **Date:** 2026-07-21
 
 ---
@@ -322,6 +322,13 @@ Slice 1 gates:
 [ ] normal guard and self-test are wired into CI/release checklist
 [ ] no production or test Rust file above 500 ELOC without justification
 ```
+
+Slice 1 implementation checkpoint note: `render.rs` and `render/tests.rs`
+temporarily preserve the unchanged combined report/render bodies and exact
+snapshots moved out of the entry point. They remain above 500 lines so this
+checkpoint does not combine entry/CLI/app ownership with the later reviewed
+family/format extractions. They must not grow and must be split by those later
+units; this is not a permanent size-policy exception.
 
 Stop for review before report-family extraction.
 
