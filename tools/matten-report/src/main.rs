@@ -7,6 +7,7 @@ use std::path::PathBuf;
 use matten::{Element, NumericPolicy, Tensor};
 use matten_data::{MattenDataError, Table};
 use matten_mlprep::standardize_columns;
+use serde::Serialize;
 
 const DEMO_CSV: &str = "\
 region,sales,cost,note
@@ -43,6 +44,7 @@ enum Input {
 enum OutputFormat {
     Markdown,
     Html,
+    Json,
 }
 
 #[derive(Debug)]
@@ -198,17 +200,22 @@ fn parse_format(value: &str) -> Result<OutputFormat, String> {
     match value {
         "markdown" => Ok(OutputFormat::Markdown),
         "html" => Ok(OutputFormat::Html),
+        "json" => Ok(OutputFormat::Json),
         other => Err(format!(
-            "unsupported --format {other:?}; expected \"markdown\" or \"html\""
+            "unsupported --format {other:?}; expected \"markdown\", \"html\", or \"json\""
         )),
     }
 }
 
 fn validate_format_policy(config: &Config) -> Result<(), String> {
-    if config.format != OutputFormat::Html {
-        return Ok(());
+    match config.format {
+        OutputFormat::Markdown => Ok(()),
+        OutputFormat::Html => validate_html_format_policy(config),
+        OutputFormat::Json => validate_json_format_policy(config),
     }
+}
 
+fn validate_html_format_policy(config: &Config) -> Result<(), String> {
     if config.output.is_none() {
         return Err("--format html requires --output <report.html>".to_string());
     }
@@ -226,6 +233,21 @@ fn validate_format_policy(config: &Config) -> Result<(), String> {
     }
 }
 
+fn validate_json_format_policy(config: &Config) -> Result<(), String> {
+    if config.output.is_none() {
+        return Err("--format json requires --output <report.json>".to_string());
+    }
+
+    match &config.input {
+        Input::Demo { label } if supports_json_demo(label) => Ok(()),
+        Input::Demo { label } => Err(format!(
+            "--format json is only supported for --demo {}; got {label:?}",
+            supported_json_demos()
+        )),
+        Input::CsvPath { .. } => Err("--format json is not supported for --input yet".to_string()),
+    }
+}
+
 fn supports_html_demo(label: &str) -> bool {
     matches!(
         label,
@@ -238,6 +260,14 @@ fn supports_html_demo(label: &str) -> bool {
 }
 
 fn supported_html_demos() -> &'static str {
+    "\"data-readiness\", \"shape-flow\", \"dynamic-readiness\", \"mlprep-standardization\", or \"educational-path\""
+}
+
+fn supports_json_demo(label: &str) -> bool {
+    is_supported_demo(label)
+}
+
+fn supported_json_demos() -> &'static str {
     "\"data-readiness\", \"shape-flow\", \"dynamic-readiness\", \"mlprep-standardization\", or \"educational-path\""
 }
 
@@ -269,6 +299,13 @@ fn is_supported_demo(label: &str) -> bool {
 }
 
 fn render_report(config: &Config) -> Result<String, Box<dyn Error>> {
+    if config.format == OutputFormat::Json {
+        return match &config.input {
+            Input::Demo { label } => render_fixed_demo_json_report(label),
+            Input::CsvPath { .. } => Err("--format json is not supported for --input yet".into()),
+        };
+    }
+
     if config.format == OutputFormat::Html {
         return match &config.input {
             Input::Demo { label } if label == KIND_DATA_READINESS => {
@@ -333,6 +370,464 @@ fn render_report(config: &Config) -> Result<String, Box<dyn Error>> {
             render_table_report(&format!("path: {}", path.display()), &table, &config.select)
         }
     }
+}
+
+#[derive(Serialize)]
+struct JsonReportEnvelope<T> {
+    schema_version: u8,
+    schema_status: &'static str,
+    tool: &'static str,
+    report_kind: &'static str,
+    input_mode: &'static str,
+    data: T,
+}
+
+#[derive(Serialize)]
+struct JsonTensorPreview {
+    shape: Vec<usize>,
+    values: Vec<f64>,
+    truncated: bool,
+    shown_values: usize,
+    total_values: usize,
+    limit: usize,
+}
+
+#[derive(Serialize)]
+struct JsonMissingCount {
+    column: String,
+    missing: usize,
+}
+
+#[derive(Serialize)]
+struct JsonDataReadinessPayload {
+    input_label: &'static str,
+    source_columns: Vec<String>,
+    selected_columns: Vec<String>,
+    left_out_columns: Vec<String>,
+    missing_counts: Vec<JsonMissingCount>,
+    numeric_conversion: JsonNumericConversion,
+}
+
+#[derive(Serialize)]
+struct JsonNumericConversion {
+    status: &'static str,
+    tensor: JsonTensorPreview,
+}
+
+#[derive(Serialize)]
+struct JsonShapeFlowPayload {
+    broadcast: JsonBroadcastOperation,
+    reshape: JsonReshapeOperation,
+    axis_reductions: JsonAxisReductions,
+    matmul: JsonMatmulOperation,
+}
+
+#[derive(Serialize)]
+struct JsonBroadcastOperation {
+    operation: &'static str,
+    input_a_shape: Vec<usize>,
+    input_b_shape: Vec<usize>,
+    result: JsonTensorPreview,
+}
+
+#[derive(Serialize)]
+struct JsonReshapeOperation {
+    operation: &'static str,
+    input_shape: Vec<usize>,
+    result: JsonTensorPreview,
+}
+
+#[derive(Serialize)]
+struct JsonAxisReductions {
+    input_shape: Vec<usize>,
+    mean_axis_0: JsonTensorPreview,
+    mean_axis_1: JsonTensorPreview,
+}
+
+#[derive(Serialize)]
+struct JsonMatmulOperation {
+    operation: &'static str,
+    left_shape: Vec<usize>,
+    right_shape: Vec<usize>,
+    result: JsonTensorPreview,
+}
+
+#[derive(Serialize)]
+struct JsonDynamicReadinessPayload {
+    shape: Vec<usize>,
+    values: Vec<JsonDynamicValue>,
+    schema_summary: Vec<JsonSchemaSummaryRow>,
+    readiness_masks: JsonReadinessMasks,
+    strict_conversion: JsonConversionResult,
+    explicit_policy_conversion: JsonExplicitPolicyConversion,
+}
+
+#[derive(Serialize)]
+struct JsonDynamicValue {
+    row: usize,
+    column: usize,
+    element: String,
+}
+
+#[derive(Serialize)]
+struct JsonSchemaSummaryRow {
+    label: &'static str,
+    count: usize,
+}
+
+#[derive(Serialize)]
+struct JsonReadinessMasks {
+    none_mask: JsonTensorPreview,
+    numeric_mask: JsonTensorPreview,
+    strict_numeric_ready: bool,
+}
+
+#[derive(Serialize)]
+struct JsonConversionResult {
+    status: &'static str,
+    message: &'static str,
+}
+
+#[derive(Serialize)]
+struct JsonExplicitPolicyConversion {
+    policy: &'static str,
+    tensor: JsonTensorPreview,
+}
+
+#[derive(Serialize)]
+struct JsonMlprepStandardizationPayload {
+    selected_columns: Vec<&'static str>,
+    operation: &'static str,
+    before: JsonMlprepState,
+    after: JsonMlprepState,
+}
+
+#[derive(Serialize)]
+struct JsonMlprepState {
+    tensor: JsonTensorPreview,
+    column_mean: Vec<f64>,
+    column_population_std: Vec<f64>,
+}
+
+#[derive(Serialize)]
+struct JsonEducationalPathPayload {
+    reading_steps: Vec<&'static str>,
+    broadcasting: JsonEducationalBroadcast,
+    reshape_and_transpose: JsonEducationalReshapeTranspose,
+    axis_reductions: JsonEducationalAxisReductions,
+    matmul: JsonEducationalMatmul,
+    dynamic_readiness: JsonEducationalDynamicReadiness,
+    standardization: JsonEducationalStandardization,
+    non_goals: Vec<&'static str>,
+}
+
+#[derive(Serialize)]
+struct JsonEducationalBroadcast {
+    left_shape: Vec<usize>,
+    right_shape: Vec<usize>,
+    result: JsonTensorPreview,
+    axis_1_meaning: &'static str,
+    axis_0_meaning: &'static str,
+}
+
+#[derive(Serialize)]
+struct JsonEducationalReshapeTranspose {
+    input_shape: Vec<usize>,
+    reshape: JsonTensorPreview,
+    transpose: JsonTensorPreview,
+    meaning: &'static str,
+}
+
+#[derive(Serialize)]
+struct JsonEducationalAxisReductions {
+    input_shape: Vec<usize>,
+    mean_axis_0: JsonTensorPreview,
+    mean_axis_1: JsonTensorPreview,
+}
+
+#[derive(Serialize)]
+struct JsonEducationalMatmul {
+    left_shape: Vec<usize>,
+    right_shape: Vec<usize>,
+    shared_inner_dimension: usize,
+    result: JsonTensorPreview,
+}
+
+#[derive(Serialize)]
+struct JsonEducationalDynamicReadiness {
+    shape: Vec<usize>,
+    none_mask: JsonTensorPreview,
+    numeric_mask: JsonTensorPreview,
+    note: &'static str,
+    next_step: &'static str,
+}
+
+#[derive(Serialize)]
+struct JsonEducationalStandardization {
+    operation: &'static str,
+    input_shape: Vec<usize>,
+    output_shape: Vec<usize>,
+    before_mean: Vec<f64>,
+    before_population_std: Vec<f64>,
+    after_mean: Vec<f64>,
+    after_population_std: Vec<f64>,
+}
+
+fn render_fixed_demo_json_report(label: &str) -> Result<String, Box<dyn Error>> {
+    match label {
+        KIND_DATA_READINESS => {
+            render_json_envelope(KIND_DATA_READINESS, data_readiness_json_payload()?)
+        }
+        KIND_SHAPE_FLOW => render_json_envelope(KIND_SHAPE_FLOW, shape_flow_json_payload()?),
+        KIND_DYNAMIC_READINESS => {
+            render_json_envelope(KIND_DYNAMIC_READINESS, dynamic_readiness_json_payload()?)
+        }
+        KIND_MLPREP_STANDARDIZATION => render_json_envelope(
+            KIND_MLPREP_STANDARDIZATION,
+            mlprep_standardization_json_payload()?,
+        ),
+        KIND_EDUCATIONAL_PATH => {
+            render_json_envelope(KIND_EDUCATIONAL_PATH, educational_path_json_payload()?)
+        }
+        other => Err(format!(
+            "--format json is only supported for --demo {}; got {other:?}",
+            supported_json_demos()
+        )
+        .into()),
+    }
+}
+
+fn render_json_envelope<T: Serialize>(
+    report_kind: &'static str,
+    data: T,
+) -> Result<String, Box<dyn Error>> {
+    let envelope = JsonReportEnvelope {
+        schema_version: 0,
+        schema_status: "private-local",
+        tool: "matten-report",
+        report_kind,
+        input_mode: "demo",
+        data,
+    };
+    let mut report = serde_json::to_string_pretty(&envelope)?;
+    report.push('\n');
+    Ok(report)
+}
+
+fn json_tensor_preview(
+    shape: &[usize],
+    values: &[f64],
+) -> Result<JsonTensorPreview, Box<dyn Error>> {
+    ensure_finite_values(values)?;
+    let shown_values = values.len().min(MAX_TENSOR_PREVIEW_VALUES);
+    Ok(JsonTensorPreview {
+        shape: shape.to_vec(),
+        values: values.iter().copied().take(shown_values).collect(),
+        truncated: values.len() > MAX_TENSOR_PREVIEW_VALUES,
+        shown_values,
+        total_values: values.len(),
+        limit: MAX_TENSOR_PREVIEW_VALUES,
+    })
+}
+
+fn ensure_finite_values(values: &[f64]) -> Result<(), Box<dyn Error>> {
+    if values.iter().all(|value| value.is_finite()) {
+        Ok(())
+    } else {
+        Err("JSON report encountered a non-finite numeric value".into())
+    }
+}
+
+fn data_readiness_json_payload() -> Result<JsonDataReadinessPayload, Box<dyn Error>> {
+    let data = data_readiness_demo_report_data()?;
+    Ok(JsonDataReadinessPayload {
+        input_label: data.input_label,
+        source_columns: data.source_columns,
+        selected_columns: data.selected_columns,
+        left_out_columns: data.left_out_columns,
+        missing_counts: data
+            .missing_counts
+            .into_iter()
+            .map(|row| JsonMissingCount {
+                column: row.column,
+                missing: row.missing,
+            })
+            .collect(),
+        numeric_conversion: JsonNumericConversion {
+            status: data.conversion_status,
+            tensor: json_tensor_preview(&data.tensor_shape, &data.tensor_values)?,
+        },
+    })
+}
+
+fn shape_flow_json_payload() -> Result<JsonShapeFlowPayload, Box<dyn Error>> {
+    let data = shape_flow_report_data();
+    Ok(JsonShapeFlowPayload {
+        broadcast: JsonBroadcastOperation {
+            operation: data.broadcast.operation,
+            input_a_shape: data.broadcast.input_a_shape,
+            input_b_shape: data.broadcast.input_b_shape,
+            result: json_tensor_preview(
+                &data.broadcast.result_shape,
+                &data.broadcast.result_values,
+            )?,
+        },
+        reshape: JsonReshapeOperation {
+            operation: data.reshape.operation,
+            input_shape: data.reshape.input_shape,
+            result: json_tensor_preview(&data.reshape.result_shape, &data.reshape.result_values)?,
+        },
+        axis_reductions: JsonAxisReductions {
+            input_shape: data.axis.input_shape,
+            mean_axis_0: json_tensor_preview(
+                &data.axis.mean_axis_0_shape,
+                &data.axis.mean_axis_0_values,
+            )?,
+            mean_axis_1: json_tensor_preview(
+                &data.axis.mean_axis_1_shape,
+                &data.axis.mean_axis_1_values,
+            )?,
+        },
+        matmul: JsonMatmulOperation {
+            operation: data.matmul.operation,
+            left_shape: data.matmul.left_shape,
+            right_shape: data.matmul.right_shape,
+            result: json_tensor_preview(&data.matmul.result_shape, &data.matmul.result_values)?,
+        },
+    })
+}
+
+fn dynamic_readiness_json_payload() -> Result<JsonDynamicReadinessPayload, Box<dyn Error>> {
+    let data = dynamic_readiness_report_data()?;
+    Ok(JsonDynamicReadinessPayload {
+        shape: data.shape.clone(),
+        values: data
+            .values
+            .into_iter()
+            .map(|value| JsonDynamicValue {
+                row: value.row,
+                column: value.column,
+                element: value.element,
+            })
+            .collect(),
+        schema_summary: data
+            .schema_summary
+            .into_iter()
+            .map(|row| JsonSchemaSummaryRow {
+                label: row.label,
+                count: row.count,
+            })
+            .collect(),
+        readiness_masks: JsonReadinessMasks {
+            none_mask: json_tensor_preview(&data.shape, &data.none_mask_values)?,
+            numeric_mask: json_tensor_preview(&data.shape, &data.numeric_mask_values)?,
+            strict_numeric_ready: data.strict_numeric_ready,
+        },
+        strict_conversion: JsonConversionResult {
+            status: "error",
+            message: data.strict_conversion_result,
+        },
+        explicit_policy_conversion: JsonExplicitPolicyConversion {
+            policy: data.explicit_policy,
+            tensor: json_tensor_preview(&data.converted_shape, &data.converted_values)?,
+        },
+    })
+}
+
+fn mlprep_standardization_json_payload() -> Result<JsonMlprepStandardizationPayload, Box<dyn Error>>
+{
+    let data = mlprep_standardization_report_data()?;
+    ensure_finite_values(&data.before_mean)?;
+    ensure_finite_values(&data.before_std)?;
+    ensure_finite_values(&data.after_mean)?;
+    ensure_finite_values(&data.after_std)?;
+    Ok(JsonMlprepStandardizationPayload {
+        selected_columns: vec!["feature_0", "feature_1"],
+        operation: "standardize_columns(input)",
+        before: JsonMlprepState {
+            tensor: json_tensor_preview(&data.input_shape, &data.input_values)?,
+            column_mean: data.before_mean,
+            column_population_std: data.before_std,
+        },
+        after: JsonMlprepState {
+            tensor: json_tensor_preview(&data.output_shape, &data.output_values)?,
+            column_mean: data.after_mean,
+            column_population_std: data.after_std,
+        },
+    })
+}
+
+fn educational_path_json_payload() -> Result<JsonEducationalPathPayload, Box<dyn Error>> {
+    let data = educational_path_report_data()?;
+    ensure_finite_values(&data.standardization.before_mean)?;
+    ensure_finite_values(&data.standardization.before_std)?;
+    ensure_finite_values(&data.standardization.after_mean)?;
+    ensure_finite_values(&data.standardization.after_std)?;
+    Ok(JsonEducationalPathPayload {
+        reading_steps: data.reading_steps.to_vec(),
+        broadcasting: JsonEducationalBroadcast {
+            left_shape: data.broadcast.left_shape,
+            right_shape: data.broadcast.right_shape,
+            result: json_tensor_preview(
+                &data.broadcast.result_shape,
+                &data.broadcast.result_values,
+            )?,
+            axis_1_meaning: "left repeats across 4 columns",
+            axis_0_meaning: "right repeats across 3 rows",
+        },
+        reshape_and_transpose: JsonEducationalReshapeTranspose {
+            input_shape: data.reshape_transpose.input_shape,
+            reshape: json_tensor_preview(
+                &data.reshape_transpose.reshape_shape,
+                &data.reshape_transpose.reshape_values,
+            )?,
+            transpose: json_tensor_preview(
+                &data.reshape_transpose.transpose_shape,
+                &data.reshape_transpose.transpose_values,
+            )?,
+            meaning: "reshape changes grouping; transpose changes coordinate meaning",
+        },
+        axis_reductions: JsonEducationalAxisReductions {
+            input_shape: data.axis_reductions.input_shape,
+            mean_axis_0: json_tensor_preview(
+                &data.axis_reductions.mean_axis_0_shape,
+                &data.axis_reductions.mean_axis_0_values,
+            )?,
+            mean_axis_1: json_tensor_preview(
+                &data.axis_reductions.mean_axis_1_shape,
+                &data.axis_reductions.mean_axis_1_values,
+            )?,
+        },
+        matmul: JsonEducationalMatmul {
+            left_shape: data.matmul.left_shape,
+            right_shape: data.matmul.right_shape,
+            shared_inner_dimension: data.matmul.shared_inner_dimension,
+            result: json_tensor_preview(&data.matmul.result_shape, &data.matmul.result_values)?,
+        },
+        dynamic_readiness: JsonEducationalDynamicReadiness {
+            shape: data.dynamic_readiness.shape.clone(),
+            none_mask: json_tensor_preview(
+                &data.dynamic_readiness.shape,
+                &data.dynamic_readiness.none_mask_values,
+            )?,
+            numeric_mask: json_tensor_preview(
+                &data.dynamic_readiness.shape,
+                &data.dynamic_readiness.numeric_mask_values,
+            )?,
+            note: "Text values are not numeric-ready under the strict mask",
+            next_step: "clean values, then call try_numeric()",
+        },
+        standardization: JsonEducationalStandardization {
+            operation: "standardize_columns(input)",
+            input_shape: data.standardization.input_shape,
+            output_shape: data.standardization.output_shape,
+            before_mean: data.standardization.before_mean,
+            before_population_std: data.standardization.before_std,
+            after_mean: data.standardization.after_mean,
+            after_population_std: data.standardization.after_std,
+        },
+        non_goals: data.non_goals.to_vec(),
+    })
 }
 
 fn render_table_report(
@@ -2122,19 +2617,24 @@ fn usage() -> String {
 Usage:
   matten-report --demo data-readiness [--output <report.md>]
   matten-report --demo data-readiness --format html --output <report.html>
+  matten-report --demo data-readiness --format json --output <report.json>
   matten-report --demo shape-flow [--output <report.md>]
   matten-report --demo shape-flow --format html --output <report.html>
+  matten-report --demo shape-flow --format json --output <report.json>
   matten-report --demo dynamic-readiness [--output <report.md>]
   matten-report --demo dynamic-readiness --format html --output <report.html>
+  matten-report --demo dynamic-readiness --format json --output <report.json>
   matten-report --demo mlprep-standardization [--output <report.md>]
   matten-report --demo mlprep-standardization --format html --output <report.html>
+  matten-report --demo mlprep-standardization --format json --output <report.json>
   matten-report --demo educational-path [--format markdown] [--output <report.md>]
   matten-report --demo educational-path --format html --output <report.html>
+  matten-report --demo educational-path --format json --output <report.json>
   matten-report --input <csv-path> --kind data-readiness --select <col1,col2> [--output <report.md>]
   matten-report --input <csv-path> --kind data-readiness --select <col1,col2> --format html --output <report.html>
 
 Demo reports are fixed examples. Input mode supports only data-readiness.
-Markdown is the default format. HTML is local file output and requires --output."
+Markdown is the default format. HTML and private fixed-demo JSON are local file output and require --output."
         .to_string()
 }
 
@@ -2530,7 +3030,735 @@ mod tests {
         ]))
         .unwrap_err();
 
-        assert!(err.contains("unsupported --format \"svg\"; expected \"markdown\" or \"html\""));
+        assert!(err.contains(
+            "unsupported --format \"svg\"; expected \"markdown\", \"html\", or \"json\""
+        ));
+    }
+
+    #[test]
+    fn fixed_demo_json_requires_output() {
+        let err = parse_args(args(&["--demo", "shape-flow", "--format", "json"])).unwrap_err();
+
+        assert!(err.contains("--format json requires --output <report.json>"));
+    }
+
+    #[test]
+    fn fixed_demo_json_allows_explicit_output() {
+        let action = parse_args(args(&[
+            "--demo",
+            "shape-flow",
+            "--format",
+            "json",
+            "--output",
+            "target/matten-report-shape-flow.json",
+        ]))
+        .expect("shape-flow JSON with output should parse");
+
+        let Action::Run(config) = action else {
+            panic!("expected run action");
+        };
+        assert!(matches!(
+            config.input,
+            Input::Demo { ref label } if label == "shape-flow"
+        ));
+        assert_eq!(config.format, OutputFormat::Json);
+        assert_eq!(
+            config.output,
+            Some(PathBuf::from("target/matten-report-shape-flow.json"))
+        );
+    }
+
+    #[test]
+    fn input_mode_json_is_not_supported() {
+        let err = parse_args(args(&[
+            "--input",
+            "fixtures/small.csv",
+            "--kind",
+            "data-readiness",
+            "--select",
+            "sales,cost",
+            "--format",
+            "json",
+            "--output",
+            "target/matten-report-input.json",
+        ]))
+        .unwrap_err();
+
+        assert!(err.contains("--format json is not supported for --input yet"));
+    }
+
+    #[test]
+    fn fixed_demo_json_is_deterministic() {
+        let first = render_fixed_demo_json_report(KIND_EDUCATIONAL_PATH)
+            .expect("educational-path JSON should render");
+        let second = render_fixed_demo_json_report(KIND_EDUCATIONAL_PATH)
+            .expect("educational-path JSON should render again");
+
+        assert_eq!(first, second);
+    }
+
+    #[test]
+    fn data_readiness_json_report_matches_expected_snapshot() {
+        let report = render_fixed_demo_json_report(KIND_DATA_READINESS)
+            .expect("data-readiness JSON should render");
+
+        assert_eq!(
+            report,
+            r#"{
+  "schema_version": 0,
+  "schema_status": "private-local",
+  "tool": "matten-report",
+  "report_kind": "data-readiness",
+  "input_mode": "demo",
+  "data": {
+    "input_label": "demo: data-readiness",
+    "source_columns": [
+      "region",
+      "sales",
+      "cost",
+      "note"
+    ],
+    "selected_columns": [
+      "sales",
+      "cost"
+    ],
+    "left_out_columns": [
+      "region",
+      "note"
+    ],
+    "missing_counts": [
+      {
+        "column": "sales",
+        "missing": 0
+      },
+      {
+        "column": "cost",
+        "missing": 0
+      }
+    ],
+    "numeric_conversion": {
+      "status": "success",
+      "tensor": {
+        "shape": [
+          3,
+          2
+        ],
+        "values": [
+          100.0,
+          40.0,
+          150.0,
+          45.0,
+          120.0,
+          55.0
+        ],
+        "truncated": false,
+        "shown_values": 6,
+        "total_values": 6,
+        "limit": 12
+      }
+    }
+  }
+}
+"#
+        );
+    }
+
+    #[test]
+    fn shape_flow_json_report_matches_expected_snapshot() {
+        let report =
+            render_fixed_demo_json_report(KIND_SHAPE_FLOW).expect("shape-flow JSON should render");
+
+        assert_eq!(
+            report,
+            r#"{
+  "schema_version": 0,
+  "schema_status": "private-local",
+  "tool": "matten-report",
+  "report_kind": "shape-flow",
+  "input_mode": "demo",
+  "data": {
+    "broadcast": {
+      "operation": "a + b",
+      "input_a_shape": [
+        2,
+        3
+      ],
+      "input_b_shape": [
+        3
+      ],
+      "result": {
+        "shape": [
+          2,
+          3
+        ],
+        "values": [
+          11.0,
+          22.0,
+          33.0,
+          14.0,
+          25.0,
+          36.0
+        ],
+        "truncated": false,
+        "shown_values": 6,
+        "total_values": 6,
+        "limit": 12
+      }
+    },
+    "reshape": {
+      "operation": "reshape([3, 2])",
+      "input_shape": [
+        2,
+        3
+      ],
+      "result": {
+        "shape": [
+          3,
+          2
+        ],
+        "values": [
+          1.0,
+          2.0,
+          3.0,
+          4.0,
+          5.0,
+          6.0
+        ],
+        "truncated": false,
+        "shown_values": 6,
+        "total_values": 6,
+        "limit": 12
+      }
+    },
+    "axis_reductions": {
+      "input_shape": [
+        2,
+        3
+      ],
+      "mean_axis_0": {
+        "shape": [
+          3
+        ],
+        "values": [
+          2.5,
+          3.5,
+          4.5
+        ],
+        "truncated": false,
+        "shown_values": 3,
+        "total_values": 3,
+        "limit": 12
+      },
+      "mean_axis_1": {
+        "shape": [
+          2
+        ],
+        "values": [
+          2.0,
+          5.0
+        ],
+        "truncated": false,
+        "shown_values": 2,
+        "total_values": 2,
+        "limit": 12
+      }
+    },
+    "matmul": {
+      "operation": "left.matmul(right)",
+      "left_shape": [
+        2,
+        3
+      ],
+      "right_shape": [
+        3,
+        2
+      ],
+      "result": {
+        "shape": [
+          2,
+          2
+        ],
+        "values": [
+          22.0,
+          28.0,
+          49.0,
+          64.0
+        ],
+        "truncated": false,
+        "shown_values": 4,
+        "total_values": 4,
+        "limit": 12
+      }
+    }
+  }
+}
+"#
+        );
+    }
+
+    #[test]
+    fn dynamic_readiness_json_report_matches_expected_snapshot() {
+        let report = render_fixed_demo_json_report(KIND_DYNAMIC_READINESS)
+            .expect("dynamic-readiness JSON should render");
+
+        assert_eq!(
+            report,
+            r#"{
+  "schema_version": 0,
+  "schema_status": "private-local",
+  "tool": "matten-report",
+  "report_kind": "dynamic-readiness",
+  "input_mode": "demo",
+  "data": {
+    "shape": [
+      2,
+      3
+    ],
+    "values": [
+      {
+        "row": 0,
+        "column": 0,
+        "element": "Float(1.0)"
+      },
+      {
+        "row": 0,
+        "column": 1,
+        "element": "Text(\"2.5\")"
+      },
+      {
+        "row": 0,
+        "column": 2,
+        "element": "None"
+      },
+      {
+        "row": 1,
+        "column": 0,
+        "element": "Int(4)"
+      },
+      {
+        "row": 1,
+        "column": 1,
+        "element": "Text(\"6.0\")"
+      },
+      {
+        "row": 1,
+        "column": 2,
+        "element": "Float(8.0)"
+      }
+    ],
+    "schema_summary": [
+      {
+        "label": "Float",
+        "count": 2
+      },
+      {
+        "label": "Int",
+        "count": 1
+      },
+      {
+        "label": "Text",
+        "count": 2
+      },
+      {
+        "label": "None",
+        "count": 1
+      }
+    ],
+    "readiness_masks": {
+      "none_mask": {
+        "shape": [
+          2,
+          3
+        ],
+        "values": [
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "truncated": false,
+        "shown_values": 6,
+        "total_values": 6,
+        "limit": 12
+      },
+      "numeric_mask": {
+        "shape": [
+          2,
+          3
+        ],
+        "values": [
+          1.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          1.0
+        ],
+        "truncated": false,
+        "shown_values": 6,
+        "total_values": 6,
+        "limit": 12
+      },
+      "strict_numeric_ready": false
+    },
+    "strict_conversion": {
+      "status": "error",
+      "message": "error: strict conversion rejects Text and None values"
+    },
+    "explicit_policy_conversion": {
+      "policy": "none_as(0.0) + allow_text_parse()",
+      "tensor": {
+        "shape": [
+          2,
+          3
+        ],
+        "values": [
+          1.0,
+          2.5,
+          0.0,
+          4.0,
+          6.0,
+          8.0
+        ],
+        "truncated": false,
+        "shown_values": 6,
+        "total_values": 6,
+        "limit": 12
+      }
+    }
+  }
+}
+"#
+        );
+    }
+
+    #[test]
+    fn mlprep_standardization_json_report_matches_expected_snapshot() {
+        let report = render_fixed_demo_json_report(KIND_MLPREP_STANDARDIZATION)
+            .expect("mlprep-standardization JSON should render");
+
+        assert_eq!(
+            report,
+            r#"{
+  "schema_version": 0,
+  "schema_status": "private-local",
+  "tool": "matten-report",
+  "report_kind": "mlprep-standardization",
+  "input_mode": "demo",
+  "data": {
+    "selected_columns": [
+      "feature_0",
+      "feature_1"
+    ],
+    "operation": "standardize_columns(input)",
+    "before": {
+      "tensor": {
+        "shape": [
+          3,
+          2
+        ],
+        "values": [
+          8.0,
+          80.0,
+          10.0,
+          100.0,
+          12.0,
+          120.0
+        ],
+        "truncated": false,
+        "shown_values": 6,
+        "total_values": 6,
+        "limit": 12
+      },
+      "column_mean": [
+        10.0,
+        100.0
+      ],
+      "column_population_std": [
+        1.632993161855452,
+        16.32993161855452
+      ]
+    },
+    "after": {
+      "tensor": {
+        "shape": [
+          3,
+          2
+        ],
+        "values": [
+          -1.224744871391589,
+          -1.224744871391589,
+          0.0,
+          0.0,
+          1.224744871391589,
+          1.224744871391589
+        ],
+        "truncated": false,
+        "shown_values": 6,
+        "total_values": 6,
+        "limit": 12
+      },
+      "column_mean": [
+        0.0,
+        0.0
+      ],
+      "column_population_std": [
+        0.9999999999999999,
+        0.9999999999999999
+      ]
+    }
+  }
+}
+"#
+        );
+    }
+
+    #[test]
+    fn educational_path_json_report_matches_expected_snapshot() {
+        let report = render_fixed_demo_json_report(KIND_EDUCATIONAL_PATH)
+            .expect("educational-path JSON should render");
+
+        assert_eq!(
+            report,
+            r#"{
+  "schema_version": 0,
+  "schema_status": "private-local",
+  "tool": "matten-report",
+  "report_kind": "educational-path",
+  "input_mode": "demo",
+  "data": {
+    "reading_steps": [
+      "ask what shape each input has",
+      "ask which axes align, disappear, or remain",
+      "read the output shape before reading values",
+      "convert dynamic data before numeric computation"
+    ],
+    "broadcasting": {
+      "left_shape": [
+        3,
+        1
+      ],
+      "right_shape": [
+        1,
+        4
+      ],
+      "result": {
+        "shape": [
+          3,
+          4
+        ],
+        "values": [
+          11.0,
+          21.0,
+          31.0,
+          41.0,
+          12.0,
+          22.0,
+          32.0,
+          42.0,
+          13.0,
+          23.0,
+          33.0,
+          43.0
+        ],
+        "truncated": false,
+        "shown_values": 12,
+        "total_values": 12,
+        "limit": 12
+      },
+      "axis_1_meaning": "left repeats across 4 columns",
+      "axis_0_meaning": "right repeats across 3 rows"
+    },
+    "reshape_and_transpose": {
+      "input_shape": [
+        2,
+        3
+      ],
+      "reshape": {
+        "shape": [
+          3,
+          2
+        ],
+        "values": [
+          1.0,
+          2.0,
+          3.0,
+          4.0,
+          5.0,
+          6.0
+        ],
+        "truncated": false,
+        "shown_values": 6,
+        "total_values": 6,
+        "limit": 12
+      },
+      "transpose": {
+        "shape": [
+          3,
+          2
+        ],
+        "values": [
+          1.0,
+          4.0,
+          2.0,
+          5.0,
+          3.0,
+          6.0
+        ],
+        "truncated": false,
+        "shown_values": 6,
+        "total_values": 6,
+        "limit": 12
+      },
+      "meaning": "reshape changes grouping; transpose changes coordinate meaning"
+    },
+    "axis_reductions": {
+      "input_shape": [
+        2,
+        3
+      ],
+      "mean_axis_0": {
+        "shape": [
+          3
+        ],
+        "values": [
+          2.5,
+          3.5,
+          4.5
+        ],
+        "truncated": false,
+        "shown_values": 3,
+        "total_values": 3,
+        "limit": 12
+      },
+      "mean_axis_1": {
+        "shape": [
+          2
+        ],
+        "values": [
+          2.0,
+          5.0
+        ],
+        "truncated": false,
+        "shown_values": 2,
+        "total_values": 2,
+        "limit": 12
+      }
+    },
+    "matmul": {
+      "left_shape": [
+        2,
+        3
+      ],
+      "right_shape": [
+        3,
+        4
+      ],
+      "shared_inner_dimension": 3,
+      "result": {
+        "shape": [
+          2,
+          4
+        ],
+        "values": [
+          38.0,
+          44.0,
+          50.0,
+          56.0,
+          83.0,
+          98.0,
+          113.0,
+          128.0
+        ],
+        "truncated": false,
+        "shown_values": 8,
+        "total_values": 8,
+        "limit": 12
+      }
+    },
+    "dynamic_readiness": {
+      "shape": [
+        2,
+        3
+      ],
+      "none_mask": {
+        "shape": [
+          2,
+          3
+        ],
+        "values": [
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "truncated": false,
+        "shown_values": 6,
+        "total_values": 6,
+        "limit": 12
+      },
+      "numeric_mask": {
+        "shape": [
+          2,
+          3
+        ],
+        "values": [
+          1.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          1.0
+        ],
+        "truncated": false,
+        "shown_values": 6,
+        "total_values": 6,
+        "limit": 12
+      },
+      "note": "Text values are not numeric-ready under the strict mask",
+      "next_step": "clean values, then call try_numeric()"
+    },
+    "standardization": {
+      "operation": "standardize_columns(input)",
+      "input_shape": [
+        3,
+        2
+      ],
+      "output_shape": [
+        3,
+        2
+      ],
+      "before_mean": [
+        10.0,
+        100.0
+      ],
+      "before_population_std": [
+        1.632993161855452,
+        16.32993161855452
+      ],
+      "after_mean": [
+        0.0,
+        0.0
+      ],
+      "after_population_std": [
+        0.9999999999999999,
+        0.9999999999999999
+      ]
+    },
+    "non_goals": [
+      "not a public API",
+      "not source scanning",
+      "not a renderer",
+      "not model-quality analysis"
+    ]
+  }
+}
+"#
+        );
     }
 
     #[test]

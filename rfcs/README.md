@@ -275,9 +275,10 @@ dependency change.
 
 The fixed-demo JSON implementation handoff
 ([`070-fixed-demo-json-report-implementation-handoff.md`](./handoffs/070-fixed-demo-json-report-implementation-handoff.md))
-translates that policy into a proposed implementation boundary for review. It
-would add private `tools/matten-report --demo ... --format json --output
-<path>` output for the five fixed demos only, with deterministic
-`schema_version: 0` snapshots. It does not authorize input-mode JSON, public
-schemas, public crates, public renderer APIs, release work, generated artifacts,
-or any dependency change in published crates.
+has an implementation prepared for review. The slice adds private
+`tools/matten-report --demo ... --format json --output <path>` output for the
+five fixed demos only, with deterministic `schema_version: 0` snapshots and
+direct `serde` / `serde_json` dependencies confined to the workspace-excluded
+local tool. It does not authorize input-mode JSON, public schemas, public
+crates, public renderer APIs, release work, generated artifacts, or any
+dependency change in published crates.

@@ -15,3 +15,6 @@ publish = false
 matten                      = { path = "../../crates/matten", default-features = false, features = ["dynamic"] }
 matten-data                 = { path = "../../crates/matten-data", features = ["csv"] }
 matten-mlprep               = { path = "../../crates/matten-mlprep" }
+
+serde                       = { version = "1", features = ["derive"] }
+serde_json                  = "1"

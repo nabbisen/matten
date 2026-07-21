@@ -20,8 +20,10 @@ Scope:
 local tool only
 Markdown/plain text output by default
 static self-contained HTML output for fixed demos and data-readiness input mode
+private schema_version 0 JSON output for fixed demos only
 explicit input/output behavior
 no public API
+no public JSON schema
 no published crate
 no JavaScript or external assets in HTML output
 no network
@@ -56,6 +58,15 @@ cargo run --manifest-path tools/matten-report/Cargo.toml -- \
   --output target/matten-report-data-readiness.html
 ```
 
+Write the data-readiness report as private local JSON:
+
+```bash
+cargo run --manifest-path tools/matten-report/Cargo.toml -- \
+  --demo data-readiness \
+  --format json \
+  --output target/matten-report-data-readiness.json
+```
+
 Run the shape-flow demo report:
 
 ```bash
@@ -72,6 +83,15 @@ cargo run --manifest-path tools/matten-report/Cargo.toml -- \
   --demo shape-flow \
   --format html \
   --output target/matten-report-shape-flow.html
+```
+
+Write the shape-flow report as private local JSON:
+
+```bash
+cargo run --manifest-path tools/matten-report/Cargo.toml -- \
+  --demo shape-flow \
+  --format json \
+  --output target/matten-report-shape-flow.json
 ```
 
 Run the dynamic-readiness demo report:
@@ -93,6 +113,15 @@ cargo run --manifest-path tools/matten-report/Cargo.toml -- \
   --output target/matten-report-dynamic-readiness.html
 ```
 
+Write the dynamic-readiness report as private local JSON:
+
+```bash
+cargo run --manifest-path tools/matten-report/Cargo.toml -- \
+  --demo dynamic-readiness \
+  --format json \
+  --output target/matten-report-dynamic-readiness.json
+```
+
 Run the mlprep-standardization demo report:
 
 ```bash
@@ -110,6 +139,15 @@ cargo run --manifest-path tools/matten-report/Cargo.toml -- \
   --demo mlprep-standardization \
   --format html \
   --output target/matten-report-mlprep-standardization.html
+```
+
+Write the mlprep-standardization report as private local JSON:
+
+```bash
+cargo run --manifest-path tools/matten-report/Cargo.toml -- \
+  --demo mlprep-standardization \
+  --format json \
+  --output target/matten-report-mlprep-standardization.json
 ```
 
 Run the educational-path demo report:
@@ -132,10 +170,24 @@ cargo run --manifest-path tools/matten-report/Cargo.toml -- \
   --output target/matten-report-educational-path.html
 ```
 
+Write the educational-path report as private local JSON:
+
+```bash
+cargo run --manifest-path tools/matten-report/Cargo.toml -- \
+  --demo educational-path \
+  --format json \
+  --output target/matten-report-educational-path.json
+```
+
 HTML output requires `--output`, writes a self-contained static document, and
 uses no JavaScript, network access, or external assets. Input-mode HTML is
 limited to `--kind data-readiness`; it renders a bounded summary of the provided
 CSV file, not a full raw table.
+
+JSON output also requires `--output`. It is a private local-tool artifact with
+`schema_version: 0` and `schema_status: "private-local"`, supported only for
+fixed demo reports. Input-mode JSON is not supported, and there is no public
+JSON schema or compatibility promise.
 
 Run on a CSV file:
 
@@ -170,6 +222,13 @@ cargo run --manifest-path tools/matten-report/Cargo.toml -- \
   --demo data-readiness \
   --format html \
   --output target/matten-report-data-readiness.html
+```
+
+```bash
+cargo run --manifest-path tools/matten-report/Cargo.toml -- \
+  --demo data-readiness \
+  --format json \
+  --output target/matten-report-data-readiness.json
 ```
 
 ```bash

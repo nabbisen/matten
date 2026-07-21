@@ -3,7 +3,7 @@
 **Project:** `matten`
 **Related RFCs:** RFC-063, RFC-065, RFC-068, RFC-069, RFC-070
 **Document kind:** Local-tool implementation handoff
-**Status:** Drafted for review; no implementation authorized
+**Status:** Implementation prepared for review; no release authorized
 **Date:** 2026-07-21
 
 ---
@@ -330,7 +330,7 @@ Update only documentation needed for the new local-tool behavior:
 
 ```text
 tools/matten-report/README.md
-docs/release-checklist.md or the current release-checklist surface if it lists matten-report smoke commands
+docs/src/contributing/release-checklist.md
 rfcs/README.md after implementation review
 ROADMAP.md after implementation review
 ```

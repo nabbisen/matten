@@ -63,21 +63,26 @@ cargo clippy --manifest-path tools/matten-report/Cargo.toml -- -D warnings
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo data-readiness
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo data-readiness --output target/matten-report-demo.md
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo data-readiness --format html --output target/matten-report-data-readiness.html
+cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo data-readiness --format json --output target/matten-report-data-readiness.json
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --input tools/matten-report/fixtures/small.csv --kind data-readiness --select sales,cost
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --input tools/matten-report/fixtures/small.csv --kind data-readiness --select sales,cost --format html --output target/matten-report-input.html
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --input tools/matten-report/fixtures/non_numeric.csv --kind data-readiness --select sales,cost --format html --output target/matten-report-input-error.html
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo shape-flow
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo shape-flow --output target/matten-report-shape-flow.md
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo shape-flow --format html --output target/matten-report-shape-flow.html
+cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo shape-flow --format json --output target/matten-report-shape-flow.json
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo dynamic-readiness
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo dynamic-readiness --output target/matten-report-dynamic-readiness.md
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo dynamic-readiness --format html --output target/matten-report-dynamic-readiness.html
+cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo dynamic-readiness --format json --output target/matten-report-dynamic-readiness.json
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo mlprep-standardization
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo mlprep-standardization --output target/matten-report-mlprep-standardization.md
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo mlprep-standardization --format html --output target/matten-report-mlprep-standardization.html
+cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo mlprep-standardization --format json --output target/matten-report-mlprep-standardization.json
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo educational-path
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo educational-path --output target/matten-report-educational-path.md
 cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo educational-path --format html --output target/matten-report-educational-path.html
+cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo educational-path --format json --output target/matten-report-educational-path.json
 cargo check --manifest-path tools/matten-migrate/Cargo.toml
 cargo test --manifest-path tools/matten-migrate/Cargo.toml
 cargo clippy --manifest-path tools/matten-migrate/Cargo.toml -- -D warnings
