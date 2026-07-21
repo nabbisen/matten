@@ -18,6 +18,61 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.37.0] - 2026-07-21
+
+RFC-071 fixed-demo private JSON report release. This release stops feature work
+after adding private local JSON output for the five fixed `tools/matten-report`
+demo families. Markdown/plain text remains the default. JSON is explicit-file
+only, private-local, and not a public schema. No public API, published crate
+dependency graph, core default feature, runtime behavior, MSRV, or
+maturity-label change.
+
+### Added
+
+- `tools/matten-report --demo <kind> --format json --output <path>`, supported
+  for the five fixed demos: `data-readiness`, `shape-flow`,
+  `dynamic-readiness`, `mlprep-standardization`, and `educational-path`.
+- Deterministic private JSON envelope with `schema_version: 0`,
+  `schema_status: "private-local"`, `tool: "matten-report"`,
+  `report_kind`, `input_mode: "demo"`, and family-specific `data`.
+- Exact JSON snapshot coverage for all five fixed demos, JSON rejection tests,
+  and deterministic render coverage.
+- Release-checklist smoke commands for the five fixed-demo JSON artifacts.
+
+### Changed
+
+- Current-family documentation and install snippets retargeted from `0.36.0` to
+  `0.37.0`.
+- `tools/matten-report` gained direct `serde` / `serde_json` dependencies only
+  inside the workspace-excluded `publish = false` local tool. Published crates
+  and the root lockfile are unaffected.
+- RFC-071 records the fixed-demo JSON slice as implemented, reviewed,
+  committed, and prepared for the `0.37.0` release. RFC-070 remains proposed
+  for public visualization/report readiness. Public report/viz crates, public
+  schemas, public renderer APIs, input-mode JSON, SVG/Vega-Lite output,
+  expression tracing, autograd, notebook/browser/GUI scope, and broader linalg
+  remain deferred.
+
+### Version
+
+- Release bump `0.36.0` -> `0.37.0`. Lock-step family versioning still applies
+  to all workspace crates; `tools/matten-report` and `tools/matten-migrate`
+  remain local unpublished tools at their own tool versions.
+
+### Threat model
+
+Local-tool, docs, RFC, roadmap, and release-metadata updates only. The new JSON
+path is fixed-demo-only, local-file-only, requires explicit `--output`, uses
+`serde_json` for escaping, emits deterministic private-local JSON, and includes
+no timestamps, hostnames, environment data, absolute paths, random IDs, build
+metadata, Cargo package version, or generated checked-in artifacts. Input-mode
+JSON remains rejected, so user-controlled CSV JSON output is not introduced. No
+public API change, published dependency change, core default feature change,
+MSRV change, maturity-label change, companion promotion, automatic project
+mutation, network, telemetry, JavaScript, external asset, SVG, Vega-Lite,
+plotting, notebook, GUI, browser app, expression tracing, autograd, public
+tooling crate change, or tag/publish action.
+
 ## [0.36.0] - 2026-07-17
 
 RFC-069 input-mode visualization release. This release stops feature work after

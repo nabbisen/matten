@@ -61,7 +61,7 @@ the lean core. Enabling `dynamic` does not rename or remove any numeric Tensor A
 
 The published crates are released as one lock-step family (RFC-030): matching
 crate versions are the supported, documented set. Downstream examples therefore
-show explicit matched pins such as `matten = "0.36.0"` plus a companion at the
+show explicit matched pins such as `matten = "0.37.0"` plus a companion at the
 same release.
 
 Inside the workspace, companion crates inherit the core dependency from
@@ -214,3 +214,15 @@ feature flags, maturity labels, or companion scope. Public `matten-report` /
 `matten-viz` crates, core visualization APIs, expression tracing, autograd, SVG,
 Vega-Lite, JSON report output, notebook, GUI, browser-app scope, and general raw
 CSV HTML rendering remain deferred.
+
+The **v0.37 release family** adds the RFC-071 fixed-demo private JSON slice:
+`tools/matten-report` can write deterministic private-local JSON artifacts for
+the five fixed demos when `--format json --output <path>` is explicit. Markdown
+remains the default report output, JSON remains local-file-only, and
+`schema_version: 0` means the format is not a public compatibility contract.
+This release does not change public API, published crate dependency graphs,
+core runtime behavior, MSRV, feature flags, maturity labels, or companion
+scope. Public `matten-report` / `matten-viz` crates, public report schemas,
+core visualization APIs, expression tracing, autograd, input-mode JSON, SVG,
+Vega-Lite, notebook, GUI, browser-app scope, and general raw CSV JSON rendering
+remain deferred.

@@ -180,13 +180,13 @@ if grep -rInE '0\.[0-9]+\.x.{0,2}family' "${USER_DOCS[@]}" 2>/dev/null \
   echo "ERROR: stale 'X.Y.x family' label in user-facing docs (current family is 0.${CURRENT_MINOR}.x)"
   FAIL=1
 fi
-# (c) "current [v]X.Y family" prose (e.g. the public-API snapshot header, the
+# (c) "current [v]X.Y [release] family" prose (e.g. the public-API snapshot header, the
 #     introduction page). The `v` prefix is optional: both "current v0.24 family"
-#     and "current 0.24 family" are matched, so a stale ref cannot hide behind a
-#     spelling difference (v0.24.1 deep-review P2).
-if grep -rInE 'current v?0\.[0-9]+ family' "${USER_DOCS[@]}" 2>/dev/null \
-   | grep -vE "current v?0\.${CURRENT_MINOR} family"; then
-  echo "ERROR: stale 'current [v]X.Y family' reference in user-facing docs"
+#     and "current 0.24 release family" are matched, so a stale ref cannot hide
+#     behind a spelling difference (v0.24.1 deep-review P2; v0.37.0 release-review B1).
+if grep -rInE 'current v?0\.[0-9]+( release)? family' "${USER_DOCS[@]}" 2>/dev/null \
+   | grep -vE "current v?0\.${CURRENT_MINOR}( release)? family"; then
+  echo "ERROR: stale 'current [v]X.Y [release] family' reference in user-facing docs"
   FAIL=1
 fi
 

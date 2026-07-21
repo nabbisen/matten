@@ -1,8 +1,9 @@
 # Public API snapshot
 
-This page lists every public item in `matten` at the current v0.36 release family. It serves as the
-baseline for tracking breaking changes toward v1.0.0 and as the review gate
-required by RFC-015.
+This page lists every public item in `matten` at the current v0.37 release
+family. It serves as the baseline for tracking breaking changes toward v1.0.0
+and as the review gate required by RFC-015. The public API did not change for
+the 0.37.0 local-tool JSON release.
 
 ## Root exports
 

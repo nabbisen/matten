@@ -1,6 +1,6 @@
 # RFC-070: Public Visualization and Report Readiness Audit
 
-**Status:** Proposed; audit-only, no implementation authorized
+**Status:** Proposed; audit-only for public visualization/report surface; no public implementation authorized
 **Target:** Post-0.36 readiness decision for public reporting / visualization scope
 **Theme:** Decide whether `matten-report` / `matten-viz` is ready to become a public product surface
 **Depends on:** RFC-022, RFC-030, RFC-063, RFC-065, RFC-068, RFC-069
@@ -14,9 +14,14 @@ This RFC proposes an audit-only readiness review for public visualization and
 reporting in the `matten` family.
 
 It does **not** authorize a public `matten-report` crate, a public `matten-viz`
-crate, a reusable renderer API, a report model API, JSON/SVG/Vega-Lite output,
-notebook/browser integration, core `Tensor` visualization methods, expression
-tracing, autograd, dependency changes, version bumps, tags, or publishing.
+crate, a reusable renderer API, a public report model API, public JSON/SVG/Vega-Lite
+output, notebook/browser integration, core `Tensor` visualization methods,
+expression tracing, autograd, dependency changes in published crates, tags, or
+publishing.
+
+The private fixed-demo JSON prerequisite slice is authorized separately by
+RFC-071. That slice remains local-tool-only and does not make RFC-070 ready for
+public crates, public schemas, or public renderer APIs.
 
 The audit should answer:
 
@@ -100,11 +105,11 @@ This RFC does not authorize:
 [ ] reusable renderer API
 [ ] workspace membership change for tools/matten-report
 [ ] crates.io publishing
-[ ] version bump, release prep, tag, or publish action
+[ ] public release prep, tag, or publish action
 [ ] Tensor::plot(), Tensor::show(), or Tensor::backward()
 [ ] expression tracing
 [ ] autograd
-[ ] JSON report output
+[ ] public JSON schema or public JSON output beyond RFC-071 private fixed demos
 [ ] SVG output
 [ ] Vega-Lite output
 [ ] JavaScript
@@ -278,7 +283,7 @@ stable, testable public surface.
 Review should decide:
 
 ```text
-[ ] Is RFC-070 correctly scoped as audit-only?
+[ ] Is RFC-070 correctly scoped as audit-only for public visualization/report surface?
 [ ] Is public `matten-report` / `matten-viz` readiness the right next visualization RFC?
 [ ] Are the non-goals broad enough to prevent accidental implementation scope?
 [ ] Are the audit questions sufficient to decide report model, renderer, crate, output, and core boundaries?

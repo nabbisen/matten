@@ -1,9 +1,9 @@
-# RFC-070 Fixed-Demo JSON Report Implementation Handoff
+# RFC-071 Fixed-Demo JSON Report Implementation Handoff
 
 **Project:** `matten`
-**Related RFCs:** RFC-063, RFC-065, RFC-068, RFC-069, RFC-070
+**Related RFCs:** RFC-063, RFC-065, RFC-068, RFC-069, RFC-070, RFC-071
 **Document kind:** Local-tool implementation handoff
-**Status:** Implemented and reviewed; committed in `d0ef169`; no release authorized
+**Status:** Implemented and reviewed under RFC-071; committed in `d0ef169`; release-prep candidate only
 **Date:** 2026-07-21
 
 ---
@@ -14,7 +14,8 @@ Prepare the first private JSON output slice for `tools/matten-report`, limited
 to fixed `--demo` reports.
 
 The RFC-070 JSON report-schema policy audit accepted JSON as useful only when it
-is treated as private local-tool output first. This handoff therefore proposes a
+is treated as private local-tool output first. RFC-071 records that private
+prerequisite as the normative authority. This handoff therefore proposes a
 narrow implementation boundary:
 
 ```text

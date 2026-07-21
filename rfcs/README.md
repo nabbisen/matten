@@ -83,24 +83,25 @@ The broader documentation ownership model is recorded in
 | 067 | [v1.0 Family Maturity Policy](./done/067-v1-family-maturity-policy.md) | repository policy; resolves RFC-066 MD-1 without v1.0 release authorization |
 | 068 | [Rich Local Visualization Artifacts](./done/068-rich-local-visualization-artifacts.md) | 0.32.0 (educational-path and shape-flow HTML); 0.33.0 (dynamic-readiness HTML); 0.34.0 (mlprep-standardization HTML); 0.35.0 (data-readiness HTML; fixed-demo HTML line complete; input-mode HTML and public report/viz crates deferred) |
 | 069 | [Input-Mode HTML Report Policy](./done/069-input-mode-html-report-policy.md) | 0.36.0 (`tools/matten-report` data-readiness input-mode HTML; public report/viz crates deferred) |
+| 071 | [Private Fixed-Demo JSON Report Artifacts](./done/071-private-fixed-demo-json-report-artifacts.md) | 0.37.0 candidate (`tools/matten-report` fixed-demo private JSON; public schema/crates deferred) |
 
 ## Proposed
 
 | ID | Title | Scope |
 |---:|---|---|
-| 070 | [Public Visualization and Report Readiness Audit](./proposed/070-public-visualization-report-readiness-audit.md) | Audit-only decision gate for public `matten-report` / `matten-viz`; no implementation authorized |
+| 070 | [Public Visualization and Report Readiness Audit](./proposed/070-public-visualization-report-readiness-audit.md) | Audit-only decision gate for public `matten-report` / `matten-viz`; no public implementation authorized |
 
 ## Remaining Themes And Issues
 
-`rfcs/proposed/` currently contains RFC-070, an audit-only RFC. The remaining
-themes below are not authorized unless their current status says so. The current
-post-0.36 backlog is:
+`rfcs/proposed/` currently contains RFC-070, an audit-only public-surface RFC.
+The remaining themes below are not authorized unless their current status says
+so. The current post-0.37 backlog is:
 
 | Theme | Current authority | Current status |
 |---|---|---|
 | Public `matten-report` / `matten-viz` readiness | RFC-070, RFC-063, RFC-065, RFC-068, RFC-069, post-0.36 RFC-069 closure audit | Proposed audit-only RFC; no public crate or API authorized |
 | More input-mode HTML paths | RFC-069, post-0.36 RFC-069 closure audit | Deferred until a concrete report path is reviewed |
-| JSON / SVG / Vega-Lite report output | RFC-063, RFC-068, RFC-069 | Deferred; separate RFC or reviewed handoff required |
+| JSON / SVG / Vega-Lite report output | RFC-063, RFC-068, RFC-069, RFC-070 JSON policy audit, RFC-071 | Fixed-demo private JSON prepared for 0.37.0 under RFC-071; input-mode JSON, public JSON schemas, SVG, and Vega-Lite remain deferred |
 | Streaming / large CSV | RFC-026, RFC-037 | Deferred; future implementation RFC must answer batch/schema/malformed-row/memory/sync-vs-async policy |
 | `matten-nalgebra` bridge | RFC-025, RFC-041, RFC-054 bridge-readiness handoff | Deferred; per-crate RFC required |
 | `matten-candle` bridge | RFC-025, RFC-049, RFC-054 bridge-readiness handoff | Deferred; per-crate RFC required |
@@ -273,6 +274,14 @@ next slice, if accepted, is a fixed-demo-only JSON implementation handoff with
 `schema_version: 0`, no input-mode JSON, no public API, and no published-crate
 dependency change.
 
+RFC-071
+([`071-private-fixed-demo-json-report-artifacts.md`](./done/071-private-fixed-demo-json-report-artifacts.md))
+records the private fixed-demo JSON prerequisite as the normative authority for
+the `0.37.0` candidate. It also records the project decision that selected
+private-tool visualization milestones may be released as lock-step public family
+checkpoints when release notes clearly state that published crates have no API,
+runtime, dependency, feature, or maturity-label change.
+
 The fixed-demo JSON implementation handoff
 ([`070-fixed-demo-json-report-implementation-handoff.md`](./handoffs/070-fixed-demo-json-report-implementation-handoff.md))
 was implemented, reviewed, and committed in `d0ef169`. The slice adds private
@@ -280,5 +289,6 @@ was implemented, reviewed, and committed in `d0ef169`. The slice adds private
 five fixed demos only, with deterministic `schema_version: 0` snapshots and
 direct `serde` / `serde_json` dependencies confined to the workspace-excluded
 local tool. It does not authorize input-mode JSON, public schemas, public
-crates, public renderer APIs, release work, generated artifacts, or any
-dependency change in published crates.
+crates, public renderer APIs, generated artifacts, or any dependency change in
+published crates. The slice is prepared as the RFC-071 `0.37.0` release scope; tag and
+publish actions remain separate maintainer actions.
