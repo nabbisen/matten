@@ -3,7 +3,7 @@
 **Project:** `matten`
 **Related RFCs:** RFC-063, RFC-065, RFC-068, RFC-069, RFC-070
 **Document kind:** Policy audit handoff
-**Status:** Drafted for review; no implementation authorized
+**Status:** Audit drafted for review; no implementation authorized
 **Date:** 2026-07-17
 
 ---
@@ -267,3 +267,16 @@ verdict:
 
 Do not implement JSON, public crates, public renderer APIs, or core
 visualization APIs as part of this audit handoff.
+
+---
+
+## 10. Audit Record
+
+The policy audit was drafted for review in
+[`070-json-report-schema-policy-audit.md`](./070-json-report-schema-policy-audit.md).
+
+The audit recommends private local-tool JSON as plausible future work, but only
+behind a later fixed-demo implementation handoff. Public JSON schema, public
+renderer APIs, public `matten-report` / `matten-viz` crates, input-mode JSON,
+published-crate dependency changes, release prep, version bump, tag, publish,
+and generated artifacts remain unauthorized.

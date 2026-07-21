@@ -55,6 +55,7 @@ working documents for the implementation team and may be revised as work proceed
 | `070-public-visualization-report-readiness-audit.md` | RFC-070 public visualization/report readiness audit |
 | `070-private-report-model-extraction-handoff.md` | RFC-070 private report-model extraction handoff |
 | `070-json-report-schema-policy-audit-handoff.md` | RFC-070 JSON report-schema policy audit handoff |
+| `070-json-report-schema-policy-audit.md` | RFC-070 JSON report-schema policy audit |
 
 ## Documentation-governance handoffs
 

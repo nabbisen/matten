@@ -264,3 +264,11 @@ be considered at all, and if so whether it should remain private local-tool
 output or become future public-contract material. It is audit/design-only: no
 `--format json`, public schema, public renderer API, public crate, dependency,
 release work, or generated artifact is authorized.
+
+The JSON report-schema policy audit
+([`070-json-report-schema-policy-audit.md`](./handoffs/070-json-report-schema-policy-audit.md))
+recommends exploring JSON only as private local-tool output first. Public JSON
+schema and public report/viz crates remain rejected for now; the recommended
+next slice, if accepted, is a fixed-demo-only JSON implementation handoff with
+`schema_version: 0`, no input-mode JSON, no public API, and no published-crate
+dependency change.
