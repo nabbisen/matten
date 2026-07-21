@@ -90,7 +90,7 @@ The broader documentation ownership model is recorded in
 
 | ID | Title | Scope |
 |---:|---|---|
-| 072 | [Behavior-Preserving `matten-report` Modularization](./proposed/072-matten-report-modularization.md) | Design accepted; detailed implementation handoff required before code movement |
+| 072 | [Behavior-Preserving `matten-report` Modularization](./proposed/072-matten-report-modularization.md) | Design/handoff accepted; Slice 0 process baseline authorized; no Rust movement authorized |
 
 ## Remaining Themes And Issues
 
@@ -312,3 +312,12 @@ report-family, renderer, output, and separated-test ownership boundaries. It
 does not authorize code movement until the RFC and a detailed implementation
 handoff are reviewed, and it does not add features, dependencies, public APIs,
 or release scope.
+
+The detailed RFC-072 handoff
+([`072-matten-report-modularization-implementation-handoff.md`](./handoffs/072-matten-report-modularization-implementation-handoff.md))
+defines the distinct process-baseline checkpoint, exact byte fingerprints,
+module dependency guard, family/format-sized movement units, test placement,
+and final gates. The accepted handoff also makes `app` construct report-owned
+family values before renderer dispatch and assigns every normalization/helper
+to a dependency-safe owner. Slice 0 process-baseline implementation is
+authorized as the next isolated unit; Rust source movement is not.
