@@ -275,7 +275,7 @@ dependency change.
 
 The fixed-demo JSON implementation handoff
 ([`070-fixed-demo-json-report-implementation-handoff.md`](./handoffs/070-fixed-demo-json-report-implementation-handoff.md))
-has an implementation prepared for review. The slice adds private
+was implemented, reviewed, and committed in `d0ef169`. The slice adds private
 `tools/matten-report --demo ... --format json --output <path>` output for the
 five fixed demos only, with deterministic `schema_version: 0` snapshots and
 direct `serde` / `serde_json` dependencies confined to the workspace-excluded
