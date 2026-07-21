@@ -272,3 +272,12 @@ schema and public report/viz crates remain rejected for now; the recommended
 next slice, if accepted, is a fixed-demo-only JSON implementation handoff with
 `schema_version: 0`, no input-mode JSON, no public API, and no published-crate
 dependency change.
+
+The fixed-demo JSON implementation handoff
+([`070-fixed-demo-json-report-implementation-handoff.md`](./handoffs/070-fixed-demo-json-report-implementation-handoff.md))
+translates that policy into a proposed implementation boundary for review. It
+would add private `tools/matten-report --demo ... --format json --output
+<path>` output for the five fixed demos only, with deterministic
+`schema_version: 0` snapshots. It does not authorize input-mode JSON, public
+schemas, public crates, public renderer APIs, release work, generated artifacts,
+or any dependency change in published crates.
