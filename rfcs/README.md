@@ -88,20 +88,21 @@ The broader documentation ownership model is recorded in
 
 ## Proposed
 
-None. The next ordered action is to draft a new RFC for behavior-preserving
-`matten-report` modularization.
+| ID | Title | Scope |
+|---:|---|---|
+| 072 | [Behavior-Preserving `matten-report` Modularization](./proposed/072-matten-report-modularization.md) | Design accepted; detailed implementation handoff required before code movement |
 
 ## Remaining Themes And Issues
 
-RFC-070 is closed as an audit decision without public implementation. The next
-ordered action is to draft a separate modularization RFC. The remaining themes
-below are not authorized unless their current status says so. The current
-post-0.37 backlog is:
+RFC-070 is closed as an audit decision without public implementation. RFC-072
+is the active proposed modularization RFC. The remaining themes below are not
+authorized unless their current status says so. The current post-0.37 backlog
+is:
 
 | Theme | Current authority | Current status |
 |---|---|---|
 | Public `matten-report` / `matten-viz` readiness | RFC-070, RFC-063, RFC-065, RFC-068, RFC-069, RFC-071 | RFC-070 closed after audit; no public crate or API authorized |
-| `matten-report` modularization | RFC-070 post-0.37 closure audit; new RFC required | Next ordered theme; design only until its RFC and handoff are reviewed |
+| `matten-report` modularization | RFC-072, RFC-070 post-0.37 closure audit | Proposed design; no code movement until RFC and implementation handoff review |
 | More input-mode HTML paths | RFC-069, post-0.36 RFC-069 closure audit | Deferred until a concrete report path is reviewed |
 | JSON / SVG / Vega-Lite report output | RFC-063, RFC-068, RFC-069, RFC-070 JSON policy audit, RFC-071 | Fixed-demo private JSON released in 0.37.0 under RFC-071; input-mode JSON, public JSON schemas, SVG, and Vega-Lite remain deferred |
 | Streaming / large CSV | RFC-026, RFC-037 | Deferred; future implementation RFC must answer batch/schema/malformed-row/memory/sync-vs-async policy |
@@ -302,3 +303,12 @@ renderer API, or JSON schema. Its next ordered theme is a separate,
 behavior-preserving `matten-report` modularization RFC. Private input-mode JSON,
 broader mathematics, and new ecosystem bridges remain later candidates that
 require their own RFC decisions.
+
+RFC-072
+([`072-matten-report-modularization.md`](./proposed/072-matten-report-modularization.md))
+is the next design-first theme. It proposes a behavior-preserving internal split
+of the 5,023-line local report binary into request, CLI, orchestration,
+report-family, renderer, output, and separated-test ownership boundaries. It
+does not authorize code movement until the RFC and a detailed implementation
+handoff are reviewed, and it does not add features, dependencies, public APIs,
+or release scope.
