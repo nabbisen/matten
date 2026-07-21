@@ -3,7 +3,7 @@
 **Project:** `matten`
 **Related RFCs:** RFC-013, RFC-022, RFC-043, RFC-063, RFC-068, RFC-069, RFC-070, RFC-071, RFC-072
 **Document kind:** Detailed implementation handoff
-**Status:** Accepted; Slice 0 process-baseline implementation authorized; no Rust source movement authorized
+**Status:** Accepted; Slice 0 process baseline implemented and prepared for review; no Rust source movement authorized
 **Date:** 2026-07-21
 
 ---

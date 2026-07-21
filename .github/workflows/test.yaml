@@ -179,6 +179,7 @@ jobs:
       # local tools
       - run: cargo check --manifest-path tools/matten-report/Cargo.toml
       - run: cargo test --manifest-path tools/matten-report/Cargo.toml
+      - run: bash tools/matten-report/tests/process-boundary.sh
       - run: cargo clippy --manifest-path tools/matten-report/Cargo.toml -- -D warnings
       - run: cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo data-readiness
       - run: cargo run --manifest-path tools/matten-report/Cargo.toml -- --demo data-readiness --output target/matten-report-demo.md

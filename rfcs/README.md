@@ -90,7 +90,7 @@ The broader documentation ownership model is recorded in
 
 | ID | Title | Scope |
 |---:|---|---|
-| 072 | [Behavior-Preserving `matten-report` Modularization](./proposed/072-matten-report-modularization.md) | Design/handoff accepted; Slice 0 process baseline authorized; no Rust movement authorized |
+| 072 | [Behavior-Preserving `matten-report` Modularization](./proposed/072-matten-report-modularization.md) | Design/handoff accepted; Slice 0 process baseline implemented and prepared for review; no Rust movement authorized |
 
 ## Remaining Themes And Issues
 
@@ -102,7 +102,7 @@ is:
 | Theme | Current authority | Current status |
 |---|---|---|
 | Public `matten-report` / `matten-viz` readiness | RFC-070, RFC-063, RFC-065, RFC-068, RFC-069, RFC-071 | RFC-070 closed after audit; no public crate or API authorized |
-| `matten-report` modularization | RFC-072, RFC-070 post-0.37 closure audit | Proposed design; no code movement until RFC and implementation handoff review |
+| `matten-report` modularization | RFC-072, RFC-070 post-0.37 closure audit | Slice 0 process baseline implemented and prepared for review; no Rust movement until its review and commit |
 | More input-mode HTML paths | RFC-069, post-0.36 RFC-069 closure audit | Deferred until a concrete report path is reviewed |
 | JSON / SVG / Vega-Lite report output | RFC-063, RFC-068, RFC-069, RFC-070 JSON policy audit, RFC-071 | Fixed-demo private JSON released in 0.37.0 under RFC-071; input-mode JSON, public JSON schemas, SVG, and Vega-Lite remain deferred |
 | Streaming / large CSV | RFC-026, RFC-037 | Deferred; future implementation RFC must answer batch/schema/malformed-row/memory/sync-vs-async policy |
@@ -320,4 +320,5 @@ module dependency guard, family/format-sized movement units, test placement,
 and final gates. The accepted handoff also makes `app` construct report-owned
 family values before renderer dispatch and assigns every normalization/helper
 to a dependency-safe owner. Slice 0 process-baseline implementation is
-authorized as the next isolated unit; Rust source movement is not.
+prepared for review; Rust source movement remains unauthorized until that
+baseline is reviewed and committed.

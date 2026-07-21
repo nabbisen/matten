@@ -2,9 +2,9 @@
 
 **Project:** `matten`  
 **Document Kind:** Canonical Project Roadmap  
-**Document Version:** `2.5.0`
+**Document Version:** `2.6.0`
 **Date:** 2026-07-21
-**Status:** `0.37.0` is released with the RFC-071 fixed-demo private JSON report slice. RFC-070 is closed without a public report/viz crate or API. RFC-072 design and detailed implementation handoff are accepted. Slice 0 is authorized as the next isolated unit: add and wire the process-boundary baseline against monolithic `main.rs`, using explicit repository-local target and linker-temp directories. Slice 1 and all Rust source movement remain unauthorized until Slice 0 review and commit. Input-mode JSON, broader mathematics, ecosystem bridges, public schemas, public renderer APIs, and public report/viz crates remain unauthorized.
+**Status:** `0.37.0` is released with the RFC-071 fixed-demo private JSON report slice. RFC-070 is closed without a public report/viz crate or API. RFC-072 design and detailed implementation handoff are accepted. Slice 0 is implemented and prepared for review: its five-case process-boundary baseline runs against monolithic `main.rs` with explicit repository-local target and linker-temp directories and is wired into CI and the release checklist. Slice 1 and all Rust source movement remain unauthorized until Slice 0 review and commit. Input-mode JSON, broader mathematics, ecosystem bridges, public schemas, public renderer APIs, and public report/viz crates remain unauthorized.
 **Planning Baseline:** core `matten` completed RFC-015 through RFC-021 (shipped through v0.15.3); RFC-022 through RFC-030 established the companion-crate and lock-step family model; RFC-033 through RFC-042 materialized the v0.20+ data, comfort-API, statistics, linalg-lite, and guard work; RFC-043 through RFC-048 completed the additive examples program; RFC-049 implemented benchmarking Phases 1-3 and extracted hard gates to future policy ownership; RFC-050 through RFC-054 completed production-migration documentation and local advisory tooling; RFC-055 through RFC-062 completed result-form APIs, companion maturity promotions, benchmark-doc surfacing, and the ndarray 0.17 update; RFC-063 through RFC-069 completed the reviewed local visualization/reporting line through `0.36.0`; RFC-071 shipped private fixed-demo JSON in `0.37.0`; RFC-070 closed public visualization/report readiness without public implementation; RFC-072 is the active proposed maintainability RFC for the local report tool. Under lock-step family versioning (RFC-030), every crate shares the family version; maturity is expressed by per-crate Status labels, not by separate version numbers.
 
 ---
@@ -145,7 +145,7 @@ matten -> datafusion
 | **v0.35.0** | Visualization continuation release | RFC-068 continuation implemented: static local HTML artifact for `tools/matten-report --demo data-readiness`, completing fixed-demo HTML coverage while preserving Markdown default and deferring input-mode HTML, public crates, SVG/Vega-Lite, and expression tracing | Local-tool visualization artifact |
 | **v0.36.0** | Input-mode HTML release | RFC-069 implemented: static local HTML artifact for `tools/matten-report --input ... --kind data-readiness`, preserving Markdown default and keeping output summary-only, bounded, escaped, and explicit-file-only | Local-tool visualization artifact |
 | **v0.37.0** | Fixed-demo private JSON reports | RFC-071 released: private `tools/matten-report --demo ... --format json --output <path>` artifacts for the five fixed demos, preserving Markdown default and deferring input-mode JSON, public schemas, public crates, SVG/Vega-Lite, and expression tracing | Local-tool visualization artifact |
-| **Post-v0.37.0** | RFC-070 closure and report-tool maintainability | RFC-070 closed without a public report/viz surface; RFC-072 proposed for behavior-preserving `matten-report` modularization before further feature work | Design / planning |
+| **Post-v0.37.0** | RFC-070 closure and report-tool maintainability | RFC-070 closed without a public report/viz surface; RFC-072 Slice 0 process baseline implemented and prepared for review before modular movement | Implementation checkpoint |
 | **v0.21+** | Selective production readiness | `matten-ndarray` promoted to production-ready (RFC-057); `matten-mlprep` and `matten-data` promoted to production-ready candidate (RFC-058/RFC-059); remaining full-production companion decisions require separate review. RFC-049 Phases 1-3 are implemented; Phase 4 hard gates are extracted to future policy/RFC ownership | Per-crate decisions |
 | **Later** | Public report/viz implementation follow-up, JSON/SVG/Vega-Lite output, streaming / large CSV, `nalgebra`, `candle`, broader stats/linalg companions | Separate RFCs or reviewed handoffs required | Design-only until reopened |
 
@@ -827,12 +827,13 @@ policy, or published `matten-report` / `matten-viz` crate. The RFC-070
 post-0.37 closure audit therefore closes the public-readiness audit without
 public implementation.
 
-The next ordered theme is proposed RFC-072 for behavior-preserving
-`tools/matten-report` modularization. The current binary is 5,023 lines and
-combines CLI policy, report data, input handling, Markdown/HTML/JSON rendering,
-file output, and tests. That RFC must define module ownership, dependency
-direction, test placement, migration sequence, and exact behavior-preservation
-gates before code is moved.
+The active theme is proposed RFC-072 for behavior-preserving
+`tools/matten-report` modularization. Its accepted design and handoff define
+module ownership, dependency direction, test placement, migration sequence,
+and exact behavior-preservation gates. Slice 0 implements the separately
+reviewed process baseline against the still-monolithic 5,023-line binary and is
+prepared for review. No Rust source movement is authorized until that baseline
+is reviewed and committed.
 
 ### JSON / SVG / Vega-Lite report output
 
@@ -1172,3 +1173,4 @@ dependency gated by a non-default feature would not appear, producing a false pa
 | 2.3.0 | 2026-07-21 | Drafted the detailed RFC-072 implementation handoff. It defines a separately reviewed/committed Slice 0 process harness with committed-monolith byte counts and SHA-256 anchors, a module-boundary guard, concrete request/CLI/app/report/render/output ownership, family-sized report-builder moves, format/family-sized renderer moves, symmetric production/test size gates, and seven owner-visible review points. No harness, Rust source movement, feature, public API, dependency, version, release-prep, tag, or publish action is authorized before handoff acceptance. |
 | 2.4.0 | 2026-07-21 | Revised the RFC-072 handoff after review. Defined final flow as app-owned construction of family-specific report values followed by borrowed renderer consumption; unified private data-readiness success/error data so Markdown no longer queries/converts Table; kept dynamic-element and data-error normalization report-owned; moved Markdown list emission to Markdown ownership; required an explicit target directory for the process binary; and required Slice 1 delivery, mutation self-test, CI wiring, and release-checklist wiring for the module-boundary guard. No harness or Rust source movement is authorized before rereview acceptance. |
 | 2.5.0 | 2026-07-21 | Recorded acceptance of the detailed RFC-072 handoff and authorized Slice 0 only. Incorporated the managed-environment note by requiring a validated repository-local `target/matten-report-process/tmp` linker temporary directory passed as `TMPDIR` to the explicit-target Cargo build. Slice 0 may add/wire the five-case process harness and prove deliberate digest mutation; Slice 1, Rust source movement, features, public APIs, dependencies, versions, release prep, tags, and publishing remain unauthorized. |
+| 2.6.0 | 2026-07-21 | RFC-072 Slice 0 process baseline implemented and prepared for review. Added a dependency-free five-case shell harness that builds into explicit `target/matten-report-process`, uses validated repository-local linker and case temporary directories, executes the built binary directly, checks exact help/Markdown/private-JSON bytes and routing, checks the exact HTML policy error, and tolerates platform-specific filesystem details behind the stable process-error prefix. Wired the harness into CI and the release checklist and added a deliberate Markdown-digest mutation mode for negative proof. No Rust source moved; Slice 1, features, public APIs, dependencies, versions, release prep, tags, and publishing remain unauthorized until Slice 0 is reviewed and committed. |
