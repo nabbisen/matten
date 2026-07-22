@@ -1,11 +1,12 @@
 use std::error::Error;
 use std::fmt::Write as _;
 
-use matten::{Element, NumericPolicy, Tensor};
+use matten::{Element, Tensor};
 use matten_data::{MattenDataError, Table};
 use matten_mlprep::standardize_columns;
 use serde::Serialize;
 
+use crate::report::dynamic_readiness::DynamicReadinessReportData;
 use crate::report::shape_flow::ShapeFlowReportData;
 use crate::request::{
     KIND_DATA_READINESS, KIND_DYNAMIC_READINESS, KIND_EDUCATIONAL_PATH,
@@ -230,7 +231,7 @@ pub(crate) fn render_fixed_demo_json_report(label: &str) -> Result<String, Box<d
         }
         KIND_SHAPE_FLOW => Err("shape-flow JSON requires prebuilt report data".into()),
         KIND_DYNAMIC_READINESS => {
-            render_json_envelope(KIND_DYNAMIC_READINESS, dynamic_readiness_json_payload()?)
+            Err("dynamic-readiness JSON requires prebuilt report data".into())
         }
         KIND_MLPREP_STANDARDIZATION => render_json_envelope(
             KIND_MLPREP_STANDARDIZATION,
@@ -354,22 +355,32 @@ fn shape_flow_json_payload(
     })
 }
 
-fn dynamic_readiness_json_payload() -> Result<JsonDynamicReadinessPayload, Box<dyn Error>> {
-    let data = dynamic_readiness_report_data()?;
+pub(crate) fn render_dynamic_readiness_json_report(
+    data: &DynamicReadinessReportData,
+) -> Result<String, Box<dyn Error>> {
+    render_json_envelope(
+        KIND_DYNAMIC_READINESS,
+        dynamic_readiness_json_payload(data)?,
+    )
+}
+
+fn dynamic_readiness_json_payload(
+    data: &DynamicReadinessReportData,
+) -> Result<JsonDynamicReadinessPayload, Box<dyn Error>> {
     Ok(JsonDynamicReadinessPayload {
         shape: data.shape.clone(),
         values: data
             .values
-            .into_iter()
+            .iter()
             .map(|value| JsonDynamicValue {
                 row: value.row,
                 column: value.column,
-                element: value.element,
+                element: value.element.clone(),
             })
             .collect(),
         schema_summary: data
             .schema_summary
-            .into_iter()
+            .iter()
             .map(|row| JsonSchemaSummaryRow {
                 label: row.label,
                 count: row.count,
@@ -1051,8 +1062,9 @@ pub(crate) fn render_shape_flow_html_report(
     )
 }
 
-pub(crate) fn render_dynamic_readiness_report() -> Result<String, Box<dyn Error>> {
-    let data = dynamic_readiness_report_data()?;
+pub(crate) fn render_dynamic_readiness_report(
+    data: &DynamicReadinessReportData,
+) -> Result<String, Box<dyn Error>> {
     let mut report = String::new();
     writeln!(report, "# matten dynamic-readiness report")?;
     writeln!(report)?;
@@ -1111,128 +1123,9 @@ pub(crate) fn render_dynamic_readiness_report() -> Result<String, Box<dyn Error>
     Ok(report)
 }
 
-#[derive(Debug)]
-struct DynamicReadinessReportData {
-    shape: Vec<usize>,
-    values: Vec<DynamicValueData>,
-    schema_summary: Vec<DynamicSchemaSummaryRow>,
-    none_mask_values: Vec<f64>,
-    numeric_mask_values: Vec<f64>,
-    strict_numeric_ready: bool,
-    strict_conversion_result: &'static str,
-    explicit_policy: &'static str,
-    converted_shape: Vec<usize>,
-    converted_values: Vec<f64>,
-}
-
-#[derive(Debug)]
-struct DynamicValueData {
-    row: usize,
-    column: usize,
-    element: String,
-}
-
-#[derive(Debug)]
-struct DynamicSchemaSummaryRow {
-    label: &'static str,
-    count: usize,
-}
-
-fn dynamic_readiness_report_data() -> Result<DynamicReadinessReportData, Box<dyn Error>> {
-    let dynamic = Tensor::from_elements(
-        vec![
-            Element::Float(1.0),
-            Element::text("2.5"),
-            Element::None,
-            Element::Int(4),
-            Element::text("6.0"),
-            Element::Float(8.0),
-        ],
-        &[2, 3],
-    );
-    let none_mask = dynamic.none_mask();
-    let numeric_mask = dynamic.numeric_mask();
-    let converted = dynamic
-        .try_numeric_with(NumericPolicy::default().none_as(0.0).allow_text_parse())
-        .map_err(Box::<dyn Error>::from)?;
-
-    if dynamic.try_numeric().is_ok() {
-        return Err("strict dynamic conversion unexpectedly succeeded".into());
-    }
-
-    let shape = dynamic.shape().to_vec();
-    let columns = shape.get(1).copied().unwrap_or(1);
-    let values = dynamic
-        .to_elements()
-        .iter()
-        .enumerate()
-        .map(|(index, element)| DynamicValueData {
-            row: index / columns,
-            column: index % columns,
-            element: format_dynamic_element(element),
-        })
-        .collect();
-
-    Ok(DynamicReadinessReportData {
-        shape,
-        values,
-        schema_summary: dynamic_schema_summary_rows(&dynamic),
-        none_mask_values: none_mask.as_slice().to_vec(),
-        numeric_mask_values: numeric_mask.as_slice().to_vec(),
-        strict_numeric_ready: dynamic.is_numeric_convertible(),
-        strict_conversion_result: "error: strict conversion rejects Text and None values",
-        explicit_policy: "none_as(0.0) + allow_text_parse()",
-        converted_shape: converted.shape().to_vec(),
-        converted_values: converted.as_slice().to_vec(),
-    })
-}
-
-fn dynamic_schema_summary_rows(tensor: &Tensor) -> Vec<DynamicSchemaSummaryRow> {
-    let mut floats = 0;
-    let mut ints = 0;
-    let mut texts = 0;
-    let mut bools = 0;
-    let mut none = 0;
-
-    for element in tensor.to_elements() {
-        match element {
-            Element::Float(_) => floats += 1,
-            Element::Int(_) => ints += 1,
-            Element::Text(_) => texts += 1,
-            Element::Bool(_) => bools += 1,
-            Element::None => none += 1,
-        }
-    }
-
-    let mut rows = vec![
-        DynamicSchemaSummaryRow {
-            label: "Float",
-            count: floats,
-        },
-        DynamicSchemaSummaryRow {
-            label: "Int",
-            count: ints,
-        },
-        DynamicSchemaSummaryRow {
-            label: "Text",
-            count: texts,
-        },
-    ];
-    if bools > 0 {
-        rows.push(DynamicSchemaSummaryRow {
-            label: "Bool",
-            count: bools,
-        });
-    }
-    rows.push(DynamicSchemaSummaryRow {
-        label: "None",
-        count: none,
-    });
-    rows
-}
-
-pub(crate) fn render_dynamic_readiness_html_report() -> Result<String, Box<dyn Error>> {
-    let data = dynamic_readiness_report_data()?;
+pub(crate) fn render_dynamic_readiness_html_report(
+    data: &DynamicReadinessReportData,
+) -> Result<String, Box<dyn Error>> {
     render_html_document(
         "matten dynamic-readiness report",
         "Fixed demo report, not automatic data profiling.",
@@ -2148,16 +2041,6 @@ fn format_fixed_values(values: &[f64]) -> String {
 fn format_fixed_value(value: f64) -> String {
     let stable = if value.abs() < 0.0005 { 0.0 } else { value };
     format!("{stable:.3}")
-}
-
-fn format_dynamic_element(element: &Element) -> String {
-    match element {
-        Element::Float(value) => format!("Float({value:?})"),
-        Element::Int(value) => format!("Int({value})"),
-        Element::Text(value) => format!("Text({value:?})"),
-        Element::Bool(value) => format!("Bool({value})"),
-        Element::None => "None".to_string(),
-    }
 }
 
 fn write_list(report: &mut String, values: &[String]) -> Result<(), std::fmt::Error> {
