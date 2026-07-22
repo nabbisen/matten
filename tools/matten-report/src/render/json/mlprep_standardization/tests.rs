@@ -1,4 +1,4 @@
-use super::*;
+use super::render;
 
 fn mlprep_standardization_data()
 -> crate::report::mlprep_standardization::MlprepStandardizationReportData {
@@ -9,8 +9,7 @@ fn mlprep_standardization_data()
 #[test]
 fn mlprep_standardization_json_report_matches_expected_snapshot() {
     let data = mlprep_standardization_data();
-    let report = render_mlprep_standardization_json_report(&data)
-        .expect("mlprep-standardization JSON should render");
+    let report = render(&data).expect("mlprep-standardization JSON should render");
 
     assert_eq!(
         report,

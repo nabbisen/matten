@@ -1,4 +1,4 @@
-use super::*;
+use super::render;
 
 fn dynamic_readiness_data() -> crate::report::dynamic_readiness::DynamicReadinessReportData {
     crate::report::dynamic_readiness::build().expect("dynamic-readiness data should build")
@@ -7,8 +7,7 @@ fn dynamic_readiness_data() -> crate::report::dynamic_readiness::DynamicReadines
 #[test]
 fn dynamic_readiness_json_report_matches_expected_snapshot() {
     let data = dynamic_readiness_data();
-    let report =
-        render_dynamic_readiness_json_report(&data).expect("dynamic-readiness JSON should render");
+    let report = render(&data).expect("dynamic-readiness JSON should render");
 
     assert_eq!(
         report,

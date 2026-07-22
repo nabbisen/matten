@@ -1,4 +1,4 @@
-use crate::render::render_shape_flow_json_report;
+use super::render;
 
 fn shape_flow_data() -> crate::report::shape_flow::ShapeFlowReportData {
     crate::report::shape_flow::build()
@@ -6,8 +6,7 @@ fn shape_flow_data() -> crate::report::shape_flow::ShapeFlowReportData {
 
 #[test]
 fn shape_flow_json_report_matches_expected_snapshot() {
-    let report =
-        render_shape_flow_json_report(&shape_flow_data()).expect("shape-flow JSON should render");
+    let report = render(&shape_flow_data()).expect("shape-flow JSON should render");
 
     assert_eq!(
         report,

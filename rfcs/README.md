@@ -90,7 +90,7 @@ The broader documentation ownership model is recorded in
 
 | ID | Title | Scope |
 |---:|---|---|
-| 072 | [Behavior-Preserving `matten-report` Modularization](./proposed/072-matten-report-modularization.md) | Implementation through Phase 3B committed; Phase 3C HTML extraction prepared for review |
+| 072 | [Behavior-Preserving `matten-report` Modularization](./proposed/072-matten-report-modularization.md) | Implementation through Phase 3C committed; Phase 3D private JSON extraction prepared for review |
 
 ## Remaining Themes And Issues
 
@@ -102,7 +102,7 @@ is:
 | Theme | Current authority | Current status |
 |---|---|---|
 | Public `matten-report` / `matten-viz` readiness | RFC-070, RFC-063, RFC-065, RFC-068, RFC-069, RFC-071 | RFC-070 closed after audit; no public crate or API authorized |
-| `matten-report` modularization | RFC-072, RFC-070 post-0.37 closure audit | Implementation through Phase 3B committed; Phase 3C HTML extraction prepared for review; private JSON and closure unauthorized |
+| `matten-report` modularization | RFC-072, RFC-070 post-0.37 closure audit | Implementation through Phase 3C committed; Phase 3D private JSON extraction prepared for review; closure unauthorized |
 | More input-mode HTML paths | RFC-069, post-0.36 RFC-069 closure audit | Deferred until a concrete report path is reviewed |
 | JSON / SVG / Vega-Lite report output | RFC-063, RFC-068, RFC-069, RFC-070 JSON policy audit, RFC-071 | Fixed-demo private JSON released in 0.37.0 under RFC-071; input-mode JSON, public JSON schemas, SVG, and Vega-Lite remain deferred |
 | Streaming / large CSV | RFC-026, RFC-037 | Deferred; future implementation RFC must answer batch/schema/malformed-row/memory/sync-vs-async policy |
@@ -310,9 +310,10 @@ is the active design-first theme. Its original 5,023-line local report binary
 now has a reviewed/committed process baseline, and Slice 1 separates the entry,
 request, CLI, orchestration, transitional renderer, output, and owned-test
 boundaries. Phase 2 report-model extraction and total app dispatch are also
-reviewed and committed; shared formatting and all five Markdown family owners
-are also reviewed and committed. Shared HTML document/security helpers and all
-five HTML family owners are the current Phase 3 implementation review point.
+reviewed and committed; shared formatting, all five Markdown owners, and all
+HTML document/security and family owners are also reviewed and committed. The
+private JSON model, finite-value policy, and five family mappings are the
+current Phase 3 implementation review point.
 These changes add no features,
 dependencies, public APIs, or release scope.
 
@@ -327,6 +328,6 @@ committed. The first Phase 3 checkpoint moved shared fixed-number formatting,
 data-readiness Markdown/list ownership, exact Markdown tests, and report-owned
 selection-error tests and is committed. The remaining four fixed-demo Markdown
 families and exact tests are also committed. Phase 3C HTML document/security,
-family rendering, exact snapshots, hostile-input, and bounds tests are prepared
-for review. Private JSON and closure remain unauthorized until acceptance and
-commit.
+family rendering, exact snapshots, hostile-input, and bounds tests are also
+committed. Phase 3D private JSON model/mappings/tests are prepared for review.
+Structural closure remains unauthorized until acceptance and commit.

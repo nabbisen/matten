@@ -1,11 +1,10 @@
-use super::*;
+use super::render;
 
 #[test]
 fn data_readiness_json_report_matches_expected_snapshot() {
     let data =
         crate::report::data_readiness::build_demo().expect("demo data-readiness data should build");
-    let report =
-        render_data_readiness_json_report(&data).expect("data-readiness JSON should render");
+    let report = render(&data).expect("data-readiness JSON should render");
 
     assert_eq!(
         report,

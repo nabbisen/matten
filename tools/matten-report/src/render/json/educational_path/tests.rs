@@ -1,13 +1,15 @@
-use super::*;
+use super::render;
+
+fn educational_path_data() -> crate::report::educational_path::EducationalPathReportData {
+    crate::report::educational_path::build().expect("educational-path data should build")
+}
 
 #[test]
 fn fixed_demo_json_is_deterministic() {
     let first_data = educational_path_data();
-    let first = render_educational_path_json_report(&first_data)
-        .expect("educational-path JSON should render");
+    let first = render(&first_data).expect("educational-path JSON should render");
     let second_data = educational_path_data();
-    let second = render_educational_path_json_report(&second_data)
-        .expect("educational-path JSON should render again");
+    let second = render(&second_data).expect("educational-path JSON should render again");
 
     assert_eq!(first, second);
 }
@@ -15,8 +17,7 @@ fn fixed_demo_json_is_deterministic() {
 #[test]
 fn educational_path_json_report_matches_expected_snapshot() {
     let data = educational_path_data();
-    let report =
-        render_educational_path_json_report(&data).expect("educational-path JSON should render");
+    let report = render(&data).expect("educational-path JSON should render");
 
     assert_eq!(
         report,

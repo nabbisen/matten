@@ -28,7 +28,7 @@ fn render_report(config: &Config) -> Result<String, Box<dyn Error>> {
             match config.format {
                 OutputFormat::Markdown => render::markdown::shape_flow::render(&data),
                 OutputFormat::Html => render::html::shape_flow::render(&data),
-                OutputFormat::Json => render::render_shape_flow_json_report(&data),
+                OutputFormat::Json => render::json::shape_flow::render(&data),
             }
         }
         (Input::Demo, ReportKind::DynamicReadiness) => {
@@ -36,7 +36,7 @@ fn render_report(config: &Config) -> Result<String, Box<dyn Error>> {
             match config.format {
                 OutputFormat::Markdown => render::markdown::dynamic_readiness::render(&data),
                 OutputFormat::Html => render::html::dynamic_readiness::render(&data),
-                OutputFormat::Json => render::render_dynamic_readiness_json_report(&data),
+                OutputFormat::Json => render::json::dynamic_readiness::render(&data),
             }
         }
         (Input::Demo, ReportKind::MlprepStandardization) => {
@@ -44,7 +44,7 @@ fn render_report(config: &Config) -> Result<String, Box<dyn Error>> {
             match config.format {
                 OutputFormat::Markdown => render::markdown::mlprep_standardization::render(&data),
                 OutputFormat::Html => render::html::mlprep_standardization::render(&data),
-                OutputFormat::Json => render::render_mlprep_standardization_json_report(&data),
+                OutputFormat::Json => render::json::mlprep_standardization::render(&data),
             }
         }
         (Input::Demo, ReportKind::EducationalPath) => {
@@ -52,7 +52,7 @@ fn render_report(config: &Config) -> Result<String, Box<dyn Error>> {
             match config.format {
                 OutputFormat::Markdown => render::markdown::educational_path::render(&data),
                 OutputFormat::Html => render::html::educational_path::render(&data),
-                OutputFormat::Json => render::render_educational_path_json_report(&data),
+                OutputFormat::Json => render::json::educational_path::render(&data),
             }
         }
         (Input::Demo, ReportKind::DataReadiness) => {
@@ -60,7 +60,7 @@ fn render_report(config: &Config) -> Result<String, Box<dyn Error>> {
             match config.format {
                 OutputFormat::Markdown => render::markdown::data_readiness::render(&data),
                 OutputFormat::Html => render::html::data_readiness::render_demo(&data),
-                OutputFormat::Json => render::render_data_readiness_json_report(&data),
+                OutputFormat::Json => render::json::data_readiness::render(&data),
             }
         }
         (Input::CsvPath { path }, ReportKind::DataReadiness) => {
