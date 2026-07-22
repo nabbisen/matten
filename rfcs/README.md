@@ -90,7 +90,7 @@ The broader documentation ownership model is recorded in
 
 | ID | Title | Scope |
 |---:|---|---|
-| 072 | [Behavior-Preserving `matten-report` Modularization](./proposed/072-matten-report-modularization.md) | Slice 0/1 plus first four Phase 2 families committed; final data-readiness extraction and total dispatch prepared for review |
+| 072 | [Behavior-Preserving `matten-report` Modularization](./proposed/072-matten-report-modularization.md) | Slice 0/1 and Phase 2 committed; shared formatting plus data-readiness Markdown extraction prepared for review |
 
 ## Remaining Themes And Issues
 
@@ -102,7 +102,7 @@ is:
 | Theme | Current authority | Current status |
 |---|---|---|
 | Public `matten-report` / `matten-viz` readiness | RFC-070, RFC-063, RFC-065, RFC-068, RFC-069, RFC-071 | RFC-070 closed after audit; no public crate or API authorized |
-| `matten-report` modularization | RFC-072, RFC-070 post-0.37 closure audit | Slice 0/1 plus first four Phase 2 families committed; final data-readiness extraction and total dispatch prepared for review; Phase 3/later units unauthorized |
+| `matten-report` modularization | RFC-072, RFC-070 post-0.37 closure audit | Slice 0/1 and Phase 2 committed; shared formatting plus data-readiness Markdown extraction prepared for review; later renderer units unauthorized |
 | More input-mode HTML paths | RFC-069, post-0.36 RFC-069 closure audit | Deferred until a concrete report path is reviewed |
 | JSON / SVG / Vega-Lite report output | RFC-063, RFC-068, RFC-069, RFC-070 JSON policy audit, RFC-071 | Fixed-demo private JSON released in 0.37.0 under RFC-071; input-mode JSON, public JSON schemas, SVG, and Vega-Lite remain deferred |
 | Streaming / large CSV | RFC-026, RFC-037 | Deferred; future implementation RFC must answer batch/schema/malformed-row/memory/sync-vs-async policy |
@@ -309,9 +309,9 @@ RFC-072
 is the active design-first theme. Its original 5,023-line local report binary
 now has a reviewed/committed process baseline, and Slice 1 separates the entry,
 request, CLI, orchestration, transitional renderer, output, and owned-test
-boundaries. The first four Phase 2 family extractions are also reviewed and
-committed; final data-readiness extraction and total app dispatch are the
-current implementation review point. These changes add no features,
+boundaries. Phase 2 report-model extraction and total app dispatch are also
+reviewed and committed; shared formatting plus data-readiness Markdown are the
+current Phase 3 implementation review point. These changes add no features,
 dependencies, public APIs, or release scope.
 
 The detailed RFC-072 handoff
@@ -320,8 +320,8 @@ defines the distinct process-baseline checkpoint, exact byte fingerprints,
 module dependency guard, family/format-sized movement units, test placement,
 and final gates. The accepted handoff also makes `app` construct report-owned
 family values before renderer dispatch and assigns every normalization/helper
-to a dependency-safe owner. Slice 0, Slice 1, and the first four Phase 2 family
-units are reviewed and committed. The final Phase 2 unit unifies data-readiness
-report ownership, removes transitional panic guards, and completes remaining
-test movement; it is prepared for review. Phase 3 renderer extraction and later
-units remain unauthorized until this checkpoint is accepted and committed.
+to a dependency-safe owner. Slice 0, Slice 1, and Phase 2 are reviewed and
+committed. The first Phase 3 checkpoint moves shared fixed-number formatting,
+data-readiness Markdown/list ownership, exact Markdown tests, and report-owned
+selection-error tests; it is prepared for review. Remaining Markdown families
+and later renderer units remain unauthorized until acceptance and commit.

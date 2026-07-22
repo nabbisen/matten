@@ -58,7 +58,7 @@ fn render_report(config: &Config) -> Result<String, Box<dyn Error>> {
         (Input::Demo, ReportKind::DataReadiness) => {
             let data = report::data_readiness::build_demo()?;
             match config.format {
-                OutputFormat::Markdown => render::render_table_report(&data),
+                OutputFormat::Markdown => render::markdown::data_readiness::render(&data),
                 OutputFormat::Html => render::render_data_readiness_html_report(&data),
                 OutputFormat::Json => render::render_data_readiness_json_report(&data),
             }
@@ -74,7 +74,7 @@ fn render_report(config: &Config) -> Result<String, Box<dyn Error>> {
                 &config.select,
             )?;
             match config.format {
-                OutputFormat::Markdown => render::render_table_report(&data),
+                OutputFormat::Markdown => render::markdown::data_readiness::render(&data),
                 OutputFormat::Html => render::render_input_data_readiness_html_report(&data),
                 OutputFormat::Json => Err("--format json is not supported for --input yet".into()),
             }

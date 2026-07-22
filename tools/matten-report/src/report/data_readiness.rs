@@ -107,3 +107,6 @@ fn describe_data_error(err: &MattenDataError) -> String {
         other => other.to_string(),
     }
 }
+
+#[cfg(test)]
+mod tests;

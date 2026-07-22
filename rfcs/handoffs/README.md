@@ -58,7 +58,7 @@ working documents for the implementation team and may be revised as work proceed
 | `070-json-report-schema-policy-audit.md` | RFC-070 JSON report-schema policy audit |
 | `070-fixed-demo-json-report-implementation-handoff.md` | RFC-071 fixed-demo private JSON report implementation handoff, drafted from the RFC-070 audit line |
 | `070-post-037-public-visualization-closure-audit.md` | Accepted RFC-070 post-0.37 closure audit; recommends a separate modularization RFC |
-| `072-matten-report-modularization-implementation-handoff.md` | Accepted RFC-072 handoff; Slice 0/1 plus first four Phase 2 families committed; final data-readiness extraction and total dispatch prepared for review before Phase 3 |
+| `072-matten-report-modularization-implementation-handoff.md` | Accepted RFC-072 handoff; Slice 0/1 and Phase 2 committed; shared formatting plus data-readiness Markdown extraction prepared for review |
 
 ## Documentation-governance handoffs
 
