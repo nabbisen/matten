@@ -2,6 +2,7 @@ mod app;
 mod cli;
 mod output;
 mod render;
+mod report;
 mod request;
 
 fn main() {

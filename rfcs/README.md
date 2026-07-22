@@ -90,7 +90,7 @@ The broader documentation ownership model is recorded in
 
 | ID | Title | Scope |
 |---:|---|---|
-| 072 | [Behavior-Preserving `matten-report` Modularization](./proposed/072-matten-report-modularization.md) | Slice 0 committed; Slice 1 nested-group/visibility remediation prepared for rereview |
+| 072 | [Behavior-Preserving `matten-report` Modularization](./proposed/072-matten-report-modularization.md) | Slice 0/1 committed; shape-flow report-family extraction prepared for review |
 
 ## Remaining Themes And Issues
 
@@ -102,7 +102,7 @@ is:
 | Theme | Current authority | Current status |
 |---|---|---|
 | Public `matten-report` / `matten-viz` readiness | RFC-070, RFC-063, RFC-065, RFC-068, RFC-069, RFC-071 | RFC-070 closed after audit; no public crate or API authorized |
-| `matten-report` modularization | RFC-072, RFC-070 post-0.37 closure audit | Slice 0 committed; Slice 1 second remediation prepared for rereview; report-family extraction remains unauthorized |
+| `matten-report` modularization | RFC-072, RFC-070 post-0.37 closure audit | Slice 0/1 committed; shape-flow report-family extraction prepared for review; later families unauthorized |
 | More input-mode HTML paths | RFC-069, post-0.36 RFC-069 closure audit | Deferred until a concrete report path is reviewed |
 | JSON / SVG / Vega-Lite report output | RFC-063, RFC-068, RFC-069, RFC-070 JSON policy audit, RFC-071 | Fixed-demo private JSON released in 0.37.0 under RFC-071; input-mode JSON, public JSON schemas, SVG, and Vega-Lite remain deferred |
 | Streaming / large CSV | RFC-026, RFC-037 | Deferred; future implementation RFC must answer batch/schema/malformed-row/memory/sync-vs-async policy |
@@ -318,7 +318,7 @@ defines the distinct process-baseline checkpoint, exact byte fingerprints,
 module dependency guard, family/format-sized movement units, test placement,
 and final gates. The accepted handoff also makes `app` construct report-owned
 family values before renderer dispatch and assigns every normalization/helper
-to a dependency-safe owner. Slice 0 is reviewed and committed. Slice 1 nested
-grouped-import and visibility-guard remediation is prepared for focused rereview;
-report-family extraction remains unauthorized until this checkpoint is
-accepted and committed.
+to a dependency-safe owner. Slice 0 and Slice 1 are reviewed and committed.
+The first Phase 2 unit extracts shape-flow report data/computation and is
+prepared for review; dynamic-readiness and later family/format units remain
+unauthorized until this checkpoint is accepted and committed.

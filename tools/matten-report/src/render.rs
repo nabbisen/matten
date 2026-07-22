@@ -6,6 +6,7 @@ use matten_data::{MattenDataError, Table};
 use matten_mlprep::standardize_columns;
 use serde::Serialize;
 
+use crate::report::shape_flow::ShapeFlowReportData;
 use crate::request::{
     KIND_DATA_READINESS, KIND_DYNAMIC_READINESS, KIND_EDUCATIONAL_PATH,
     KIND_MLPREP_STANDARDIZATION, KIND_SHAPE_FLOW, SUPPORTED_DEMOS,
@@ -227,7 +228,7 @@ pub(crate) fn render_fixed_demo_json_report(label: &str) -> Result<String, Box<d
         KIND_DATA_READINESS => {
             render_json_envelope(KIND_DATA_READINESS, data_readiness_json_payload()?)
         }
-        KIND_SHAPE_FLOW => render_json_envelope(KIND_SHAPE_FLOW, shape_flow_json_payload()?),
+        KIND_SHAPE_FLOW => Err("shape-flow JSON requires prebuilt report data".into()),
         KIND_DYNAMIC_READINESS => {
             render_json_envelope(KIND_DYNAMIC_READINESS, dynamic_readiness_json_payload()?)
         }
@@ -309,13 +310,20 @@ fn data_readiness_json_payload() -> Result<JsonDataReadinessPayload, Box<dyn Err
     })
 }
 
-fn shape_flow_json_payload() -> Result<JsonShapeFlowPayload, Box<dyn Error>> {
-    let data = shape_flow_report_data();
+pub(crate) fn render_shape_flow_json_report(
+    data: &ShapeFlowReportData,
+) -> Result<String, Box<dyn Error>> {
+    render_json_envelope(KIND_SHAPE_FLOW, shape_flow_json_payload(data)?)
+}
+
+fn shape_flow_json_payload(
+    data: &ShapeFlowReportData,
+) -> Result<JsonShapeFlowPayload, Box<dyn Error>> {
     Ok(JsonShapeFlowPayload {
         broadcast: JsonBroadcastOperation {
             operation: data.broadcast.operation,
-            input_a_shape: data.broadcast.input_a_shape,
-            input_b_shape: data.broadcast.input_b_shape,
+            input_a_shape: data.broadcast.input_a_shape.clone(),
+            input_b_shape: data.broadcast.input_b_shape.clone(),
             result: json_tensor_preview(
                 &data.broadcast.result_shape,
                 &data.broadcast.result_values,
@@ -323,11 +331,11 @@ fn shape_flow_json_payload() -> Result<JsonShapeFlowPayload, Box<dyn Error>> {
         },
         reshape: JsonReshapeOperation {
             operation: data.reshape.operation,
-            input_shape: data.reshape.input_shape,
+            input_shape: data.reshape.input_shape.clone(),
             result: json_tensor_preview(&data.reshape.result_shape, &data.reshape.result_values)?,
         },
         axis_reductions: JsonAxisReductions {
-            input_shape: data.axis.input_shape,
+            input_shape: data.axis.input_shape.clone(),
             mean_axis_0: json_tensor_preview(
                 &data.axis.mean_axis_0_shape,
                 &data.axis.mean_axis_0_values,
@@ -339,8 +347,8 @@ fn shape_flow_json_payload() -> Result<JsonShapeFlowPayload, Box<dyn Error>> {
         },
         matmul: JsonMatmulOperation {
             operation: data.matmul.operation,
-            left_shape: data.matmul.left_shape,
-            right_shape: data.matmul.right_shape,
+            left_shape: data.matmul.left_shape.clone(),
+            right_shape: data.matmul.right_shape.clone(),
             result: json_tensor_preview(&data.matmul.result_shape, &data.matmul.result_values)?,
         },
     })
@@ -864,8 +872,9 @@ fn format_tensor_preview(values: &[f64]) -> String {
     format!("[{}]", parts.join(", "))
 }
 
-pub(crate) fn render_shape_flow_report() -> Result<String, Box<dyn Error>> {
-    let data = shape_flow_report_data();
+pub(crate) fn render_shape_flow_report(
+    data: &ShapeFlowReportData,
+) -> Result<String, Box<dyn Error>> {
     let mut report = String::new();
     writeln!(report, "# matten shape-flow report")?;
     writeln!(report)?;
@@ -939,88 +948,9 @@ pub(crate) fn render_shape_flow_report() -> Result<String, Box<dyn Error>> {
     Ok(report)
 }
 
-struct ShapeFlowReportData {
-    broadcast: ShapeFlowBroadcastData,
-    reshape: ShapeFlowReshapeData,
-    axis: ShapeFlowAxisData,
-    matmul: ShapeFlowMatmulData,
-}
-
-struct ShapeFlowBroadcastData {
-    input_a_shape: Vec<usize>,
-    input_b_shape: Vec<usize>,
-    result_shape: Vec<usize>,
-    operation: &'static str,
-    result_values: Vec<f64>,
-}
-
-struct ShapeFlowReshapeData {
-    input_shape: Vec<usize>,
-    result_shape: Vec<usize>,
-    operation: &'static str,
-    result_values: Vec<f64>,
-}
-
-struct ShapeFlowAxisData {
-    input_shape: Vec<usize>,
-    mean_axis_0_shape: Vec<usize>,
-    mean_axis_0_values: Vec<f64>,
-    mean_axis_1_shape: Vec<usize>,
-    mean_axis_1_values: Vec<f64>,
-}
-
-struct ShapeFlowMatmulData {
-    left_shape: Vec<usize>,
-    right_shape: Vec<usize>,
-    result_shape: Vec<usize>,
-    operation: &'static str,
-    result_values: Vec<f64>,
-}
-
-fn shape_flow_report_data() -> ShapeFlowReportData {
-    let a = Tensor::new(vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0], &[2, 3]);
-    let b = Tensor::new(vec![10.0, 20.0, 30.0], &[3]);
-    let broadcast = &a + &b;
-    let reshaped = a.reshape(&[3, 2]);
-    let mean_axis_0 = a.mean_axis(0);
-    let mean_axis_1 = a.mean_axis(1);
-    let left = Tensor::new(vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0], &[2, 3]);
-    let right = Tensor::new(vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0], &[3, 2]);
-    let product = left.matmul(&right);
-
-    ShapeFlowReportData {
-        broadcast: ShapeFlowBroadcastData {
-            input_a_shape: a.shape().to_vec(),
-            input_b_shape: b.shape().to_vec(),
-            result_shape: broadcast.shape().to_vec(),
-            operation: "a + b",
-            result_values: broadcast.as_slice().to_vec(),
-        },
-        reshape: ShapeFlowReshapeData {
-            input_shape: a.shape().to_vec(),
-            result_shape: reshaped.shape().to_vec(),
-            operation: "reshape([3, 2])",
-            result_values: reshaped.as_slice().to_vec(),
-        },
-        axis: ShapeFlowAxisData {
-            input_shape: a.shape().to_vec(),
-            mean_axis_0_shape: mean_axis_0.shape().to_vec(),
-            mean_axis_0_values: mean_axis_0.as_slice().to_vec(),
-            mean_axis_1_shape: mean_axis_1.shape().to_vec(),
-            mean_axis_1_values: mean_axis_1.as_slice().to_vec(),
-        },
-        matmul: ShapeFlowMatmulData {
-            left_shape: left.shape().to_vec(),
-            right_shape: right.shape().to_vec(),
-            result_shape: product.shape().to_vec(),
-            operation: "left.matmul(right)",
-            result_values: product.as_slice().to_vec(),
-        },
-    }
-}
-
-pub(crate) fn render_shape_flow_html_report() -> Result<String, Box<dyn Error>> {
-    let data = shape_flow_report_data();
+pub(crate) fn render_shape_flow_html_report(
+    data: &ShapeFlowReportData,
+) -> Result<String, Box<dyn Error>> {
     render_html_document(
         "matten shape-flow report",
         "Fixed demo report, not automatic expression tracing.",

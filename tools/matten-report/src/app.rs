@@ -6,6 +6,7 @@ use matten_data::Table;
 use crate::cli::{self, Action};
 use crate::output;
 use crate::render;
+use crate::report;
 use crate::request::{Config, Input, OutputFormat, ReportKind};
 
 pub(crate) fn run() -> Result<(), Box<dyn Error>> {
@@ -21,6 +22,15 @@ pub(crate) fn run() -> Result<(), Box<dyn Error>> {
 }
 
 fn render_report(config: &Config) -> Result<String, Box<dyn Error>> {
+    if matches!(config.input, Input::Demo) && config.kind == ReportKind::ShapeFlow {
+        let data = report::shape_flow::build();
+        return match config.format {
+            OutputFormat::Markdown => render::render_shape_flow_report(&data),
+            OutputFormat::Html => render::render_shape_flow_html_report(&data),
+            OutputFormat::Json => render::render_shape_flow_json_report(&data),
+        };
+    }
+
     if config.format == OutputFormat::Json {
         return match config.input {
             Input::Demo => render::render_fixed_demo_json_report(config.kind.as_str()),
@@ -34,7 +44,9 @@ fn render_report(config: &Config) -> Result<String, Box<dyn Error>> {
             (Input::Demo, ReportKind::EducationalPath) => {
                 render::render_educational_path_html_report()
             }
-            (Input::Demo, ReportKind::ShapeFlow) => render::render_shape_flow_html_report(),
+            (Input::Demo, ReportKind::ShapeFlow) => {
+                unreachable!("shape-flow is dispatched with prebuilt report data")
+            }
             (Input::Demo, ReportKind::DynamicReadiness) => {
                 render::render_dynamic_readiness_html_report()
             }
@@ -59,7 +71,9 @@ fn render_report(config: &Config) -> Result<String, Box<dyn Error>> {
     }
 
     match (&config.input, config.kind) {
-        (Input::Demo, ReportKind::ShapeFlow) => render::render_shape_flow_report(),
+        (Input::Demo, ReportKind::ShapeFlow) => {
+            unreachable!("shape-flow is dispatched with prebuilt report data")
+        }
         (Input::Demo, ReportKind::DynamicReadiness) => render::render_dynamic_readiness_report(),
         (Input::Demo, ReportKind::MlprepStandardization) => {
             render::render_mlprep_standardization_report()
