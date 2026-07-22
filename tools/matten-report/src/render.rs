@@ -1,12 +1,11 @@
 use std::error::Error;
 use std::fmt::Write as _;
 
-use matten::{Element, Tensor};
 use matten_data::{MattenDataError, Table};
-use matten_mlprep::standardize_columns;
 use serde::Serialize;
 
 use crate::report::dynamic_readiness::DynamicReadinessReportData;
+use crate::report::educational_path::EducationalPathReportData;
 use crate::report::mlprep_standardization::MlprepStandardizationReportData;
 use crate::report::shape_flow::ShapeFlowReportData;
 use crate::request::{
@@ -237,9 +236,7 @@ pub(crate) fn render_fixed_demo_json_report(label: &str) -> Result<String, Box<d
         KIND_MLPREP_STANDARDIZATION => {
             Err("mlprep-standardization JSON requires prebuilt report data".into())
         }
-        KIND_EDUCATIONAL_PATH => {
-            render_json_envelope(KIND_EDUCATIONAL_PATH, educational_path_json_payload()?)
-        }
+        KIND_EDUCATIONAL_PATH => Err("educational-path JSON requires prebuilt report data".into()),
         other => Err(format!(
             "--format json is only supported for --demo {}; got {other:?}",
             SUPPORTED_DEMOS
@@ -434,8 +431,15 @@ fn mlprep_standardization_json_payload(
     })
 }
 
-fn educational_path_json_payload() -> Result<JsonEducationalPathPayload, Box<dyn Error>> {
-    let data = educational_path_report_data()?;
+pub(crate) fn render_educational_path_json_report(
+    data: &EducationalPathReportData,
+) -> Result<String, Box<dyn Error>> {
+    render_json_envelope(KIND_EDUCATIONAL_PATH, educational_path_json_payload(data)?)
+}
+
+fn educational_path_json_payload(
+    data: &EducationalPathReportData,
+) -> Result<JsonEducationalPathPayload, Box<dyn Error>> {
     ensure_finite_values(&data.standardization.before_mean)?;
     ensure_finite_values(&data.standardization.before_std)?;
     ensure_finite_values(&data.standardization.after_mean)?;
@@ -443,8 +447,8 @@ fn educational_path_json_payload() -> Result<JsonEducationalPathPayload, Box<dyn
     Ok(JsonEducationalPathPayload {
         reading_steps: data.reading_steps.to_vec(),
         broadcasting: JsonEducationalBroadcast {
-            left_shape: data.broadcast.left_shape,
-            right_shape: data.broadcast.right_shape,
+            left_shape: data.broadcast.left_shape.clone(),
+            right_shape: data.broadcast.right_shape.clone(),
             result: json_tensor_preview(
                 &data.broadcast.result_shape,
                 &data.broadcast.result_values,
@@ -453,7 +457,7 @@ fn educational_path_json_payload() -> Result<JsonEducationalPathPayload, Box<dyn
             axis_0_meaning: "right repeats across 3 rows",
         },
         reshape_and_transpose: JsonEducationalReshapeTranspose {
-            input_shape: data.reshape_transpose.input_shape,
+            input_shape: data.reshape_transpose.input_shape.clone(),
             reshape: json_tensor_preview(
                 &data.reshape_transpose.reshape_shape,
                 &data.reshape_transpose.reshape_values,
@@ -465,7 +469,7 @@ fn educational_path_json_payload() -> Result<JsonEducationalPathPayload, Box<dyn
             meaning: "reshape changes grouping; transpose changes coordinate meaning",
         },
         axis_reductions: JsonEducationalAxisReductions {
-            input_shape: data.axis_reductions.input_shape,
+            input_shape: data.axis_reductions.input_shape.clone(),
             mean_axis_0: json_tensor_preview(
                 &data.axis_reductions.mean_axis_0_shape,
                 &data.axis_reductions.mean_axis_0_values,
@@ -476,8 +480,8 @@ fn educational_path_json_payload() -> Result<JsonEducationalPathPayload, Box<dyn
             )?,
         },
         matmul: JsonEducationalMatmul {
-            left_shape: data.matmul.left_shape,
-            right_shape: data.matmul.right_shape,
+            left_shape: data.matmul.left_shape.clone(),
+            right_shape: data.matmul.right_shape.clone(),
             shared_inner_dimension: data.matmul.shared_inner_dimension,
             result: json_tensor_preview(&data.matmul.result_shape, &data.matmul.result_values)?,
         },
@@ -496,12 +500,12 @@ fn educational_path_json_payload() -> Result<JsonEducationalPathPayload, Box<dyn
         },
         standardization: JsonEducationalStandardization {
             operation: "standardize_columns(input)",
-            input_shape: data.standardization.input_shape,
-            output_shape: data.standardization.output_shape,
-            before_mean: data.standardization.before_mean,
-            before_population_std: data.standardization.before_std,
-            after_mean: data.standardization.after_mean,
-            after_population_std: data.standardization.after_std,
+            input_shape: data.standardization.input_shape.clone(),
+            output_shape: data.standardization.output_shape.clone(),
+            before_mean: data.standardization.before_mean.clone(),
+            before_population_std: data.standardization.before_std.clone(),
+            after_mean: data.standardization.after_mean.clone(),
+            after_population_std: data.standardization.after_std.clone(),
         },
         non_goals: data.non_goals.to_vec(),
     })
@@ -1391,158 +1395,9 @@ pub(crate) fn render_mlprep_standardization_html_report(
     )
 }
 
-struct EducationalPathReportData {
-    reading_steps: [&'static str; 4],
-    broadcast: EducationalBroadcastData,
-    reshape_transpose: EducationalReshapeTransposeData,
-    axis_reductions: EducationalAxisReductionData,
-    matmul: EducationalMatmulData,
-    dynamic_readiness: EducationalDynamicReadinessData,
-    standardization: EducationalStandardizationData,
-    non_goals: [&'static str; 4],
-}
-
-struct EducationalBroadcastData {
-    left_shape: Vec<usize>,
-    right_shape: Vec<usize>,
-    result_shape: Vec<usize>,
-    result_values: Vec<f64>,
-}
-
-struct EducationalReshapeTransposeData {
-    input_shape: Vec<usize>,
-    reshape_shape: Vec<usize>,
-    reshape_values: Vec<f64>,
-    transpose_shape: Vec<usize>,
-    transpose_values: Vec<f64>,
-}
-
-struct EducationalAxisReductionData {
-    input_shape: Vec<usize>,
-    mean_axis_0_shape: Vec<usize>,
-    mean_axis_0_values: Vec<f64>,
-    mean_axis_1_shape: Vec<usize>,
-    mean_axis_1_values: Vec<f64>,
-}
-
-struct EducationalMatmulData {
-    left_shape: Vec<usize>,
-    right_shape: Vec<usize>,
-    result_shape: Vec<usize>,
-    shared_inner_dimension: usize,
-    result_values: Vec<f64>,
-}
-
-struct EducationalDynamicReadinessData {
-    shape: Vec<usize>,
-    none_mask_values: Vec<f64>,
-    numeric_mask_values: Vec<f64>,
-}
-
-struct EducationalStandardizationData {
-    input_shape: Vec<usize>,
-    output_shape: Vec<usize>,
-    before_mean: Vec<f64>,
-    before_std: Vec<f64>,
-    after_mean: Vec<f64>,
-    after_std: Vec<f64>,
-}
-
-fn educational_path_report_data() -> Result<EducationalPathReportData, Box<dyn Error>> {
-    let broadcast_left = Tensor::new(vec![1.0, 2.0, 3.0], &[3, 1]);
-    let broadcast_right = Tensor::new(vec![10.0, 20.0, 30.0, 40.0], &[1, 4]);
-    let broadcast = &broadcast_left + &broadcast_right;
-
-    let shape_input = Tensor::new(vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0], &[2, 3]);
-    let reshaped = shape_input.reshape(&[3, 2]);
-    let transposed = shape_input.transpose();
-    let mean_axis_0 = shape_input.mean_axis(0);
-    let mean_axis_1 = shape_input.mean_axis(1);
-
-    let matmul_left = Tensor::new((1..=6).map(|value| value as f64).collect(), &[2, 3]);
-    let matmul_right = Tensor::new((1..=12).map(|value| value as f64).collect(), &[3, 4]);
-    let matmul = matmul_left.matmul(&matmul_right);
-
-    let dynamic = Tensor::from_elements(
-        vec![
-            Element::Float(1.0),
-            Element::text("2.5"),
-            Element::None,
-            Element::Int(4),
-            Element::text("6.0"),
-            Element::Float(8.0),
-        ],
-        &[2, 3],
-    );
-    let none_mask = dynamic.none_mask();
-    let numeric_mask = dynamic.numeric_mask();
-
-    let standardization_input = Tensor::new(vec![8.0, 80.0, 10.0, 100.0, 12.0, 120.0], &[3, 2]);
-    let standardized =
-        standardize_columns(&standardization_input).map_err(Box::<dyn Error>::from)?;
-    let before_mean = standardization_input.mean_axis(0);
-    let before_std = standardization_input.std_axis(0);
-    let after_mean = standardized.mean_axis(0);
-    let after_std = standardized.std_axis(0);
-
-    Ok(EducationalPathReportData {
-        reading_steps: [
-            "ask what shape each input has",
-            "ask which axes align, disappear, or remain",
-            "read the output shape before reading values",
-            "convert dynamic data before numeric computation",
-        ],
-        broadcast: EducationalBroadcastData {
-            left_shape: broadcast_left.shape().to_vec(),
-            right_shape: broadcast_right.shape().to_vec(),
-            result_shape: broadcast.shape().to_vec(),
-            result_values: broadcast.as_slice().to_vec(),
-        },
-        reshape_transpose: EducationalReshapeTransposeData {
-            input_shape: shape_input.shape().to_vec(),
-            reshape_shape: reshaped.shape().to_vec(),
-            reshape_values: reshaped.as_slice().to_vec(),
-            transpose_shape: transposed.shape().to_vec(),
-            transpose_values: transposed.as_slice().to_vec(),
-        },
-        axis_reductions: EducationalAxisReductionData {
-            input_shape: shape_input.shape().to_vec(),
-            mean_axis_0_shape: mean_axis_0.shape().to_vec(),
-            mean_axis_0_values: mean_axis_0.as_slice().to_vec(),
-            mean_axis_1_shape: mean_axis_1.shape().to_vec(),
-            mean_axis_1_values: mean_axis_1.as_slice().to_vec(),
-        },
-        matmul: EducationalMatmulData {
-            left_shape: matmul_left.shape().to_vec(),
-            right_shape: matmul_right.shape().to_vec(),
-            result_shape: matmul.shape().to_vec(),
-            shared_inner_dimension: matmul_left.shape()[1],
-            result_values: matmul.as_slice().to_vec(),
-        },
-        dynamic_readiness: EducationalDynamicReadinessData {
-            shape: dynamic.shape().to_vec(),
-            none_mask_values: none_mask.as_slice().to_vec(),
-            numeric_mask_values: numeric_mask.as_slice().to_vec(),
-        },
-        standardization: EducationalStandardizationData {
-            input_shape: standardization_input.shape().to_vec(),
-            output_shape: standardized.shape().to_vec(),
-            before_mean: before_mean.as_slice().to_vec(),
-            before_std: before_std.as_slice().to_vec(),
-            after_mean: after_mean.as_slice().to_vec(),
-            after_std: after_std.as_slice().to_vec(),
-        },
-        non_goals: [
-            "not a public API",
-            "not source scanning",
-            "not a renderer",
-            "not model-quality analysis",
-        ],
-    })
-}
-
-pub(crate) fn render_educational_path_report() -> Result<String, Box<dyn Error>> {
-    let data = educational_path_report_data()?;
+pub(crate) fn render_educational_path_report(
+    data: &EducationalPathReportData,
+) -> Result<String, Box<dyn Error>> {
     let mut report = String::new();
     writeln!(report, "# matten educational-path report")?;
     writeln!(report)?;
@@ -1685,15 +1540,16 @@ pub(crate) fn render_educational_path_report() -> Result<String, Box<dyn Error>>
     writeln!(report)?;
 
     writeln!(report, "## What this report is not")?;
-    for non_goal in data.non_goals {
+    for non_goal in &data.non_goals {
         writeln!(report, "- {non_goal}")?;
     }
 
     Ok(report)
 }
 
-pub(crate) fn render_educational_path_html_report() -> Result<String, Box<dyn Error>> {
-    let data = educational_path_report_data()?;
+pub(crate) fn render_educational_path_html_report(
+    data: &EducationalPathReportData,
+) -> Result<String, Box<dyn Error>> {
     render_html_document(
         "matten educational-path report",
         "Fixed educational demo report, not automatic expression tracing.",
