@@ -1,23 +1,18 @@
 use std::error::Error;
 use std::fmt::Write as _;
 
-use matten_data::{MattenDataError, Table};
 use serde::Serialize;
 
+use crate::report::data_readiness::{DataReadinessConversion, DataReadinessReportData};
 use crate::report::dynamic_readiness::DynamicReadinessReportData;
 use crate::report::educational_path::EducationalPathReportData;
 use crate::report::mlprep_standardization::MlprepStandardizationReportData;
 use crate::report::shape_flow::ShapeFlowReportData;
 use crate::request::{
     KIND_DATA_READINESS, KIND_DYNAMIC_READINESS, KIND_EDUCATIONAL_PATH,
-    KIND_MLPREP_STANDARDIZATION, KIND_SHAPE_FLOW, SUPPORTED_DEMOS,
+    KIND_MLPREP_STANDARDIZATION, KIND_SHAPE_FLOW,
 };
 
-const DEMO_CSV: &str = "\
-region,sales,cost,note
-north,100,40,ok
-south,150,45,review
-east,120,55,ok";
 const MAX_DISPLAY_COLUMNS: usize = 12;
 const MAX_DISPLAY_CHARS: usize = 120;
 const MAX_ERROR_CHARS: usize = 240;
@@ -51,7 +46,7 @@ struct JsonMissingCount {
 
 #[derive(Serialize)]
 struct JsonDataReadinessPayload {
-    input_label: &'static str,
+    input_label: String,
     source_columns: Vec<String>,
     selected_columns: Vec<String>,
     left_out_columns: Vec<String>,
@@ -224,27 +219,6 @@ struct JsonEducationalStandardization {
     after_population_std: Vec<f64>,
 }
 
-pub(crate) fn render_fixed_demo_json_report(label: &str) -> Result<String, Box<dyn Error>> {
-    match label {
-        KIND_DATA_READINESS => {
-            render_json_envelope(KIND_DATA_READINESS, data_readiness_json_payload()?)
-        }
-        KIND_SHAPE_FLOW => Err("shape-flow JSON requires prebuilt report data".into()),
-        KIND_DYNAMIC_READINESS => {
-            Err("dynamic-readiness JSON requires prebuilt report data".into())
-        }
-        KIND_MLPREP_STANDARDIZATION => {
-            Err("mlprep-standardization JSON requires prebuilt report data".into())
-        }
-        KIND_EDUCATIONAL_PATH => Err("educational-path JSON requires prebuilt report data".into()),
-        other => Err(format!(
-            "--format json is only supported for --demo {}; got {other:?}",
-            SUPPORTED_DEMOS
-        )
-        .into()),
-    }
-}
-
 fn render_json_envelope<T: Serialize>(
     report_kind: &'static str,
     data: T,
@@ -286,24 +260,40 @@ fn ensure_finite_values(values: &[f64]) -> Result<(), Box<dyn Error>> {
     }
 }
 
-fn data_readiness_json_payload() -> Result<JsonDataReadinessPayload, Box<dyn Error>> {
-    let data = data_readiness_demo_report_data()?;
+pub(crate) fn render_data_readiness_json_report(
+    data: &DataReadinessReportData,
+) -> Result<String, Box<dyn Error>> {
+    render_json_envelope(KIND_DATA_READINESS, data_readiness_json_payload(data)?)
+}
+
+fn data_readiness_json_payload(
+    data: &DataReadinessReportData,
+) -> Result<JsonDataReadinessPayload, Box<dyn Error>> {
+    let (tensor_shape, tensor_values) = match &data.conversion {
+        DataReadinessConversion::Success {
+            tensor_shape,
+            tensor_values,
+        } => (tensor_shape, tensor_values),
+        DataReadinessConversion::Error { .. } => {
+            return Err("fixed data-readiness JSON requires successful conversion".into());
+        }
+    };
     Ok(JsonDataReadinessPayload {
-        input_label: data.input_label,
-        source_columns: data.source_columns,
-        selected_columns: data.selected_columns,
-        left_out_columns: data.left_out_columns,
+        input_label: data.input_label.clone(),
+        source_columns: data.source_columns.clone(),
+        selected_columns: data.selected_columns.clone(),
+        left_out_columns: data.left_out_columns.clone(),
         missing_counts: data
             .missing_counts
-            .into_iter()
+            .iter()
             .map(|row| JsonMissingCount {
-                column: row.column,
+                column: row.column.clone(),
                 missing: row.missing,
             })
             .collect(),
         numeric_conversion: JsonNumericConversion {
-            status: data.conversion_status,
-            tensor: json_tensor_preview(&data.tensor_shape, &data.tensor_values)?,
+            status: "success",
+            tensor: json_tensor_preview(tensor_shape, tensor_values)?,
         },
     })
 }
@@ -512,121 +502,68 @@ fn educational_path_json_payload(
 }
 
 pub(crate) fn render_table_report(
-    input_label: &str,
-    table: &Table,
-    select: &[String],
+    data: &DataReadinessReportData,
 ) -> Result<String, Box<dyn Error>> {
-    let selected = table
-        .select_columns(select.iter().map(String::as_str))
-        .map_err(Box::<dyn Error>::from)?;
-    let left_out = left_out_columns(table.column_names(), select);
-    let selected_summary = selected.schema_summary();
-
     let mut report = String::new();
     writeln!(report, "# matten data-readiness report")?;
     writeln!(report)?;
 
     writeln!(report, "## Input")?;
-    writeln!(report, "{input_label}")?;
+    writeln!(report, "{}", data.input_label)?;
     writeln!(report)?;
 
     writeln!(report, "## Source columns")?;
-    write_list(&mut report, table.column_names())?;
+    write_list(&mut report, &data.source_columns)?;
     writeln!(report)?;
 
     writeln!(report, "## Selected columns")?;
-    write_list(&mut report, select)?;
+    write_list(&mut report, &data.selected_columns)?;
     writeln!(report)?;
 
     writeln!(report, "## Columns left out")?;
-    write_list(&mut report, &left_out)?;
+    write_list(&mut report, &data.left_out_columns)?;
     writeln!(report)?;
 
     writeln!(report, "## Missing values")?;
     writeln!(report, "| column | missing |")?;
     writeln!(report, "|---|---:|")?;
-    for column in selected_summary.column_summaries() {
-        writeln!(report, "| {} | {} |", column.name, column.missing)?;
+    for row in &data.missing_counts {
+        writeln!(report, "| {} | {} |", row.column, row.missing)?;
     }
     writeln!(report)?;
 
     writeln!(report, "## Numeric conversion")?;
-    match selected.try_numeric() {
-        Ok(numeric) => {
+    match &data.conversion {
+        DataReadinessConversion::Success {
+            tensor_shape,
+            tensor_values,
+        } => {
             writeln!(report, "strict conversion: success")?;
             writeln!(report)?;
-            let tensor = numeric.to_tensor().map_err(Box::<dyn Error>::from)?;
             writeln!(report, "## Tensor preview")?;
-            writeln!(report, "shape: {:?}", tensor.shape())?;
-            writeln!(report, "row-major values: {:?}", tensor.as_slice())?;
+            writeln!(report, "shape: {tensor_shape:?}")?;
+            writeln!(report, "row-major values: {tensor_values:?}")?;
         }
-        Err(err) => {
-            writeln!(
-                report,
-                "strict conversion: error: {}",
-                describe_data_error(&err)
-            )?;
+        DataReadinessConversion::Error { message } => {
+            writeln!(report, "strict conversion: error: {message}")?;
         }
     }
 
     Ok(report)
 }
 
-pub(crate) fn render_data_readiness_markdown_report(
-    select: &[String],
+pub(crate) fn render_data_readiness_html_report(
+    data: &DataReadinessReportData,
 ) -> Result<String, Box<dyn Error>> {
-    let table = Table::from_csv_str(DEMO_CSV).map_err(Box::<dyn Error>::from)?;
-    render_table_report("demo: data-readiness", &table, select)
-}
-
-struct DataReadinessReportData {
-    input_label: &'static str,
-    source_columns: Vec<String>,
-    selected_columns: Vec<String>,
-    left_out_columns: Vec<String>,
-    missing_counts: Vec<DataReadinessMissingCount>,
-    conversion_status: &'static str,
-    tensor_shape: Vec<usize>,
-    tensor_values: Vec<f64>,
-}
-
-struct DataReadinessMissingCount {
-    column: String,
-    missing: usize,
-}
-
-fn data_readiness_demo_report_data() -> Result<DataReadinessReportData, Box<dyn Error>> {
-    let table = Table::from_csv_str(DEMO_CSV).map_err(Box::<dyn Error>::from)?;
-    let selected_columns = vec!["sales".to_string(), "cost".to_string()];
-    let selected = table
-        .select_columns(selected_columns.iter().map(String::as_str))
-        .map_err(Box::<dyn Error>::from)?;
-    let selected_summary = selected.schema_summary();
-    let missing_counts = selected_summary
-        .column_summaries()
-        .iter()
-        .map(|column| DataReadinessMissingCount {
-            column: column.name.clone(),
-            missing: column.missing,
-        })
-        .collect();
-    let numeric = selected.try_numeric().map_err(Box::<dyn Error>::from)?;
-    let tensor = numeric.to_tensor().map_err(Box::<dyn Error>::from)?;
-
-    Ok(DataReadinessReportData {
-        input_label: "demo: data-readiness",
-        source_columns: table.column_names().to_vec(),
-        left_out_columns: left_out_columns(table.column_names(), &selected_columns),
-        selected_columns,
-        missing_counts,
-        conversion_status: "success",
-        tensor_shape: tensor.shape().to_vec(),
-        tensor_values: tensor.as_slice().to_vec(),
-    })
-}
-
-pub(crate) fn render_data_readiness_html_report() -> Result<String, Box<dyn Error>> {
-    let data = data_readiness_demo_report_data()?;
+    let (tensor_shape, tensor_values) = match &data.conversion {
+        DataReadinessConversion::Success {
+            tensor_shape,
+            tensor_values,
+        } => (tensor_shape, tensor_values),
+        DataReadinessConversion::Error { .. } => {
+            return Err("fixed data-readiness HTML requires successful conversion".into());
+        }
+    };
     render_html_document(
         "matten data-readiness report",
         "Fixed demo report, not arbitrary CSV profiling.",
@@ -672,10 +609,7 @@ pub(crate) fn render_data_readiness_html_report() -> Result<String, Box<dyn Erro
 
             writeln!(report, "<section>")?;
             writeln!(report, "<h2>{}</h2>", html_escape("Numeric conversion"))?;
-            write_shape_flow_table(
-                report,
-                &[("strict conversion", data.conversion_status.to_string())],
-            )?;
+            write_shape_flow_table(report, &[("strict conversion", "success".to_string())])?;
             writeln!(report, "</section>")?;
 
             writeln!(report, "<section>")?;
@@ -683,8 +617,8 @@ pub(crate) fn render_data_readiness_html_report() -> Result<String, Box<dyn Erro
             write_shape_flow_table(
                 report,
                 &[
-                    ("shape", format!("{:?}", data.tensor_shape)),
-                    ("row-major values", format!("{:?}", data.tensor_values)),
+                    ("shape", format!("{tensor_shape:?}")),
+                    ("row-major values", format!("{tensor_values:?}")),
                 ],
             )?;
             writeln!(report, "</section>")
@@ -692,71 +626,9 @@ pub(crate) fn render_data_readiness_html_report() -> Result<String, Box<dyn Erro
     )
 }
 
-struct InputDataReadinessReportData {
-    input_label: String,
-    source_columns: Vec<String>,
-    selected_columns: Vec<String>,
-    left_out_columns: Vec<String>,
-    missing_counts: Vec<DataReadinessMissingCount>,
-    conversion: InputDataReadinessConversion,
-}
-
-enum InputDataReadinessConversion {
-    Success {
-        tensor_shape: Vec<usize>,
-        tensor_values: Vec<f64>,
-    },
-    Error {
-        message: String,
-    },
-}
-
-fn input_data_readiness_report_data(
-    input_label: &str,
-    table: &Table,
-    select: &[String],
-) -> Result<InputDataReadinessReportData, Box<dyn Error>> {
-    let selected = table
-        .select_columns(select.iter().map(String::as_str))
-        .map_err(Box::<dyn Error>::from)?;
-    let selected_summary = selected.schema_summary();
-    let missing_counts = selected_summary
-        .column_summaries()
-        .iter()
-        .map(|column| DataReadinessMissingCount {
-            column: column.name.clone(),
-            missing: column.missing,
-        })
-        .collect();
-    let conversion = match selected.try_numeric() {
-        Ok(numeric) => {
-            let tensor = numeric.to_tensor().map_err(Box::<dyn Error>::from)?;
-            InputDataReadinessConversion::Success {
-                tensor_shape: tensor.shape().to_vec(),
-                tensor_values: tensor.as_slice().to_vec(),
-            }
-        }
-        Err(err) => InputDataReadinessConversion::Error {
-            message: describe_data_error(&err),
-        },
-    };
-
-    Ok(InputDataReadinessReportData {
-        input_label: input_label.to_string(),
-        source_columns: table.column_names().to_vec(),
-        selected_columns: select.to_vec(),
-        left_out_columns: left_out_columns(table.column_names(), select),
-        missing_counts,
-        conversion,
-    })
-}
-
 pub(crate) fn render_input_data_readiness_html_report(
-    input_label: &str,
-    table: &Table,
-    select: &[String],
+    data: &DataReadinessReportData,
 ) -> Result<String, Box<dyn Error>> {
-    let data = input_data_readiness_report_data(input_label, table, select)?;
     render_html_document(
         "matten data-readiness report",
         "Bounded summary of the provided CSV file; not a full raw table rendering.",
@@ -823,7 +695,7 @@ pub(crate) fn render_input_data_readiness_html_report(
             writeln!(report, "<section>")?;
             writeln!(report, "<h2>{}</h2>", html_escape("Numeric conversion"))?;
             match &data.conversion {
-                InputDataReadinessConversion::Success {
+                DataReadinessConversion::Success {
                     tensor_shape,
                     tensor_values,
                 } => {
@@ -843,7 +715,7 @@ pub(crate) fn render_input_data_readiness_html_report(
                         ],
                     )?;
                 }
-                InputDataReadinessConversion::Error { message } => {
+                DataReadinessConversion::Error { message } => {
                     write_shape_flow_table(
                         report,
                         &[
@@ -1888,33 +1760,6 @@ fn write_list(report: &mut String, values: &[String]) -> Result<(), std::fmt::Er
         }
     }
     Ok(())
-}
-
-fn left_out_columns(source: &[String], selected: &[String]) -> Vec<String> {
-    source
-        .iter()
-        .filter(|name| !selected.iter().any(|selected| selected == *name))
-        .cloned()
-        .collect()
-}
-
-fn describe_data_error(err: &MattenDataError) -> String {
-    match err {
-        MattenDataError::MissingValue { column, row } => {
-            format!("missing value in column {column:?}, CSV line {row}")
-        }
-        MattenDataError::NonNumericValue { column, row, value } => {
-            format!("non-numeric value {value:?} in column {column:?}, CSV line {row}")
-        }
-        MattenDataError::MissingColumn { name } => {
-            format!("selected column {name:?} does not exist")
-        }
-        MattenDataError::DuplicateSelection { name } => {
-            format!("selected column {name:?} was requested more than once")
-        }
-        MattenDataError::EmptySelection => "no columns were selected".to_string(),
-        other => other.to_string(),
-    }
 }
 
 #[cfg(test)]

@@ -1,6 +1,6 @@
 # RFC-072: Behavior-Preserving `matten-report` Modularization
 
-**Status:** Proposed; Slice 0/1 plus Phase 2 shape-flow, dynamic-readiness, and MLPrep-standardization reviewed and committed; Phase 2 educational-path family extraction prepared for review; later units unauthorized
+**Status:** Proposed; Slice 0/1 plus the first four Phase 2 families reviewed and committed; final Phase 2 data-readiness extraction and total dispatch prepared for review; Phase 3/later units unauthorized
 **Target:** Post-0.37 maintainability work; release family undecided
 **Theme:** Split the local report tool into explicit internal ownership boundaries
 **Depends on:** RFC-063, RFC-065, RFC-068, RFC-069, RFC-070, RFC-071
