@@ -1,7 +1,5 @@
 use super::*;
 
-mod html;
-
 fn mlprep_standardization_data()
 -> crate::report::mlprep_standardization::MlprepStandardizationReportData {
     crate::report::mlprep_standardization::build()

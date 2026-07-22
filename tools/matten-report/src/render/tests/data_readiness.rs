@@ -1,14 +1,4 @@
 use super::*;
-use matten_data::Table;
-
-mod html;
-
-const SMALL_CSV: &str = include_str!("../../../fixtures/small.csv");
-const NON_NUMERIC_CSV: &str = include_str!("../../../fixtures/non_numeric.csv");
-
-fn selected(values: &[&str]) -> Vec<String> {
-    values.iter().map(|value| value.to_string()).collect()
-}
 
 #[test]
 fn data_readiness_json_report_matches_expected_snapshot() {

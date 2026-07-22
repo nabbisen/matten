@@ -1,13 +1,20 @@
-use super::*;
+use super::{render_demo, render_input};
+use matten_data::Table;
 
 mod input;
+
+const SMALL_CSV: &str = include_str!("../../../../fixtures/small.csv");
+const NON_NUMERIC_CSV: &str = include_str!("../../../../fixtures/non_numeric.csv");
+
+fn selected(values: &[&str]) -> Vec<String> {
+    values.iter().map(|value| value.to_string()).collect()
+}
 
 #[test]
 fn data_readiness_html_report_matches_expected_html() {
     let data =
         crate::report::data_readiness::build_demo().expect("demo data-readiness data should build");
-    let report =
-        render_data_readiness_html_report(&data).expect("data-readiness HTML should render");
+    let report = render_demo(&data).expect("data-readiness HTML should render");
 
     assert_eq!(
             report,
@@ -91,8 +98,7 @@ fn data_readiness_html_report_matches_expected_html() {
 fn data_readiness_html_report_is_static_and_self_contained() {
     let data =
         crate::report::data_readiness::build_demo().expect("demo data-readiness data should build");
-    let report =
-        render_data_readiness_html_report(&data).expect("data-readiness HTML should render");
+    let report = render_demo(&data).expect("data-readiness HTML should render");
 
     assert!(report.starts_with("<!doctype html>\n<html lang=\"en\">"));
     assert!(report.contains("<title>matten data-readiness report</title>"));

@@ -9,8 +9,7 @@ fn input_data_readiness_html_success_matches_expected_html() {
         &selected(&["sales", "cost"]),
     )
     .expect("input data-readiness data should build");
-    let report = render_input_data_readiness_html_report(&data)
-        .expect("input-mode data-readiness HTML should render");
+    let report = render_input(&data).expect("input-mode data-readiness HTML should render");
 
     assert_eq!(
             report,
@@ -99,8 +98,7 @@ fn input_data_readiness_html_error_is_bounded_summary() {
         &selected(&["sales", "cost"]),
     )
     .expect("input data-readiness data should build");
-    let report = render_input_data_readiness_html_report(&data)
-        .expect("input-mode data-readiness error HTML should render");
+    let report = render_input(&data).expect("input-mode data-readiness error HTML should render");
 
     assert!(report.contains("<h1>matten data-readiness report</h1>"));
     assert!(report.contains("Bounded summary of the provided CSV file"));
@@ -127,8 +125,7 @@ north,<b>oops</b>,40,ok
         &selected(&["<script>alert(1)</script>", "cost"]),
     )
     .expect("input data-readiness data should build");
-    let report =
-        render_input_data_readiness_html_report(&data).expect("hostile input HTML should render");
+    let report = render_input(&data).expect("hostile input HTML should render");
 
     assert!(report.starts_with("<!doctype html>\n<html lang=\"en\">"));
     assert!(report.contains("path: &lt;script&gt;/tmp/hostile.csv&lt;/script&gt;"));
@@ -163,8 +160,7 @@ fn input_data_readiness_html_bounds_wide_and_long_fields() {
         &selected(&[&headers[1], "col2"]),
     )
     .expect("input data-readiness data should build");
-    let report =
-        render_input_data_readiness_html_report(&data).expect("wide input HTML should render");
+    let report = render_input(&data).expect("wide input HTML should render");
 
     assert!(report.contains("... 3 more"));
     assert!(report.contains("path: ppppp"));
@@ -193,8 +189,7 @@ sales,cost
         &selected(&["sales", "cost"]),
     )
     .expect("input data-readiness data should build");
-    let report = render_input_data_readiness_html_report(&data)
-        .expect("long numeric input HTML should render");
+    let report = render_input(&data).expect("long numeric input HTML should render");
 
     assert!(
         report.contains(

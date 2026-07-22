@@ -1,10 +1,13 @@
-use super::*;
+use super::render;
+
+fn dynamic_readiness_data() -> crate::report::dynamic_readiness::DynamicReadinessReportData {
+    crate::report::dynamic_readiness::build().expect("dynamic-readiness data should build")
+}
 
 #[test]
 fn dynamic_readiness_html_report_matches_expected_html() {
     let data = dynamic_readiness_data();
-    let report =
-        render_dynamic_readiness_html_report(&data).expect("dynamic-readiness HTML should render");
+    let report = render(&data).expect("dynamic-readiness HTML should render");
 
     assert_eq!(
             report,
@@ -101,8 +104,7 @@ fn dynamic_readiness_html_report_matches_expected_html() {
 #[test]
 fn dynamic_readiness_html_report_is_static_and_self_contained() {
     let data = dynamic_readiness_data();
-    let report =
-        render_dynamic_readiness_html_report(&data).expect("dynamic-readiness HTML should render");
+    let report = render(&data).expect("dynamic-readiness HTML should render");
 
     assert!(report.starts_with("<!doctype html>\n<html lang=\"en\">"));
     assert!(report.contains("<title>matten dynamic-readiness report</title>"));

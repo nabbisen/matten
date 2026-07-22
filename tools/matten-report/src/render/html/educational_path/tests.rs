@@ -1,10 +1,13 @@
-use super::*;
+use super::render;
+
+fn educational_path_data() -> crate::report::educational_path::EducationalPathReportData {
+    crate::report::educational_path::build().expect("educational-path data should build")
+}
 
 #[test]
 fn educational_path_html_report_matches_expected_html() {
     let data = educational_path_data();
-    let report =
-        render_educational_path_html_report(&data).expect("educational-path HTML should render");
+    let report = render(&data).expect("educational-path HTML should render");
 
     assert_eq!(
             report,
@@ -133,8 +136,7 @@ mean_axis(1) keeps rows: [2.0, 5.0]</code></pre>
 #[test]
 fn educational_path_html_report_is_static_and_self_contained() {
     let data = educational_path_data();
-    let report =
-        render_educational_path_html_report(&data).expect("educational-path HTML should render");
+    let report = render(&data).expect("educational-path HTML should render");
 
     assert!(report.starts_with("<!doctype html>\n<html lang=\"en\">"));
     assert!(report.contains("<title>matten educational-path report</title>"));

@@ -1,10 +1,15 @@
-use super::*;
+use super::render;
+
+fn mlprep_standardization_data()
+-> crate::report::mlprep_standardization::MlprepStandardizationReportData {
+    crate::report::mlprep_standardization::build()
+        .expect("mlprep-standardization data should build")
+}
 
 #[test]
 fn mlprep_standardization_html_report_matches_expected_html() {
     let data = mlprep_standardization_data();
-    let report = render_mlprep_standardization_html_report(&data)
-        .expect("mlprep-standardization HTML should render");
+    let report = render(&data).expect("mlprep-standardization HTML should render");
 
     assert_eq!(
             report,
@@ -94,8 +99,7 @@ fn mlprep_standardization_html_report_matches_expected_html() {
 #[test]
 fn mlprep_standardization_html_report_is_static_and_self_contained() {
     let data = mlprep_standardization_data();
-    let report = render_mlprep_standardization_html_report(&data)
-        .expect("mlprep-standardization HTML should render");
+    let report = render(&data).expect("mlprep-standardization HTML should render");
 
     assert!(report.starts_with("<!doctype html>\n<html lang=\"en\">"));
     assert!(report.contains("<title>matten mlprep-standardization report</title>"));

@@ -1,7 +1,5 @@
 use super::*;
 
-mod html;
-
 fn dynamic_readiness_data() -> crate::report::dynamic_readiness::DynamicReadinessReportData {
     crate::report::dynamic_readiness::build().expect("dynamic-readiness data should build")
 }
