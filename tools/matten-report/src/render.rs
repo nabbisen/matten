@@ -7,6 +7,7 @@ use matten_mlprep::standardize_columns;
 use serde::Serialize;
 
 use crate::report::dynamic_readiness::DynamicReadinessReportData;
+use crate::report::mlprep_standardization::MlprepStandardizationReportData;
 use crate::report::shape_flow::ShapeFlowReportData;
 use crate::request::{
     KIND_DATA_READINESS, KIND_DYNAMIC_READINESS, KIND_EDUCATIONAL_PATH,
@@ -233,10 +234,9 @@ pub(crate) fn render_fixed_demo_json_report(label: &str) -> Result<String, Box<d
         KIND_DYNAMIC_READINESS => {
             Err("dynamic-readiness JSON requires prebuilt report data".into())
         }
-        KIND_MLPREP_STANDARDIZATION => render_json_envelope(
-            KIND_MLPREP_STANDARDIZATION,
-            mlprep_standardization_json_payload()?,
-        ),
+        KIND_MLPREP_STANDARDIZATION => {
+            Err("mlprep-standardization JSON requires prebuilt report data".into())
+        }
         KIND_EDUCATIONAL_PATH => {
             render_json_envelope(KIND_EDUCATIONAL_PATH, educational_path_json_payload()?)
         }
@@ -402,9 +402,18 @@ fn dynamic_readiness_json_payload(
     })
 }
 
-fn mlprep_standardization_json_payload() -> Result<JsonMlprepStandardizationPayload, Box<dyn Error>>
-{
-    let data = mlprep_standardization_report_data()?;
+pub(crate) fn render_mlprep_standardization_json_report(
+    data: &MlprepStandardizationReportData,
+) -> Result<String, Box<dyn Error>> {
+    render_json_envelope(
+        KIND_MLPREP_STANDARDIZATION,
+        mlprep_standardization_json_payload(data)?,
+    )
+}
+
+fn mlprep_standardization_json_payload(
+    data: &MlprepStandardizationReportData,
+) -> Result<JsonMlprepStandardizationPayload, Box<dyn Error>> {
     ensure_finite_values(&data.before_mean)?;
     ensure_finite_values(&data.before_std)?;
     ensure_finite_values(&data.after_mean)?;
@@ -414,13 +423,13 @@ fn mlprep_standardization_json_payload() -> Result<JsonMlprepStandardizationPayl
         operation: "standardize_columns(input)",
         before: JsonMlprepState {
             tensor: json_tensor_preview(&data.input_shape, &data.input_values)?,
-            column_mean: data.before_mean,
-            column_population_std: data.before_std,
+            column_mean: data.before_mean.clone(),
+            column_population_std: data.before_std.clone(),
         },
         after: JsonMlprepState {
             tensor: json_tensor_preview(&data.output_shape, &data.output_values)?,
-            column_mean: data.after_mean,
-            column_population_std: data.after_std,
+            column_mean: data.after_mean.clone(),
+            column_population_std: data.after_std.clone(),
         },
     })
 }
@@ -1225,39 +1234,9 @@ pub(crate) fn render_dynamic_readiness_html_report(
     )
 }
 
-struct MlprepStandardizationReportData {
-    input_shape: Vec<usize>,
-    input_values: Vec<f64>,
-    before_mean: Vec<f64>,
-    before_std: Vec<f64>,
-    output_shape: Vec<usize>,
-    output_values: Vec<f64>,
-    after_mean: Vec<f64>,
-    after_std: Vec<f64>,
-}
-
-fn mlprep_standardization_report_data() -> Result<MlprepStandardizationReportData, Box<dyn Error>> {
-    let input = Tensor::new(vec![8.0, 80.0, 10.0, 100.0, 12.0, 120.0], &[3, 2]);
-    let standardized = standardize_columns(&input).map_err(Box::<dyn Error>::from)?;
-    let before_mean = input.mean_axis(0);
-    let before_std = input.std_axis(0);
-    let after_mean = standardized.mean_axis(0);
-    let after_std = standardized.std_axis(0);
-
-    Ok(MlprepStandardizationReportData {
-        input_shape: input.shape().to_vec(),
-        input_values: input.as_slice().to_vec(),
-        before_mean: before_mean.as_slice().to_vec(),
-        before_std: before_std.as_slice().to_vec(),
-        output_shape: standardized.shape().to_vec(),
-        output_values: standardized.as_slice().to_vec(),
-        after_mean: after_mean.as_slice().to_vec(),
-        after_std: after_std.as_slice().to_vec(),
-    })
-}
-
-pub(crate) fn render_mlprep_standardization_report() -> Result<String, Box<dyn Error>> {
-    let data = mlprep_standardization_report_data()?;
+pub(crate) fn render_mlprep_standardization_report(
+    data: &MlprepStandardizationReportData,
+) -> Result<String, Box<dyn Error>> {
     let mut report = String::new();
     writeln!(report, "# matten mlprep-standardization report")?;
     writeln!(report)?;
@@ -1328,8 +1307,9 @@ pub(crate) fn render_mlprep_standardization_report() -> Result<String, Box<dyn E
     Ok(report)
 }
 
-pub(crate) fn render_mlprep_standardization_html_report() -> Result<String, Box<dyn Error>> {
-    let data = mlprep_standardization_report_data()?;
+pub(crate) fn render_mlprep_standardization_html_report(
+    data: &MlprepStandardizationReportData,
+) -> Result<String, Box<dyn Error>> {
     render_html_document(
         "matten mlprep-standardization report",
         "Fixed demo report, not automatic model-quality analysis.",

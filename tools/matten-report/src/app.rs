@@ -40,6 +40,15 @@ fn render_report(config: &Config) -> Result<String, Box<dyn Error>> {
         };
     }
 
+    if matches!(config.input, Input::Demo) && config.kind == ReportKind::MlprepStandardization {
+        let data = report::mlprep_standardization::build()?;
+        return match config.format {
+            OutputFormat::Markdown => render::render_mlprep_standardization_report(&data),
+            OutputFormat::Html => render::render_mlprep_standardization_html_report(&data),
+            OutputFormat::Json => render::render_mlprep_standardization_json_report(&data),
+        };
+    }
+
     if config.format == OutputFormat::Json {
         return match config.input {
             Input::Demo => render::render_fixed_demo_json_report(config.kind.as_str()),
@@ -60,7 +69,7 @@ fn render_report(config: &Config) -> Result<String, Box<dyn Error>> {
                 unreachable!("dynamic-readiness is dispatched with prebuilt report data")
             }
             (Input::Demo, ReportKind::MlprepStandardization) => {
-                render::render_mlprep_standardization_html_report()
+                unreachable!("mlprep-standardization is dispatched with prebuilt report data")
             }
             (Input::CsvPath { path }, ReportKind::DataReadiness) => {
                 let table = Table::from_csv_path(path).map_err(Box::<dyn Error>::from)?;
@@ -87,7 +96,7 @@ fn render_report(config: &Config) -> Result<String, Box<dyn Error>> {
             unreachable!("dynamic-readiness is dispatched with prebuilt report data")
         }
         (Input::Demo, ReportKind::MlprepStandardization) => {
-            render::render_mlprep_standardization_report()
+            unreachable!("mlprep-standardization is dispatched with prebuilt report data")
         }
         (Input::Demo, ReportKind::EducationalPath) => render::render_educational_path_report(),
         (Input::Demo, ReportKind::DataReadiness) => {
