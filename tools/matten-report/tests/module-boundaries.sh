@@ -10,6 +10,7 @@ SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd -- "$SCRIPT_DIR/../../.." && pwd)"
 REPO_ROOT="$(realpath -- "$REPO_ROOT")"
 REPORT_ROOT="$REPO_ROOT/tools/matten-report"
+MAX_RUST_LINES=500
 
 FAILED=0
 
@@ -127,7 +128,7 @@ check_tree() {
     local root="$1"
     local src="$root/src"
     local manifest="$root/Cargo.toml"
-    local file relative owner dependency
+    local file relative owner dependency line_count
     FAILED=0
 
     [[ -d "$src" ]] || fail "source directory is missing: $src"
@@ -148,6 +149,10 @@ check_tree() {
 
     while IFS= read -r file; do
         relative="${file#"$src"/}"
+        line_count="$(wc -l <"$file")"
+        if ((line_count > MAX_RUST_LINES)); then
+            finding "$file" "$line_count" "Rust source exceeds ${MAX_RUST_LINES}-line ceiling" "line count: $line_count"
+        fi
         scan_public_items "$file"
         case "$relative" in
             report.rs|report/*)
@@ -187,6 +192,7 @@ self_test() {
     local self_target="$REPO_ROOT/target/matten-report-boundaries"
     local fixture="$self_target/fixture"
     local output="$self_target/check.stderr"
+    local line
 
     mkdir -p -- "$self_target"
     self_target="$(realpath -- "$self_target")"
@@ -281,6 +287,21 @@ self_test() {
     printf 'pub(crate) struct Internal;\n' >"$fixture/src/request.rs"
     check_tree "$fixture" 2>"$output" || fail "self-test pub(crate) control unexpectedly failed"
     printf 'module-boundaries: self-test pub(crate)-control: PASS\n'
+
+    reset_fixture
+    : >"$fixture/src/main.rs"
+    for ((line = 1; line <= MAX_RUST_LINES + 1; line++)); do
+        printf '// line %s\n' "$line" >>"$fixture/src/main.rs"
+    done
+    expect_failure rust-file-size "exceeds ${MAX_RUST_LINES}-line ceiling"
+
+    reset_fixture
+    : >"$fixture/src/main.rs"
+    for ((line = 1; line <= MAX_RUST_LINES; line++)); do
+        printf '// line %s\n' "$line" >>"$fixture/src/main.rs"
+    done
+    check_tree "$fixture" 2>"$output" || fail "self-test Rust file size control unexpectedly failed"
+    printf 'module-boundaries: self-test rust-file-size-control: PASS\n'
     printf 'module-boundaries: self-test PASS\n'
     cleanup
     trap - EXIT

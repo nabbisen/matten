@@ -1,6 +1,6 @@
 # RFC-072: Behavior-Preserving `matten-report` Modularization
 
-**Status:** Proposed; implementation through Phase 3C reviewed and committed; Phase 3D private JSON extraction prepared for review; structural closure unauthorized
+**Status:** Proposed; implementation through Phase 3D reviewed and committed; Phase 4 structural closure prepared for full implementation review; lifecycle closure unauthorized
 **Target:** Post-0.37 maintainability work; release family undecided
 **Theme:** Split the local report tool into explicit internal ownership boundaries
 **Depends on:** RFC-063, RFC-065, RFC-068, RFC-069, RFC-070, RFC-071
