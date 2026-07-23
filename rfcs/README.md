@@ -89,21 +89,24 @@ The broader documentation ownership model is recorded in
 
 ## Proposed
 
-No RFCs are currently proposed.
+| ID | Title | Scope |
+|---:|---|---|
+| 073 | [Private Input-Mode JSON Report Policy](./proposed/073-private-input-mode-json-report-policy.md) | Policy-first decision for bounded private data-readiness CSV JSON; no implementation or release authorized |
 
 ## Remaining Themes And Issues
 
 RFC-070 is closed as an audit decision without public implementation. RFC-072
-is closed after its reviewed behavior-preserving modularization. The remaining
-themes below are not authorized unless their current status says so. The
-current post-0.37 backlog is:
+is closed after its reviewed behavior-preserving modularization. RFC-073 is the
+active policy-first decision for private input-mode JSON. The remaining themes
+below are not authorized unless their current status says so. The current
+post-0.37 backlog is:
 
 | Theme | Current authority | Current status |
 |---|---|---|
 | Public `matten-report` / `matten-viz` readiness | RFC-070, RFC-063, RFC-065, RFC-068, RFC-069, RFC-071 | RFC-070 closed after audit; no public crate or API authorized |
 | `matten-report` modularization | RFC-072, RFC-070 post-0.37 closure audit | Implemented and closed; internal ownership and size guards are established without behavior or public-surface change |
 | More input-mode HTML paths | RFC-069, post-0.36 RFC-069 closure audit | Deferred until a concrete report path is reviewed |
-| JSON / SVG / Vega-Lite report output | RFC-063, RFC-068, RFC-069, RFC-070 JSON policy audit, RFC-071 | Fixed-demo private JSON released in 0.37.0 under RFC-071; input-mode JSON, public JSON schemas, SVG, and Vega-Lite remain deferred |
+| JSON / SVG / Vega-Lite report output | RFC-063, RFC-068, RFC-069, RFC-070 JSON policy audit, RFC-071, RFC-073 | RFC-073 proposes bounded private input-mode data-readiness JSON; implementation, public schemas, SVG, and Vega-Lite remain unauthorized |
 | Streaming / large CSV | RFC-026, RFC-037 | Deferred; future implementation RFC must answer batch/schema/malformed-row/memory/sync-vs-async policy |
 | `matten-nalgebra` bridge | RFC-025, RFC-041, RFC-054 bridge-readiness handoff | Deferred; per-crate RFC required |
 | `matten-candle` bridge | RFC-025, RFC-049, RFC-054 bridge-readiness handoff | Deferred; per-crate RFC required |
@@ -330,3 +333,12 @@ family rendering, exact snapshots, hostile-input, and bounds tests are also
 committed. Phase 3D private JSON model/mappings/tests and Phase 4 structural
 closure are reviewed and committed. RFC-072 is terminal; further report-tool
 features require a separate RFC-first decision.
+
+RFC-073
+([`073-private-input-mode-json-report-policy.md`](./proposed/073-private-input-mode-json-report-policy.md))
+is the active policy-first candidate. It asks whether the existing
+data-readiness CSV input path may produce a bounded private schema-v0 JSON file
+for both successful and failed strict numeric conversion. It keeps raw CSV
+export, public schemas/APIs/crates, other input report kinds, broader formats,
+mathematics, bridges, implementation, and release work unauthorized. Acceptance
+would open only a detailed implementation handoff.
