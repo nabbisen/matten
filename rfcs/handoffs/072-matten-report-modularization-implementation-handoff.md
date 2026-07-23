@@ -3,7 +3,7 @@
 **Project:** `matten`
 **Related RFCs:** RFC-013, RFC-022, RFC-043, RFC-063, RFC-068, RFC-069, RFC-070, RFC-071, RFC-072
 **Document kind:** Detailed implementation handoff
-**Status:** Accepted; Slice 0/1 reviewed and committed; Phase 2 shape-flow family extraction prepared for review; later units unauthorized
+**Status:** Retained accepted implementation record; all phases reviewed and committed; RFC-072 lifecycle closed
 **Date:** 2026-07-21
 
 ---

@@ -85,24 +85,23 @@ The broader documentation ownership model is recorded in
 | 069 | [Input-Mode HTML Report Policy](./done/069-input-mode-html-report-policy.md) | 0.36.0 (`tools/matten-report` data-readiness input-mode HTML; public report/viz crates deferred) |
 | 070 | [Public Visualization and Report Readiness Audit](./done/070-public-visualization-report-readiness-audit.md) | post-0.37 audit decision; closed without public implementation |
 | 071 | [Private Fixed-Demo JSON Report Artifacts](./done/071-private-fixed-demo-json-report-artifacts.md) | 0.37.0 (`tools/matten-report` fixed-demo private JSON; public schema/crates deferred) |
+| 072 | [Behavior-Preserving `matten-report` Modularization](./done/072-matten-report-modularization.md) | post-0.37 internal modularization and structural closure; no behavior or public-surface change |
 
 ## Proposed
 
-| ID | Title | Scope |
-|---:|---|---|
-| 072 | [Behavior-Preserving `matten-report` Modularization](./proposed/072-matten-report-modularization.md) | Implementation through Phase 3D committed; Phase 4 structural closure prepared for full review |
+No RFCs are currently proposed.
 
 ## Remaining Themes And Issues
 
 RFC-070 is closed as an audit decision without public implementation. RFC-072
-is the active proposed modularization RFC. The remaining themes below are not
-authorized unless their current status says so. The current post-0.37 backlog
-is:
+is closed after its reviewed behavior-preserving modularization. The remaining
+themes below are not authorized unless their current status says so. The
+current post-0.37 backlog is:
 
 | Theme | Current authority | Current status |
 |---|---|---|
 | Public `matten-report` / `matten-viz` readiness | RFC-070, RFC-063, RFC-065, RFC-068, RFC-069, RFC-071 | RFC-070 closed after audit; no public crate or API authorized |
-| `matten-report` modularization | RFC-072, RFC-070 post-0.37 closure audit | Implementation through Phase 3D committed; Phase 4 structural closure prepared for full review; lifecycle closure unauthorized |
+| `matten-report` modularization | RFC-072, RFC-070 post-0.37 closure audit | Implemented and closed; internal ownership and size guards are established without behavior or public-surface change |
 | More input-mode HTML paths | RFC-069, post-0.36 RFC-069 closure audit | Deferred until a concrete report path is reviewed |
 | JSON / SVG / Vega-Lite report output | RFC-063, RFC-068, RFC-069, RFC-070 JSON policy audit, RFC-071 | Fixed-demo private JSON released in 0.37.0 under RFC-071; input-mode JSON, public JSON schemas, SVG, and Vega-Lite remain deferred |
 | Streaming / large CSV | RFC-026, RFC-037 | Deferred; future implementation RFC must answer batch/schema/malformed-row/memory/sync-vs-async policy |
@@ -305,17 +304,16 @@ broader mathematics, and new ecosystem bridges remain later candidates that
 require their own RFC decisions.
 
 RFC-072
-([`072-matten-report-modularization.md`](./proposed/072-matten-report-modularization.md))
-is the active design-first theme. Its original 5,023-line local report binary
+([`072-matten-report-modularization.md`](./done/072-matten-report-modularization.md))
+is implemented and closed. Its original 5,023-line local report binary
 now has a reviewed/committed process baseline, and Slice 1 separates the entry,
 request, CLI, orchestration, transitional renderer, output, and owned-test
 boundaries. Phase 2 report-model extraction and total app dispatch are also
 reviewed and committed; shared formatting, all five Markdown owners, all HTML
 document/security and family owners, and the private JSON model/policy/family
 mappings are also reviewed and committed. Phase 4 structural closure and the
-mechanical file-size ceiling are the current full implementation review point.
-These changes add no features,
-dependencies, public APIs, or release scope.
+mechanical file-size ceiling are reviewed and committed. These changes add no
+features, dependencies, public APIs, or release scope.
 
 The detailed RFC-072 handoff
 ([`072-matten-report-modularization-implementation-handoff.md`](./handoffs/072-matten-report-modularization-implementation-handoff.md))
@@ -329,6 +327,6 @@ data-readiness Markdown/list ownership, exact Markdown tests, and report-owned
 selection-error tests and is committed. The remaining four fixed-demo Markdown
 families and exact tests are also committed. Phase 3C HTML document/security,
 family rendering, exact snapshots, hostile-input, and bounds tests are also
-committed. Phase 3D private JSON model/mappings/tests are committed. Phase 4
-structural closure is prepared for full implementation review. RFC lifecycle
-closure remains unauthorized until acceptance and commit.
+committed. Phase 3D private JSON model/mappings/tests and Phase 4 structural
+closure are reviewed and committed. RFC-072 is terminal; further report-tool
+features require a separate RFC-first decision.

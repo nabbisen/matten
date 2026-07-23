@@ -1,6 +1,6 @@
 # RFC-072: Behavior-Preserving `matten-report` Modularization
 
-**Status:** Proposed; implementation through Phase 3D reviewed and committed; Phase 4 structural closure prepared for full implementation review; lifecycle closure unauthorized
+**Status:** Implemented; behavior-preserving modularization and structural closure reviewed and committed
 **Target:** Post-0.37 maintainability work; release family undecided
 **Theme:** Split the local report tool into explicit internal ownership boundaries
 **Depends on:** RFC-063, RFC-065, RFC-068, RFC-069, RFC-070, RFC-071
@@ -477,3 +477,22 @@ If this RFC is accepted:
 3. Obtain implementation review and commit the completed refactor.
 4. Then choose a separate next RFC among private input-mode JSON, broader
    mathematics, or a new ecosystem bridge.
+
+## 13. Implementation Outcome
+
+RFC-072 is complete. The implementation established a thin process entry
+point and private request, CLI-policy, application, report-model, renderer, and
+output owners. Every report family is constructed once before format dispatch;
+Markdown, HTML, and private JSON representations are owned by format/family
+modules; and `render` remains the intentional representation boundary.
+
+The final structural review confirmed the unchanged process anchors, all 59
+original tests plus one focused finite-number policy test, the full report-tool
+smoke matrix, crate-private visibility, unchanged Cargo metadata, and the
+mechanically enforced 500-line Rust-source ceiling. The largest Rust source or
+test file was 271 lines at closure.
+
+This terminal state authorizes no additional report format, public report
+schema or API, published report/viz crate, dependency, version, or release
+work. Private input-mode JSON, broader mathematics, and ecosystem bridges
+remain separate RFC-first candidates.
