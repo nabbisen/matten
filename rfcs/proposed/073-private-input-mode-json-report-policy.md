@@ -1,6 +1,6 @@
 # RFC-073: Private Input-Mode JSON Report Policy
 
-**Status:** Proposed; policy review required before implementation or handoff
+**Status:** Proposed; policy and detailed implementation handoff accepted; one implementation checkpoint authorized; release decision unauthorized
 **Target:** Post-0.37 local-tool policy; release family undecided
 **Theme:** Bounded private JSON for user-provided data-readiness input
 **Depends on:** RFC-001, RFC-037, RFC-069, RFC-070, RFC-071, RFC-072

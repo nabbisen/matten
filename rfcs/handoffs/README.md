@@ -59,6 +59,7 @@ working documents for the implementation team and may be revised as work proceed
 | `070-fixed-demo-json-report-implementation-handoff.md` | RFC-071 fixed-demo private JSON report implementation handoff, drafted from the RFC-070 audit line |
 | `070-post-037-public-visualization-closure-audit.md` | Accepted RFC-070 post-0.37 closure audit; recommends a separate modularization RFC |
 | `072-matten-report-modularization-implementation-handoff.md` | Retained accepted RFC-072 implementation record; all phases reviewed and committed, lifecycle closed |
+| `073-private-input-mode-json-implementation-handoff.md` | Accepted RFC-073 handoff; one bounded private data-readiness input JSON checkpoint authorized, release decision unauthorized |
 
 ## Documentation-governance handoffs
 
