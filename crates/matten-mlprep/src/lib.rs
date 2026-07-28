@@ -19,6 +19,7 @@
 //! - [`minmax_scale_columns`] — per-column scaling to `[0, 1]`.
 //! - [`add_bias_column`] — prepend a constant `1.0` intercept column.
 //! - [`train_test_split`] — ordered, deterministic row split.
+//! - [`train_test_split_seeded`] — seeded, shuffled, deterministic row split (RFC-077).
 //!
 //! ```
 //! use matten::Tensor;
@@ -35,8 +36,9 @@
 //! # Status
 //!
 //! **Production-ready candidate.** The small surface is stable; usable seriously
-//! if the documented limits are acceptable. Note that [`train_test_split`] is
-//! ordered-only (no shuffle). Constant (zero-variance) columns are rejected
+//! if the documented limits are acceptable. [`train_test_split`] is ordered
+//! (no shuffle); [`train_test_split_seeded`] provides a reproducible shuffled
+//! alternative (RFC-077). Constant (zero-variance) columns are rejected
 //! explicitly by the scalers rather than silently producing a zero column — see
 //! [`MattenMlprepError::ZeroVariance`]. Dynamic tensors are rejected at every
 //! public entry point unconditionally — the guard does not depend on the
@@ -60,4 +62,4 @@ mod util;
 pub use crate::bias::add_bias_column;
 pub use crate::error::MattenMlprepError;
 pub use crate::scale::{minmax_scale_columns, standardize_columns};
-pub use crate::split::train_test_split;
+pub use crate::split::{train_test_split, train_test_split_seeded};

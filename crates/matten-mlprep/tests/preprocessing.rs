@@ -2,7 +2,8 @@
 
 use matten::Tensor;
 use matten_mlprep::{
-    MattenMlprepError, add_bias_column, minmax_scale_columns, standardize_columns, train_test_split,
+    MattenMlprepError, add_bias_column, minmax_scale_columns, standardize_columns,
+    train_test_split, train_test_split_seeded,
 };
 
 fn approx(a: &[f64], b: &[f64]) {
@@ -115,6 +116,139 @@ fn split_that_empties_train_is_rejected() {
     let x = Tensor::new(vec![1.0, 2.0, 3.0], &[3, 1]);
     let err = train_test_split(&x, 0.1).unwrap_err();
     assert!(matches!(err, MattenMlprepError::EmptySplit { rows: 3, .. }));
+}
+
+// ── train_test_split_seeded (RFC-077) ─────────────────────────────────────
+
+#[test]
+fn seeded_split_is_reproducible() {
+    let x = Tensor::new((0..16).map(|v| v as f64).collect(), &[8, 2]);
+    let a = train_test_split_seeded(&x, 0.625, 42).unwrap();
+    let b = train_test_split_seeded(&x, 0.625, 42).unwrap();
+    assert_eq!(a.0.as_slice(), b.0.as_slice());
+    assert_eq!(a.1.as_slice(), b.1.as_slice());
+}
+
+/// Locks the exact permutation SplitMix64 + Fisher-Yates produce for a fixed
+/// input and seed. This is the test that makes the RFC-077 §6 reproducibility
+/// contract real: it fails if the PRNG constants, the shuffle direction, or
+/// the seed-to-state mapping ever change, rather than silently reshuffling
+/// every user's data on the next release.
+#[test]
+fn seeded_split_locked_permutation() {
+    let x = Tensor::new(vec![10.0, 20.0, 30.0, 40.0, 50.0], &[5, 1]);
+    let (train, test) = train_test_split_seeded(&x, 0.6, 7).unwrap();
+    assert_eq!(train.shape(), &[3, 1]);
+    assert_eq!(test.shape(), &[2, 1]);
+    assert_eq!(train.as_slice(), &[50.0, 20.0, 40.0]);
+    assert_eq!(test.as_slice(), &[10.0, 30.0]);
+}
+
+#[test]
+fn seeded_split_different_seeds_differ() {
+    // 10 rows so a coincidental match across two seeds is implausible.
+    let x = Tensor::new((0..10).map(|v| v as f64).collect(), &[10, 1]);
+    let (a, _) = train_test_split_seeded(&x, 0.5, 1).unwrap();
+    let (b, _) = train_test_split_seeded(&x, 0.5, 2).unwrap();
+    assert_ne!(a.as_slice(), b.as_slice());
+}
+
+#[test]
+fn seeded_split_size_parity_with_ordered_split() {
+    let x = Tensor::new((0..20).map(|v| v as f64).collect(), &[10, 2]);
+    let ordered = train_test_split(&x, 0.7).unwrap();
+    let seeded = train_test_split_seeded(&x, 0.7, 123).unwrap();
+    assert_eq!(ordered.0.shape(), seeded.0.shape());
+    assert_eq!(ordered.1.shape(), seeded.1.shape());
+}
+
+#[test]
+fn seeded_split_permutation_integrity() {
+    // train ∪ test, as a sorted row multiset, must equal the input's rows
+    // exactly: no row lost, duplicated, or corrupted across the boundary.
+    let x = Tensor::new((0..16).map(|v| v as f64).collect(), &[8, 2]);
+    let (train, test) = train_test_split_seeded(&x, 0.625, 42).unwrap();
+
+    let mut rows: Vec<[u64; 2]> = train
+        .as_slice()
+        .chunks(2)
+        .chain(test.as_slice().chunks(2))
+        .map(|r| [r[0].to_bits(), r[1].to_bits()])
+        .collect();
+    let mut expected: Vec<[u64; 2]> = x
+        .as_slice()
+        .chunks(2)
+        .map(|r| [r[0].to_bits(), r[1].to_bits()])
+        .collect();
+    rows.sort();
+    expected.sort();
+    assert_eq!(rows, expected);
+}
+
+#[test]
+fn seeded_split_shuffles_rows_not_values() {
+    // Every output row must match some *complete* input row — catches an
+    // off-by-one or misaligned stride in the gather step, which would
+    // otherwise produce right-shaped, silently-corrupt tensors.
+    let x = Tensor::new((0..16).map(|v| v as f64).collect(), &[8, 2]);
+    let input_rows: Vec<&[f64]> = x.as_slice().chunks(2).collect();
+    let (train, test) = train_test_split_seeded(&x, 0.625, 42).unwrap();
+    for row in train.as_slice().chunks(2).chain(test.as_slice().chunks(2)) {
+        assert!(
+            input_rows.contains(&row),
+            "output row {row:?} does not match any complete input row"
+        );
+    }
+}
+
+#[test]
+fn seeded_split_error_parity_with_ordered_split() {
+    let v = Tensor::from_vec(vec![1.0, 2.0, 3.0]); // rank-1
+    assert!(matches!(
+        train_test_split_seeded(&v, 0.5, 0),
+        Err(MattenMlprepError::ExpectedMatrix { .. })
+    ));
+
+    let x = Tensor::new(vec![1.0, 2.0, 3.0, 4.0], &[4, 1]);
+    for r in [0.0, 1.0, -0.5, 1.5, f64::NAN, f64::INFINITY] {
+        assert!(matches!(
+            train_test_split_seeded(&x, r, 0),
+            Err(MattenMlprepError::InvalidRatio(_))
+        ));
+    }
+
+    // 3 rows * 0.1 = 0.3 -> floor 0 train rows, same as the ordered split.
+    let small = Tensor::new(vec![1.0, 2.0, 3.0], &[3, 1]);
+    let err = train_test_split_seeded(&small, 0.1, 0).unwrap_err();
+    assert!(matches!(err, MattenMlprepError::EmptySplit { rows: 3, .. }));
+}
+
+#[cfg(feature = "dynamic")]
+#[test]
+fn seeded_split_dynamic_input_is_rejected_not_panicked() {
+    use matten::Element;
+    let t = Tensor::from_elements(
+        vec![
+            Element::Float(1.0),
+            Element::None,
+            Element::Int(3),
+            Element::Float(4.0),
+        ],
+        &[2, 2],
+    );
+    assert!(matches!(
+        train_test_split_seeded(&t, 0.5, 0),
+        Err(MattenMlprepError::DynamicTensor)
+    ));
+}
+
+#[test]
+fn ordered_split_still_passes_unchanged() {
+    // Existing train_test_split behaviour is untouched by the seeded addition.
+    let x = Tensor::new(vec![10.0, 20.0, 30.0, 40.0, 50.0], &[5, 1]);
+    let (train, test) = train_test_split(&x, 0.6).unwrap();
+    assert_eq!(train.as_slice(), &[10.0, 20.0, 30.0]);
+    assert_eq!(test.as_slice(), &[40.0, 50.0]);
 }
 
 // ── shape / dynamic guards ────────────────────────────────────────────────

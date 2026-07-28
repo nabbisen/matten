@@ -63,8 +63,11 @@ let (train, test) = train_test_split(&z, 0.75)?;
   deliberately.
 - **`add_bias_column` prepends** the `1.0` column (intercept at index 0).
 - **`train_test_split` is ordered and deterministic** — `first floor(n*ratio)`
-  rows are train, the rest are test. No shuffle. (A seeded variant is planned;
-  see RFC-024 §6.)
+  rows are train, the rest are test. No shuffle.
+- **`train_test_split_seeded` is shuffled and deterministic** (RFC-077) — same
+  `n_train` formula, but row order comes from a seeded Fisher-Yates shuffle
+  (dependency-free SplitMix64 PRNG, RFC-024 §6). Same `(x, ratio, seed)`
+  always reproduces the same split.
 - **Dynamic tensors are rejected, not panicked** — regardless of whether the
   companion `dynamic` feature is enabled (RFC-031).
 
@@ -77,6 +80,8 @@ pub fn standardize_columns(x: &Tensor) -> Result<Tensor, MattenMlprepError>;
 pub fn minmax_scale_columns(x: &Tensor) -> Result<Tensor, MattenMlprepError>;
 pub fn add_bias_column(x: &Tensor)      -> Result<Tensor, MattenMlprepError>;
 pub fn train_test_split(x: &Tensor, train_ratio: f64)
+    -> Result<(Tensor, Tensor), MattenMlprepError>;
+pub fn train_test_split_seeded(x: &Tensor, train_ratio: f64, seed: u64)
     -> Result<(Tensor, Tensor), MattenMlprepError>;
 
 #[non_exhaustive]
@@ -97,8 +102,9 @@ pub enum MattenMlprepError {
 - **No data cleaning.** `NaN`/`Inf` propagate to the output; clean your data
   first (e.g. via the core `dynamic` on-ramp) if it is not already numeric-clean.
 - **Population std.** `standardize_columns` divides by `n` (not `n-1`).
-- **Ordered split only.** `train_test_split` does not shuffle. A seeded shuffled
-  variant is planned but not yet available (RFC-024 §6).
+- **Two split modes.** `train_test_split` is ordered (no shuffle);
+  `train_test_split_seeded` (RFC-077) shuffles rows deterministically from a
+  `u64` seed.
 - **Not for large/streaming data.** These are eager, in-memory transforms.
 
 ## Compatibility
