@@ -177,8 +177,15 @@ first (a maturity-neutral package description; `required-features = ["csv"]` on 
 examples). Label/docs/packaging only — no API, runtime, error-variant, or dependency change, and
 **no scope expansion**: the RFC-042 lock holds (still a CSV→tensor on-ramp, not a dataframe
 engine). Full production-ready is deferred to a separate future review. This does **not** imply
-v1.0. The ladder now reads `matten-ndarray` production-ready, `matten-mlprep` and `matten-data`
+v1.0. The ladder then read `matten-ndarray` production-ready, `matten-mlprep` and `matten-data`
 production-ready candidates.
+
+`matten-mlprep` was subsequently promoted from **production-ready candidate** to
+**production-ready** (RFC-080), now that RFC-058 §5.1's Option B exit criterion is satisfied:
+RFC-077 added `train_test_split_seeded`, closing the ordered-only-split caveat that held the
+promotion at candidate. Label/docs only — no API, runtime, error-variant, dependency, or version
+change, and no other crate's maturity changes. `matten-data` remains production-ready candidate
+for its own separate reasons; `matten-stats` remains Experimental.
 
 The **v0.28 family** moves the `matten-ndarray` bridge to **`ndarray` 0.17** (RFC-062): the
 supported requirement changes from the `0.16` minor to `0.17` (CI targets `0.17.2`). Because

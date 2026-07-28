@@ -76,7 +76,7 @@ fi
 
 echo "=== Checking matten-mlprep does not claim Experimental status ==="
 if grep -in "Experimental (0\." "$MLPREP/src/lib.rs"; then
-  echo "ERROR: matten-mlprep lib.rs still claims Experimental (0.x) status (should be beta)"
+  echo "ERROR: matten-mlprep lib.rs still claims Experimental (0.x) status (should be production-ready)"
   FAIL=1
 fi
 
@@ -389,16 +389,25 @@ if grep -rInE 'production-ready candidate' \
 fi
 
 # ---------------------------------------------------------------------------
-# matten-mlprep maturity-label freshness (RFC-058)
+# matten-mlprep maturity-label freshness (RFC-058, RFC-080)
 # ---------------------------------------------------------------------------
-# matten-mlprep is production-ready candidate as of v0.26.0. Its own current-status
-# files must not still carry a "Beta" maturity label. Historical contexts
-# (CHANGELOG, rfcs/, maturity-progression narrative) are intentionally NOT scanned.
+# matten-mlprep was production-ready candidate as of v0.26.0 (RFC-058), then promoted to
+# production-ready (RFC-080), now that RFC-058 §5.1's Option B exit criterion (a shuffled/seeded
+# split, RFC-077) is satisfied. Its own current-status files must not regress to "Beta" (two
+# rungs back) or still claim "candidate" (one rung back). Historical contexts (CHANGELOG, rfcs/,
+# maturity-progression narrative) are intentionally NOT scanned.
 if grep -rInE '\bBeta\b' \
      crates/matten-mlprep/README.md \
      crates/matten-mlprep/src/lib.rs \
      crates/matten-mlprep/Cargo.toml 2>/dev/null; then
-  echo "ERROR: stale 'Beta' label in matten-mlprep status files (now production-ready candidate)"
+  echo "ERROR: stale 'Beta' label in matten-mlprep status files (now production-ready)"
+  FAIL=1
+fi
+if grep -rInEi 'production-ready candidate' \
+     crates/matten-mlprep/README.md \
+     crates/matten-mlprep/src/lib.rs \
+     crates/matten-mlprep/Cargo.toml 2>/dev/null; then
+  echo "ERROR: stale 'production-ready candidate' label in matten-mlprep status files (now production-ready)"
   FAIL=1
 fi
 

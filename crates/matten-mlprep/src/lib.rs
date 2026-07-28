@@ -35,8 +35,8 @@
 //!
 //! # Status
 //!
-//! **Production-ready candidate.** The small surface is stable; usable seriously
-//! if the documented limits are acceptable. [`train_test_split`] is ordered
+//! **Production-ready.** The small surface is stable; usable seriously
+//! within the documented limits. [`train_test_split`] is ordered
 //! (no shuffle); [`train_test_split_seeded`] provides a reproducible shuffled
 //! alternative (RFC-077). Constant (zero-variance) columns are rejected
 //! explicitly by the scalers rather than silently producing a zero column — see

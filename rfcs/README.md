@@ -92,6 +92,7 @@ The broader documentation ownership model is recorded in
 | 077 | [Seeded Train/Test Split for `matten-mlprep`](./done/077-seeded-train-test-split.md) | Implemented and reviewed (GO, no conditions), `e9b87fd`; pre-v1 additive API on `0.38.x`; no release |
 | 078 | [`matten-stats` Companion Crate](./done/078-matten-stats-companion.md) | Implemented and reviewed (GO, no conditions), `3ab3864`; fifth published crate, Experimental maturity; no release |
 | 079 | [`0.39.0` Pre-v1 Feature Release](./done/079-0390-pre-v1-feature-release.md) | Reviewed (GO, no conditions), committed, and released as `0.39.0` (tagged and published). Scope was narrowed to RFC-077 only, deferring `matten-stats`'s first publication — but the actual publish included it anyway; see §13 and the `0.39.0` post-release alignment |
+| 080 | [Promote `matten-mlprep` to Production-Ready](./done/080-matten-mlprep-production-ready.md) | Reviewed and accepted (GO, conditional on three corrections, all applied); label-only promotion, closing RFC-058 §5.1's Option B exit criterion via RFC-077; no code, version, or release |
 
 ## Proposed
 
@@ -126,7 +127,7 @@ their current status says so. The current post-0.38 backlog is:
 | Benchmark hard gates | RFC-049 | Phases 1-3 implemented; Phase 4 hard gates extracted to future RFC/release-policy ownership |
 | Broader stats APIs / `matten-stats` | RFC-040 | Core `var`/`std` shipped; covariance/correlation/quantile/histogram/z-score require future RFC |
 | Broader linalg / linalg companion | RFC-041 | Core `norm`/`trace`/`outer` shipped; inverse/determinant/decomposition/BLAS/sparse scope requires future RFC |
-| Companion full-production decisions | RFC-057, RFC-058, RFC-059, RFC-067 | `matten-ndarray` is production-ready; `matten-mlprep` and `matten-data` are production-ready candidates; further promotion requires explicit review |
+| Companion full-production decisions | RFC-057, RFC-058, RFC-059, RFC-067, RFC-080 | `matten-ndarray` and `matten-mlprep` are production-ready (RFC-080 promoted `matten-mlprep`, closing RFC-058 §5.1's Option B exit criterion via RFC-077); `matten-data` remains production-ready candidate; `matten-stats` remains Experimental; further promotion requires explicit review |
 
 Implementation handoffs for the v0.20+ proposed set (RFC-033–042), the examples
 program (RFC-043–048), and the benchmarking program (RFC-049) live in

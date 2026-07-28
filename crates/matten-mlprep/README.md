@@ -4,9 +4,9 @@
 [![Docs.rs](https://docs.rs/matten-mlprep/badge.svg)](https://docs.rs/matten-mlprep)
 [![license](https://img.shields.io/crates/l/matten-mlprep.svg)](../../LICENSE)
 
-> **Production-ready candidate (`0.39.x` family).** Small, transparent, deterministic preprocessing helpers for
+> **Production-ready (`0.39.x` family).** Small, transparent, deterministic preprocessing helpers for
 > [`matten::Tensor`](https://crates.io/crates/matten). Not an ML framework. The
-> API is intended to be mostly stable but is still pre-1.0; pin the minor version.
+> API is stable; still pre-1.0, so pin the minor version.
 
 Part of the [`matten` workspace](../../README.md) — see it for the full family.
 

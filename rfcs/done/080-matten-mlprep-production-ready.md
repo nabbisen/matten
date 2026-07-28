@@ -1,6 +1,9 @@
 # RFC-080: Promote `matten-mlprep` to Production-Ready
 
-**Status:** Proposed; maturity-label decision only, no code or release change
+**Status:** Implemented — reviewed and accepted (GO, conditional on three corrections — a
+corrected six-site list, a new maturity guard for `matten-mlprep`, and recording RFC-076's
+resulting staleness — all applied). `matten-mlprep` is production-ready at every status site;
+maturity-label decision only, no code, API, version, or release change
 **Target:** Post-`0.39.0` maturity decision on the `0.x` line; release family undecided
 **Theme:** Take the promotion review RFC-058 deferred, now that RFC-058 §5.1's Option B is satisfied
 **Depends on:** RFC-024, RFC-057, RFC-058, RFC-067, RFC-077
@@ -146,6 +149,13 @@ it does not imply matten-stats is near promotion — that crate is Experimental
 family. This promotion reduces how much that provision must carry, but does not remove the need for it —
 `matten-data` is still a candidate, and `matten-stats` raises the separate, unanswered question of whether a
 1.0 family may include an `Experimental` crate (RFC-079 §9).
+
+**Consequence for RFC-076 (recorded, not fixed here):** `rfcs/proposed/076-v1-release-preparation.md`'s
+RFC-067 family maturity table (§5) still lists `matten-mlprep` as `production-ready candidate (RFC-058)`.
+That becomes stale the moment this RFC is accepted. RFC-076 is proposed and unexecuted, so nothing breaks
+today, but this joins its existing staleness (the four-crate-family assumption from RFC-078/079, and the
+unanswered question of whether a v1.0 family may include an `Experimental` crate). RFC-076 is out of scope
+for this slice and is not edited here; its maturity table is corrected whenever RFC-076 is next revised.
 
 ## 9. Acceptance criteria
 
