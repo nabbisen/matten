@@ -94,7 +94,7 @@ The broader documentation ownership model is recorded in
 
 | ID | Title | Scope |
 |---:|---|---|
-| 076 | [v1.0 Release Preparation](./proposed/076-v1-release-preparation.md) | Reviewed and accepted (GO, no conditions); implementation authorized; no tag or publish |
+| 076 | [v1.0 Release Preparation](./proposed/076-v1-release-preparation.md) | Reviewed and accepted (GO, no conditions); execution deferred pending pre-v1 feature work (RFC-077, RFC-078); no implementation authorized |
 
 ## Remaining Themes And Issues
 
@@ -110,7 +110,7 @@ their current status says so. The current post-0.38 backlog is:
 
 | Theme | Current authority | Current status |
 |---|---|---|
-| v1.0 readiness | RFC-066, RFC-067, RFC-074, RFC-075, RFC-076 | RFC-074 (audit) and RFC-075 (MD-2/serde/maturity-table decision) closed; RFC-076 (release preparation) reviewed and accepted (GO, no conditions), implementation authorized; tag/publish remain a separate maintainer-authorized step |
+| v1.0 readiness | RFC-066, RFC-067, RFC-074, RFC-075, RFC-076 | RFC-074 (audit) and RFC-075 (MD-2/serde/maturity-table decision) closed; RFC-076 (release preparation) reviewed and accepted (GO, no conditions), but execution is deferred pending pre-v1 feature work (RFC-077, RFC-078); no v1.0 implementation is currently authorized |
 | Public `matten-report` / `matten-viz` readiness | RFC-070, RFC-063, RFC-065, RFC-068, RFC-069, RFC-071 | RFC-070 closed after audit; no public crate or API authorized |
 | `matten-report` modularization | RFC-072, RFC-070 post-0.37 closure audit | Implemented and closed; internal ownership and size guards are established without behavior or public-surface change |
 | More input-mode HTML paths | RFC-069, post-0.36 RFC-069 closure audit | Deferred until a concrete report path is reviewed |
@@ -445,8 +445,18 @@ independently re-reviewed: the three `#[doc(hidden)]` slice-plumbing items
 `1.0.0` promise rather than excluded, and `cargo public-api` is recorded as
 **not required** for this release — both decisions dated, attributed, and
 reasoned rather than silently applied. The final review was **GO, no
-conditions**; implementation is authorized. RFC-076 authorizes no tag or
-crates.io publish; Unit 3 (release execution) remains a separate,
-maintainer-authorized step after this release-prep commit is reviewed and
-committed, and is the point at which the project's choices stop being
-reversible.
+conditions**.
+
+**Execution status: deferred.** An implementation attempt was made and then
+fully reverted at the owner's explicit instruction, because it proceeded
+without the owner's direct confirmation of the version bump specifically —
+review acceptance is not the same authority as the owner's go-ahead to
+execute. **No RFC-076 implementation is currently authorized.** The owner has
+since directed that pre-v1 feature work (RFC-077's seeded train/test split,
+RFC-078's `matten-stats` companion proposal) proceed first on the `0.38.x`
+line while RFC-076 remains accepted-but-unexecuted. `0.38.0` remains the
+current released version. RFC-076 authorizes no tag or crates.io publish in
+any case; Unit 3 (release execution) remains a separate, maintainer-authorized
+step required after a future release-prep commit is reviewed, committed, and
+explicitly re-authorized to proceed — the point at which the project's
+choices stop being reversible.
