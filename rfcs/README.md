@@ -90,19 +90,25 @@ The broader documentation ownership model is recorded in
 
 ## Proposed
 
-_None currently proposed._
+| ID | Title | Scope |
+|---:|---|---|
+| 074 | [v1.0 Readiness Re-Audit](./proposed/074-v1-readiness-reaudit.md) | Audit-only; no implementation, version bump, or release authorized |
 
 ## Remaining Themes And Issues
 
 RFC-070 is closed as an audit decision without public implementation. RFC-072
 is closed after its reviewed behavior-preserving modularization. RFC-073's
 private input-mode JSON implementation is reviewed (GO, no conditions),
-committed, and released in `0.38.0`. The remaining themes below are not
-authorized unless their current status says so. The current post-0.38 backlog
-is:
+committed, and released in `0.38.0`. A post-`0.38.0` assessment found eight
+consecutive releases (`0.31.0` -> `0.38.0`) with zero published-crate change
+and recommended re-running the RFC-066 v1.0 readiness audit rather than
+picking the next implementation theme by intuition; RFC-074 opens that
+audit-only re-audit. The remaining themes below are not authorized unless
+their current status says so. The current post-0.38 backlog is:
 
 | Theme | Current authority | Current status |
 |---|---|---|
+| v1.0 readiness | RFC-066, RFC-067, RFC-074 | RFC-066 stale since v0.31.0; RFC-074 proposed as an audit-only re-audit given eight consumer-invisible releases |
 | Public `matten-report` / `matten-viz` readiness | RFC-070, RFC-063, RFC-065, RFC-068, RFC-069, RFC-071 | RFC-070 closed after audit; no public crate or API authorized |
 | `matten-report` modularization | RFC-072, RFC-070 post-0.37 closure audit | Implemented and closed; internal ownership and size guards are established without behavior or public-surface change |
 | More input-mode HTML paths | RFC-069, post-0.36 RFC-069 closure audit | Deferred until a concrete report path is reviewed |
@@ -354,3 +360,26 @@ conditional on one fixed ROADMAP history-row gap) and committed. `matten`,
 `matten-ndarray`, `matten-mlprep`, and `matten-data` `0.38.0` are tagged and
 published to crates.io. RFC-073 is terminal; further report-tool features
 require a separate RFC-first decision.
+
+A post-`0.38.0` release-confirmation assessment
+(`matten-post-0380-next-theme-assessment-v0.1.md`) confirmed the release
+completed cleanly with no outstanding work, then found that
+`0.31.0` -> `0.38.0` — eight releases — shipped zero functional change to any
+published crate: the entire span's `crates/*/src/` diff is nine doc-comment
+version-string lines in `crates/matten/src/lib.rs`. It recommended re-running
+the RFC-066 v1.0 readiness audit as the next theme rather than picking among
+the RFC-070 remaining-themes backlog by intuition, since RFC-066 is stale by
+exactly the length of that drift and an audit produces a ranked,
+evidence-based answer instead of a guess.
+
+RFC-074
+([`074-v1-readiness-reaudit.md`](./proposed/074-v1-readiness-reaudit.md))
+opens that audit-only re-audit. It re-measures RFC-066's original findings,
+asks whether the published `Tensor` contract/error model/boundary APIs are
+v1-stable, classifies deferred stats/linalg/streaming scope as v1-blocking or
+post-v1, asks whether `matten-mlprep`/`matten-data` should be recommended for
+promotion to production-ready, and asks whether RFC-030 lock-step versioning
+still serves the family given the observed drift — treated as a first-class
+question, not a footnote. It authorizes no implementation, version bump,
+maturity promotion, public API change, or release action; any finding it
+produces still requires a separate implementation RFC before code changes.
