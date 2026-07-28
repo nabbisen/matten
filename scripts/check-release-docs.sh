@@ -332,6 +332,28 @@ if ! awk '
 fi
 
 # ---------------------------------------------------------------------------
+# ROADMAP header / document-history parity (RFC-073 0.38.0 release-prep review)
+# ---------------------------------------------------------------------------
+# The header's Document Version/Date must equal the LAST row of the
+# document-history table, mirroring the CHANGELOG top-heading check above. A
+# 0.38.0 release-prep pass bumped the header without appending its history
+# row and no existing guard caught it; this check closes that gap.
+
+echo "=== Checking ROADMAP.md header matches the last document-history row ==="
+RM_HEADER_VERSION="$(grep -m1 -oE '\*\*Document Version:\*\* `[0-9]+\.[0-9]+\.[0-9]+`' ROADMAP.md | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')"
+RM_HEADER_DATE="$(grep -m1 -oE '\*\*Date:\*\* [0-9]{4}-[0-9]{2}-[0-9]{2}' ROADMAP.md | grep -oE '[0-9]{4}-[0-9]{2}-[0-9]{2}')"
+RM_LAST_ROW="$(grep -E '^\| [0-9]+\.[0-9]+\.[0-9]+ \| [0-9]{4}-[0-9]{2}-[0-9]{2} \|' ROADMAP.md | tail -1)"
+RM_LAST_VERSION="$(echo "$RM_LAST_ROW" | awk -F'|' '{gsub(/ /,"",$2); print $2}')"
+RM_LAST_DATE="$(echo "$RM_LAST_ROW" | awk -F'|' '{gsub(/ /,"",$3); print $3}')"
+if [ -z "$RM_HEADER_VERSION" ] || [ -z "$RM_HEADER_DATE" ] || [ -z "$RM_LAST_VERSION" ] || [ -z "$RM_LAST_DATE" ]; then
+  echo "ERROR: failed to parse ROADMAP.md Document Version/Date header or last document-history row"
+  FAIL=1
+elif [ "$RM_HEADER_VERSION" != "$RM_LAST_VERSION" ] || [ "$RM_HEADER_DATE" != "$RM_LAST_DATE" ]; then
+  echo "ERROR: ROADMAP.md header (Document Version $RM_HEADER_VERSION / Date $RM_HEADER_DATE) does not match the last document-history row ($RM_LAST_VERSION / $RM_LAST_DATE)"
+  FAIL=1
+fi
+
+# ---------------------------------------------------------------------------
 # matten-ndarray maturity-label freshness (RFC-057)
 # ---------------------------------------------------------------------------
 # matten-ndarray is production-ready as of v0.25.0. Its own current-status files
