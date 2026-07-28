@@ -90,13 +90,13 @@ The broader documentation ownership model is recorded in
 | 074 | [v1.0 Readiness Re-Audit](./done/074-v1-readiness-reaudit.md) | post-0.38 audit; accepted, conditionally-ready verdict; no v1.0 release authorized |
 | 075 | [v1.0 Release Decision](./done/075-v1-release-decision.md) | MD-2 resolved, serde format declared stable, RFC-067 family maturity table recorded; no v1.0 release authorized |
 | 077 | [Seeded Train/Test Split for `matten-mlprep`](./done/077-seeded-train-test-split.md) | Implemented and reviewed (GO, no conditions), `e9b87fd`; pre-v1 additive API on `0.38.x`; no release |
+| 078 | [`matten-stats` Companion Crate](./done/078-matten-stats-companion.md) | Implemented and reviewed (GO, no conditions), `3ab3864`; fifth published crate, Experimental maturity; no release |
 
 ## Proposed
 
 | ID | Title | Scope |
 |---:|---|---|
 | 076 | [v1.0 Release Preparation](./proposed/076-v1-release-preparation.md) | Reviewed and accepted (GO, no conditions); execution deferred pending pre-v1 feature work (RFC-077, RFC-078); no implementation authorized |
-| 078 | [`matten-stats` Companion Crate](./proposed/078-matten-stats-companion.md) | Reviewed and accepted (GO, conditional on two mechanical handoff corrections, both applied); implemented on the `0.38.x` line (fifth published crate, Experimental maturity); no version bump or release |
 
 ## Remaining Themes And Issues
 
@@ -113,7 +113,7 @@ their current status says so. The current post-0.38 backlog is:
 | Theme | Current authority | Current status |
 |---|---|---|
 | v1.0 readiness | RFC-066, RFC-067, RFC-074, RFC-075, RFC-076 | RFC-074 (audit) and RFC-075 (MD-2/serde/maturity-table decision) closed; RFC-076 (release preparation) reviewed and accepted (GO, no conditions), but execution is deferred pending pre-v1 feature work (RFC-077, RFC-078); no v1.0 implementation is currently authorized |
-| Pre-v1 feature work | RFC-077, RFC-078 | RFC-077 (`train_test_split_seeded`) implemented and reviewed (GO, no conditions), closed; RFC-078 (`matten-stats` companion) reviewed (GO, conditional, corrections applied) and implemented; family grows to five published crates; RFC-076 must be updated for five crates before it is executed |
+| Pre-v1 feature work | RFC-077, RFC-078 | Both implemented, reviewed (GO, no conditions), and closed. RFC-040's small-statistics theme is now *partially* addressed by RFC-078 (`covariance`, `correlation`, `quantile` shipped in `matten-stats`); histogram, z-score, percentile aliases, skew, kurtosis, and matrix-wide/axis-wise variants remain deferred — histogram specifically still blocks on RFC-040 §8's unresolved bin-selection policy. Family grows to five published crates; RFC-076 must be updated for five crates before it is executed |
 | Public `matten-report` / `matten-viz` readiness | RFC-070, RFC-063, RFC-065, RFC-068, RFC-069, RFC-071 | RFC-070 closed after audit; no public crate or API authorized |
 | `matten-report` modularization | RFC-072, RFC-070 post-0.37 closure audit | Implemented and closed; internal ownership and size guards are established without behavior or public-surface change |
 | More input-mode HTML paths | RFC-069, post-0.36 RFC-069 closure audit | Deferred until a concrete report path is reviewed |
@@ -487,8 +487,8 @@ RFC-077 is closed; it authorized no version bump or release, and none
 occurred.
 
 RFC-078
-([`078-matten-stats-companion.md`](./proposed/078-matten-stats-companion.md))
-adds `matten-stats`, the fifth published crate, at **Experimental** maturity
+([`078-matten-stats-companion.md`](./done/078-matten-stats-companion.md))
+added `matten-stats`, the fifth published crate, at **Experimental** maturity
 (RFC-040 §9's pre-decided rung for a crate with no usage history). It
 provides three scalar statistics RFC-040 §8 deliberately kept out of core:
 `covariance`, `correlation` (both sample, `ddof = 1`, diverging deliberately
@@ -505,6 +505,21 @@ tensor → `Empty`" test is unconstructible; the tests and crate README were
 adjusted to cover what is actually reachable (`covariance`/`correlation`'s
 real `n = 1` case) rather than silently dropping the scenario. Full gate set
 green, including MSRV and `cargo package --workspace` packaging all five
-crates. RFC-078 authorizes no version bump or release; RFC-076's
-release-prep specification now assumes four crates and must be updated
-before it is executed.
+crates. The implementation was committed (`3ab3864`) without a prior
+implementation review, despite the RFC-078 review's own recommendation to
+review this slice before committing (a new published crate is permanent once
+released). The post-commit review re-verified the three algorithms against
+RFC-078 §4 line by line and proved the `ddof = 1` policy by mutation
+(flipping covariance's `n-1` divisor to `n` correctly failed two tests,
+including the one asserting `cov(x,x)` equals the sample variance). It also
+confirmed all six guard scripts pass — three edited, one (`check-streaming-
+scope.sh`) correctly left alone since it auto-covers the new crate — and that
+the four existing crates are untouched. Final review: **GO, no conditions**.
+Two standing items remain, neither a defect: the `ddof = 1` divergence has
+still never been reviewed by anyone who did not propose it, and
+review-before-commit did not happen for this slice even though it was
+specifically recommended — both are noted for the next comparable slice, not
+fixed here. RFC-078 is closed; it authorized no version bump or release, and
+none occurred. RFC-076's release-prep specification now assumes four crates
+and must be updated before it is executed — before this closure, that was
+advisory; it is now a hard precondition, since RFC-078 has shipped.

@@ -1,6 +1,6 @@
 # RFC-078: `matten-stats` Companion Crate
 
-**Status:** Reviewed and accepted (GO, conditional on two mechanical handoff corrections, both applied); implemented on the `0.38.x` line; no version bump or release authorized
+**Status:** Implemented — reviewed (GO, no conditions, `matten-rfc078-implementation-review-v0.1.md`), committed `3ab3864`; fifth published crate, Experimental maturity, pre-v1 on the `0.38.x` line; no release authorized
 **Target:** Pre-`1.0.0` feature work on the `0.x` line; release family undecided
 **Theme:** Create the `matten-stats` companion RFC-040 §9 anticipated, with the three statistics APIs
 core deliberately does not carry
