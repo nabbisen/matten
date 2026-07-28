@@ -92,7 +92,9 @@ The broader documentation ownership model is recorded in
 
 ## Proposed
 
-_None currently proposed._
+| ID | Title | Scope |
+|---:|---|---|
+| 076 | [v1.0 Release Preparation](./proposed/076-v1-release-preparation.md) | Reviewed and accepted (GO, no conditions); implementation authorized; no tag or publish |
 
 ## Remaining Themes And Issues
 
@@ -108,7 +110,7 @@ their current status says so. The current post-0.38 backlog is:
 
 | Theme | Current authority | Current status |
 |---|---|---|
-| v1.0 readiness | RFC-066, RFC-067, RFC-074, RFC-075 | RFC-074 (audit) and RFC-075 (MD-2/serde/maturity-table decision) both accepted and closed; a separate future v1.0 release-prep RFC is required before any release action; no v1.0 release authorized |
+| v1.0 readiness | RFC-066, RFC-067, RFC-074, RFC-075, RFC-076 | RFC-074 (audit) and RFC-075 (MD-2/serde/maturity-table decision) closed; RFC-076 (release preparation) reviewed and accepted (GO, no conditions), implementation authorized; tag/publish remain a separate maintainer-authorized step |
 | Public `matten-report` / `matten-viz` readiness | RFC-070, RFC-063, RFC-065, RFC-068, RFC-069, RFC-071 | RFC-070 closed after audit; no public crate or API authorized |
 | `matten-report` modularization | RFC-072, RFC-070 post-0.37 closure audit | Implemented and closed; internal ownership and size guards are established without behavior or public-surface change |
 | More input-mode HTML paths | RFC-069, post-0.36 RFC-069 closure audit | Deferred until a concrete report path is reviewed |
@@ -422,7 +424,29 @@ unfired for eight releases. RFC-075 authorizes no v1.0 release, version
 bump, tag, publish, API change, dependency change, or maturity promotion; a
 separate future v1.0 release-prep RFC (Unit 2) is required before any
 release action, and must run the full gate set (clippy, full feature
-matrix, doctests, MSRV, an actually-executed `cargo public-api` snapshot,
-`cargo package`) this documentation-only line did not run, and must
-reproduce the RFC-067 family maturity table in full rather than merely
-citing RFC-075.
+matrix, doctests, MSRV, `cargo package`) this documentation-only line did
+not run, and must reproduce the RFC-067 family maturity table in full
+rather than merely citing RFC-075.
+
+RFC-076
+([`076-v1-release-preparation.md`](./proposed/076-v1-release-preparation.md))
+is that release-prep unit. It specifies the `1.0.0` release-preparation
+change in full: the RFC-067 family maturity table reproduced (neither
+companion promoted), a rewritten `compatibility.md` stating what SemVer
+covers and excludes, a 19-site `pre-1.0`/`0.x` documentation sweep across 9
+files (including reconciling a second, contradictory compatibility promise
+in `migration.md` down to a single canonical home), a 29-string
+current-family version retarget across 14 files, and the `0.38.0` ->
+`1.0.0` version bump. It went through two review rounds (NO-GO on missing
+sweep/retarget scope, then GO conditional on two mechanical count
+corrections) before two further maintainer decisions were applied and
+independently re-reviewed: the three `#[doc(hidden)]` slice-plumbing items
+(`IntoSliceRange`/`SliceConvert`/`SliceSpecRepr`) are **covered** by the
+`1.0.0` promise rather than excluded, and `cargo public-api` is recorded as
+**not required** for this release — both decisions dated, attributed, and
+reasoned rather than silently applied. The final review was **GO, no
+conditions**; implementation is authorized. RFC-076 authorizes no tag or
+crates.io publish; Unit 3 (release execution) remains a separate,
+maintainer-authorized step after this release-prep commit is reviewed and
+committed, and is the point at which the project's choices stop being
+reversible.
