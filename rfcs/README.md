@@ -91,7 +91,7 @@ The broader documentation ownership model is recorded in
 | 075 | [v1.0 Release Decision](./done/075-v1-release-decision.md) | MD-2 resolved, serde format declared stable, RFC-067 family maturity table recorded; no v1.0 release authorized |
 | 077 | [Seeded Train/Test Split for `matten-mlprep`](./done/077-seeded-train-test-split.md) | Implemented and reviewed (GO, no conditions), `e9b87fd`; pre-v1 additive API on `0.38.x`; no release |
 | 078 | [`matten-stats` Companion Crate](./done/078-matten-stats-companion.md) | Implemented and reviewed (GO, no conditions), `3ab3864`; fifth published crate, Experimental maturity; no release |
-| 079 | [`0.39.0` Pre-v1 Feature Release](./done/079-0390-pre-v1-feature-release.md) | Reviewed (GO, no conditions) and committed as a release-prep commit; releases RFC-077 only, `matten-stats`'s first publish deferred (owner decision); publish/tag not yet authorized |
+| 079 | [`0.39.0` Pre-v1 Feature Release](./done/079-0390-pre-v1-feature-release.md) | Reviewed (GO, no conditions), committed, and released as `0.39.0` (tagged and published). Scope was narrowed to RFC-077 only, deferring `matten-stats`'s first publication — but the actual publish included it anyway; see §13 and the `0.39.0` post-release alignment |
 
 ## Proposed
 
@@ -115,7 +115,7 @@ their current status says so. The current post-0.38 backlog is:
 |---|---|---|
 | v1.0 readiness | RFC-066, RFC-067, RFC-074, RFC-075, RFC-076 | RFC-074 (audit) and RFC-075 (MD-2/serde/maturity-table decision) closed; RFC-076 (release preparation) reviewed and accepted (GO, no conditions), but execution is deferred pending pre-v1 feature work (RFC-077, RFC-078); no v1.0 implementation is currently authorized |
 | Pre-v1 feature work | RFC-077, RFC-078 | Both implemented, reviewed (GO, no conditions), and closed. RFC-040's small-statistics theme is now *partially* addressed by RFC-078 (`covariance`, `correlation`, `quantile` implemented in `matten-stats`, not yet published — see RFC-079); histogram, z-score, percentile aliases, skew, kurtosis, and matrix-wide/axis-wise variants remain deferred — histogram specifically still blocks on RFC-040 §8's unresolved bin-selection policy. Family grows to five workspace crates; RFC-076 must be updated for five before it is executed |
-| Pre-v1 feature release | RFC-079 | Reviewed (GO, no conditions) and committed as a release-prep commit for `0.39.0`. Releases RFC-077 only; `matten-stats`'s first publication is deferred — owner decision, obtaining an external read of RFC-078 §4.1's `ddof = 1` policy outside this project's assistant session first. Publish and tag remain a separate, not-yet-authorized step |
+| Pre-v1 feature release | RFC-079 | Reviewed (GO, no conditions), committed, and released as `0.39.0` — tagged and published outside this project's assistant session. Release-prep scoped RFC-077 only, deferring `matten-stats`'s first publication pending an external `ddof` read; the actual publish included `matten-stats` anyway (no `publish = false` key enforced the deferral). Corrected in the post-release alignment: RFC-079/RFC-078 status, a dated CHANGELOG note, and a new ROADMAP history row (`3.25.0` left unedited). The external `ddof` read is no longer a publication gate; it now informs a possible future policy change |
 | Public `matten-report` / `matten-viz` readiness | RFC-070, RFC-063, RFC-065, RFC-068, RFC-069, RFC-071 | RFC-070 closed after audit; no public crate or API authorized |
 | `matten-report` modularization | RFC-072, RFC-070 post-0.37 closure audit | Implemented and closed; internal ownership and size guards are established without behavior or public-surface change |
 | More input-mode HTML paths | RFC-069, post-0.36 RFC-069 closure audit | Deferred until a concrete report path is reviewed |
@@ -551,6 +551,17 @@ fifth-crate teaching — all deferred to whichever release actually first publis
 the narrowed scope caught one gap neither document anticipated: `docs/src/introduction.md`'s
 "current 0.38 release family" sentence named RFC-073's release specifically and needed rewriting
 for content, not just substitution, once `0.39.0` became a different release with different
-contents. Release-prep is committed; tag and publish remain a separate, not-yet-authorized step,
-and `matten-stats` is explicitly excluded from that future publish list until its external read
-lands.
+contents. Release-prep was committed, then `0.39.0` was tagged and published outside this
+project's assistant session.
+
+**The exclusion did not hold.** `matten-stats` carried no `publish = false` key — a discipline
+decision, not an enforced one — and the actual publish action shipped it alongside the other four
+crates. Verified directly against crates.io (never via `cargo publish`, the wrong instrument for
+checking a state that was never mechanically withheld): `matten-stats` shows exactly one version,
+`0.39.0`, published the same day. The post-release alignment handoff's Case B corrections were
+applied: RFC-079's and RFC-078's status now say "published," a dated correction was added to the
+`[0.39.0]` CHANGELOG entry without erasing its original text, and ROADMAP records the divergence in
+a new history row rather than editing the row that accurately described the decision as it stood
+when made. The external `ddof = 1` read (RFC-078 §4.1) no longer gates a first publication that has
+already happened — it now informs whether a future change to that policy is warranted, and remains
+open.

@@ -34,6 +34,18 @@ RFC-079 pre-v1 feature release. Adds a reproducible seeded train/test split to
 published crate dependency graph, core runtime behavior, MSRV, or
 maturity-label change.
 
+> **Correction (2026-07-28, post-release):** this entry originally made no mention of
+> `matten-stats`, which was correct for the release as prepared — RFC-079 §3 deferred that
+> crate's first publication pending an external read of its `ddof = 1` policy. The actual
+> publish action, taken outside this project's assistant session, included `matten-stats`
+> anyway (its manifest never carried a `publish = false` key). **`matten-stats` 0.39.0 was
+> in fact published**, at **Experimental** maturity, with `covariance`/`correlation` using
+> the sample estimator (`ddof = 1`) and `quantile` using linear interpolation — see the
+> crate's own README for the full surface. The external read of that `ddof = 1` choice
+> (RFC-078 §4.1) is no longer a publication gate, since publication already happened; it now
+> informs whether a future change to the divergence is warranted. See RFC-079 §13 and the
+> `0.39.0` post-release alignment handoff for the full account.
+
 ### Added
 
 - `matten_mlprep::train_test_split_seeded(x, train_ratio, seed) ->

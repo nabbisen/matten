@@ -1,13 +1,18 @@
 # RFC-079: `0.39.0` Pre-v1 Feature Release
 
-**Status:** Reviewed (GO, no conditions after one correction, applied) and committed as a
-release-prep commit; `0.39.0` release-prep complete; publish/tag not yet authorized. Scope
-narrowed by owner decision (§3): `0.39.0` ships RFC-077 only; `matten-stats`'s first publication
-is deferred pending an external read of RFC-078 §4.1 obtained outside this project's assistant
-session
-**Target:** `0.39.0` on the `0.x` line; tag and publish remain a separate owner-authorized step
+**Status:** Reviewed (GO, no conditions after one correction, applied), committed, and **released
+as `0.39.0`** — tagged and published to crates.io. Scope was narrowed by owner decision (§3) to
+release RFC-077 only, deferring `matten-stats`'s first publication pending an external read of
+RFC-078 §4.1 — but the actual publish action, taken outside this project's assistant session,
+included `matten-stats` anyway (no `publish` key ever mechanically enforced the deferral). See the
+`0.39.0` post-release alignment handoff for the correction: RFC-079 §3's deferral decision itself
+is recorded accurately as of the time it was made; it is the crates.io outcome that diverged from
+it, not this document being wrong when written.
+**Target:** `0.39.0` on the `0.x` line — released, tagged, and published (all five crates,
+`matten-stats` included)
 **Theme:** Release RFC-077's seeded split as the family's first consumer-visible release since
-`0.31.0`. `matten-stats` (RFC-078) is version-bumped in lock-step but not published this cycle
+`0.31.0`. `matten-stats` (RFC-078) shipped alongside it at `0.39.0`, Experimental maturity, despite
+this RFC's own §3 decision to defer it
 **Depends on:** RFC-030, RFC-067, RFC-075, RFC-077, RFC-078
 **Related:** RFC-024, RFC-040, RFC-058, RFC-074, RFC-076
 
@@ -271,3 +276,20 @@ owner-authorized step:
 **`matten-stats` publishes in a later release**, once the owner has obtained an external read of RFC-078
 §4.1 outside this project's assistant session. Nothing about *this* release is irreversible in that sense —
 every crate it does publish is a routine additive `0.x` change to an already-published crate.
+
+## 13. Post-release correction — `matten-stats` published anyway
+
+`0.39.0` was tagged and published outside this project's assistant session. Verified directly against
+crates.io (not `cargo publish --dry-run`, which is the wrong instrument for checking state that was
+never withheld by tooling): `matten-stats` shows exactly one version, `0.39.0`, alongside `matten` and
+the other three crates. `crates/matten-stats/Cargo.toml` never carried a `publish = false` key — §3
+named that as the mechanism-free state that made the deferral a discipline decision, not an
+enforced one, and the actual publish action did not honor it.
+
+**§3's decision itself is unchanged and was correctly recorded at the time it was made.** What changed
+is the crates.io outcome, not this RFC's account of the decision. The consequence: the crate name
+`matten-stats` is now permanently claimed, the `ddof = 1` policy has shipped without the external read
+§3 called for, and that read now informs whether a *future* change to `covariance`/`correlation` is
+warranted — it is no longer a gate on first publication, because first publication already happened.
+See the `0.39.0` post-release alignment handoff and ROADMAP's corresponding new history row (added
+after `3.25.0`, which is left untouched as an accurate record of the decision as it stood).
