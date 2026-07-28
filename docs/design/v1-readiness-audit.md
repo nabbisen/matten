@@ -1,45 +1,64 @@
 # v1.0 Readiness Audit
 
 **Project:** `matten`
-**Related RFC:** RFC-066: v1.0 Readiness Audit and Release Decision Gate
+**Related RFC:** RFC-066 (original audit, v0.31.0); re-audited under RFC-074
 **Document kind:** Readiness audit report
-**Status:** Accepted audit; BF-1 and MD-1 follow-ups recorded
+**Status:** Re-audited (0.38.0); conditionally ready on technical grounds, blocked on an
+explicit maintainer decision (MD-2)
 **Scope:** Audit report only; no v1.0 release authorization
 
 ---
 
 ## Summary
 
-The current `matten` family is close enough to justify a maintainer-level v1.0
-readiness discussion. BF-1 has been remediated, and MD-1 has been resolved by
-RFC-067 as repository policy. The project is still **not authorized for v1.0
-release preparation** until a separate v1.0 release RFC is drafted and reviewed.
+This is a re-audit of the original RFC-066 v1.0 readiness audit, conducted under
+RFC-074 after eight releases (`0.31.0` -> `0.38.0`) with no published-crate
+change. It supersedes the RFC-066 findings below while preserving them for
+traceability, per RFC-074 goal #1.
 
-The original audit found:
-
-```text
-resolved blocking finding:
-  BF-1: public API snapshot had an inconsistent dynamic serde statement.
-        Remediated in docs/src/reference/public-api-snapshot.md.
-
-maintainer-decision finding:
-  MD-1: lock-step v1.0 with production-ready-candidate companions must be
-        decided explicitly. Resolved by RFC-067.
-
-non-blocking findings:
-  NF-1: companion snapshot-equivalent docs are adequate, but matten-data would
-        benefit from a more explicit public API block before v1.0.
-  NF-2: cargo public-api remains a required future snapshot step, but it is not
-        wired as a project gate in this audit slice.
-```
-
-Recommendation:
+**Every RFC-066 finding remains resolved or unchanged, with no regression:**
 
 ```text
-Do not start v1.0 release preparation yet.
-BF-1 has been remediated; MD-1 is resolved by RFC-067.
-Maintainers may decide whether to draft a separate v1.0 release RFC.
+BF-1 (public API snapshot dynamic-serde inconsistency): remains remediated.
+MD-1 (lock-step v1.0 with candidate companions): remains resolved by RFC-067.
+NF-1 (matten-data lacks an explicit Public API README block): still open, unchanged.
+NF-2 (cargo public-api not wired as a gate): still open, unchanged.
 ```
+
+**On narrow technical grounds, the public surface is more provably stable now
+than at the original audit**, not less: `git diff 0.31.0..HEAD -- crates/*/src/`
+touches exactly one file (`crates/matten/src/lib.rs`), and every changed line
+is a version string inside a `//!` doc comment. Zero functional change reached
+any published crate across eight consecutive releases. The public API snapshot,
+error model, and boundary docs are internally consistent and match source.
+
+**But this audit finds a new, unresolved maintainer-decision finding (MD-2)
+that the original audit did not have to consider**, because it is a direct
+consequence of the eight-release gap this re-audit was triggered by:
+
+```text
+MD-2: The published family has had zero functional change across eight
+      releases while all engineering effort went into a private,
+      unpublished local tool (tools/matten-report). RFC-071's own accepted
+      rationale for releasing private-tool milestones as lock-step
+      checkpoints included an explicit reconsideration trigger — "if the
+      publish churn outweighs the value of a public project checkpoint" —
+      that has not fired despite eight consecutive occasions to fire it.
+      No v1.0 release RFC has been drafted in the ~7 releases since RFC-066
+      opened that possibility. This audit cannot decide, on the maintainer's
+      behalf, whether the project's real direction is "heading toward 1.0"
+      or "0.x indefinitely with occasional local-tool-only checkpoints" —
+      but it can no longer treat that question as implicitly answered by
+      inaction, because inaction has now produced eight releases of
+      evidence pointing toward the latter.
+```
+
+**Verdict: conditionally ready.** The technical/API axis clears every gate
+RFC-066 set. The audit does not recommend starting v1.0 release preparation,
+because doing so without first resolving MD-2 would silently choose "heading
+toward 1.0" as the answer by default, the same way lock-step versioning's
+reconsideration trigger silently went unfired eight times. See
+[Recommendation](#recommendation).
 
 This report does not authorize a v1.0 release.
 
@@ -56,10 +75,25 @@ API change
 dependency change
 companion promotion
 new public tooling crate
+RFC-030 lock-step versioning policy change
 ```
 
 If a later decision proposes any of those actions, it needs a separate release
 RFC, release-policy decision, or accepted implementation slice.
+
+## RFC-066 Findings Re-Verified, Item By Item
+
+| RFC-066 finding | Original disposition | Re-audit status |
+|---|---|---|
+| BF-1 — public API snapshot self-contradicted on dynamic serde behavior | Remediated | **Unchanged, remains remediated.** `public-api-snapshot.md`'s dynamic-behaviour table still says `Serialize` returns a serde error; `crates/matten/src/ser.rs` behavior is unchanged (zero source churn since `0.31.0`). |
+| MD-1 — can a lock-step v1.0 family include candidate-labeled companions? | Resolved by RFC-067 | **Unchanged, remains resolved.** RFC-067's policy (candidate label is not an automatic v1.0 blocker, but a future v1.0 RFC must include the RFC-067 family maturity table) has not been revisited or contradicted. |
+| NF-1 — `matten-data` README lacks an explicit Public API block | Non-blocking | **Still open.** `crates/matten-data/README.md` sections remain: Overview, Not a dataframe library, Relationship to core `dynamic`, Status and scope, Dependency style, Compatibility — no `## Public API` heading. `matten-mlprep/README.md` has one (`## Public API`, line 71); `matten-data` and `matten-ndarray` do not. |
+| NF-2 — `cargo public-api` not wired as a gate | Non-blocking | **Still open.** No reference to `cargo public-api` or `public-api` tooling exists in `scripts/`, `.github/workflows/`, or the release checklist beyond the existing manual `grep -n "^pub use"` spot-check. |
+
+No RFC-066 finding regressed. Two non-blocking findings (NF-1, NF-2) simply
+never got picked up, which is consistent with this audit's broader finding
+that engineering effort went entirely into `tools/matten-report` for eight
+releases.
 
 ## Public API Review
 
@@ -75,7 +109,26 @@ crates/matten-data/src/lib.rs
 crate READMEs
 ```
 
-The core crate root matches the documented root surface:
+Independently re-verified for this re-audit:
+
+```text
+git diff --stat 0.31.0..HEAD -- crates/
+  -> crates/matten-data/README.md    | 2 +-
+     crates/matten-mlprep/README.md  | 6 +++---
+     crates/matten-ndarray/README.md | 6 +++---
+     crates/matten/README.md         | 2 +-
+     crates/matten/src/lib.rs        | 2 +-
+     5 files changed, 9 insertions(+), 9 deletions(-)
+
+git diff 0.31.0..HEAD -- crates/matten/src/lib.rs
+  -> one hunk, both changed lines are inside a ```toml //! doc-comment
+     snippet showing the install-pin version string (0.31.0 -> 0.38.0)
+```
+
+The core crate root still matches the documented root surface exactly
+(confirmed both by direct `grep -n "^pub use"` and by
+`scripts/check-release-docs.sh`'s automated root-export allowlist check,
+currently green):
 
 ```text
 Tensor
@@ -87,7 +140,7 @@ Element                 # feature = "dynamic"
 NumericPolicy           # feature = "dynamic"
 ```
 
-The extra core exports remain hidden compiler-visibility plumbing:
+Hidden compiler-visibility plumbing is unchanged:
 
 ```text
 IntoSliceRange          # #[doc(hidden)]
@@ -95,129 +148,78 @@ SliceConvert            # #[doc(hidden)]
 SliceSpecRepr           # #[doc(hidden)]
 ```
 
-The crate root does not expose public modules. Source review found only private
-modules plus explicit `pub use` exports.
+Companion surfaces (`matten-ndarray`, `matten-mlprep`, `matten-data`) are
+unchanged from the original audit's inventory — re-confirmed by the same
+zero-source-churn evidence above.
 
-The public snapshot documents `MattenError` and `DataFormat` as
-`#[non_exhaustive]`, which is the right compatibility posture for future
-variants. `MattenError` is also documented as match-by-variant, not
-`PartialEq`-comparable, because it embeds `std::io::Error`.
+`docs/src/reference/public-api-snapshot.md` states "the public API did not
+change for the 0.38.0 local-tool JSON release," which is accurate and is one
+instance of a claim that has now been accurate eight releases running.
 
-Companion surfaces are small and source-visible:
-
-```text
-matten-ndarray:
-  from_arrayd
-  to_arrayd
-  MattenNdarrayError
-
-matten-mlprep:
-  standardize_columns
-  minmax_scale_columns
-  add_bias_column
-  train_test_split
-  MattenMlprepError
-
-matten-data:
-  Table
-  NumericTable
-  ColumnKind
-  ColumnSummary
-  SchemaSummary
-  CellValue
-  MattenDataError
-```
-
-`matten-ndarray` and `matten-mlprep` have clear README/rustdoc
-snapshot-equivalent public API sections. `matten-data` documents the workflow,
-status, scope, dependency direction, and exported crate root, but its README is
-less explicit as a public API snapshot than the other companions. That is
-recorded as NF-1, not as a current release blocker.
-
-Original finding BF-1: `docs/src/reference/public-api-snapshot.md` was
-internally inconsistent about dynamic serde behavior. The dynamic behavior table
-said `Serialize` returns a serde error, while the later boundary/serde table
-said `Serialize` panics on dynamic. Source review of `crates/matten/src/ser.rs`
-shows that dynamic serialization returns `Err(serde::ser::Error::custom(...))`.
-The snapshot now matches source behavior: dynamic serialization returns a serde
-error.
+**Conclusion: no regression from the original audit; the API surface is more
+strongly evidenced as stable than it was at `0.31.0`, precisely because it has
+not moved.**
 
 ## Panic/Result Boundary Review
 
-Reviewed inputs:
-
-```text
-docs/src/reference/compatibility.md
-docs/src/reference/error-model.md
-docs/src/reference/boundary.md
-docs/src/reference/public-api-snapshot.md
-docs/src/reference/dynamic.md
-```
-
-The project has a stable and well-explained two-zone policy:
-
-```text
-Panic zone:
-  local, trusted, developer-authored convenience APIs
-
-Result zone:
-  external boundaries: parsing, files, user shapes, conversion boundaries
-```
-
-The boundary pages consistently teach `try_*` APIs for user-provided shapes and
-file/parse APIs returning `Result<Tensor, MattenError>`. Dynamic tensors are also
-guarded: numeric operations reject them until the user explicitly calls
-`try_numeric()` or `try_numeric_with(policy)`.
-
-The panic/Result split is stable enough for v1.0 discussion after BF-1
-remediation. BF-1 was a documentation inconsistency, not an apparent source
-behavior defect.
+Reviewed inputs unchanged from the original audit
+(`compatibility.md`, `error-model.md`, `boundary.md`, `public-api-snapshot.md`,
+`dynamic.md`). Source review confirms zero churn in `crates/matten/src/`
+outside the single doc-comment line already noted, so the two-zone
+panic/Result policy, `MattenError` variant set, and dynamic-tensor guard
+behavior are unchanged and remain stable enough for v1.0 discussion.
 
 ## Serde/Format Review
 
+Reviewed inputs unchanged from the original audit. The canonical JSON object
+form (`{"shape":[...],"data":[...]}`), the nested-array convenience forms, and
+CSV's framing as ingestion (not canonical serialization) are unchanged.
+`crates/matten/src/ser.rs` has zero churn since `0.31.0`. Stable.
+
+## Deferred Mathematics And Streaming Scope (RFC-074 §5.2)
+
+This section did not exist in the original RFC-066 audit; RFC-074 added it
+because eleven backlog items sit behind the v1.0 question and each needs an
+explicit blocker/non-blocker classification rather than an implicit one.
+
 Reviewed inputs:
 
 ```text
-docs/src/reference/boundary.md
-rfcs/done/009-serde-json-csv-and-boundary-integration.md
-crates/matten/examples/10_json_roundtrip.rs
-crates/matten/examples/11_csv_numeric_loading.rs
-crates/matten/src/ser.rs
+rfcs/done/040-small-statistics-boundary-core-vs-companion.md
+rfcs/done/041-linear-algebra-boundary-core-lite-vs-external-crates.md
+rfcs/done/026-large-csv-and-streaming-data-policy.md
+rfcs/done/037-deferred-streaming-and-large-csv-policy.md
 ```
 
-JSON has a clear canonical object form:
+**Broader statistics** (covariance, correlation, quantile, percentile,
+histogram, z-score): RFC-040 §8 explicitly rejects these from core, not merely
+defers them — "Do not put histogram or quantile in core initially," with
+`matten-stats` requiring "at least three APIs are clearly useful" before even
+being scaffolded. This is a **settled scope decision**, not an open question.
+**Not a v1 blocker** — v1.0 can ship with the documented boundary as-is.
 
-```text
-{"shape":[...],"data":[...]}
-```
+**Broader linear algebra** (inverse, determinant, decomposition, BLAS/sparse):
+RFC-041 §5 explicitly rejects these from core with a permanent rationale
+("too much numerical policy... would change project identity"), directing
+users to `nalgebra`/`ndarray-linalg` instead. **Settled, not a v1 blocker.**
 
-The canonical form is unambiguous for any rank and is used by serde
-serialization/deserialization. Rank-1 and rank-2 nested arrays are documented as
-convenience input forms, not as the canonical representation.
+**Streaming / large CSV**: RFC-037 defers this with explicit, unmet reopening
+criteria (batch model, schema-drift policy, malformed-row policy, memory
+budget, sync-vs-async, crate placement — none answered). Unlike stats/linalg,
+this is a genuine "not yet designed" gap rather than a rejected scope. But
+`matten-data`'s current documented scope (in-memory rectangular CSV,
+explicitly "not a dataframe engine") does not promise streaming, so v1.0 does
+not need to resolve it first — reopening streaming later is additive, not a
+breaking change to the current contract. **Not a v1 blocker**, provided the
+current scope statement stays in the docs unchanged at v1.0.
 
-CSV is correctly framed as ingestion:
+**Conclusion: none of the three deferred-mathematics/streaming themes block
+v1.0.** All three are either explicitly rejected core scope (settled) or an
+additive future capability outside the current documented contract
+(streaming). This narrows the v1.0 question to the API/boundary/versioning
+axes actually covered elsewhere in this report.
 
-```text
-rectangular numeric CSV -> Tensor with shape [rows, cols]
-```
-
-It is not documented as canonical tensor serialization. Mixed/missing data is
-owned by the dynamic path or by `matten-data` table preparation, not by core
-numeric CSV.
-
-The feature split is clear:
-
-```text
-serde  -> Serialize / Deserialize
-json   -> from_json / load_json, implies serde
-csv    -> from_csv / load_csv
-dynamic -> heterogeneous ingestion and explicit numeric conversion
-```
-
-With BF-1 remediated, the serde/format story is stable enough for v1.0
-discussion.
-
-## Companion Maturity Review
+## Companion Maturity Review (RFC-074 §5.3)
 
 Reviewed inputs:
 
@@ -226,12 +228,12 @@ rfcs/done/030-workspace-versioning-model-lockstep.md
 rfcs/done/057-promote-matten-ndarray-production-ready.md
 rfcs/done/058-promote-matten-mlprep-production-ready-candidate.md
 rfcs/done/059-promote-matten-data-production-ready-candidate.md
+rfcs/done/067-v1-family-maturity-policy.md
 README.md
 crates/*/README.md
-crates/*/src/lib.rs
 ```
 
-The current maturity ladder is explicit:
+Current maturity ladder, unchanged since the original audit:
 
 ```text
 matten          stable (v0.x)
@@ -240,244 +242,207 @@ matten-mlprep  production-ready candidate
 matten-data    production-ready candidate
 ```
 
-RFC-030 separates version compatibility from maturity label. Matching lock-step
-versions mean "matched family set"; maturity is the Status label.
+**No new evidence justifies promoting `matten-mlprep` or `matten-data` to
+production-ready.** RFC-058 §5.1 explicitly recorded full-production-ready
+exit criteria as "recorded, not required here" and deferred the decision to "a
+*separate future review*" (RFC-058, RFC-059 §"Architect ruling: full
+production-ready is deferred"). Since zero source lines changed in either
+crate since `0.31.0`, the specific caveats those RFCs cited at promotion time
+— `matten-mlprep`'s ordered-only `train_test_split` (no shuffle/seed) and
+`matten-data`'s CSV-only, non-dataframe scope — are unchanged and still apply.
+Promotion requires new work (e.g., a seeded-split option) or a fresh
+maintainer review accepting the current limitation as permanently acceptable,
+neither of which has happened.
 
-This creates the required maintainer decision point:
+**Recommendation: hold both companions at `production-ready candidate`.**
+RFC-067's resolution of MD-1 already covers this case — a v1.0 family may
+include them at their current labels if a future v1.0 release RFC states so
+explicitly with the RFC-067 family maturity table. This audit does not
+recommend spending the promotion review as a v1.0 prerequisite; it recommends
+carrying the candidate label into any future v1.0 family exactly as RFC-067
+already anticipated.
 
-```text
-Can a lock-step v1.0 family include production-ready-candidate companions
-with explicit labels, or must all family crates become production-ready first?
-```
-
-This audit did not answer that silently. It recorded MD-1:
-
-```text
-MD-1: Before v1.0 release preparation, the maintainer must decide whether the
-      v1.0 family may include candidate-labeled companions, or whether
-      matten-mlprep and matten-data must first receive separate full
-      production-ready reviews.
-```
-
-If the answer is "candidate-labeled companions are allowed under lock-step v1,"
-then the current maturity labels may be compatible with v1.0, provided the
-release notes and README state the distinction clearly.
-
-If the answer is "all v1 family crates must be production-ready," then
-`matten-mlprep` and `matten-data` need follow-up maturity RFCs before v1.0
-release preparation.
-
-Resolution: RFC-067 adopts the middle rule. Candidate-labeled companions are not
-automatic v1.0 blockers, but a future v1.0 release RFC must include a family
-maturity table and decide each candidate-labeled crate's inclusion explicitly.
-That policy does not promote any companion and does not authorize v1.0 release
-preparation.
-
-## Deferred-Item Review
+## Lock-Step Versioning Assessment (RFC-074 §5.4 — first-class, not a footnote)
 
 Reviewed inputs:
 
 ```text
-docs/src/reference/compatibility.md
-docs/src/philosophy.md
-docs/src/migration/
-rfcs/README.md
-ROADMAP.md
-docs/src/examples/
+rfcs/done/030-workspace-versioning-model-lockstep.md
+rfcs/done/071-private-fixed-demo-json-report-artifacts.md
+CHANGELOG.md (0.31.0 through 0.38.0 entries)
 ```
 
-Deferred items are explicit enough not to block v1.0 by ambiguity. The project
-does not hide future work as accidental current scope.
+RFC-030's rationale for lock-step versioning is that the crates "only ship
+together" and users benefit from "the simplest possible compatibility
+contract." That rationale is unaffected by this finding — the crates still
+ship together, and a matched version number is still the simplest contract
+*when a release changes something*.
 
-Examples:
+The problem is narrower and specific: **RFC-071 §6 itself named the failure
+mode and the exact condition under which the project should stop, and that
+condition has now been met without triggering the reconsideration:**
+
+> "reconsider this release model before future private-tool-only milestones
+> if the publish churn outweighs the value of a public project checkpoint"
+> — RFC-071 §6, accepted as the `0.37.0` release's business decision.
+
+Measured evidence that the condition has been met:
 
 ```text
-Display for Tensor: deferred formatting contract
-public mutation API: deferred
-zero-sized tensors: rejected/deferred
-negative slice indices: deferred
-batched matmul: deferred
-serious linalg/decompositions: out of core; migrate
-sample variance / quantile / histogram / covariance / correlation: deferred
-streaming / large CSV: deferred
-shuffled or seeded train_test_split: deferred
-public matten-report / matten-viz / matten-migrate crates: deferred
-rewrite/apply migration automation: future-owned
-autograd / ML framework scope: not core scope
+Releases 0.32.0 through 0.38.0 (seven releases after RFC-071's own release,
+counting 0.37.0 itself as the eighth data point in the 0.31.0-0.38.0 span):
+  every one shipped a "no public API / dependency / runtime / MSRV /
+  maturity change" CHANGELOG disclaimer (31 occurrences of "No public API"
+  across CHANGELOG.md);
+  the entire published-crate diff across all eight is nine doc-comment
+  version-string insertions and nine deletions.
 ```
 
-The examples program is also scoped: examples demonstrate accepted APIs and are
-not a path for adding dataframe, ML, GPU, large-data, or serious-linalg scope.
+**This is a maintainer-decision finding, not a source defect** — identical in
+character to MD-1. It is recorded as **MD-2**:
 
-No deferred item should be converted into implementation work as part of the
-v1.0 audit. If a deferred item becomes required for v1.0, that needs a separate
-RFC or release-policy decision.
+```text
+MD-2: Should RFC-030 lock-step versioning continue to release
+      publish-a-family-checkpoint-regardless-of-content for private-tool-only
+      milestones, or should the RFC-071 reconsideration trigger now fire —
+      e.g. by requiring an explicit per-release justification, tracking
+      local-tool milestones on a separate unpublished coordinate, or some
+      other policy the maintainer prefers?
+```
+
+This audit does not resolve MD-2. Resolving it requires a maintainer decision
+and, if the answer changes policy, a separate RFC amending or superseding
+RFC-030/RFC-071 — the same pattern RFC-067 used to resolve MD-1 without this
+audit deciding company policy unilaterally.
+
+**MD-2 is independent of the v1.0 question and does not block it**: a v1.0
+release RFC could proceed under the current lock-step policy unchanged. But it
+does bear on the "is a 1.0 commitment appropriate" question below, because a
+versioning scheme that has been signaling false progress for eight releases
+should not gain a *bigger* promise (1.0's compatibility commitment) layered on
+top of it without the maintainer having consciously decided to keep it as-is.
+
+## The 1.0 Commitment Itself (RFC-074 §5.5)
+
+Reviewed inputs:
+
+```text
+rfcs/done/066-v1-readiness-audit-and-release-decision-gate.md
+rfcs/done/067-v1-family-maturity-policy.md
+docs/src/reference/compatibility.md (v1.0 requirements section)
+```
+
+`compatibility.md`'s v1.0 requirements section lists: public API review
+complete, `cargo public-api` snapshot approved, panic/Result split finalized,
+serde canonical format declared stable, limitations/non-goals documented, and
+the RFC-067 family maturity table included if any crate remains candidate-
+labeled.
+
+Against that list:
+
+```text
+public API review complete             -> substantively yes (re-verified above)
+cargo public-api snapshot approved      -> NOT DONE (NF-2, still open, 2+ audits running)
+panic/Result split finalized            -> yes, unchanged and stable
+serde canonical format declared stable  -> the JSON object form is de facto
+                                            stable (zero churn) but has never
+                                            been explicitly "declared" stable
+                                            as its own decision
+limitations/non-goals documented        -> yes (RFC-040/041/037 boundaries)
+RFC-067 family maturity table           -> not yet drafted (it lives in the
+                                            not-yet-written v1.0 release RFC)
+```
+
+Three of six gates are met outright; the other three (`cargo public-api`,
+explicit serde-stability declaration, the RFC-067 table) are not defects — they
+are work items that were always deferred to "whenever a v1.0 release RFC gets
+drafted." No one has drafted one in the ~7 releases since RFC-066 opened that
+door.
+
+**Recommendation: do not treat "not ready" as a permanent default answer, and
+do not silently default into "must be heading toward 1.0" either.** The
+honest reading of eight releases of zero published-crate change is that the
+project's *de facto* behavior has been "0.x, with occasional lock-step
+checkpoints for local-tool work" — not "en route to 1.0." That may be exactly
+the right choice; family-car positioning (README.md, `philosophy.md`) never
+promised a 1.0 timeline. But it should be a **conscious** choice, matching
+this audit's headline finding, not an emergent one.
+
+This audit recommends the maintainer pick one of two paths explicitly (see
+[Recommendation](#recommendation)) rather than leaving the question open for
+a ninth consecutive release.
 
 ## Release-Gate Review
 
-Reviewed inputs:
-
-```text
-docs/src/contributing/release-checklist.md
-docs/src/tutorial/start-here.md
-docs/src/examples/
-docs/src/reference/error-model.md
-docs/src/reference/dynamic.md
-rfcs/done/022-companion-crate-boundary-policy.md
-```
-
-The release checklist has two relevant layers:
-
-```text
-normal release gates:
-  fmt, boundary scripts, release-docs guard, clippy, tests, doctests,
-  feature matrix, examples, tools, MSRV, public API audit
-
-v1.0.0 gate:
-  explicit maintainer confirmation plus:
-  stable core public API
-  clear dynamic on-ramp story
-  strong, scoped examples
-  reliable diagnostics
-  documented companion-crate boundary
-  clean feature matrix across all profiles
-```
-
-Assessment against the v1.0.0 gate:
+Reviewed inputs unchanged from the original audit. Re-assessed against the
+same v1.0.0 gate:
 
 | Gate | Assessment |
 |---|---|
-| stable core public API | Mostly yes. BF-1 has been remediated; the official future public API snapshot step still needs release-prep ownership. |
-| clear dynamic on-ramp story | Yes. `docs/src/reference/dynamic.md` and `docs/src/tutorial/start-here.md` teach ingest, inspect, clean, convert, then compute. |
-| strong, scoped examples | Yes. Examples are grouped, linked to source, and explicitly constrained to accepted APIs. |
-| reliable diagnostics | Mostly yes. `docs/src/reference/error-model.md` documents error variants, panic prefix, and matching guidance. BF-1 has been remediated to avoid serde-boundary ambiguity. |
-| documented companion-crate boundary | Yes. README, migration docs, and RFC-022/RFC-030 family policy keep core dependency-light and companions optional. |
-| clean feature matrix | The release checklist defines the required feature-matrix commands. This audit did not convert those commands into a new gate. |
-
-The release checklist and compatibility policy are reconciled: both say v1.0
-requires explicit maintainer confirmation, public API review, and stable
-boundary/format documentation. This report is not that confirmation.
+| stable core public API | **Stronger than at the original audit.** Zero churn across eight releases is direct evidence, not just documentation review. `cargo public-api` snapshot (NF-2) is still the one missing formal step. |
+| clear dynamic on-ramp story | Unchanged; still yes. |
+| strong, scoped examples | Unchanged; still yes. |
+| reliable diagnostics | Unchanged; still yes. |
+| documented companion-crate boundary | Unchanged; still yes, and RFC-030/RFC-067 now additionally cover the lock-step/maturity-table question explicitly. |
+| clean feature matrix | Unchanged; the release-checklist commands remain the required gate, not converted into an additional audit-owned check. |
 
 ## Blocking Findings
 
-No unresolved blocking source/doc mismatch remains after BF-1 remediation.
-
-### Resolved BF-1: Public API snapshot contradicted itself on dynamic serde behavior
-
-Path:
-
-```text
-docs/src/reference/public-api-snapshot.md
-crates/matten/src/ser.rs
-```
-
-Problem:
-
-```text
-The dynamic behavior table says Serialize returns a serde error.
-The boundary/serde table said Serialize panics on dynamic.
-The source returns a serde error for dynamic tensors.
-```
-
-Impact:
-
-```text
-The public API snapshot could not be approved for v1.0 while it contained
-contradictory behavior for a public serde implementation.
-```
-
-Remediation:
-
-```text
-The boundary/serde table now says Serialize returns a serde error on dynamic.
-The correction was reviewed and BF-1 is closed.
-```
+None. No unresolved blocking source/doc mismatch exists, matching the
+original audit's conclusion after BF-1 remediation, re-confirmed with zero
+source churn since.
 
 ## Maintainer-Decision Findings
 
 ### Resolved MD-1: Lock-step v1.0 with candidate-labeled companions
 
-Path:
+Unchanged from the original audit. Resolved by RFC-067: candidate-labeled
+companions are not automatic v1.0 blockers, but a future v1.0 release RFC must
+include the RFC-067 family maturity table and decide inclusion explicitly.
 
-```text
-README.md
-rfcs/done/030-workspace-versioning-model-lockstep.md
-rfcs/done/057-promote-matten-ndarray-production-ready.md
-rfcs/done/058-promote-matten-mlprep-production-ready-candidate.md
-rfcs/done/059-promote-matten-data-production-ready-candidate.md
-crates/*/README.md
-```
+### New MD-2: Lock-step versioning's unfired reconsideration trigger
 
-Original question:
-
-```text
-Can the v1.0 family include matten-mlprep and matten-data as
-production-ready candidates, or must they first become production-ready?
-```
-
-This is not a source defect. It is a release-policy decision created by the
-combination of lock-step family versioning and per-crate maturity labels.
-
-Resolution:
-
-```text
-RFC-067 resolves MD-1. Production-ready-candidate companions are not automatic
-v1.0 blockers, but any future v1.0 release RFC must include the RFC-067 family
-maturity table and decide candidate-labeled crate inclusion explicitly.
-```
+See [Lock-Step Versioning Assessment](#lock-step-versioning-assessment-rfc-074-54--first-class-not-a-footnote)
+above. Not resolved by this audit; requires an explicit maintainer decision
+and, if policy changes, a separate RFC.
 
 ## Non-Blocking Findings
 
-### NF-1: matten-data snapshot-equivalent docs are less explicit
+### NF-1: `matten-data` snapshot-equivalent docs are less explicit (unchanged, still open)
 
-`matten-data` has a clear README, crate-level docs, and source-visible root
-exports. However, compared with `matten-ndarray` and `matten-mlprep`, its README
-is less explicit as a public API snapshot-equivalent.
+Unchanged from the original audit. `crates/matten-data/README.md` still lacks
+an explicit `## Public API` block comparable to `matten-mlprep`'s. Cheap to
+close whenever the maintainer next touches that README; does not require its
+own RFC.
 
-Before v1.0, consider adding a compact `Public API` block to
-`crates/matten-data/README.md` covering:
+### NF-2: `cargo public-api` remains a future snapshot step (unchanged, still open)
 
-```text
-Table
-NumericTable
-SchemaSummary / ColumnSummary / ColumnKind
-CellValue
-MattenDataError
-CSV feature requirement
-missing-value handling
-strict numeric conversion
-scope lock: not a dataframe
-```
-
-This is non-blocking because the current source and docs are sufficient for this
-audit, but the README could be clearer as a v1 review artifact.
-
-### NF-2: cargo public-api remains a future snapshot step
-
-The compatibility policy requires a `cargo public-api` snapshot before v1.0
-approval. This audit performed source-level export review and documentation
-comparison, but it did not add `cargo public-api` as a dependency or required
-project gate.
-
-That is intentional for RFC-066. A later v1.0 release-prep RFC should decide how
-to take, store, and review the official public API snapshot.
+Unchanged from the original audit. Still not wired as a project dependency or
+gate. A v1.0 release-prep RFC should decide how to take, store, and review the
+official snapshot — this audit does not add the tooling itself.
 
 ## Verification Record
 
-Observed during this audit implementation:
+Observed during this re-audit:
 
 ```text
 cargo fmt --all --check                                      passed
 bash scripts/check-core-dependency-boundary.sh                passed
 bash scripts/check-published-dependency-isolation.sh          passed
-bash scripts/check-matten-data-scope.sh                       passed
-bash scripts/check-benchmark-dependency-sync.sh               passed
-bash scripts/check-streaming-scope.sh                         passed
-bash scripts/check-release-docs.sh                            passed
-git diff --check                                              passed
+bash scripts/check-matten-data-scope.sh                        passed
+bash scripts/check-benchmark-dependency-sync.sh                passed
+bash scripts/check-streaming-scope.sh                          passed
+bash scripts/check-release-docs.sh                             passed
+git diff --check                                               passed
+git diff --stat 0.31.0..HEAD -- crates/                        independently reproduced
+git diff --name-only 0.31.0..HEAD -- 'crates/*/src/*'          independently reproduced
+git diff 0.31.0..HEAD -- crates/matten/src/lib.rs               independently reproduced
+grep -c "No public API" CHANGELOG.md                            independently reproduced (31)
+grep -n "^pub use" crates/matten/src/lib.rs                     independently reproduced
+grep -rn "production-ready" README.md crates/*/README.md        independently reproduced
 ```
 
-Not run in this audit implementation:
+Not run in this re-audit, matching the original audit's scope boundary:
 
 ```text
 cargo clippy --all-targets --all-features -- -D warnings
@@ -488,31 +453,50 @@ full feature-matrix test set from docs/src/contributing/release-checklist.md
 MSRV build/test commands
 ```
 
-Reason:
-
-```text
-This slice creates an audit report and design-doc index entry only. It changes
-no Rust source, public API, dependencies, feature flags, manifests, generated
-artifacts, or release versions. The omitted gates remain required before any
-actual v1.0 release-prep decision.
-```
+Reason: this slice updates the audit report and design-doc index entry only.
+It changes no Rust source, public API, dependencies, feature flags,
+manifests, generated artifacts, or release versions. The omitted gates remain
+required before any actual v1.0 release-prep decision.
 
 ## Recommendation
 
 Current recommendation:
 
 ```text
-not authorized for v1.0 release preparation until a separate v1.0 release RFC
-is drafted and reviewed
+Not authorized for v1.0 release preparation.
+Technical readiness (public API, error model, boundary, deferred-scope
+  clarity) clears every gate this audit and RFC-066 set.
+Process readiness is blocked on an explicit maintainer decision (MD-2) that
+  this audit cannot make: is the project heading toward 1.0, or is a
+  documented "0.x indefinitely" stance the more honest position given eight
+  releases of evidence pointing that way?
 ```
 
-Minimum next steps:
+Two explicit next paths, ranked by how directly they resolve MD-2 rather than
+leaving it open for a ninth release:
 
 ```text
-1. Record RFC-067 as the MD-1 policy resolution.
-2. If maintainers choose to continue, draft a separate v1.0 release RFC.
-3. In that release RFC, include the RFC-067 family maturity table and decide
-   candidate-labeled crate inclusion explicitly.
+Path A — adopt "0.x indefinitely" explicitly.
+  Update docs/src/reference/compatibility.md's v1.0 section to state this
+  is a deliberate position, not an oversight. Close RFC-066 and RFC-074 as
+  resolved-without-1.0. Revisit RFC-030/RFC-071's lock-step release-churn
+  question (MD-2) on its own merits, independent of any 1.0 timeline.
+  Lowest effort; matches eight releases of observed behavior; requires the
+  maintainer to actually choose this rather than let it remain implicit.
+
+Path B — pursue v1.0 deliberately.
+  Draft a separate v1.0 release RFC that: closes NF-1 (matten-data Public
+  API README block), closes NF-2 (adopt and wire cargo public-api), declares
+  the JSON canonical serde format explicitly stable, includes the RFC-067
+  family maturity table deciding matten-mlprep/matten-data's candidate-label
+  inclusion, and resolves MD-2 (a versioning-policy statement, even if the
+  answer is "keep RFC-030 unchanged, decided consciously").
 ```
+
+This audit does not choose between Path A and Path B; that choice is MD-2's
+resolution and belongs to the maintainer. Whichever is chosen, this report's
+prerequisite list (NF-1, NF-2, serde-stability declaration, RFC-067 table,
+MD-2 resolution) is what a Path B v1.0 release RFC would need to close before
+release preparation could begin.
 
 No v1.0 release is authorized by this report.
