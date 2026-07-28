@@ -95,6 +95,7 @@ The broader documentation ownership model is recorded in
 | ID | Title | Scope |
 |---:|---|---|
 | 076 | [v1.0 Release Preparation](./proposed/076-v1-release-preparation.md) | Reviewed and accepted (GO, no conditions); execution deferred pending pre-v1 feature work (RFC-077, RFC-078); no implementation authorized |
+| 077 | [Seeded Train/Test Split for `matten-mlprep`](./proposed/077-seeded-train-test-split.md) | Reviewed and accepted (GO); implementation authorized on the `0.38.x` line; no version bump or release |
 
 ## Remaining Themes And Issues
 
@@ -460,3 +461,23 @@ any case; Unit 3 (release execution) remains a separate, maintainer-authorized
 step required after a future release-prep commit is reviewed, committed, and
 explicitly re-authorized to proceed — the point at which the project's
 choices stop being reversible.
+
+RFC-077
+([`077-seeded-train-test-split.md`](./proposed/077-seeded-train-test-split.md))
+is deliberately pre-v1 feature work on the `0.38.x` line: one additive
+function, `train_test_split_seeded`, implementing the signature RFC-024 §6
+specified and left as "planned." It closes the one caveat RFC-076 §5's family
+maturity table cites for `matten-mlprep`'s `production-ready candidate`
+label, without promoting the crate — that stays a separate decision. The RNG
+is a hand-rolled, dependency-free SplitMix64 (RFC-024 §6's pre-decided
+choice); Fisher-Yates shuffles a row-index vector, never the data itself; and
+the exact PRNG constants, shuffle direction, and seed-to-state mapping become
+a reproducibility contract once released, enforced by a locked-permutation
+test. Two review rounds found and fixed three defects, all in the
+author-drafted documents: a handoff code sketch that would not compile
+(missing `MattenMlprepError::Matten` conversion), an error-surface claim that
+undercounted the reused variants by one, and a stale project-tracking claim
+that RFC-076 implementation was authorized when it had in fact been reverted
+— fixed as part of this same round. Final review: **GO**. Implementation is
+authorized on the `0.38.x` line; RFC-077 does not authorize any version bump
+or release.
