@@ -19,9 +19,12 @@ matten = { workspace = true }
 csv    = { workspace = true, optional = true }
 
 [features]
-default = ["csv"]
+default         = ["csv"]
 # CSV ingestion (`Table::from_csv_str` / `from_csv_path`).
-csv = ["dep:csv"]
+csv             = ["dep:csv"]
+# Row-count-bounded batched CSV reading (`CsvBatchReader`, RFC-082). Off by
+# default; implies `csv` — no new dependency.
+streaming       = ["csv"]
 
 # The example uses the CSV constructors, so it only builds when `csv` is enabled.
 [[example]]
@@ -58,3 +61,13 @@ required-features = ["csv"]
 [[example]]
 name = "data_06_visual_readiness_summary"
 required-features = ["csv"]
+
+[[example]]
+name = "data_csv_batches"
+path = "examples/csv_batches.rs"
+required-features = ["streaming"]
+
+[[test]]
+name = "streaming"
+path = "tests/streaming.rs"
+required-features = ["streaming"]

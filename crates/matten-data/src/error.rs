@@ -74,6 +74,9 @@ pub enum MattenDataError {
     },
     /// A column selection or conversion was attempted with no columns.
     EmptySelection,
+    /// `CsvBatchReader::open` was called with `batch_rows == 0` (RFC-082 §4.5,
+    /// `streaming` feature only).
+    InvalidBatchSize,
     /// A wrapped core `matten` error (for example from `Tensor` construction).
     Matten(matten::MattenError),
 }
@@ -129,6 +132,9 @@ impl fmt::Display for MattenDataError {
             ),
             MattenDataError::EmptySelection => {
                 write!(f, "matten-data error: no columns were selected")
+            }
+            MattenDataError::InvalidBatchSize => {
+                write!(f, "matten-data error: batch_rows must be greater than zero")
             }
             MattenDataError::Matten(e) => write!(f, "matten-data error: {e}"),
         }

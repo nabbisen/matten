@@ -116,7 +116,7 @@ impl Table {
 /// value is inferred as `Int`, then `Float`, then `Bool` (`true`/`false`), and
 /// finally `Text`. Booleans are not numbers, and text is not parsed as numeric
 /// here — numeric conversion is strict and explicit in `try_numeric`.
-fn parse_cell(raw: &str) -> CellValue {
+pub(crate) fn parse_cell(raw: &str) -> CellValue {
     let s = raw.trim();
     if s.is_empty() {
         return CellValue::Missing;

@@ -45,10 +45,18 @@
 //!
 //! `matten-data` is **not a dataframe library**. It has no joins, group-by, pivot,
 //! query DSL, lazy execution, indexing/`loc`/`iloc`, rolling/window operations,
-//! datetime engine, categorical dtype system, or large-data streaming. For those
-//! workloads use [Polars](https://pola.rs), [DataFusion](https://datafusion.apache.org),
-//! Pandas, or another dataframe/query tool. It is a small conversion helper for
+//! datetime engine, or categorical dtype system. For those workloads use
+//! [Polars](https://pola.rs), [DataFusion](https://datafusion.apache.org), Pandas,
+//! or another dataframe/query tool. It is a small conversion helper for
 //! application-validated or trusted data, not a CSV firewall or input sandbox.
+//!
+//! # Streaming (optional, `streaming` feature)
+//!
+//! `CsvBatchReader` (RFC-082) reads a CSV file in row-count-bounded [`Table`]
+//! batches, off by default behind the `streaming` feature. This is a memory
+//! strategy, not a dataframe engine: batches carry no schema evolution, no
+//! lenient/skip-malformed mode, and no streaming numeric conversion — a batch is
+//! exactly a `Table`, and every existing `Table` operation works on it unchanged.
 //!
 //! # Relationship to core `dynamic`
 //!
@@ -72,6 +80,8 @@ mod csv;
 mod error;
 mod numeric;
 mod schema;
+#[cfg(feature = "streaming")]
+mod stream;
 mod table;
 
 #[cfg(all(test, feature = "csv"))]
@@ -80,4 +90,6 @@ mod tests;
 pub use error::MattenDataError;
 pub use numeric::NumericTable;
 pub use schema::{ColumnKind, ColumnSummary, SchemaSummary};
+#[cfg(feature = "streaming")]
+pub use stream::CsvBatchReader;
 pub use table::{CellValue, Table};

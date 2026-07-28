@@ -38,14 +38,40 @@ column order is the requested selection order. See
 
 `matten-data` is **not a dataframe library**. It deliberately has no joins,
 group-by, pivot, query DSL, lazy execution, indexing / `loc` / `iloc`, rolling or
-window operations, datetime engine, categorical dtype system, or large-data
-streaming.
+window operations, datetime engine, or categorical dtype system.
 
-For dataframe, query, or large-data workloads use
+For dataframe or query workloads use
 [Polars](https://pola.rs), [DataFusion](https://datafusion.apache.org), Pandas, or
 another dataframe/query tool. `matten-data` is a small conversion helper for
 application-validated or trusted data, not a CSV firewall or malicious-input
 sandbox.
+
+## Streaming (optional, `streaming` feature)
+
+`CsvBatchReader` (RFC-082) reads a CSV file in row-count-bounded `Table` batches,
+off by default behind the `streaming` feature — the `csv` feature is implied, no
+new dependency. This is a memory strategy, not a dataframe engine: no schema
+evolution, no lenient/skip-malformed mode, no streaming numeric conversion, and
+no async. A batch is exactly a `Table`; concatenating every batch reproduces
+`Table::from_csv_path`'s output exactly.
+
+```toml
+[dependencies]
+matten-data = { version = "0.39.0", features = ["streaming"] }
+```
+
+```rust
+use matten_data::CsvBatchReader;
+
+# fn main() -> Result<(), matten_data::MattenDataError> {
+# let path = std::path::Path::new("large.csv");
+let mut reader = CsvBatchReader::open(path, 10_000)?;
+while let Some(batch) = reader.next_batch()? {
+    // process one Table batch at a time
+}
+# Ok(())
+# }
+```
 
 ## Relationship to core `dynamic`
 
@@ -87,6 +113,12 @@ impl NumericTable {
     pub fn to_tensor(&self)      -> Result<matten::Tensor, MattenDataError>;
 }
 
+// `streaming` feature only (off by default; implies `csv`) — RFC-082
+impl CsvBatchReader {
+    pub fn open(path: &Path, batch_rows: usize) -> Result<Self, MattenDataError>;
+    pub fn next_batch(&mut self)                -> Result<Option<Table>, MattenDataError>;
+}
+
 pub enum CellValue { Text(String), Float(f64), Int(i64), Bool(bool), Missing }
 
 #[non_exhaustive]
@@ -112,6 +144,7 @@ pub enum MattenDataError {
     NonNumericValue { column: String, row: usize, value: String },
     MissingValue { column: String, row: usize },
     EmptySelection,
+    InvalidBatchSize, // `streaming` feature only
     Matten(matten::MattenError),
 }
 ```

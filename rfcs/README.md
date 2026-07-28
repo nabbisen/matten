@@ -93,6 +93,7 @@ The broader documentation ownership model is recorded in
 | 078 | [`matten-stats` Companion Crate](./done/078-matten-stats-companion.md) | Implemented and reviewed (GO, no conditions), `3ab3864`; fifth published crate, Experimental maturity; no release |
 | 079 | [`0.39.0` Pre-v1 Feature Release](./done/079-0390-pre-v1-feature-release.md) | Reviewed (GO, no conditions), committed, and released as `0.39.0` (tagged and published). Scope was narrowed to RFC-077 only, deferring `matten-stats`'s first publication — but the actual publish included it anyway; see §13 and the `0.39.0` post-release alignment |
 | 080 | [Promote `matten-mlprep` to Production-Ready](./done/080-matten-mlprep-production-ready.md) | Reviewed and accepted (GO, conditional on three corrections, all applied); label-only promotion, closing RFC-058 §5.1's Option B exit criterion via RFC-077; no code, version, or release |
+| 082 | [Streaming CSV Batches for `matten-data`](./done/082-streaming-csv-batches.md) | Reviewed and accepted; `CsvBatchReader` added behind the off-by-default `streaming` feature, answering all six of RFC-037 §4's reopening criteria; no `matten-stream` crate (structural argument: it would need a companion-to-companion dependency on `matten-data` for `Table`, which RFC-078 §6 forbids); no version bump or release |
 
 ## Proposed
 
@@ -122,7 +123,7 @@ their current status says so. The current post-0.38 backlog is:
 | `matten-report` modularization | RFC-072, RFC-070 post-0.37 closure audit | Implemented and closed; internal ownership and size guards are established without behavior or public-surface change |
 | More input-mode HTML paths | RFC-069, post-0.36 RFC-069 closure audit | Deferred until a concrete report path is reviewed |
 | JSON / SVG / Vega-Lite report output | RFC-063, RFC-068, RFC-069, RFC-070 JSON policy audit, RFC-071, RFC-073 | RFC-073 private input-mode JSON implemented, reviewed, and released in `0.38.0`; other input kinds, raw CSV export, public schemas, SVG, and Vega-Lite remain unauthorized |
-| Streaming / large CSV | RFC-026, RFC-037 | Deferred; future implementation RFC must answer batch/schema/malformed-row/memory/sync-vs-async policy |
+| Streaming / large CSV | RFC-026, RFC-037, RFC-082 | RFC-082 answers all six RFC-037 §4 reopening criteria and ships `CsvBatchReader` behind `matten-data`'s off-by-default `streaming` feature. Deliberately deferred by RFC-082 itself: async, resumability, backpressure, parallel reading, lenient/skip-malformed modes, schema inference, streaming numeric conversion, and a `matten-stream` crate (rejected on structure, not just cost) |
 | `matten-nalgebra` bridge | RFC-025, RFC-041, RFC-054 bridge-readiness handoff | Deferred; per-crate RFC required |
 | `matten-candle` bridge | RFC-025, RFC-049, RFC-054 bridge-readiness handoff | Deferred; per-crate RFC required |
 | Benchmark hard gates | RFC-049 | Phases 1-3 implemented; Phase 4 hard gates extracted to future RFC/release-policy ownership |
