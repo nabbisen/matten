@@ -61,7 +61,7 @@ the lean core. Enabling `dynamic` does not rename or remove any numeric Tensor A
 
 The published crates are released as one lock-step family (RFC-030): matching
 crate versions are the supported, documented set. Downstream examples therefore
-show explicit matched pins such as `matten = "0.37.0"` plus a companion at the
+show explicit matched pins such as `matten = "0.38.0"` plus a companion at the
 same release.
 
 Inside the workspace, companion crates inherit the core dependency from
@@ -226,3 +226,19 @@ scope. Public `matten-report` / `matten-viz` crates, public report schemas,
 core visualization APIs, expression tracing, autograd, input-mode JSON, SVG,
 Vega-Lite, notebook, GUI, browser-app scope, and general raw CSV JSON rendering
 remain deferred.
+
+The **v0.38 release family** adds the RFC-073 private input-mode JSON slice:
+`tools/matten-report` can write a bounded private-local JSON artifact for the
+existing CSV data-readiness input path when `--format json --output <path>` is
+explicit, covering both successful strict numeric conversion and bounded
+conversion-error outcomes. `input_mode: "csv"` extends the `schema_version: 0`
+envelope; the five fixed-demo JSON artifacts remain byte-identical. Every
+user-controlled string and list (paths, headers, column names, conversion-error
+text, tensor previews) is bounded with structured truncation metadata; raw CSV
+rows/cells and unselected cell values are never emitted; non-finite tensor
+values are rejected before any write. This release does not change public API,
+published crate dependency graphs, core runtime behavior, MSRV, feature flags,
+maturity labels, or companion scope. Public `matten-report` / `matten-viz`
+crates, public report schemas, input-mode JSON for other report kinds, raw CSV
+export, core visualization APIs, expression tracing, autograd, SVG, Vega-Lite,
+notebook, GUI, and browser-app scope remain deferred.

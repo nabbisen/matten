@@ -14,7 +14,7 @@ This book is organized by reader:
 - **Reference** — the rules that shape the public API.
 - **Contributors** — project layout, milestones, and process.
 
-> This documentation tracks the current 0.37 release family, an RFC-071 local
-> visualization-artifact release that adds private fixed-demo JSON output for
+> This documentation tracks the current 0.38 release family, an RFC-073 local
+> visualization-artifact release that adds private input-mode JSON output for
 > `matten-report` without changing public APIs, published dependencies, core
 > runtime behavior, or maturity labels.

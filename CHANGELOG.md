@@ -18,6 +18,62 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+## [0.38.0] - 2026-07-28
+
+RFC-073 private input-mode JSON report release. This release extends the
+private local JSON output added in `0.37.0` to the existing CSV data-readiness
+input path. Markdown/plain text remains the default. JSON remains explicit-file
+only, private-local, and not a public schema. No public API, published crate
+dependency graph, core default feature, runtime behavior, MSRV, or
+maturity-label change.
+
+### Added
+
+- `tools/matten-report --input <csv-path> --kind data-readiness --select
+  <cols> --format json --output <report.json>`, covering both successful
+  strict numeric conversion and bounded strict-conversion-error outcomes.
+- `input_mode: "csv"` extension of the private `schema_version: 0` envelope
+  (`schema_status: "private-local"`, `tool: "matten-report"`, `report_kind:
+  "data-readiness"`), alongside the existing `input_mode: "demo"` fixed-demo
+  envelope.
+- Structured bounded-string and bounded-list representations (`value` /
+  `truncated` / `shown_*` / `total_*` / `limit`) for every user-controlled
+  field: input label, source/selected/left-out column names, missing-count
+  entries, and normalized conversion-error text. No synthetic `"... N more"`
+  items; counts use Unicode scalar values, not bytes.
+- Exact source-owned snapshot and policy tests for both outcomes, including
+  quote/backslash/control/non-ASCII round-trips, 120/240-character boundaries,
+  wide-list truncation, and non-finite tensor-value rejection.
+- `tools/matten-report/fixtures/header_only.csv` and `fixtures/non_finite.csv`,
+  and pre-write destination-preservation coverage (absent and existing-sentinel
+  destinations) for the zero-row tensor-construction and non-finite failure
+  paths.
+- Release-checklist and CI smoke commands for the new input-mode JSON success
+  and conversion-error artifacts.
+
+### Changed
+
+- The four shared report display-limit constants (`MAX_DISPLAY_COLUMNS`,
+  `MAX_DISPLAY_CHARS`, `MAX_ERROR_CHARS`, `MAX_TENSOR_PREVIEW_VALUES`) are now
+  owned solely by `render::common`; HTML and fixed-demo JSON output are
+  unchanged (byte-identical) after the relocation.
+- `tools/matten-report --help` grew one usage line for the new input-mode JSON
+  command; the JSON policy sentence now reads "HTML and private JSON are local
+  file output" instead of "HTML and private fixed-demo JSON," since the old
+  wording became inaccurate once input-mode JSON shipped.
+- RFC-073 records the private input-mode JSON slice as implemented, reviewed,
+  committed, and prepared for the `0.38.0` release. RFC-070 remains closed for
+  public visualization/report readiness. Public report/viz crates, public
+  schemas, public renderer APIs, input-mode JSON for report kinds other than
+  data-readiness, raw CSV export, SVG/Vega-Lite output, expression tracing,
+  autograd, notebook/browser/GUI scope, and broader linalg remain deferred.
+
+### Version
+
+- Release bump `0.37.0` -> `0.38.0`. Lock-step family versioning still applies
+  to all workspace crates; `tools/matten-report` and `tools/matten-migrate`
+  remain local unpublished tools at their own tool versions.
+
 ## [0.37.0] - 2026-07-21
 
 RFC-071 fixed-demo private JSON report release. This release stops feature work
