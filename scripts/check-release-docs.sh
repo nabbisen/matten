@@ -9,6 +9,7 @@ CORE="crates/matten"
 NDARRAY="crates/matten-ndarray"
 MLPREP="crates/matten-mlprep"
 DATA="crates/matten-data"
+STATS="crates/matten-stats"
 
 # ---------------------------------------------------------------------------
 # Core checks
@@ -109,12 +110,31 @@ if grep -niE 'matten-data.*\((Experimental|Beta)\)' docs/src/examples/companions
   FAIL=1
 fi
 
+echo "=== Checking matten-stats declares Experimental status (RFC-078) ==="
+# Unlike the other companions, Experimental IS the correct current label for
+# matten-stats — it is a brand-new crate with no usage history. This check is
+# the positive counterpart of the staleness checks above: it fails if the
+# label is ever silently dropped (e.g. a doc edit that forgets it) rather than
+# deliberately promoted through a reviewed maturity decision.
+if [ -d "$STATS" ]; then
+  if ! grep -qi "Experimental" "$STATS/README.md" 2>/dev/null; then
+    echo "ERROR: matten-stats README does not declare Experimental status"
+    FAIL=1
+  fi
+  if ! grep -q "Experimental" "$STATS/src/lib.rs" 2>/dev/null; then
+    echo "ERROR: matten-stats lib.rs does not declare Experimental status"
+    FAIL=1
+  fi
+fi
+
 # ---------------------------------------------------------------------------
 # Companion dynamic-rejection guard soundness (RFC-031)
 # ---------------------------------------------------------------------------
 
 echo "=== Checking companion dynamic guards are NOT cfg-gated (RFC-031) ==="
-if grep -n '#\[cfg(feature = "dynamic")\]' "$NDARRAY/src/convert.rs" "$MLPREP/src/util.rs" 2>/dev/null; then
+if grep -n '#\[cfg(feature = "dynamic")\]' \
+     "$NDARRAY/src/convert.rs" "$MLPREP/src/util.rs" \
+     "$STATS/src/covariance.rs" "$STATS/src/quantile.rs" 2>/dev/null; then
   echo "ERROR: companion dynamic rejection guard is still behind #[cfg(feature = \"dynamic\")] (RFC-031 regression)"
   FAIL=1
 fi
@@ -126,15 +146,15 @@ fi
 echo "=== Checking companions do not re-export core matten (RFC-032 §3.2/§3.3) ==="
 # Matches `pub use matten;` and `pub use matten::<Item>;`. Whole-crate re-export
 # (§3.3) is deferred; introducing it requires amending RFC-032 and relaxing this check.
-if grep -rn "pub use matten\b" "$NDARRAY/src" "$MLPREP/src" "$DATA/src" 2>/dev/null; then
+if grep -rn "pub use matten\b" "$NDARRAY/src" "$MLPREP/src" "$DATA/src" "$STATS/src" 2>/dev/null; then
   echo "ERROR: companions must not re-export core matten types/crate (RFC-032)"
   FAIL=1
 fi
 
 echo "=== Checking Tensor is imported from matten, not a companion (RFC-032 §3.4) ==="
-if grep -rn "use matten_ndarray::[^;]*Tensor\|use matten_mlprep::[^;]*Tensor" \
-     "$NDARRAY/examples" "$MLPREP/examples" \
-     "$NDARRAY/README.md" "$MLPREP/README.md" \
+if grep -rn "use matten_ndarray::[^;]*Tensor\|use matten_mlprep::[^;]*Tensor\|use matten_stats::[^;]*Tensor" \
+     "$NDARRAY/examples" "$MLPREP/examples" "$STATS/examples" \
+     "$NDARRAY/README.md" "$MLPREP/README.md" "$STATS/README.md" \
      docs/src 2>/dev/null; then
   echo "ERROR: import Tensor from matten, not a companion (RFC-032 §3.4)"
   FAIL=1
@@ -149,8 +169,8 @@ fi
 
 USER_DOCS=(
   README.md
-  "$CORE/README.md" "$NDARRAY/README.md" "$MLPREP/README.md" "$DATA/README.md"
-  "$CORE/src/lib.rs" "$NDARRAY/src/lib.rs" "$MLPREP/src/lib.rs" "$DATA/src/lib.rs"
+  "$CORE/README.md" "$NDARRAY/README.md" "$MLPREP/README.md" "$DATA/README.md" "$STATS/README.md"
+  "$CORE/src/lib.rs" "$NDARRAY/src/lib.rs" "$MLPREP/src/lib.rs" "$DATA/src/lib.rs" "$STATS/src/lib.rs"
   docs/src
 )
 

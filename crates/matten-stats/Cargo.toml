@@ -1,0 +1,33 @@
+[package]
+name        = "matten-stats"
+description = "Small, explicit scalar statistics for matten::Tensor (covariance, correlation, quantile)."
+readme      = "README.md"
+categories              = ["science", "mathematics"]
+keywords                = ["tensor", "statistics", "covariance", "correlation", "matten"]
+version.workspace       = true
+edition.workspace       = true
+rust-version.workspace  = true
+license.workspace       = true
+authors.workspace       = true
+repository.workspace    = true
+
+[features]
+# Forwarded so dynamic-tensor rejection compiles only when dynamic tensors exist.
+dynamic         = ["matten/dynamic"]
+
+[dependencies]
+matten                      = { workspace = true }
+
+# Namespaced example target names avoid a binary-name collision with core
+# matten's same-named pattern examples when the whole workspace is built at once.
+[[example]]
+name = "stats_covariance"
+path = "examples/covariance.rs"
+
+[[example]]
+name = "stats_correlation"
+path = "examples/correlation.rs"
+
+[[example]]
+name = "stats_quantile"
+path = "examples/quantile.rs"

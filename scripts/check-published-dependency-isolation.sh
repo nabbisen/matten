@@ -27,17 +27,18 @@ if ! command -v cargo >/dev/null 2>&1; then
   exit 1
 fi
 
-PUBLISHED_CRATES=(matten matten-data matten-mlprep matten-ndarray)
+PUBLISHED_CRATES=(matten matten-data matten-mlprep matten-ndarray matten-stats)
 
 # Forbidden direct/transitive (normal,build) dependencies per published crate.
 # `matten-ndarray` is allowed `ndarray` (its reason for existing); everything else
 # forbids the peer/benchmark crates. Core additionally forbids the companions.
 forbidden_for() {
   case "$1" in
-    matten)         echo "criterion ndarray nalgebra matten-data matten-mlprep matten-ndarray" ;;
+    matten)         echo "criterion ndarray nalgebra matten-data matten-mlprep matten-ndarray matten-stats" ;;
     matten-data)    echo "criterion ndarray nalgebra" ;;
     matten-mlprep)  echo "criterion ndarray nalgebra" ;;
     matten-ndarray) echo "criterion nalgebra" ;;  # ndarray intentionally allowed (bridge)
+    matten-stats)   echo "criterion ndarray nalgebra" ;;
     *)              echo "" ;;
   esac
 }

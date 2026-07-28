@@ -5,6 +5,7 @@ members = [
     "crates/matten-ndarray",
     "crates/matten-mlprep",
     "crates/matten-data",
+    "crates/matten-stats",
 ]
 # The RFC-031 regression fixture is a standalone crate, intentionally kept OUT of
 # the workspace: it simulates a downstream consumer with a specific feature set

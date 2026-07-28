@@ -70,6 +70,18 @@ local path). This is a maintenance policy (RFC-064): it reduces version-line
 churn in member manifests while keeping release identity, maturity labels, and
 user-facing install guidance tied to the lock-step family.
 
+## `matten-stats` — a deliberate `ddof` divergence (RFC-078)
+
+`matten-stats` is a new companion crate at **Experimental** maturity (no usage
+history yet). Its `covariance` and `correlation` functions use the **sample**
+estimator (`ddof = 1`, i.e. divide by `n - 1`), diverging deliberately from
+core `matten`'s **population** `var`/`std` (`ddof = 0`). This matches the
+near-universal default in inferential statistics (NumPy, R, pandas) and is
+the only behavioral divergence between a companion and core in the family.
+`correlation` is unaffected by the choice — the `n - 1` factors cancel — so
+only `covariance`'s numeric output actually differs from what core's
+population convention would produce. See RFC-078 §4.1 for the full rationale.
+
 ## v1.0 requirements
 
 v1.0.0 requires explicit maintainer confirmation. Before that can happen:

@@ -23,6 +23,7 @@ FORBIDDEN=(
   matten-ndarray
   matten-mlprep
   matten-data
+  matten-stats
   criterion
 )
 
