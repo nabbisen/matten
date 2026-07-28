@@ -61,6 +61,23 @@ let back = from_arrayd(arr)?;     // ArrayD<f64> -> Tensor
   `Tensor::try_numeric()` first.
 - **Supported `ndarray`:** the `0.17` minor (CI targets `0.17.2`).
 
+## Public API
+
+The complete surface (the breaking-change baseline for this crate):
+
+```rust
+pub fn to_arrayd(tensor: &Tensor)      -> Result<ArrayD<f64>, MattenNdarrayError>;
+pub fn from_arrayd(array: ArrayD<f64>) -> Result<Tensor, MattenNdarrayError>;
+
+#[non_exhaustive]
+pub enum MattenNdarrayError {
+    DynamicTensor,
+    ZeroSizedAxis(Vec<usize>),
+    NdarrayShape(ndarray::ShapeError),
+    Matten(matten::MattenError),
+}
+```
+
 ## Conversion contract
 
 `matten-ndarray` follows the bridge [conversion-contract](../../docs/src/migration/bridge-contracts.md)

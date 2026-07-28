@@ -63,6 +63,59 @@ expose a second computation engine.
   depends on `matten-data` (enforced by the dependency-boundary CI check).
 - **Safe Rust only:** `#![forbid(unsafe_code)]`.
 
+## Public API
+
+The complete surface (the breaking-change baseline for this crate):
+
+```rust
+impl Table {
+    pub fn from_csv_str(input: &str)                      -> Result<Table, MattenDataError>;
+    pub fn from_csv_path<P: AsRef<Path>>(path: P)          -> Result<Table, MattenDataError>;
+    pub fn row_count(&self)                                -> usize;
+    pub fn column_count(&self)                             -> usize;
+    pub fn column_names(&self)                             -> &[String];
+    pub fn schema_summary(&self)                           -> SchemaSummary;
+    pub fn select_columns<I, S>(&self, columns: I)         -> Result<Table, MattenDataError>;
+    pub fn fill_missing(&self, value: impl Into<CellValue>) -> Result<Table, MattenDataError>;
+    pub fn try_numeric(&self)                              -> Result<NumericTable, MattenDataError>;
+}
+
+impl NumericTable {
+    pub fn row_count(&self)      -> usize;
+    pub fn column_count(&self)   -> usize;
+    pub fn column_names(&self)   -> &[String];
+    pub fn to_tensor(&self)      -> Result<matten::Tensor, MattenDataError>;
+}
+
+pub enum CellValue { Text(String), Float(f64), Int(i64), Bool(bool), Missing }
+
+#[non_exhaustive]
+pub enum ColumnKind { Integer, Float, Boolean, Text, Mixed, MissingOnly }
+
+pub struct ColumnSummary { pub name: String, pub kind: ColumnKind, pub missing: usize }
+
+pub struct SchemaSummary {
+    pub rows: usize,
+    pub columns: usize,
+    // per-column detail via column_summaries() -> &[ColumnSummary]
+}
+
+#[non_exhaustive]
+pub enum MattenDataError {
+    Csv { message: String },
+    Io { path: PathBuf, source: std::io::Error },
+    EmptyInput,
+    MissingColumn { name: String },
+    DuplicateColumn { name: String },
+    DuplicateSelection { name: String },
+    RaggedRow { row: usize, expected: usize, actual: usize },
+    NonNumericValue { column: String, row: usize, value: String },
+    MissingValue { column: String, row: usize },
+    EmptySelection,
+    Matten(matten::MattenError),
+}
+```
+
 ## Dependency style
 
 This crate depends on `matten`. Official examples import `Tensor` from `matten` directly:

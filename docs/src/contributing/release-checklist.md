@@ -141,6 +141,24 @@ grep -n "^pub use" src/lib.rs
 
 Verify no module accidentally became `pub mod`.
 
+**`cargo public-api` snapshot (manual, pre-v1.0 minimum-viable step; RFC-066
+NF-2, re-confirmed open by the RFC-074 re-audit).** Not wired as a CI gate or
+project dependency. Before a minor/major release that touches public API
+surface, run it by hand for `matten` and any companion whose surface changed,
+and reconcile the output against `docs/src/reference/public-api-snapshot.md`
+and each crate's `## Public API` README block:
+
+```bash
+cargo install cargo-public-api   # one-time, not a project dependency
+cargo public-api --manifest-path crates/matten/Cargo.toml
+cargo public-api --manifest-path crates/matten-ndarray/Cargo.toml
+cargo public-api --manifest-path crates/matten-mlprep/Cargo.toml
+cargo public-api --manifest-path crates/matten-data/Cargo.toml
+```
+
+Wiring this into CI (toolchain pinning, nightly requirements) is a separate,
+explicit decision — do not add it silently as part of a routine release.
+
 ### 6. Documentation truth pass
 
 ```bash

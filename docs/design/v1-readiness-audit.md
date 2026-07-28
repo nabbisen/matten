@@ -4,7 +4,8 @@
 **Related RFC:** RFC-066 (original audit, v0.31.0); re-audited under RFC-074
 **Document kind:** Readiness audit report
 **Status:** Re-audited (0.38.0); conditionally ready on technical grounds, blocked on an
-explicit maintainer decision (MD-2)
+explicit maintainer decision (MD-2). Post-audit: NF-1 and NF-2 closed (H0, see
+[Post-Audit Update](#post-audit-update-nf-1-nf-2-closed)).
 **Scope:** Audit report only; no v1.0 release authorization
 
 ---
@@ -21,8 +22,8 @@ traceability, per RFC-074 goal #1.
 ```text
 BF-1 (public API snapshot dynamic-serde inconsistency): remains remediated.
 MD-1 (lock-step v1.0 with candidate companions): remains resolved by RFC-067.
-NF-1 (matten-data and matten-ndarray lack an explicit Public API README block): still open, unchanged.
-NF-2 (cargo public-api not wired as a gate): still open, unchanged.
+NF-1 (matten-data and matten-ndarray lack an explicit Public API README block): closed post-audit (H0).
+NF-2 (cargo public-api not wired as a gate): closed post-audit (H0) as a manual release-checklist step.
 ```
 
 **On narrow technical grounds, the public surface is more provably stable now
@@ -87,8 +88,8 @@ RFC, release-policy decision, or accepted implementation slice.
 |---|---|---|
 | BF-1 — public API snapshot self-contradicted on dynamic serde behavior | Remediated | **Unchanged, remains remediated.** `public-api-snapshot.md`'s dynamic-behaviour table still says `Serialize` returns a serde error; `crates/matten/src/ser.rs` behavior is unchanged (zero source churn since `0.31.0`). |
 | MD-1 — can a lock-step v1.0 family include candidate-labeled companions? | Resolved by RFC-067 | **Unchanged, remains resolved.** RFC-067's policy (candidate label is not an automatic v1.0 blocker, but a future v1.0 RFC must include the RFC-067 family maturity table) has not been revisited or contradicted. |
-| NF-1 — `matten-data` README lacks an explicit Public API block | Non-blocking | **Still open.** `crates/matten-data/README.md` sections remain: Overview, Not a dataframe library, Relationship to core `dynamic`, Status and scope, Dependency style, Compatibility — no `## Public API` heading. `matten-mlprep/README.md` has one (`## Public API`, line 71); `matten-data` and `matten-ndarray` do not. |
-| NF-2 — `cargo public-api` not wired as a gate | Non-blocking | **Still open.** No reference to `cargo public-api` or `public-api` tooling exists in `scripts/`, `.github/workflows/`, or the release checklist beyond the existing manual `grep -n "^pub use"` spot-check. |
+| NF-1 — `matten-data` README lacks an explicit Public API block | Non-blocking | As found at audit time: open. `crates/matten-data/README.md` sections were: Overview, Not a dataframe library, Relationship to core `dynamic`, Status and scope, Dependency style, Compatibility — no `## Public API` heading. `matten-mlprep/README.md` had one (`## Public API`, line 71); `matten-data` and `matten-ndarray` did not. **Closed post-audit; see [Post-Audit Update](#post-audit-update-nf-1-nf-2-closed).** |
+| NF-2 — `cargo public-api` not wired as a gate | Non-blocking | As found at audit time: open. No reference to `cargo public-api` or `public-api` tooling existed in `scripts/`, `.github/workflows/`, or the release checklist beyond the existing manual `grep -n "^pub use"` spot-check. **Closed post-audit; see [Post-Audit Update](#post-audit-update-nf-1-nf-2-closed).** |
 
 No RFC-066 finding regressed. Two non-blocking findings (NF-1, NF-2) simply
 never got picked up, which is consistent with this audit's broader finding
@@ -348,7 +349,12 @@ Against that list:
 
 ```text
 public API review complete             -> substantively yes (re-verified above)
-cargo public-api snapshot approved      -> NOT DONE (NF-2, still open, 2+ audits running)
+cargo public-api snapshot approved      -> tooling now documented as a manual
+                                            release-checklist step (NF-2
+                                            closed post-audit), but no
+                                            snapshot has actually been taken
+                                            or approved yet -> still NOT DONE
+                                            as a v1.0 gate item
 panic/Result split finalized            -> yes, unchanged and stable
 serde canonical format declared stable  -> the JSON object form is de facto
                                             stable (zero churn) but has never
@@ -385,7 +391,7 @@ same v1.0.0 gate:
 
 | Gate | Assessment |
 |---|---|
-| stable core public API | **Stronger than at the original audit.** Zero churn across eight releases is direct evidence, not just documentation review. `cargo public-api` snapshot (NF-2) is still the one missing formal step. |
+| stable core public API | **Stronger than at the original audit.** Zero churn across eight releases is direct evidence, not just documentation review. `cargo public-api` tooling is now documented (NF-2 closed); actually running and approving a snapshot is still the one missing formal step. |
 | clear dynamic on-ramp story | Unchanged; still yes. |
 | strong, scoped examples | Unchanged; still yes. |
 | reliable diagnostics | Unchanged; still yes. |
@@ -414,22 +420,24 @@ and, if policy changes, a separate RFC.
 
 ## Non-Blocking Findings
 
-### NF-1: `matten-data` snapshot-equivalent docs are less explicit (unchanged, still open; scope corrected)
+### NF-1: `matten-data` snapshot-equivalent docs are less explicit (CLOSED post-audit)
 
-Unchanged from the original audit. `crates/matten-data/README.md` still lacks
-an explicit `## Public API` block comparable to `matten-mlprep`'s. The
-re-audit corrects the scope of this finding: `crates/matten-ndarray/README.md`
-also lacks one — the asymmetry is one-of-four (only `matten-mlprep` has the
-block), not the `matten-data`-only gap the original audit's prose suggested,
-even though its own finding table already listed both crates correctly. Cheap
-to close whenever the maintainer next touches those READMEs; does not require
-its own RFC.
+As found at audit time (unchanged from the original audit):
+`crates/matten-data/README.md` lacked an explicit `## Public API` block
+comparable to `matten-mlprep`'s. The re-audit corrected the scope of this
+finding: `crates/matten-ndarray/README.md` also lacked one — the asymmetry
+was one-of-four (only `matten-mlprep` had the block), not the
+`matten-data`-only gap the original audit's prose suggested, even though its
+own finding table already listed both crates correctly.
 
-### NF-2: `cargo public-api` remains a future snapshot step (unchanged, still open)
+**Closed.** See [Post-Audit Update](#post-audit-update-nf-1-nf-2-closed).
 
-Unchanged from the original audit. Still not wired as a project dependency or
-gate. A v1.0 release-prep RFC should decide how to take, store, and review the
-official snapshot — this audit does not add the tooling itself.
+### NF-2: `cargo public-api` remains a future snapshot step (CLOSED post-audit)
+
+As found at audit time (unchanged from the original audit): not wired as a
+project dependency or gate.
+
+**Closed.** See [Post-Audit Update](#post-audit-update-nf-1-nf-2-closed).
 
 ## Verification Record
 
@@ -495,19 +503,40 @@ Path A — adopt "0.x indefinitely" explicitly.
   maintainer to actually choose this rather than let it remain implicit.
 
 Path B — pursue v1.0 deliberately.
-  Draft a separate v1.0 release RFC that: closes NF-1 (matten-data and
-  matten-ndarray Public API README blocks), closes NF-2 (adopt and wire
-  cargo public-api), declares
-  the JSON canonical serde format explicitly stable, includes the RFC-067
-  family maturity table deciding matten-mlprep/matten-data's candidate-label
-  inclusion, and resolves MD-2 (a versioning-policy statement, even if the
-  answer is "keep RFC-030 unchanged, decided consciously").
+  NF-1 and NF-2 are now closed post-audit (see Post-Audit Update below), so
+  a v1.0 release RFC's remaining prerequisites are: declare the JSON
+  canonical serde format explicitly stable, include the RFC-067 family
+  maturity table deciding matten-mlprep/matten-data's candidate-label
+  inclusion, actually run and approve a cargo public-api snapshot, and
+  resolve MD-2 (a versioning-policy statement, even if the answer is "keep
+  RFC-030 unchanged, decided consciously").
 ```
 
 This audit does not choose between Path A and Path B; that choice is MD-2's
 resolution and belongs to the maintainer. Whichever is chosen, this report's
-prerequisite list (NF-1, NF-2, serde-stability declaration, RFC-067 table,
-MD-2 resolution) is what a Path B v1.0 release RFC would need to close before
-release preparation could begin.
+prerequisite list (serde-stability declaration, RFC-067 table, an approved
+cargo public-api snapshot, MD-2 resolution) is what a Path B v1.0 release RFC
+would need to close before release preparation could begin.
+
+## Post-Audit Update: NF-1, NF-2 closed
+
+After this re-audit and its review (`matten-rfc074-v1-readiness-reaudit-review-v0.1.md`,
+GO), the two non-blocking findings were closed as the review's H0 common
+first step (applicable to either path):
+
+```text
+NF-1: added a `## Public API` block to crates/matten-data/README.md and
+      crates/matten-ndarray/README.md, mirroring crates/matten-mlprep/README.md's.
+NF-2: added `cargo public-api` as a documented manual pre-release step in
+      docs/src/contributing/release-checklist.md, reconciled against
+      docs/src/reference/public-api-snapshot.md and each crate's README
+      Public API block. Not wired into CI; that remains a separate,
+      explicit future decision (toolchain pinning, nightly requirements).
+```
+
+This closes the tooling/documentation gap only. It does not mean a
+`cargo public-api` snapshot has actually been taken and approved yet — that
+remains a real Path B prerequisite, to be run before an actual v1.0
+release-prep RFC, not before this audit-adjacent cleanup.
 
 No v1.0 release is authorized by this report.
