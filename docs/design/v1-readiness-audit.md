@@ -21,7 +21,7 @@ traceability, per RFC-074 goal #1.
 ```text
 BF-1 (public API snapshot dynamic-serde inconsistency): remains remediated.
 MD-1 (lock-step v1.0 with candidate companions): remains resolved by RFC-067.
-NF-1 (matten-data lacks an explicit Public API README block): still open, unchanged.
+NF-1 (matten-data and matten-ndarray lack an explicit Public API README block): still open, unchanged.
 NF-2 (cargo public-api not wired as a gate): still open, unchanged.
 ```
 
@@ -192,11 +192,14 @@ rfcs/done/037-deferred-streaming-and-large-csv-policy.md
 ```
 
 **Broader statistics** (covariance, correlation, quantile, percentile,
-histogram, z-score): RFC-040 §8 explicitly rejects these from core, not merely
-defers them — "Do not put histogram or quantile in core initially," with
-`matten-stats` requiring "at least three APIs are clearly useful" before even
-being scaffolded. This is a **settled scope decision**, not an open question.
-**Not a v1 blocker** — v1.0 can ship with the documented boundary as-is.
+histogram, z-score): RFC-040 §8's own wording is a deferral with a directed
+home, not a permanent rejection — "Do not put histogram or quantile in core
+**initially**," with `matten-stats` accepting them "**if accepted**," and
+RFC-040's status line reads "quantile/histogram/cov/corr/z-score
+**deferred**." Core placement is settled *against* for now; the companion
+question remains explicitly open, unlike RFC-041 below. Either way, this sits
+outside the current documented contract and adding it later — in core or in
+`matten-stats` — is additive, not breaking. **Not a v1 blocker.**
 
 **Broader linear algebra** (inverse, determinant, decomposition, BLAS/sparse):
 RFC-041 §5 explicitly rejects these from core with a permanent rationale
@@ -205,8 +208,10 @@ users to `nalgebra`/`ndarray-linalg` instead. **Settled, not a v1 blocker.**
 
 **Streaming / large CSV**: RFC-037 defers this with explicit, unmet reopening
 criteria (batch model, schema-drift policy, malformed-row policy, memory
-budget, sync-vs-async, crate placement — none answered). Unlike stats/linalg,
-this is a genuine "not yet designed" gap rather than a rejected scope. But
+budget, sync-vs-async, crate placement — none answered). Unlike linalg, this
+is a genuine "not yet designed" gap rather than a rejected scope, and it is
+even less settled than the deferred-but-directed stats question above (no
+companion crate name or acceptance bar exists yet for streaming). But
 `matten-data`'s current documented scope (in-memory rectangular CSV,
 explicitly "not a dataframe engine") does not promise streaming, so v1.0 does
 not need to resolve it first — reopening streaming later is additive, not a
@@ -214,10 +219,11 @@ breaking change to the current contract. **Not a v1 blocker**, provided the
 current scope statement stays in the docs unchanged at v1.0.
 
 **Conclusion: none of the three deferred-mathematics/streaming themes block
-v1.0.** All three are either explicitly rejected core scope (settled) or an
-additive future capability outside the current documented contract
-(streaming). This narrows the v1.0 question to the API/boundary/versioning
-axes actually covered elsewhere in this report.
+v1.0.** Linalg is settled-rejected; stats is settled-against-core-for-now but
+deferred-not-rejected toward a companion; streaming is genuinely open but
+additive. All three sit outside the current documented contract, and none
+requires resolution before v1.0. This narrows the v1.0 question to the
+API/boundary/versioning axes actually covered elsewhere in this report.
 
 ## Companion Maturity Review (RFC-074 §5.3)
 
@@ -408,12 +414,16 @@ and, if policy changes, a separate RFC.
 
 ## Non-Blocking Findings
 
-### NF-1: `matten-data` snapshot-equivalent docs are less explicit (unchanged, still open)
+### NF-1: `matten-data` snapshot-equivalent docs are less explicit (unchanged, still open; scope corrected)
 
 Unchanged from the original audit. `crates/matten-data/README.md` still lacks
-an explicit `## Public API` block comparable to `matten-mlprep`'s. Cheap to
-close whenever the maintainer next touches that README; does not require its
-own RFC.
+an explicit `## Public API` block comparable to `matten-mlprep`'s. The
+re-audit corrects the scope of this finding: `crates/matten-ndarray/README.md`
+also lacks one — the asymmetry is one-of-four (only `matten-mlprep` has the
+block), not the `matten-data`-only gap the original audit's prose suggested,
+even though its own finding table already listed both crates correctly. Cheap
+to close whenever the maintainer next touches those READMEs; does not require
+its own RFC.
 
 ### NF-2: `cargo public-api` remains a future snapshot step (unchanged, still open)
 
@@ -485,8 +495,9 @@ Path A — adopt "0.x indefinitely" explicitly.
   maintainer to actually choose this rather than let it remain implicit.
 
 Path B — pursue v1.0 deliberately.
-  Draft a separate v1.0 release RFC that: closes NF-1 (matten-data Public
-  API README block), closes NF-2 (adopt and wire cargo public-api), declares
+  Draft a separate v1.0 release RFC that: closes NF-1 (matten-data and
+  matten-ndarray Public API README blocks), closes NF-2 (adopt and wire
+  cargo public-api), declares
   the JSON canonical serde format explicitly stable, includes the RFC-067
   family maturity table deciding matten-mlprep/matten-data's candidate-label
   inclusion, and resolves MD-2 (a versioning-policy statement, even if the
