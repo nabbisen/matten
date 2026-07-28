@@ -2,12 +2,10 @@ use std::error::Error;
 use std::fmt::Write as _;
 
 use super::document::{escape, render, write_shape_flow_table};
+use crate::render::common::{
+    MAX_DISPLAY_CHARS, MAX_DISPLAY_COLUMNS, MAX_ERROR_CHARS, MAX_TENSOR_PREVIEW_VALUES,
+};
 use crate::report::data_readiness::{DataReadinessConversion, DataReadinessReportData};
-
-const MAX_DISPLAY_COLUMNS: usize = 12;
-const MAX_DISPLAY_CHARS: usize = 120;
-const MAX_ERROR_CHARS: usize = 240;
-const MAX_TENSOR_PREVIEW_VALUES: usize = 12;
 
 pub(crate) fn render_demo(data: &DataReadinessReportData) -> Result<String, Box<dyn Error>> {
     let (tensor_shape, tensor_values) = match &data.conversion {

@@ -64,9 +64,6 @@ fn render_report(config: &Config) -> Result<String, Box<dyn Error>> {
             }
         }
         (Input::CsvPath { path }, ReportKind::DataReadiness) => {
-            if config.format == OutputFormat::Json {
-                return Err("--format json is not supported for --input yet".into());
-            }
             let table = Table::from_csv_path(path).map_err(Box::<dyn Error>::from)?;
             let data = report::data_readiness::build(
                 &format!("path: {}", path.display()),
@@ -76,7 +73,7 @@ fn render_report(config: &Config) -> Result<String, Box<dyn Error>> {
             match config.format {
                 OutputFormat::Markdown => render::markdown::data_readiness::render(&data),
                 OutputFormat::Html => render::html::data_readiness::render_input(&data),
-                OutputFormat::Json => Err("--format json is not supported for --input yet".into()),
+                OutputFormat::Json => render::json::data_readiness::input::render(&data),
             }
         }
         (Input::CsvPath { .. }, kind) => Err(format!(

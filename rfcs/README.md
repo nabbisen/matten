@@ -91,22 +91,22 @@ The broader documentation ownership model is recorded in
 
 | ID | Title | Scope |
 |---:|---|---|
-| 073 | [Private Input-Mode JSON Report Policy](./proposed/073-private-input-mode-json-report-policy.md) | Policy and detailed handoff accepted; one implementation checkpoint authorized; release decision unauthorized |
+| 073 | [Private Input-Mode JSON Report Policy](./proposed/073-private-input-mode-json-report-policy.md) | Implementation completed and prepared for review; release decision unauthorized |
 
 ## Remaining Themes And Issues
 
 RFC-070 is closed as an audit decision without public implementation. RFC-072
 is closed after its reviewed behavior-preserving modularization. RFC-073 is the
-active policy-first decision for private input-mode JSON. The remaining themes
-below are not authorized unless their current status says so. The current
-post-0.37 backlog is:
+active private input-mode JSON implementation line and is prepared for review.
+The remaining themes below are not authorized unless their current status says
+so. The current post-0.37 backlog is:
 
 | Theme | Current authority | Current status |
 |---|---|---|
 | Public `matten-report` / `matten-viz` readiness | RFC-070, RFC-063, RFC-065, RFC-068, RFC-069, RFC-071 | RFC-070 closed after audit; no public crate or API authorized |
 | `matten-report` modularization | RFC-072, RFC-070 post-0.37 closure audit | Implemented and closed; internal ownership and size guards are established without behavior or public-surface change |
 | More input-mode HTML paths | RFC-069, post-0.36 RFC-069 closure audit | Deferred until a concrete report path is reviewed |
-| JSON / SVG / Vega-Lite report output | RFC-063, RFC-068, RFC-069, RFC-070 JSON policy audit, RFC-071, RFC-073 | RFC-073 policy/handoff accepted and one private input JSON implementation checkpoint authorized; release, public schemas, SVG, and Vega-Lite remain unauthorized |
+| JSON / SVG / Vega-Lite report output | RFC-063, RFC-068, RFC-069, RFC-070 JSON policy audit, RFC-071, RFC-073 | RFC-073 private input JSON implementation completed and prepared for review; release, public schemas, SVG, and Vega-Lite remain unauthorized |
 | Streaming / large CSV | RFC-026, RFC-037 | Deferred; future implementation RFC must answer batch/schema/malformed-row/memory/sync-vs-async policy |
 | `matten-nalgebra` bridge | RFC-025, RFC-041, RFC-054 bridge-readiness handoff | Deferred; per-crate RFC required |
 | `matten-candle` bridge | RFC-025, RFC-049, RFC-054 bridge-readiness handoff | Deferred; per-crate RFC required |
@@ -336,14 +336,14 @@ features require a separate RFC-first decision.
 
 RFC-073
 ([`073-private-input-mode-json-report-policy.md`](./proposed/073-private-input-mode-json-report-policy.md))
-is the active implementation candidate. Its accepted policy permits a bounded
+is the active implementation line. Its accepted policy permits a bounded
 private schema-v0 JSON file for successful and failed strict numeric conversion
 on the existing data-readiness CSV input path. It keeps raw CSV export, public
 schemas/APIs/crates, other input report kinds, broader formats, mathematics,
-bridges, implementation, and release work unauthorized until the applicable
-review gate. Policy acceptance opened only a detailed implementation handoff
+bridges and release work unauthorized until the applicable review gate. Policy
+acceptance opened a detailed implementation handoff
 ([`073-private-input-mode-json-implementation-handoff.md`](./handoffs/073-private-input-mode-json-implementation-handoff.md)).
-That accepted handoff defines and authorizes one coherent implementation
-checkpoint with exact private schema shape, bounds, outcome taxonomy,
-destination-preservation tests, and regression gates. Release work remains a
-separate unauthorized decision.
+That accepted handoff defines one coherent implementation checkpoint with exact
+private schema shape, bounds, outcome taxonomy, destination-preservation tests,
+and regression gates. The checkpoint is complete and prepared for review.
+Release work remains a separate unauthorized decision.

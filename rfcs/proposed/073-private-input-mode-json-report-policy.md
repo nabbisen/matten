@@ -1,6 +1,6 @@
 # RFC-073: Private Input-Mode JSON Report Policy
 
-**Status:** Proposed; policy and detailed implementation handoff accepted; one implementation checkpoint authorized; release decision unauthorized
+**Status:** Proposed; implementation completed and prepared for review; release decision unauthorized
 **Target:** Post-0.37 local-tool policy; release family undecided
 **Theme:** Bounded private JSON for user-provided data-readiness input
 **Depends on:** RFC-001, RFC-037, RFC-069, RFC-070, RFC-071, RFC-072
@@ -27,9 +27,10 @@ extends the private schema-v0 approach from RFC-071 to the already-supported
 data-readiness input path from RFC-069. It does not create a public schema,
 public renderer API, published report crate, or raw CSV export.
 
-This proposal defines the policy review boundary only. No implementation,
-detailed handoff, version, release preparation, tag, or publish action is
-authorized before review accepts the RFC.
+The accepted policy and detailed handoff authorized one implementation
+checkpoint. That checkpoint is complete and prepared for review. No public
+schema or API, version, release preparation, tag, or publish action is
+authorized.
 
 ## 2. Why This Is The Next Candidate
 

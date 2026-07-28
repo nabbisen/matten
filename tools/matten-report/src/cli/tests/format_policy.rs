@@ -250,22 +250,3 @@ fn fixed_demo_json_allows_explicit_output() {
         Some(PathBuf::from("target/matten-report-shape-flow.json"))
     );
 }
-
-#[test]
-fn input_mode_json_is_not_supported() {
-    let err = parse_args(args(&[
-        "--input",
-        "fixtures/small.csv",
-        "--kind",
-        "data-readiness",
-        "--select",
-        "sales,cost",
-        "--format",
-        "json",
-        "--output",
-        "target/matten-report-input.json",
-    ]))
-    .unwrap_err();
-
-    assert!(err.contains("--format json is not supported for --input yet"));
-}

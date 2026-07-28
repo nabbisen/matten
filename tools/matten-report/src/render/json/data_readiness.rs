@@ -7,6 +7,8 @@ use super::model::{
 use crate::report::data_readiness::{DataReadinessConversion, DataReadinessReportData};
 use crate::request::KIND_DATA_READINESS;
 
+pub(crate) mod input;
+
 pub(crate) fn render(data: &DataReadinessReportData) -> Result<String, Box<dyn Error>> {
     render_json_envelope(KIND_DATA_READINESS, payload(data)?)
 }

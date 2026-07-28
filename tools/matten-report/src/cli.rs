@@ -160,7 +160,10 @@ fn validate_json_format_policy(config: &Config) -> Result<(), String> {
             supported_json_demos(),
             config.kind.as_str()
         )),
-        Input::CsvPath { .. } => Err("--format json is not supported for --input yet".to_string()),
+        Input::CsvPath { .. } if config.kind == ReportKind::DataReadiness => Ok(()),
+        Input::CsvPath { .. } => Err(format!(
+            "--format json is only supported for --input <csv-path> --kind {KIND_DATA_READINESS}"
+        )),
     }
 }
 
@@ -216,9 +219,10 @@ Usage:
   matten-report --demo educational-path --format json --output <report.json>
   matten-report --input <csv-path> --kind data-readiness --select <col1,col2> [--output <report.md>]
   matten-report --input <csv-path> --kind data-readiness --select <col1,col2> --format html --output <report.html>
+  matten-report --input <csv-path> --kind data-readiness --select <col1,col2> --format json --output <report.json>
 
 Demo reports are fixed examples. Input mode supports only data-readiness.
-Markdown is the default format. HTML and private fixed-demo JSON are local file output and require --output."
+Markdown is the default format. HTML and private JSON are local file output and require --output."
         .to_string()
 }
 

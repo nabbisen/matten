@@ -2,7 +2,7 @@ use std::error::Error;
 
 use serde::Serialize;
 
-const MAX_TENSOR_PREVIEW_VALUES: usize = 12;
+use crate::render::common::MAX_TENSOR_PREVIEW_VALUES;
 
 #[derive(Serialize)]
 pub(crate) struct JsonReportEnvelope<T> {

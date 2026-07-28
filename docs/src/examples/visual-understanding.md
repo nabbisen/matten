@@ -223,12 +223,14 @@ They deliberately do not add:
 ```text
 Tensor::plot or Tensor::show
 automatic expression tracing
-SVG, Vega-Lite, public JSON output, or input-mode JSON output
+SVG, Vega-Lite, or public JSON output
 notebook, GUI, or dashboard integration
 published report or visualization crates
 ```
 
-For local report artifacts, `tools/matten-report` supports private
-fixed-demo JSON output with `--format json --output <path>` in addition to the
-reviewed local HTML paths. That JSON is a private local-tool format, not a
-public schema.
+For local report artifacts, `tools/matten-report` supports private JSON output
+with `--format json --output <path>` for fixed demos and CSV
+`data-readiness` input. Input-mode JSON reports are bounded, summary-only
+artifacts for numeric-conversion success or conversion error; they do not
+export raw CSV rows. This remains a private schema-v0 local-tool format without
+a public compatibility promise.

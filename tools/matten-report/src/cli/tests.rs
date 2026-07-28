@@ -9,6 +9,7 @@ fn selected(values: &[&str]) -> Vec<String> {
 }
 
 mod format_policy;
+mod input_json;
 
 #[test]
 fn help_is_success_action() {

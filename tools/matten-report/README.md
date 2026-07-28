@@ -20,7 +20,7 @@ Scope:
 local tool only
 Markdown/plain text output by default
 static self-contained HTML output for fixed demos and data-readiness input mode
-private schema_version 0 JSON output for fixed demos only
+private schema_version 0 JSON output for fixed demos and data-readiness input mode
 explicit input/output behavior
 no public API
 no public JSON schema
@@ -185,9 +185,11 @@ limited to `--kind data-readiness`; it renders a bounded summary of the provided
 CSV file, not a full raw table.
 
 JSON output also requires `--output`. It is a private local-tool artifact with
-`schema_version: 0` and `schema_status: "private-local"`, supported only for
-fixed demo reports. Input-mode JSON is not supported, and there is no public
-JSON schema or compatibility promise.
+`schema_version: 0` and `schema_status: "private-local"`. Fixed demos and CSV
+input with `--kind data-readiness` are supported. Input reports contain bounded,
+summary-only source/selection/missing/conversion information for both numeric
+conversion success and conversion error; they do not export raw CSV rows or
+provide a public schema or compatibility promise.
 
 Run on a CSV file:
 
@@ -207,6 +209,17 @@ cargo run --manifest-path tools/matten-report/Cargo.toml -- \
   --select sales,cost \
   --format html \
   --output target/matten-report-input.html
+```
+
+Write a bounded private JSON summary for a CSV file:
+
+```bash
+cargo run --manifest-path tools/matten-report/Cargo.toml -- \
+  --input tools/matten-report/fixtures/small.csv \
+  --kind data-readiness \
+  --select sales,cost \
+  --format json \
+  --output target/matten-report-input.json
 ```
 
 Write to an explicit output file:

@@ -1,3 +1,8 @@
+pub(crate) const MAX_DISPLAY_COLUMNS: usize = 12;
+pub(crate) const MAX_DISPLAY_CHARS: usize = 120;
+pub(crate) const MAX_ERROR_CHARS: usize = 240;
+pub(crate) const MAX_TENSOR_PREVIEW_VALUES: usize = 12;
+
 pub(crate) fn format_fixed_values(values: &[f64]) -> String {
     let values = values
         .iter()
