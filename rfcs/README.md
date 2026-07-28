@@ -86,7 +86,7 @@ The broader documentation ownership model is recorded in
 | 070 | [Public Visualization and Report Readiness Audit](./done/070-public-visualization-report-readiness-audit.md) | post-0.37 audit decision; closed without public implementation |
 | 071 | [Private Fixed-Demo JSON Report Artifacts](./done/071-private-fixed-demo-json-report-artifacts.md) | 0.37.0 (`tools/matten-report` fixed-demo private JSON; public schema/crates deferred) |
 | 072 | [Behavior-Preserving `matten-report` Modularization](./done/072-matten-report-modularization.md) | post-0.37 internal modularization and structural closure; no behavior or public-surface change |
-| 073 | [Private Input-Mode JSON Report Policy](./done/073-private-input-mode-json-report-policy.md) | reviewed (GO, no conditions) and committed; `0.38.0` release-prep complete and prepared for review; publish/tag not yet authorized |
+| 073 | [Private Input-Mode JSON Report Policy](./done/073-private-input-mode-json-report-policy.md) | 0.38.0 |
 
 ## Proposed
 
@@ -96,17 +96,17 @@ _None currently proposed._
 
 RFC-070 is closed as an audit decision without public implementation. RFC-072
 is closed after its reviewed behavior-preserving modularization. RFC-073's
-private input-mode JSON implementation is reviewed (GO, no conditions) and
-committed; `0.38.0` release-prep is complete and prepared for review. The
-remaining themes below are not authorized unless their current status says
-so. The current post-0.37 backlog is:
+private input-mode JSON implementation is reviewed (GO, no conditions),
+committed, and released in `0.38.0`. The remaining themes below are not
+authorized unless their current status says so. The current post-0.38 backlog
+is:
 
 | Theme | Current authority | Current status |
 |---|---|---|
 | Public `matten-report` / `matten-viz` readiness | RFC-070, RFC-063, RFC-065, RFC-068, RFC-069, RFC-071 | RFC-070 closed after audit; no public crate or API authorized |
 | `matten-report` modularization | RFC-072, RFC-070 post-0.37 closure audit | Implemented and closed; internal ownership and size guards are established without behavior or public-surface change |
 | More input-mode HTML paths | RFC-069, post-0.36 RFC-069 closure audit | Deferred until a concrete report path is reviewed |
-| JSON / SVG / Vega-Lite report output | RFC-063, RFC-068, RFC-069, RFC-070 JSON policy audit, RFC-071, RFC-073 | RFC-073 private input-mode JSON implemented, reviewed, and committed; `0.38.0` release-prep complete and prepared for review; other input kinds, raw CSV export, public schemas, SVG, and Vega-Lite remain unauthorized |
+| JSON / SVG / Vega-Lite report output | RFC-063, RFC-068, RFC-069, RFC-070 JSON policy audit, RFC-071, RFC-073 | RFC-073 private input-mode JSON implemented, reviewed, and released in `0.38.0`; other input kinds, raw CSV export, public schemas, SVG, and Vega-Lite remain unauthorized |
 | Streaming / large CSV | RFC-026, RFC-037 | Deferred; future implementation RFC must answer batch/schema/malformed-row/memory/sync-vs-async policy |
 | `matten-nalgebra` bridge | RFC-025, RFC-041, RFC-054 bridge-readiness handoff | Deferred; per-crate RFC required |
 | `matten-candle` bridge | RFC-025, RFC-049, RFC-054 bridge-readiness handoff | Deferred; per-crate RFC required |
@@ -348,7 +348,9 @@ That accepted handoff defined one coherent implementation checkpoint with exact
 private schema shape, bounds, outcome taxonomy, destination-preservation tests,
 and regression gates. The checkpoint was reviewed
 (`matten-rfc073-private-input-mode-json-implementation-review-v0.1.md`, GO, no
-conditions) and committed. `0.38.0` release-prep — version bump, CHANGELOG
-entry, compatibility-docs update, this roadmap/RFC status update — is complete
-and prepared for its own review. Publish and tag remain a separate,
-unauthorized decision until that release-prep review passes.
+conditions) and committed. Its `0.38.0` release-prep was reviewed
+(`matten-0380-rfc073-input-mode-json-release-prep-review-v0.1.md`, GO
+conditional on one fixed ROADMAP history-row gap) and committed. `matten`,
+`matten-ndarray`, `matten-mlprep`, and `matten-data` `0.38.0` are tagged and
+published to crates.io. RFC-073 is terminal; further report-tool features
+require a separate RFC-first decision.

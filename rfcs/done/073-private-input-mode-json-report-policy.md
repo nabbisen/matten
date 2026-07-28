@@ -1,7 +1,7 @@
 # RFC-073: Private Input-Mode JSON Report Policy
 
-**Status:** Implemented; reviewed (GO, no conditions) and committed; `0.38.0` release-prep complete and prepared for review; publish/tag not yet authorized
-**Target:** `0.38.0` local-tool policy (release-prep candidate)
+**Status:** Implemented (0.38.0)
+**Target:** `0.38.0` local-tool policy
 **Theme:** Bounded private JSON for user-provided data-readiness input
 **Depends on:** RFC-001, RFC-037, RFC-069, RFC-070, RFC-071, RFC-072
 **Related:** RFC-023, RFC-034, RFC-035, RFC-063, RFC-068

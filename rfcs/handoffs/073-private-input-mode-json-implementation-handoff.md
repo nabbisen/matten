@@ -3,7 +3,7 @@
 **Project:** `matten`  
 **Related RFC:** RFC-073: Private Input-Mode JSON Report Policy  
 **Document kind:** Detailed local-tool implementation handoff  
-**Status:** Accepted; implementation reviewed (GO, no conditions) and committed; `0.38.0` release-prep complete and prepared for review; publish/tag not yet authorized
+**Status:** Accepted; implemented and released in `0.38.0`
 **Date:** 2026-07-23
 
 ---
