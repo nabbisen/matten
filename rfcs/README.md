@@ -87,12 +87,13 @@ The broader documentation ownership model is recorded in
 | 071 | [Private Fixed-Demo JSON Report Artifacts](./done/071-private-fixed-demo-json-report-artifacts.md) | 0.37.0 (`tools/matten-report` fixed-demo private JSON; public schema/crates deferred) |
 | 072 | [Behavior-Preserving `matten-report` Modularization](./done/072-matten-report-modularization.md) | post-0.37 internal modularization and structural closure; no behavior or public-surface change |
 | 073 | [Private Input-Mode JSON Report Policy](./done/073-private-input-mode-json-report-policy.md) | 0.38.0 |
+| 074 | [v1.0 Readiness Re-Audit](./done/074-v1-readiness-reaudit.md) | post-0.38 audit; accepted, conditionally-ready verdict; no v1.0 release authorized |
 
 ## Proposed
 
 | ID | Title | Scope |
 |---:|---|---|
-| 074 | [v1.0 Readiness Re-Audit](./proposed/074-v1-readiness-reaudit.md) | Audit report complete (`docs/design/v1-readiness-audit.md`) and prepared for review; no v1.0 release authorized |
+| 075 | [v1.0 Release Decision](./proposed/075-v1-release-decision.md) | Resolves RFC-074 MD-2, declares serde format stable, records RFC-067 family maturity table; no v1.0 release authorized |
 
 ## Remaining Themes And Issues
 
@@ -108,7 +109,7 @@ their current status says so. The current post-0.38 backlog is:
 
 | Theme | Current authority | Current status |
 |---|---|---|
-| v1.0 readiness | RFC-066, RFC-067, RFC-074 | RFC-074 re-audit complete: conditionally ready technically; blocked on maintainer decision MD-2 (RFC-030 lock-step reconsideration; v1.0 vs. "0.x indefinitely") |
+| v1.0 readiness | RFC-066, RFC-067, RFC-074, RFC-075 | RFC-074 re-audit accepted (conditionally ready); owner chose Path B (pursue v1.0 deliberately); RFC-075 proposed to resolve MD-2, declare serde stability, and record the RFC-067 family maturity table; no v1.0 release authorized |
 | Public `matten-report` / `matten-viz` readiness | RFC-070, RFC-063, RFC-065, RFC-068, RFC-069, RFC-071 | RFC-070 closed after audit; no public crate or API authorized |
 | `matten-report` modularization | RFC-072, RFC-070 post-0.37 closure audit | Implemented and closed; internal ownership and size guards are established without behavior or public-surface change |
 | More input-mode HTML paths | RFC-069, post-0.36 RFC-069 closure audit | Deferred until a concrete report path is reviewed |
@@ -373,31 +374,47 @@ exactly the length of that drift and an audit produces a ranked,
 evidence-based answer instead of a guess.
 
 RFC-074
-([`074-v1-readiness-reaudit.md`](./proposed/074-v1-readiness-reaudit.md))
-opens that audit-only re-audit. It re-measures RFC-066's original findings,
-asks whether the published `Tensor` contract/error model/boundary APIs are
-v1-stable, classifies deferred stats/linalg/streaming scope as v1-blocking or
-post-v1, asks whether `matten-mlprep`/`matten-data` should be recommended for
-promotion to production-ready, and asks whether RFC-030 lock-step versioning
-still serves the family given the observed drift — treated as a first-class
-question, not a footnote. It authorizes no implementation, version bump,
-maturity promotion, public API change, or release action; any finding it
-produces still requires a separate implementation RFC before code changes.
+([`074-v1-readiness-reaudit.md`](./done/074-v1-readiness-reaudit.md))
+was that audit-only re-audit. It re-measured RFC-066's original findings,
+asked whether the published `Tensor` contract/error model/boundary APIs are
+v1-stable, classified deferred stats/linalg/streaming scope as v1-blocking or
+post-v1, asked whether `matten-mlprep`/`matten-data` should be recommended
+for promotion to production-ready, and asked whether RFC-030 lock-step
+versioning still serves the family given the observed drift — treated as a
+first-class question, not a footnote.
 
 The audit report
 ([`docs/design/v1-readiness-audit.md`](../docs/design/v1-readiness-audit.md))
-is complete and prepared for review. Every RFC-066 finding is re-verified
-without regression (BF-1 remains remediated; MD-1 remains resolved by
-RFC-067; NF-1/NF-2 remain open and non-blocking). Broader stats/linalg are
-found to be settled, explicitly-rejected core scope rather than open
-questions, and streaming remains an additive future capability outside
-`matten-data`'s current documented contract — none of the three block v1.0.
-The report's verdict is **conditionally ready**: the technical/API surface
-clears every gate RFC-066 set (more strongly than at the original audit,
-since it has had zero churn across eight releases), but release preparation
-should not start until the maintainer resolves a new finding, **MD-2** —
-whether RFC-030 lock-step versioning's RFC-071 §6 reconsideration trigger
-should now fire, and relatedly, whether the project's real direction is
-toward v1.0 or a deliberate "0.x indefinitely" stance. The report offers two
-explicit paths (adopt 0.x indefinitely, or pursue v1.0 via a release RFC
-that closes NF-1/NF-2 and resolves MD-2) without choosing between them.
+was reviewed and accepted
+(`matten-rfc074-v1-readiness-reaudit-review-v0.1.md`, GO). Every RFC-066
+finding was re-verified without regression (BF-1 remains remediated; MD-1
+remains resolved by RFC-067). Broader stats/linalg were found to be settled
+core-scope decisions (linalg explicitly rejected; stats deferred toward a
+companion, not rejected — corrected per review) rather than open questions,
+and streaming remains an additive future capability outside `matten-data`'s
+current documented contract — none of the three block v1.0. The report's
+verdict is **conditionally ready**: the technical/API surface clears every
+gate RFC-066 set (more strongly than at the original audit, since it has had
+zero churn across eight releases), but release preparation should not start
+until the maintainer resolves a new finding, **MD-2** — whether RFC-030
+lock-step versioning's RFC-071 §6 reconsideration trigger should now fire,
+and relatedly, whether the project's real direction is toward v1.0 or a
+deliberate "0.x indefinitely" stance. The report offered two explicit paths
+without choosing between them; **the owner chose Path B (pursue v1.0
+deliberately)**. NF-1 and NF-2 (matten-data/matten-ndarray missing README
+Public API blocks; `cargo public-api` not wired anywhere) were closed as the
+review's H0 common first step, applicable to either path.
+
+RFC-075
+([`075-v1-release-decision.md`](./proposed/075-v1-release-decision.md))
+is the maintainer-decision document Path B requires. It resolves MD-2 (keeps
+RFC-030 lock-step versioning unchanged, adding a CHANGELOG justification
+requirement for future local-tool-only releases), declares the JSON
+canonical serde format explicitly stable, and records the RFC-067 family
+maturity table recommending `matten-mlprep`/`matten-data` enter a future
+v1.0 family at their current `production-ready candidate` label without
+promotion. It authorizes no v1.0 release, version bump, tag, publish, API
+change, dependency change, or maturity promotion; a separate future v1.0
+release-prep RFC is required before any release action, and must run the
+full gate set (clippy, full feature matrix, doctests, MSRV, `cargo
+public-api`, `cargo package`) this documentation-only line did not run.

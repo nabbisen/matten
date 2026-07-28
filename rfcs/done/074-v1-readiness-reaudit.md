@@ -1,6 +1,6 @@
 # RFC-074: v1.0 Readiness Re-Audit
 
-**Status:** Proposed; audit report complete (`docs/design/v1-readiness-audit.md`) and prepared for review; no v1.0 release authorized
+**Status:** Implemented — audit report accepted (`matten-rfc074-v1-readiness-reaudit-review-v0.1.md`, GO); verdict conditionally ready; MD-2 addressed by proposed RFC-075; no v1.0 release authorized
 **Target:** Post-0.38 v1.0 readiness re-audit; no version bump or release authorization
 **Theme:** Re-run the RFC-066 v1.0 readiness audit, which is stale by exactly the
 length of eight consumer-invisible releases
