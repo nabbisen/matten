@@ -98,7 +98,8 @@ The broader documentation ownership model is recorded in
 
 | ID | Title | Scope |
 |---:|---|---|
-| 076 | [v1.0 Release Preparation](./proposed/076-v1-release-preparation.md) | Reviewed and accepted (GO, no conditions); execution deferred pending pre-v1 feature work (RFC-077, RFC-078); no implementation authorized |
+| 076 | [v1.0 Release Preparation](./proposed/076-v1-release-preparation.md) | Reviewed and accepted (GO, no conditions); its inventory refreshed by RFC-081 (five-crate family, matten-mlprep production-ready, matten-stats row added, RFC-081 §3 precondition added); now additionally blocked on matten-stats resolving an Exit A/B decision; no implementation authorized |
+| 081 | [`Experimental` Crates in a v1.0 Family](./proposed/081-v1-family-experimental-crate-policy.md) | Reviewed (GO, rereview, conditional on one fix, applied); mechanical RFC-076 refresh (17 sites) implemented and committed. §5's reasoning (why Experimental differs from candidate) is authored and reviewed by one party — awaiting the owner's decision: external read, narrow the rule, or accept as argued. `matten-stats`'s exit remains undecided by design |
 
 ## Remaining Themes And Issues
 
@@ -114,7 +115,7 @@ their current status says so. The current post-0.38 backlog is:
 
 | Theme | Current authority | Current status |
 |---|---|---|
-| v1.0 readiness | RFC-066, RFC-067, RFC-074, RFC-075, RFC-076 | RFC-074 (audit) and RFC-075 (MD-2/serde/maturity-table decision) closed; RFC-076 (release preparation) reviewed and accepted (GO, no conditions), but execution is deferred pending pre-v1 feature work (RFC-077, RFC-078); no v1.0 implementation is currently authorized |
+| v1.0 readiness | RFC-066, RFC-067, RFC-074, RFC-075, RFC-076, RFC-081 | RFC-074 (audit) and RFC-075 (MD-2/serde/maturity-table decision) closed; RFC-076 (release preparation) reviewed and accepted (GO, no conditions); RFC-081 answers the question RFC-067 left open (an `Experimental` crate may not ship in a lock-step 1.0 family — Exit A promote or Exit B remove) and its mechanical RFC-076 inventory refresh (17 sites) is applied; RFC-076 is now additionally **blocked** on `matten-stats` taking an exit, and RFC-081 §5's own reasoning awaits the owner's decision (external read, narrowing the rule, or accepting it as argued); no v1.0 implementation is currently authorized |
 | Pre-v1 feature work | RFC-077, RFC-078 | Both implemented, reviewed (GO, no conditions), and closed. RFC-040's small-statistics theme is now *partially* addressed by RFC-078 (`covariance`, `correlation`, `quantile` implemented in `matten-stats`, not yet published — see RFC-079); histogram, z-score, percentile aliases, skew, kurtosis, and matrix-wide/axis-wise variants remain deferred — histogram specifically still blocks on RFC-040 §8's unresolved bin-selection policy. Family grows to five workspace crates; RFC-076 must be updated for five before it is executed |
 | Pre-v1 feature release | RFC-079 | Reviewed (GO, no conditions), committed, and released as `0.39.0` — tagged and published outside this project's assistant session. Release-prep scoped RFC-077 only, deferring `matten-stats`'s first publication pending an external `ddof` read; the actual publish included `matten-stats` anyway (no `publish = false` key enforced the deferral). Corrected in the post-release alignment: RFC-079/RFC-078 status, a dated CHANGELOG note, and a new ROADMAP history row (`3.25.0` left unedited). The external `ddof` read is no longer a publication gate; it now informs a possible future policy change |
 | Public `matten-report` / `matten-viz` readiness | RFC-070, RFC-063, RFC-065, RFC-068, RFC-069, RFC-071 | RFC-070 closed after audit; no public crate or API authorized |
