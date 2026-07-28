@@ -61,7 +61,7 @@ working documents for the implementation team and may be revised as work proceed
 | `072-matten-report-modularization-implementation-handoff.md` | Retained accepted RFC-072 implementation record; all phases reviewed and committed, lifecycle closed |
 | `073-private-input-mode-json-implementation-handoff.md` | Accepted RFC-073 handoff; bounded private data-readiness input JSON implemented, reviewed (GO, no conditions), and released in `0.38.0` |
 | `076-v1-release-preparation-handoff.md` | Accepted RFC-076 handoff; sequences the `1.0.0` release-preparation change (RFC-067 maturity table, compatibility.md rewrite, 19-site pre-1.0/0.x sweep, 29-string current-family retarget, version bump); reviewed (GO, no conditions); execution deferred pending pre-v1 feature work (RFC-077, RFC-078); no implementation authorized |
-| `077-seeded-train-test-split-handoff.md` | Accepted RFC-077 handoff; sequences `train_test_split_seeded` for `matten-mlprep` (SplitMix64, Fisher-Yates over row indices, locked-permutation test); reviewed (GO); implementation authorized on the `0.38.x` line; no version bump or release |
+| `077-seeded-train-test-split-handoff.md` | Accepted RFC-077 handoff; `train_test_split_seeded` for `matten-mlprep` (SplitMix64, Fisher-Yates over row indices, locked-permutation test); implemented and reviewed (GO, no conditions, reproducibility contract proven by mutation), committed `e9b87fd`; no version bump or release |
 
 ## Documentation-governance handoffs
 

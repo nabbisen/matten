@@ -89,13 +89,13 @@ The broader documentation ownership model is recorded in
 | 073 | [Private Input-Mode JSON Report Policy](./done/073-private-input-mode-json-report-policy.md) | 0.38.0 |
 | 074 | [v1.0 Readiness Re-Audit](./done/074-v1-readiness-reaudit.md) | post-0.38 audit; accepted, conditionally-ready verdict; no v1.0 release authorized |
 | 075 | [v1.0 Release Decision](./done/075-v1-release-decision.md) | MD-2 resolved, serde format declared stable, RFC-067 family maturity table recorded; no v1.0 release authorized |
+| 077 | [Seeded Train/Test Split for `matten-mlprep`](./done/077-seeded-train-test-split.md) | Implemented and reviewed (GO, no conditions), `e9b87fd`; pre-v1 additive API on `0.38.x`; no release |
 
 ## Proposed
 
 | ID | Title | Scope |
 |---:|---|---|
 | 076 | [v1.0 Release Preparation](./proposed/076-v1-release-preparation.md) | Reviewed and accepted (GO, no conditions); execution deferred pending pre-v1 feature work (RFC-077, RFC-078); no implementation authorized |
-| 077 | [Seeded Train/Test Split for `matten-mlprep`](./proposed/077-seeded-train-test-split.md) | Reviewed and accepted (GO); implementation authorized on the `0.38.x` line; no version bump or release |
 
 ## Remaining Themes And Issues
 
@@ -112,6 +112,7 @@ their current status says so. The current post-0.38 backlog is:
 | Theme | Current authority | Current status |
 |---|---|---|
 | v1.0 readiness | RFC-066, RFC-067, RFC-074, RFC-075, RFC-076 | RFC-074 (audit) and RFC-075 (MD-2/serde/maturity-table decision) closed; RFC-076 (release preparation) reviewed and accepted (GO, no conditions), but execution is deferred pending pre-v1 feature work (RFC-077, RFC-078); no v1.0 implementation is currently authorized |
+| Pre-v1 feature work | RFC-077, RFC-078 | RFC-077 (`train_test_split_seeded`) implemented and reviewed (GO, no conditions), closed; RFC-078 (`matten-stats` companion) proposed, not yet reviewed |
 | Public `matten-report` / `matten-viz` readiness | RFC-070, RFC-063, RFC-065, RFC-068, RFC-069, RFC-071 | RFC-070 closed after audit; no public crate or API authorized |
 | `matten-report` modularization | RFC-072, RFC-070 post-0.37 closure audit | Implemented and closed; internal ownership and size guards are established without behavior or public-surface change |
 | More input-mode HTML paths | RFC-069, post-0.36 RFC-069 closure audit | Deferred until a concrete report path is reviewed |
@@ -463,21 +464,23 @@ explicitly re-authorized to proceed — the point at which the project's
 choices stop being reversible.
 
 RFC-077
-([`077-seeded-train-test-split.md`](./proposed/077-seeded-train-test-split.md))
-is deliberately pre-v1 feature work on the `0.38.x` line: one additive
-function, `train_test_split_seeded`, implementing the signature RFC-024 §6
-specified and left as "planned." It closes the one caveat RFC-076 §5's family
-maturity table cites for `matten-mlprep`'s `production-ready candidate`
-label, without promoting the crate — that stays a separate decision. The RNG
-is a hand-rolled, dependency-free SplitMix64 (RFC-024 §6's pre-decided
-choice); Fisher-Yates shuffles a row-index vector, never the data itself; and
-the exact PRNG constants, shuffle direction, and seed-to-state mapping become
-a reproducibility contract once released, enforced by a locked-permutation
-test. Two review rounds found and fixed three defects, all in the
-author-drafted documents: a handoff code sketch that would not compile
-(missing `MattenMlprepError::Matten` conversion), an error-surface claim that
-undercounted the reused variants by one, and a stale project-tracking claim
-that RFC-076 implementation was authorized when it had in fact been reverted
-— fixed as part of this same round. Final review: **GO**. Implementation is
-authorized on the `0.38.x` line; RFC-077 does not authorize any version bump
-or release.
+([`077-seeded-train-test-split.md`](./done/077-seeded-train-test-split.md))
+was pre-v1 feature work on the `0.38.x` line: one additive function,
+`train_test_split_seeded`, implementing the signature RFC-024 §6 specified
+and left as "planned." It closes the one caveat RFC-076 §5's family maturity
+table cites for `matten-mlprep`'s `production-ready candidate` label, without
+promoting the crate — that stays a separate decision. The RNG is a
+hand-rolled, dependency-free SplitMix64 (RFC-024 §6's pre-decided choice);
+Fisher-Yates shuffles a row-index vector, never the data itself; and the
+exact PRNG constants, shuffle direction, and seed-to-state mapping are a
+reproducibility contract, enforced by a locked-permutation test. Two design
+review rounds found and fixed three defects in the author-drafted documents
+(a handoff sketch that would not compile, an error-surface undercount, and a
+stale tracking claim, the last already fixed via the RFC-076 deferral
+commit). The implementation was committed (`e9b87fd`) and reviewed
+afterward — the review independently re-verified spec conformance line by
+line and proved the reproducibility contract by mutation (flipping the
+Fisher-Yates direction and altering a SplitMix64 constant both correctly
+failed the locked-permutation test). Final review: **GO, no conditions**.
+RFC-077 is closed; it authorized no version bump or release, and none
+occurred.

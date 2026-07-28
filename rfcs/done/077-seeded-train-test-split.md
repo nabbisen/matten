@@ -1,6 +1,6 @@
 # RFC-077: Seeded Train/Test Split for `matten-mlprep`
 
-**Status:** Proposed; pre-v1 additive API, no release authorized
+**Status:** Implemented — reviewed (GO, no conditions, `matten-rfc077-implementation-review-v0.1.md`), committed `e9b87fd`; pre-v1 additive API on the `0.38.x` line; no release authorized
 **Target:** Pre-`1.0.0` feature work on the `0.x` line; release family undecided
 **Theme:** Implement the seeded shuffled split RFC-024 §6 already specified, closing the one
 documented caveat holding `matten-mlprep` at production-ready candidate
