@@ -1,6 +1,6 @@
 # RFC-075: v1.0 Release Decision
 
-**Status:** Proposed; policy/decision only, no v1.0 release authorized
+**Status:** Implemented — reviewed and accepted (`matten-rfc075-v1-release-decision-review-v0.1.md`, GO); MD-2 resolved, serde format declared stable, RFC-067 family maturity table recorded; no v1.0 release authorized
 **Target:** Post-RFC-074 v1.0 prerequisite closure; no version bump or release authorization
 **Theme:** Resolve RFC-074 MD-2, declare the serde canonical format stable, and
 record the RFC-067 family maturity table, closing every non-code prerequisite
@@ -76,6 +76,15 @@ stating why a lock-step family checkpoint is being released despite no
 published-crate change, rather than relying on the RFC-071 precedent
 silently.
 ```
+
+This requirement is recorded operationally in
+`docs/src/contributing/release-checklist.md` §7 (CHANGELOG) and in
+`CHANGELOG.md`'s conventions blockquote, not only here — RFC-071 §6's
+trigger lived in exactly one place (an RFC that moved to `rfcs/done/`) and
+was bypassed silently across all eight releases this RFC exists to address.
+Stating the rule once, in an RFC alone, reproduces that failure mode; the
+RFC and the operational location must point at each other so neither drifts
+silently.
 
 This is deliberately the lighter of the two options RFC-074 raised (the
 other being a separate unpublished coordinate for local-tool milestones).

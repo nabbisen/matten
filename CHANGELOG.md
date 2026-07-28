@@ -18,6 +18,14 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > and license files are reintroduced if and when crates begin publishing to
 > crates.io on independent cadences.
 
+> **Convention (resolved in RFC-075 §3.1).** If an entire release's scope is
+> local-tool-only (workspace-excluded, `publish = false` crates such as
+> `tools/matten-report` or `tools/matten-migrate`), its entry below must
+> include a one-line justification for cutting a lock-step family checkpoint
+> despite no published-crate change. This makes RFC-071 §6's reconsideration
+> trigger — unfired across eight consecutive releases before RFC-074 found
+> it — a mandatory per-entry check rather than a rule that only an RFC states.
+
 ## [0.38.0] - 2026-07-28
 
 RFC-073 private input-mode JSON report release. This release extends the

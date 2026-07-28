@@ -177,6 +177,11 @@ grep "This is.*0\." src/lib.rs || true
 - Every API change has a changelog entry.
 - Changelog entries describe actual changes, not planned ones.
 - No changelog entry claims a fix that is not in the code.
+- If the entire scope of this release is local-tool-only (workspace-excluded,
+  `publish = false` crates such as `tools/matten-report` or
+  `tools/matten-migrate`), the CHANGELOG entry **must** include a one-line
+  justification for cutting a lock-step family checkpoint despite no
+  published-crate change (RFC-075 §3.1).
 
 ### 8. Version bump
 

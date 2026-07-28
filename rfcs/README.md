@@ -88,12 +88,11 @@ The broader documentation ownership model is recorded in
 | 072 | [Behavior-Preserving `matten-report` Modularization](./done/072-matten-report-modularization.md) | post-0.37 internal modularization and structural closure; no behavior or public-surface change |
 | 073 | [Private Input-Mode JSON Report Policy](./done/073-private-input-mode-json-report-policy.md) | 0.38.0 |
 | 074 | [v1.0 Readiness Re-Audit](./done/074-v1-readiness-reaudit.md) | post-0.38 audit; accepted, conditionally-ready verdict; no v1.0 release authorized |
+| 075 | [v1.0 Release Decision](./done/075-v1-release-decision.md) | MD-2 resolved, serde format declared stable, RFC-067 family maturity table recorded; no v1.0 release authorized |
 
 ## Proposed
 
-| ID | Title | Scope |
-|---:|---|---|
-| 075 | [v1.0 Release Decision](./proposed/075-v1-release-decision.md) | Resolves RFC-074 MD-2, declares serde format stable, records RFC-067 family maturity table; no v1.0 release authorized |
+_None currently proposed._
 
 ## Remaining Themes And Issues
 
@@ -109,7 +108,7 @@ their current status says so. The current post-0.38 backlog is:
 
 | Theme | Current authority | Current status |
 |---|---|---|
-| v1.0 readiness | RFC-066, RFC-067, RFC-074, RFC-075 | RFC-074 re-audit accepted (conditionally ready); owner chose Path B (pursue v1.0 deliberately); RFC-075 proposed to resolve MD-2, declare serde stability, and record the RFC-067 family maturity table; no v1.0 release authorized |
+| v1.0 readiness | RFC-066, RFC-067, RFC-074, RFC-075 | RFC-074 (audit) and RFC-075 (MD-2/serde/maturity-table decision) both accepted and closed; a separate future v1.0 release-prep RFC is required before any release action; no v1.0 release authorized |
 | Public `matten-report` / `matten-viz` readiness | RFC-070, RFC-063, RFC-065, RFC-068, RFC-069, RFC-071 | RFC-070 closed after audit; no public crate or API authorized |
 | `matten-report` modularization | RFC-072, RFC-070 post-0.37 closure audit | Implemented and closed; internal ownership and size guards are established without behavior or public-surface change |
 | More input-mode HTML paths | RFC-069, post-0.36 RFC-069 closure audit | Deferred until a concrete report path is reviewed |
@@ -406,15 +405,24 @@ Public API blocks; `cargo public-api` not wired anywhere) were closed as the
 review's H0 common first step, applicable to either path.
 
 RFC-075
-([`075-v1-release-decision.md`](./proposed/075-v1-release-decision.md))
-is the maintainer-decision document Path B requires. It resolves MD-2 (keeps
+([`075-v1-release-decision.md`](./done/075-v1-release-decision.md))
+was the maintainer-decision document Path B required. It resolved MD-2 (keeps
 RFC-030 lock-step versioning unchanged, adding a CHANGELOG justification
-requirement for future local-tool-only releases), declares the JSON
-canonical serde format explicitly stable, and records the RFC-067 family
+requirement for future local-tool-only releases), declared the JSON
+canonical serde format explicitly stable, and recorded the RFC-067 family
 maturity table recommending `matten-mlprep`/`matten-data` enter a future
 v1.0 family at their current `production-ready candidate` label without
-promotion. It authorizes no v1.0 release, version bump, tag, publish, API
-change, dependency change, or maturity promotion; a separate future v1.0
-release-prep RFC is required before any release action, and must run the
-full gate set (clippy, full feature matrix, doctests, MSRV, `cargo
-public-api`, `cargo package`) this documentation-only line did not run.
+promotion. It was reviewed and accepted
+(`matten-rfc075-v1-release-decision-review-v0.1.md`, GO), with one required
+follow-through applied before closure: the §3.1 CHANGELOG-justification rule
+is now also recorded in `docs/src/contributing/release-checklist.md` §7 and
+`CHANGELOG.md`'s conventions blockquote — not stored only inside the RFC,
+which is exactly where RFC-071 §6's predecessor rule lived when it went
+unfired for eight releases. RFC-075 authorizes no v1.0 release, version
+bump, tag, publish, API change, dependency change, or maturity promotion; a
+separate future v1.0 release-prep RFC (Unit 2) is required before any
+release action, and must run the full gate set (clippy, full feature
+matrix, doctests, MSRV, an actually-executed `cargo public-api` snapshot,
+`cargo package`) this documentation-only line did not run, and must
+reproduce the RFC-067 family maturity table in full rather than merely
+citing RFC-075.
