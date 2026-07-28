@@ -14,7 +14,7 @@ This book is organized by reader:
 - **Reference** — the rules that shape the public API.
 - **Contributors** — project layout, milestones, and process.
 
-> This documentation tracks the current 0.38 release family, an RFC-073 local
-> visualization-artifact release that adds private input-mode JSON output for
-> `matten-report` without changing public APIs, published dependencies, core
-> runtime behavior, or maturity labels.
+> This documentation tracks the current 0.39 release family, an RFC-079 release
+> adding `matten_mlprep::train_test_split_seeded` (a reproducible, seeded
+> shuffled train/test split) without changing existing public APIs, published
+> dependencies, core runtime behavior, or maturity labels.

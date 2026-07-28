@@ -3,7 +3,7 @@
 This page lists every public item in `matten` at the current v0.38 release
 family. It serves as the baseline for tracking breaking changes toward v1.0.0
 and as the review gate required by RFC-015. The public API did not change for
-the 0.38.0 local-tool JSON release.
+the 0.39.0 local-tool JSON release.
 
 ## Root exports
 

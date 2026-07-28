@@ -26,6 +26,30 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > trigger — unfired across eight consecutive releases before RFC-074 found
 > it — a mandatory per-entry check rather than a rule that only an RFC states.
 
+## [0.39.0] - 2026-07-28
+
+RFC-079 pre-v1 feature release. Adds a reproducible seeded train/test split to
+`matten-mlprep`, the family's first consumer-visible release since `0.31.0`
+(RFC-074's MD-2 finding). No public API change beyond the one new function; no
+published crate dependency graph, core runtime behavior, MSRV, or
+maturity-label change.
+
+### Added
+
+- `matten_mlprep::train_test_split_seeded(x, train_ratio, seed) ->
+  Result<(Tensor, Tensor), MattenMlprepError>` — a seeded, shuffled train/test
+  split. `n_train = floor(rows * train_ratio)`, identical to the existing
+  ordered `train_test_split`; row order comes from a dependency-free
+  SplitMix64 PRNG (RFC-024 §6) driving a Fisher-Yates shuffle over row
+  indices, never the data itself. The same `(x, train_ratio, seed)` always
+  reproduces byte-identical output on every platform and future release. The
+  existing `train_test_split` (ordered, no shuffle) is unchanged.
+
+### Version
+
+- Release bump `0.38.0` -> `0.39.0`. Lock-step family versioning (RFC-030)
+  still applies to all workspace crates.
+
 ## [0.38.0] - 2026-07-28
 
 RFC-073 private input-mode JSON report release. This release extends the

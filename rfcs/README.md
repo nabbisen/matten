@@ -91,6 +91,7 @@ The broader documentation ownership model is recorded in
 | 075 | [v1.0 Release Decision](./done/075-v1-release-decision.md) | MD-2 resolved, serde format declared stable, RFC-067 family maturity table recorded; no v1.0 release authorized |
 | 077 | [Seeded Train/Test Split for `matten-mlprep`](./done/077-seeded-train-test-split.md) | Implemented and reviewed (GO, no conditions), `e9b87fd`; pre-v1 additive API on `0.38.x`; no release |
 | 078 | [`matten-stats` Companion Crate](./done/078-matten-stats-companion.md) | Implemented and reviewed (GO, no conditions), `3ab3864`; fifth published crate, Experimental maturity; no release |
+| 079 | [`0.39.0` Pre-v1 Feature Release](./done/079-0390-pre-v1-feature-release.md) | Reviewed (GO, no conditions) and committed as a release-prep commit; releases RFC-077 only, `matten-stats`'s first publish deferred (owner decision); publish/tag not yet authorized |
 
 ## Proposed
 
@@ -113,7 +114,8 @@ their current status says so. The current post-0.38 backlog is:
 | Theme | Current authority | Current status |
 |---|---|---|
 | v1.0 readiness | RFC-066, RFC-067, RFC-074, RFC-075, RFC-076 | RFC-074 (audit) and RFC-075 (MD-2/serde/maturity-table decision) closed; RFC-076 (release preparation) reviewed and accepted (GO, no conditions), but execution is deferred pending pre-v1 feature work (RFC-077, RFC-078); no v1.0 implementation is currently authorized |
-| Pre-v1 feature work | RFC-077, RFC-078 | Both implemented, reviewed (GO, no conditions), and closed. RFC-040's small-statistics theme is now *partially* addressed by RFC-078 (`covariance`, `correlation`, `quantile` shipped in `matten-stats`); histogram, z-score, percentile aliases, skew, kurtosis, and matrix-wide/axis-wise variants remain deferred — histogram specifically still blocks on RFC-040 §8's unresolved bin-selection policy. Family grows to five published crates; RFC-076 must be updated for five crates before it is executed |
+| Pre-v1 feature work | RFC-077, RFC-078 | Both implemented, reviewed (GO, no conditions), and closed. RFC-040's small-statistics theme is now *partially* addressed by RFC-078 (`covariance`, `correlation`, `quantile` implemented in `matten-stats`, not yet published — see RFC-079); histogram, z-score, percentile aliases, skew, kurtosis, and matrix-wide/axis-wise variants remain deferred — histogram specifically still blocks on RFC-040 §8's unresolved bin-selection policy. Family grows to five workspace crates; RFC-076 must be updated for five before it is executed |
+| Pre-v1 feature release | RFC-079 | Reviewed (GO, no conditions) and committed as a release-prep commit for `0.39.0`. Releases RFC-077 only; `matten-stats`'s first publication is deferred — owner decision, obtaining an external read of RFC-078 §4.1's `ddof = 1` policy outside this project's assistant session first. Publish and tag remain a separate, not-yet-authorized step |
 | Public `matten-report` / `matten-viz` readiness | RFC-070, RFC-063, RFC-065, RFC-068, RFC-069, RFC-071 | RFC-070 closed after audit; no public crate or API authorized |
 | `matten-report` modularization | RFC-072, RFC-070 post-0.37 closure audit | Implemented and closed; internal ownership and size guards are established without behavior or public-surface change |
 | More input-mode HTML paths | RFC-069, post-0.36 RFC-069 closure audit | Deferred until a concrete report path is reviewed |
@@ -522,4 +524,33 @@ specifically recommended — both are noted for the next comparable slice, not
 fixed here. RFC-078 is closed; it authorized no version bump or release, and
 none occurred. RFC-076's release-prep specification now assumes four crates
 and must be updated before it is executed — before this closure, that was
-advisory; it is now a hard precondition, since RFC-078 has shipped.
+advisory; it is now a hard precondition, since `matten-stats` exists in the
+workspace regardless of when it actually publishes.
+
+RFC-079
+([`079-0390-pre-v1-feature-release.md`](./done/079-0390-pre-v1-feature-release.md))
+sequenced the release of RFC-077 and RFC-078 as `0.39.0`, a normal `0.x` minor bump and the
+family's first consumer-visible release since `0.31.0` (RFC-074's MD-2 finding). Its
+self-authored review found one defect: the retarget instruction (`git grep 0.38`) did not exempt
+two files that legitimately keep `0.38` references after a correct retarget —
+`docs/design/v1-readiness-audit.md`'s dated finding ("eight releases `0.31.0` -> `0.38.0`") and
+`scripts/check-release-docs.sh`'s comment recording the `0.38.0` incident that motivated its own
+ROADMAP parity guard. Following the instruction literally would have silently corrupted both,
+since no gate checks either file's content; both exemptions were added before implementation.
+
+RFC-079 §3 named one consequential, so-far-unreviewed decision: `matten-stats` carries no
+`publish` key, so this release would otherwise ship it to crates.io for the first time, and its
+`ddof = 1` covariance/correlation choice (RFC-078 §4.1) had only ever been proposed, argued, and
+reviewed by the same author. Given that choice, the owner confirmed the version bump but declined
+both options the RFC anticipated (external read now, or accept the risk now) in favor of a third:
+defer `matten-stats`'s first publication entirely until an external read is obtained outside this
+project's assistant session. `0.39.0` therefore releases `train_test_split_seeded` alone;
+`matten-stats` still moves to `0.39.0` in the workspace under lock-step versioning (RFC-030), but
+is excluded from this release's publish step, its CHANGELOG entry, and the release-checklist's
+fifth-crate teaching — all deferred to whichever release actually first publishes it. Implementing
+the narrowed scope caught one gap neither document anticipated: `docs/src/introduction.md`'s
+"current 0.38 release family" sentence named RFC-073's release specifically and needed rewriting
+for content, not just substitution, once `0.39.0` became a different release with different
+contents. Release-prep is committed; tag and publish remain a separate, not-yet-authorized step,
+and `matten-stats` is explicitly excluded from that future publish list until its external read
+lands.

@@ -4,7 +4,7 @@
 [![Docs.rs](https://docs.rs/matten-stats/badge.svg)](https://docs.rs/matten-stats)
 [![license](https://img.shields.io/crates/l/matten-stats.svg)](../../LICENSE)
 
-> **Experimental (`0.38.x` family).** A new companion crate with no usage history (RFC-078).
+> **Experimental (`0.39.x` family).** A new companion crate with no usage history (RFC-078).
 > The three-function surface is small and deliberately scoped, but has not yet
 > earned a higher maturity label. Pin the exact version.
 
@@ -102,9 +102,9 @@ pub enum MattenStatsError {
 
 - **SemVer:** pre-1.0 (`0.x`). A `0.x` minor bump may break and carries
   migration notes; patch releases are additive only. Pin the release
-  explicitly (`matten-stats = "0.38.0"`).
+  explicitly (`matten-stats = "0.39.0"`).
 - **MSRV:** Rust 1.85 (edition 2024).
-- **`matten`:** released with the `0.38.x` family version (RFC-030). The
+- **`matten`:** released with the `0.39.x` family version (RFC-030). The
   published manifest uses the workspace's broad pre-1.0 core requirement for
   maintenance (`matten = "0"`, RFC-064); users should still declare the
   matched family explicitly.
