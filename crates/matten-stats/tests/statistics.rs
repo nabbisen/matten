@@ -1,11 +1,14 @@
-//! Tests validating the RFC-078 §4 policy decisions and §6 test list.
+//! Tests validating the RFC-078 §4 and RFC-083 §4 policy decisions and their
+//! handoffs' §6 test lists.
 //!
 //! All tests live in this single integration file (RFC-078 handoff §6): the
-//! crate's entire purpose is three public functions, so exercising them
-//! through the public surface is exactly what should be verified.
+//! crate's entire purpose is a small set of public functions, so exercising
+//! them through the public surface is exactly what should be verified.
 
 use matten::Tensor;
-use matten_stats::{MattenStatsError, correlation, covariance, quantile};
+use matten_stats::{
+    MattenStatsError, correlation, covariance, covariance_population, kurtosis, quantile, skewness,
+};
 
 fn approx(a: f64, b: f64) {
     assert!((a - b).abs() < 1e-9, "expected {b}, got {a}");
@@ -104,6 +107,75 @@ fn covariance_non_finite_input_is_an_error() {
     let x_inf = vec_tensor(vec![1.0, f64::INFINITY, 3.0]);
     assert!(matches!(
         covariance(&x_inf, &y).unwrap_err(),
+        MattenStatsError::NonFiniteValue
+    ));
+}
+
+// ── covariance_population ────────────────────────────────────────────────────
+
+#[test]
+fn covariance_population_matches_sample_identity() {
+    // x = [1,2,3,7], y = [2,4,5,11]; mean_x=3.25, mean_y=5.5.
+    // deviations: (-2.25,-3.5), (-1.25,-1.5), (-0.25,-0.5), (3.75,5.5)
+    // products: 7.875, 1.875, 0.125, 20.625 -> sum 30.5
+    // cov_sample = 30.5 / (4-1) = 30.5/3; cov_pop = 30.5/4
+    // identity: cov_pop * n == cov_sample * (n - 1), both sides == 30.5 exactly.
+    let x = vec_tensor(vec![1.0, 2.0, 3.0, 7.0]);
+    let y = vec_tensor(vec![2.0, 4.0, 5.0, 11.0]);
+    let n = 4.0;
+
+    let cov_pop = covariance_population(&x, &y).unwrap();
+    let cov_sample = covariance(&x, &y).unwrap();
+
+    approx(cov_pop * n, 30.5);
+    approx(cov_sample * (n - 1.0), 30.5);
+    approx(cov_pop * n, cov_sample * (n - 1.0));
+}
+
+#[test]
+fn covariance_population_with_n_1_returns_zero() {
+    // Unlike `covariance` (divisor n - 1), `covariance_population`'s divisor
+    // is n, so a single-element pair is well-defined and returns 0.0 exactly.
+    let x = vec_tensor(vec![5.0]);
+    let y = vec_tensor(vec![9.0]);
+    assert_eq!(covariance_population(&x, &y).unwrap(), 0.0);
+}
+
+#[test]
+fn covariance_with_n_1_still_rejects_as_empty() {
+    // The two minimums differ on purpose (RFC-083 §4.3): covariance needs
+    // n >= 2 (its n - 1 divisor would be zero), covariance_population needs
+    // only n >= 1.
+    let x = vec_tensor(vec![5.0]);
+    let y = vec_tensor(vec![9.0]);
+    assert!(matches!(
+        covariance(&x, &y).unwrap_err(),
+        MattenStatsError::Empty
+    ));
+}
+
+#[test]
+fn covariance_population_length_mismatch_is_an_error() {
+    let x = vec_tensor(vec![1.0, 2.0, 3.0]);
+    let y = vec_tensor(vec![1.0, 2.0]);
+    assert!(matches!(
+        covariance_population(&x, &y).unwrap_err(),
+        MattenStatsError::LengthMismatch { left: 3, right: 2 }
+    ));
+}
+
+#[test]
+fn covariance_population_non_finite_input_is_an_error() {
+    let x = vec_tensor(vec![1.0, f64::NAN, 3.0]);
+    let y = vec_tensor(vec![1.0, 2.0, 3.0]);
+    assert!(matches!(
+        covariance_population(&x, &y).unwrap_err(),
+        MattenStatsError::NonFiniteValue
+    ));
+
+    let x_inf = vec_tensor(vec![1.0, f64::INFINITY, 3.0]);
+    assert!(matches!(
+        covariance_population(&x_inf, &y).unwrap_err(),
         MattenStatsError::NonFiniteValue
     ));
 }
@@ -274,22 +346,115 @@ fn quantile_non_finite_input_value_is_an_error() {
     ));
 }
 
+// ── skewness / kurtosis ──────────────────────────────────────────────────────
+
+#[test]
+fn skewness_of_symmetric_input_is_exactly_zero() {
+    let x = vec_tensor(vec![1.0, 2.0, 3.0, 4.0, 5.0]);
+    assert_eq!(skewness(&x).unwrap(), 0.0);
+}
+
+#[test]
+fn skewness_of_asymmetric_fixture_matches_hand_computed_value() {
+    // x = [1,2,3,10]; mean = 16/4 = 4.
+    // deviations: -3,-2,-1,6 -> d^2: 9,4,1,36 -> sum 50 -> m2 = 50/4 = 12.5
+    //                          -> d^3: -27,-8,-1,216 -> sum 180 -> m3 = 180/4 = 45
+    // skewness = m3 / m2^1.5 = 45 / 12.5^1.5
+    let x = vec_tensor(vec![1.0, 2.0, 3.0, 10.0]);
+    let expected = 45.0 / 12.5_f64.powf(1.5);
+    approx(skewness(&x).unwrap(), expected);
+}
+
+#[test]
+fn kurtosis_pins_the_excess_fisher_convention() {
+    // x = [1,2,3,4,5]; m2 = 2, m4 = 6.8; raw (Pearson) ratio = 6.8/4 = 1.7;
+    // excess (Fisher) = 1.7 - 3 = -1.3. This is the test that distinguishes
+    // the two conventions unambiguously -- do NOT replace it with a
+    // "near enough to 0" tolerance check on some other fixture: small
+    // discrete samples do not sit near 0 (see the 9-point fixture in
+    // kurtosis_small_symmetric_sample_is_not_near_zero below), so such a
+    // test would either fail or get its tolerance widened until it stops
+    // meaning anything.
+    let x = vec_tensor(vec![1.0, 2.0, 3.0, 4.0, 5.0]);
+    assert_eq!(kurtosis(&x).unwrap(), -1.3);
+}
+
+#[test]
+fn kurtosis_small_symmetric_sample_is_not_near_zero() {
+    // A 9-point symmetric fixture [1..9]: mean=5, deviations -4..4.
+    // m2 = (16+9+4+1+0+1+4+9+16)/9 = 60/9; m4 = (256+81+16+1+0+1+16+81+256)/9 = 708/9.
+    // excess = (708/9) / (60/9)^2 - 3 = 1.77 - 3 = -1.23 -- demonstrating why
+    // "normal-ish small sample -> near 0" is not a valid test for the excess
+    // convention (RFC-083 handoff SS6).
+    let x = vec_tensor(vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0]);
+    approx(kurtosis(&x).unwrap(), -1.23);
+}
+
+#[test]
+fn skewness_and_kurtosis_zero_variance_is_explicit_error_not_nan() {
+    let constant = vec_tensor(vec![5.0, 5.0, 5.0]);
+    assert!(matches!(
+        skewness(&constant).unwrap_err(),
+        MattenStatsError::ZeroVariance
+    ));
+    assert!(matches!(
+        kurtosis(&constant).unwrap_err(),
+        MattenStatsError::ZeroVariance
+    ));
+}
+
+#[test]
+fn skewness_and_kurtosis_single_element_is_empty() {
+    // Both require n >= 2 (m2 > 0 is otherwise unreachable); the
+    // zero-element case is untestable through the public API, same as
+    // covariance/correlation -- see the NOTE below.
+    let x = vec_tensor(vec![3.0]);
+    assert!(matches!(skewness(&x).unwrap_err(), MattenStatsError::Empty));
+    assert!(matches!(kurtosis(&x).unwrap_err(), MattenStatsError::Empty));
+}
+
+#[test]
+fn skewness_and_kurtosis_non_finite_input_is_an_error() {
+    let nan = vec_tensor(vec![1.0, f64::NAN, 3.0]);
+    assert!(matches!(
+        skewness(&nan).unwrap_err(),
+        MattenStatsError::NonFiniteValue
+    ));
+    assert!(matches!(
+        kurtosis(&nan).unwrap_err(),
+        MattenStatsError::NonFiniteValue
+    ));
+
+    let inf = vec_tensor(vec![1.0, f64::INFINITY, 3.0]);
+    assert!(matches!(
+        skewness(&inf).unwrap_err(),
+        MattenStatsError::NonFiniteValue
+    ));
+    assert!(matches!(
+        kurtosis(&inf).unwrap_err(),
+        MattenStatsError::NonFiniteValue
+    ));
+}
+
 // ── shared ─────────────────────────────────────────────────────────────────
 
-// NOTE: RFC-078 handoff §6 asks for "empty tensor -> Empty for all three",
-// but `matten::Tensor::try_new`/`new` unconditionally reject every zero-sized
+// NOTE: RFC-078 handoff §6 (and RFC-083 handoff §6 for the three new
+// functions) asks for "empty tensor -> Empty for all", but
+// `matten::Tensor::try_new`/`new` unconditionally reject every zero-sized
 // dimension (see compatibility.md's `is_empty()` entry) -- a genuinely empty
 // Tensor cannot be constructed at all, so that exact scenario is untestable
 // through the public API. `MattenStatsError::Empty`'s "empty tensor" wording
 // is retained defensively (in case that invariant is ever relaxed upstream),
-// but the only path to it that a caller can actually reach today is
-// covariance/correlation's `n < 2` case, covered above by
-// `covariance_fewer_than_two_elements_is_an_error`. `quantile`'s `x.len() ==
-// 0` branch is unreachable dead code under matten's current shape model.
+// but the only path to it that a caller can actually reach today is the
+// `n < 2` case for covariance/correlation/skewness/kurtosis, covered above by
+// `covariance_fewer_than_two_elements_is_an_error` and
+// `skewness_and_kurtosis_single_element_is_empty`. `quantile`'s `x.len() ==
+// 0` branch is unreachable dead code under matten's current shape model, and
+// so is `covariance_population`'s (its minimum is 1, not 0).
 
 #[cfg(feature = "dynamic")]
 #[test]
-fn dynamic_tensor_is_rejected_for_all_three() {
+fn dynamic_tensor_is_rejected_for_all_six() {
     use matten::Element;
 
     let dynamic = Tensor::from_elements(vec![Element::Float(1.0), Element::Float(2.0)], &[2]);
@@ -298,7 +463,19 @@ fn dynamic_tensor_is_rejected_for_all_three() {
         MattenStatsError::DynamicTensor
     ));
     assert!(matches!(
+        covariance_population(&dynamic, &dynamic).unwrap_err(),
+        MattenStatsError::DynamicTensor
+    ));
+    assert!(matches!(
         correlation(&dynamic, &dynamic).unwrap_err(),
+        MattenStatsError::DynamicTensor
+    ));
+    assert!(matches!(
+        skewness(&dynamic).unwrap_err(),
+        MattenStatsError::DynamicTensor
+    ));
+    assert!(matches!(
+        kurtosis(&dynamic).unwrap_err(),
         MattenStatsError::DynamicTensor
     ));
     assert!(matches!(

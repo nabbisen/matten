@@ -4,8 +4,8 @@
 [![Docs.rs](https://docs.rs/matten-stats/badge.svg)](https://docs.rs/matten-stats)
 [![license](https://img.shields.io/crates/l/matten-stats.svg)](../../LICENSE)
 
-> **Experimental (`0.39.x` family).** A new companion crate with no usage history (RFC-078).
-> The three-function surface is small and deliberately scoped, but has not yet
+> **Experimental (`0.39.x` family).** A companion crate with no usage history (RFC-078,
+> RFC-083). The six-function surface is small and deliberately scoped, but has not yet
 > earned a higher maturity label. Pin the exact version.
 
 Part of the [`matten` workspace](../../README.md) — see it for the full family.
@@ -13,10 +13,11 @@ Part of the [`matten` workspace](../../README.md) — see it for the full family
 ## Overview
 
 `matten-stats` provides small, explicit scalar statistics over [`matten::Tensor`]:
-`covariance`, `correlation`, and `quantile`. These are the three APIs RFC-040 §8
-deliberately kept out of core `matten`, and RFC-078 accepts them into their own
-companion once RFC-040 §9's gate is cleared. It depends only on core `matten`
-(no default features) — no third-party dependency of any kind.
+`covariance`, `covariance_population`, `correlation`, `quantile`, `skewness`, and
+`kurtosis`. These are statistics APIs RFC-040 §8 deliberately kept out of core
+`matten`, accepted into their own companion once RFC-040 §9's gate was cleared
+(RFC-078), then expanded (RFC-083). It depends only on core `matten` (no default
+features) — no third-party dependency of any kind.
 
 ## The `matten-mlprep` boundary
 
@@ -27,28 +28,43 @@ matten-stats   computes scalar statistical summaries: Tensor -> f64
 
 No function appears in both crates.
 
-## The `ddof = 1` divergence from core — read this before using `covariance`
+## Estimator conventions — read this before using `covariance`, `skewness`, or `kurtosis`
 
-Core `matten`'s `var`/`std` are **population** statistics (`ddof = 0`).
-**`covariance` and `correlation` in this crate use the sample estimator
-(`ddof = 1`, i.e. divide by `n - 1`)**, matching the near-universal default in
-inferential statistics (NumPy's `cov`/`corrcoef`, R, pandas). This is a
-deliberate divergence from the rest of the family, not an oversight.
-`correlation` is unaffected by the choice — the `n - 1` factors cancel in the
-ratio — so only `covariance`'s numeric output actually differs.
+Core `matten`'s `var`/`std` are **population** statistics (`ddof = 0`). Each
+function below matches the convention its ecosystem name is expected to
+carry — the estimator **differs per function**, deliberately, because the
+ecosystem's own defaults differ per function (RFC-078 §4.1, RFC-083 §4.1):
+
+```text
+covariance             sample,     ddof = 1        (NumPy/R/pandas `cov`/`corrcoef` default)
+covariance_population  population, ddof = 0        (explicit in the name; no default to choose)
+correlation            ddof-invariant                 (the n - 1 factors cancel; see below)
+skewness               g1,  uncorrected                (SciPy `skew(bias=True)` default; NOT pandas' `.skew()`)
+kurtosis               g2,  uncorrected, EXCESS         (SciPy `kurtosis(fisher=True, bias=True)` default; NOT pandas' `.kurt()`)
+```
+
+`correlation` is unaffected by the `ddof` choice — the `n - 1` factors cancel
+algebraically in the ratio — so only `covariance`'s numeric output actually
+differs from its population counterpart. **pandas' `.skew()`/`.kurt()`
+bias-correct and return a different number** than `skewness`/`kurtosis` for
+the same input; do not assume the two ecosystems agree. This is a deliberate
+divergence from the rest of the family, not an oversight.
 
 ## Quick start
 
 ```rust
 use matten::Tensor;
-use matten_stats::{correlation, covariance, quantile};
+use matten_stats::{correlation, covariance, covariance_population, kurtosis, quantile, skewness};
 
 let x = Tensor::new(vec![1.0, 2.0, 3.0, 4.0], &[4]);
 let y = Tensor::new(vec![2.0, 4.0, 6.0, 8.0], &[4]);
 
-let cov = covariance(&x, &y)?;   // sample covariance, ddof = 1
-let r = correlation(&x, &y)?;    // Pearson correlation, ddof-invariant
-let median = quantile(&x, 0.5)?; // linear interpolation
+let cov = covariance(&x, &y)?;             // sample covariance, ddof = 1
+let cov_pop = covariance_population(&x, &y)?; // population covariance, ddof = 0
+let r = correlation(&x, &y)?;              // Pearson correlation, ddof-invariant
+let median = quantile(&x, 0.5)?;           // linear interpolation
+let skew = skewness(&x)?;                  // uncorrected g1
+let kurt = kurtosis(&x)?;                  // uncorrected excess (Fisher) g2
 # Ok::<(), matten_stats::MattenStatsError>(())
 ```
 
@@ -59,10 +75,14 @@ let median = quantile(&x, 0.5)?; // linear interpolation
   (nearest, lower, higher, midpoint) is provided in this release.
 - **Non-finite input values are rejected explicitly**, never silently
   propagated as `NaN`.
-- **Zero variance in `correlation` is an explicit error**
-  (`MattenStatsError::ZeroVariance`), not a silent `NaN`.
-- **`covariance`/`correlation` accept any equal-length pair** — shape beyond
-  element count is not constrained; values are read in row-major order.
+- **Zero variance is an explicit error**
+  (`MattenStatsError::ZeroVariance`) in `correlation`, `skewness`, and
+  `kurtosis`, not a silent `NaN`.
+- **`covariance`/`covariance_population`/`correlation` accept any
+  equal-length pair** — shape beyond element count is not constrained; values
+  are read in row-major order.
+- **`covariance_population` accepts a single-element pair** and returns
+  `0.0` — unlike `covariance`, whose `n - 1` divisor would be zero.
 - **Dynamic tensors are rejected, not panicked**, regardless of whether the
   `dynamic` feature is enabled.
 
@@ -71,9 +91,12 @@ let median = quantile(&x, 0.5)?; // linear interpolation
 The complete surface (the breaking-change baseline for this crate):
 
 ```rust
-pub fn covariance(x: &Tensor, y: &Tensor)  -> Result<f64, MattenStatsError>;
-pub fn correlation(x: &Tensor, y: &Tensor) -> Result<f64, MattenStatsError>;
-pub fn quantile(x: &Tensor, q: f64)        -> Result<f64, MattenStatsError>;
+pub fn covariance(x: &Tensor, y: &Tensor)            -> Result<f64, MattenStatsError>;
+pub fn covariance_population(x: &Tensor, y: &Tensor) -> Result<f64, MattenStatsError>;
+pub fn correlation(x: &Tensor, y: &Tensor)           -> Result<f64, MattenStatsError>;
+pub fn quantile(x: &Tensor, q: f64)                  -> Result<f64, MattenStatsError>;
+pub fn skewness(x: &Tensor)                          -> Result<f64, MattenStatsError>;
+pub fn kurtosis(x: &Tensor)                          -> Result<f64, MattenStatsError>;
 
 #[non_exhaustive]
 pub enum MattenStatsError {
@@ -88,14 +111,21 @@ pub enum MattenStatsError {
 
 ## Limitations
 
-- **No histogram, z-score, skew, kurtosis, or mode.** RFC-040 §8 left
-  histogram's bin-selection policy unresolved; the others were never proposed.
+- **No histogram, z-score, mode, matrix-wide/axis-wise forms, or percentile
+  aliases.** RFC-040 §8 left histogram's bin-selection policy unresolved;
+  z-score belongs to `matten-mlprep`'s `Tensor -> Tensor` shape instead
+  (`standardize_columns`); the others were never proposed or were rejected as
+  pure sugar (RFC-083 §6).
+- **No bias-corrected `skewness`/`kurtosis` variant.** Both are the
+  uncorrected (SciPy-default) estimator only; a bias-corrected form is a
+  purely additive follow-up if ever wanted (RFC-083 §4.1).
 - **Scalar pair APIs only.** No matrix-wide covariance/correlation over many
   columns, and no axis-wise variants.
 - **`Empty` on an input with fewer than 2 elements**, not on a literally
   zero-length tensor — `matten::Tensor` cannot represent zero elements at all
   (every dimension must be non-zero), so the only reachable "too few
-  elements" case for `covariance`/`correlation` is exactly 1 element per side.
+  elements" case for `covariance`/`correlation`/`skewness`/`kurtosis` is
+  exactly 1 element per side (`covariance_population` alone accepts that).
 - **Not for large/streaming data.** These are eager, in-memory computations.
 
 ## Compatibility

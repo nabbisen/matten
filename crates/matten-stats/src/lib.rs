@@ -1,9 +1,10 @@
 //! `matten-stats` — small, explicit scalar statistics over [`matten::Tensor`].
 //!
-//! This companion crate (RFC-078) provides the three statistics APIs RFC-040
-//! §8 deliberately kept out of core: [`covariance`], [`correlation`], and
-//! [`quantile`]. It depends only on core `matten` (no default features) — no
-//! third-party dependency of any kind.
+//! This companion crate (RFC-078, RFC-083) provides six statistics APIs
+//! RFC-040 §8 deliberately kept out of core: [`covariance`],
+//! [`covariance_population`], [`correlation`], [`quantile`], [`skewness`],
+//! and [`kurtosis`]. It depends only on core `matten` (no default features) —
+//! no third-party dependency of any kind.
 //!
 //! # The `matten-mlprep` boundary (RFC-078 §5)
 //!
@@ -11,15 +12,27 @@
 //! `matten-stats` computes scalar statistical summaries: `Tensor -> f64`. No
 //! function appears in both crates.
 //!
-//! # The `ddof = 1` divergence from core (RFC-078 §4.1)
+//! # Estimator conventions (RFC-078 §4.1, RFC-083 §4.1)
 //!
 //! Core `matten`'s `var`/`std` are **population** statistics (`ddof = 0`).
-//! [`covariance`] and [`correlation`] in this crate use the **sample**
-//! estimator (`ddof = 1`, i.e. divide by `n - 1`), matching the near-universal
-//! default in inferential statistics (NumPy, R, pandas). This is a deliberate
-//! divergence, not an oversight — a reader must not have to discover it
-//! empirically. `correlation` is unaffected by the choice (the `n-1` factors
-//! cancel); only `covariance` is a genuine policy decision.
+//! Each function below matches the convention its ecosystem name is expected
+//! to carry — the estimator **differs per function**, deliberately, because
+//! the ecosystem's own defaults differ per function:
+//!
+//! ```text
+//! covariance             sample,     ddof = 1        (NumPy/R/pandas `cov`/`corrcoef` default)
+//! covariance_population  population, ddof = 0        (explicit in the name; no default to choose)
+//! correlation            ddof-invariant                (the `n - 1` factors cancel; see below)
+//! skewness               g1,  uncorrected               (SciPy `skew(bias=True)` default; NOT pandas' `.skew()`)
+//! kurtosis               g2,  uncorrected, EXCESS        (SciPy `kurtosis(fisher=True, bias=True)` default; NOT pandas' `.kurt()`)
+//! ```
+//!
+//! `correlation` is unaffected by the `ddof` choice (the `n - 1` factors
+//! cancel algebraically); only [`covariance`] is a genuine policy decision.
+//! pandas' `.skew()`/`.kurt()` bias-correct and so return a **different**
+//! number than [`skewness`]/[`kurtosis`] for the same input — this must not
+//! be assumed away. This is a deliberate divergence, not an oversight; a
+//! reader must not have to discover it empirically.
 //!
 //! # Quantile method (RFC-078 §4.2)
 //!
@@ -30,7 +43,8 @@
 //! # Status
 //!
 //! **Experimental** (RFC-040 §9). This is a new crate with no usage history;
-//! its surface may still change. This RFC does not promote it further.
+//! its surface may still change. Neither RFC-078 nor RFC-083 promotes it
+//! further.
 //!
 //! ```
 //! use matten::Tensor;
@@ -50,8 +64,10 @@
 
 mod covariance;
 mod error;
+mod moments;
 mod quantile;
 
-pub use crate::covariance::{correlation, covariance};
+pub use crate::covariance::{correlation, covariance, covariance_population};
 pub use crate::error::MattenStatsError;
+pub use crate::moments::{kurtosis, skewness};
 pub use crate::quantile::quantile;

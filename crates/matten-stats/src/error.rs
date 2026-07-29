@@ -18,8 +18,11 @@ pub enum MattenStatsError {
     /// tensor first with `Tensor::try_numeric()`.
     DynamicTensor,
     /// The input has too few elements for the requested operation: an empty
-    /// tensor for any function, or fewer than 2 elements for
-    /// `covariance`/`correlation` (their `n - 1` divisor would be zero).
+    /// tensor for any function; fewer than 2 elements for
+    /// `covariance`/`correlation`/`skewness`/`kurtosis` (their `n - 1`
+    /// divisor, or their ratio's `m2 > 0` precondition, would be undefined).
+    /// `covariance_population` is the one exception — its divisor is `n`, so
+    /// a single element is well-defined and returns `0.0`.
     Empty,
     /// `covariance`/`correlation` require both inputs to have the same
     /// element count.
@@ -49,7 +52,8 @@ impl fmt::Display for MattenStatsError {
             MattenStatsError::Empty => write!(
                 f,
                 "matten-stats error: input has too few elements for this operation \
-                 (must be non-empty; covariance/correlation require at least 2)"
+                 (must be non-empty; covariance/correlation/skewness/kurtosis require \
+                 at least 2; covariance_population accepts 1)"
             ),
             MattenStatsError::LengthMismatch { left, right } => write!(
                 f,

@@ -96,10 +96,33 @@ histogram                     covariance      correlation
 z-score                       nanvar/nanstd   statistical tests
 ```
 
-These are deferred to a possible future `matten-stats` companion, which would only
-be created once at least three clearly-useful, well-scoped APIs are accepted
-(RFC-040 §9). Some (`z-score`) overlap with `matten-mlprep` and must not be
-duplicated.
+These stay out of core; RFC-040 §9's gate for a future companion was cleared once at
+least three clearly-useful, well-scoped APIs were accepted, and that companion —
+`matten-stats` — now exists (RFC-078, expanded by RFC-083; see below). Some
+(`z-score`) overlap with `matten-mlprep` and must not be duplicated there.
+
+## The `matten-stats` companion (RFC-078, RFC-083)
+
+`matten-stats` is a separate, `Experimental` companion crate providing six
+`Tensor -> f64` scalar statistics that core deliberately excludes: `covariance`,
+`covariance_population`, `correlation`, `quantile`, `skewness`, `kurtosis`. Its
+estimator conventions differ per function, matching what each function's name is
+expected to mean in the wider ecosystem (NumPy/SciPy/R/pandas):
+
+```text
+covariance             sample,     ddof = 1        (NumPy/R/pandas `cov`/`corrcoef` default)
+covariance_population  population, ddof = 0        (explicit in the name; no default to choose)
+correlation            ddof-invariant                 (the n - 1 factors cancel)
+skewness               g1,  uncorrected                (SciPy `skew(bias=True)` default; NOT pandas' `.skew()`)
+kurtosis               g2,  uncorrected, EXCESS         (SciPy `kurtosis(fisher=True, bias=True)` default; NOT pandas' `.kurt()`)
+```
+
+`kurtosis` reports **excess** kurtosis (Fisher's definition): a normal
+distribution scores `0.0`, not `3.0`. pandas' `.skew()`/`.kurt()` bias-correct
+and so return a different number than `skewness`/`kurtosis` for the same input —
+this divergence is deliberate, not an oversight. See the crate's own
+[README](https://github.com/nabbisen/matten/blob/main/crates/matten-stats/README.md)
+for the full API and error model.
 
 ## Example
 

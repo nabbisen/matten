@@ -31,3 +31,7 @@ path = "examples/correlation.rs"
 [[example]]
 name = "stats_quantile"
 path = "examples/quantile.rs"
+
+[[example]]
+name = "stats_expansion"
+path = "examples/expansion.rs"
