@@ -89,11 +89,11 @@ The broader documentation ownership model is recorded in
 | 073 | [Private Input-Mode JSON Report Policy](./done/073-private-input-mode-json-report-policy.md) | 0.38.0 |
 | 074 | [v1.0 Readiness Re-Audit](./done/074-v1-readiness-reaudit.md) | post-0.38 audit; accepted, conditionally-ready verdict; no v1.0 release authorized |
 | 075 | [v1.0 Release Decision](./done/075-v1-release-decision.md) | MD-2 resolved, serde format declared stable, RFC-067 family maturity table recorded; no v1.0 release authorized |
-| 077 | [Seeded Train/Test Split for `matten-mlprep`](./done/077-seeded-train-test-split.md) | Implemented and reviewed (GO, no conditions), `e9b87fd`; pre-v1 additive API on `0.38.x`; no release |
-| 078 | [`matten-stats` Companion Crate](./done/078-matten-stats-companion.md) | Implemented and reviewed (GO, no conditions), `3ab3864`; fifth published crate, Experimental maturity; no release |
+| 077 | [Seeded Train/Test Split for `matten-mlprep`](./done/077-seeded-train-test-split.md) | Implemented and reviewed (GO, no conditions), `4c554a4`; pre-v1 additive API on `0.38.x`; no release |
+| 078 | [`matten-stats` Companion Crate](./done/078-matten-stats-companion.md) | Implemented and reviewed (GO, no conditions), `7f1cbba`; fifth published crate, Experimental maturity; no release |
 | 079 | [`0.39.0` Pre-v1 Feature Release](./done/079-0390-pre-v1-feature-release.md) | Reviewed (GO, no conditions), committed, and released as `0.39.0` (tagged and published). Scope was narrowed to RFC-077 only, deferring `matten-stats`'s first publication — but the actual publish included it anyway; see §13 and the `0.39.0` post-release alignment |
 | 080 | [Promote `matten-mlprep` to Production-Ready](./done/080-matten-mlprep-production-ready.md) | Reviewed and accepted (GO, conditional on three corrections, all applied); label-only promotion, closing RFC-058 §5.1's Option B exit criterion via RFC-077; no code, version, or release |
-| 081 | [`Experimental` Crates in a v1.0 Family](./done/081-v1-family-experimental-crate-policy.md) | Reviewed (GO, rereview, conditional on one fix, applied); decides that no crate labelled `Experimental` may ship in a lock-step `1.0.0` family, and applies §6's mechanical RFC-076 inventory refresh (17 sites), committed `5bc8a39`. §5 rests the rule on a checkable contradiction between `matten-stats/src/lib.rs:32-33` and `compatibility.md`'s `v0.x`-scoped breaking-change permission. `matten-stats`'s exit was subsequently decided as **Exit A (promotion)**, landing under its own RFC; no v1.0 release authorized |
+| 081 | [`Experimental` Crates in a v1.0 Family](./done/081-v1-family-experimental-crate-policy.md) | Reviewed (GO, rereview, conditional on one fix, applied); decides that no crate labelled `Experimental` may ship in a lock-step `1.0.0` family, and applies §6's mechanical RFC-076 inventory refresh (17 sites), committed `7a4b334`. §5 rests the rule on a checkable contradiction between `matten-stats/src/lib.rs:32-33` and `compatibility.md`'s `v0.x`-scoped breaking-change permission. `matten-stats`'s exit was subsequently decided as **Exit A (promotion)**, landing under its own RFC; no v1.0 release authorized |
 | 082 | [Streaming CSV Batches for `matten-data`](./done/082-streaming-csv-batches.md) | Reviewed and accepted; `CsvBatchReader` added behind the off-by-default `streaming` feature, answering all six of RFC-037 §4's reopening criteria; no `matten-stream` crate (structural argument: it would need a companion-to-companion dependency on `matten-data` for `Table`, which RFC-078 §6 forbids); no version bump or release |
 
 ## Proposed
@@ -484,7 +484,7 @@ reproducibility contract, enforced by a locked-permutation test. Two design
 review rounds found and fixed three defects in the author-drafted documents
 (a handoff sketch that would not compile, an error-surface undercount, and a
 stale tracking claim, the last already fixed via the RFC-076 deferral
-commit). The implementation was committed (`e9b87fd`) and reviewed
+commit). The implementation was committed (`4c554a4`) and reviewed
 afterward — the review independently re-verified spec conformance line by
 line and proved the reproducibility contract by mutation (flipping the
 Fisher-Yates direction and altering a SplitMix64 constant both correctly
@@ -511,7 +511,7 @@ tensor → `Empty`" test is unconstructible; the tests and crate README were
 adjusted to cover what is actually reachable (`covariance`/`correlation`'s
 real `n = 1` case) rather than silently dropping the scenario. Full gate set
 green, including MSRV and `cargo package --workspace` packaging all five
-crates. The implementation was committed (`3ab3864`) without a prior
+crates. The implementation was committed (`7f1cbba`) without a prior
 implementation review, despite the RFC-078 review's own recommendation to
 review this slice before committing (a new published crate is permanent once
 released). The post-commit review re-verified the three algorithms against

@@ -3,7 +3,7 @@
 **Project:** `matten`
 **Related RFC:** RFC-077 (design authority)
 **Document kind:** Detailed implementation handoff
-**Status:** Accepted; implemented and reviewed (GO, no conditions), committed `e9b87fd`
+**Status:** Accepted; implemented and reviewed (GO, no conditions), committed `4c554a4`
 **Date:** 2026-07-28
 
 ---

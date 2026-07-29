@@ -11,7 +11,7 @@
 ## 1. Purpose
 
 `0.39.0` is tagged and published, but the repository does not say so. The last commit is
-`557ffcb Prepare 0.39.0 RFC-079 pre-v1 feature release`; every prior release in this line closed with an
+`041c115 Prepare 0.39.0 RFC-079 pre-v1 feature release`; every prior release in this line closed with an
 alignment commit and this one has not. This handoff closes that gap.
 
 **Documentation only.** No code, no version change, no publish action.

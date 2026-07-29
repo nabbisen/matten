@@ -1,7 +1,7 @@
 # RFC-081: `Experimental` Crates in a Lock-Step v1.0 Family
 
 **Status:** Implemented — the policy is decided and §6's mechanical RFC-076 inventory refresh is applied and
-committed (`5bc8a39`). No v1.0 release is authorized by this RFC. `matten-stats`'s exit was subsequently
+committed (`7a4b334`). No v1.0 release is authorized by this RFC. `matten-stats`'s exit was subsequently
 decided as **Exit A (promotion)**; the promotion itself lands under its own RFC, not this one
 **Target:** Post-`0.39.0` policy decision; unblocks RFC-076's rehabilitation
 **Theme:** Answer the question RFC-067 did not reach — may a lock-step v1.0 family include a crate

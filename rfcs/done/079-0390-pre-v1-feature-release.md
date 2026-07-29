@@ -24,8 +24,8 @@ Prepare `0.39.0` as a normal `0.x` minor release. Two features are implemented, 
 on the `0.38.x` line, but only one is published this cycle:
 
 ```text
-RFC-077  matten_mlprep::train_test_split_seeded   (e9b87fd, closed ea8fd23)   -- PUBLISHED in 0.39.0
-RFC-078  the matten-stats companion crate         (3ab3864, closed 7fb9c7c)   -- NOT published; see SS3
+RFC-077  matten_mlprep::train_test_split_seeded   (4c554a4, closed 4af80da)   -- PUBLISHED in 0.39.0
+RFC-078  the matten-stats companion crate         (7f1cbba, closed b84873c)   -- NOT published; see SS3
 ```
 
 `matten-stats` stays a workspace member and moves to `0.39.0` in lock-step (RFC-030) like every other

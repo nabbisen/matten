@@ -25,7 +25,7 @@ the owner's explicit confirmation of the version bump: OBTAINED — bump to 0.39
 the owner's decision on RFC-079 §3: DEFER — matten-stats's first publish waits on an external
   read of RFC-078 §4.1 obtained by someone outside this project's assistant session; it is
   NOT published in 0.39.0 and NOT mentioned in the [0.39.0] CHANGELOG entry
-RFC-077 and RFC-078 closed (ea8fd23, 7fb9c7c)
+RFC-077 and RFC-078 closed (4af80da, b84873c)
 working tree clean
 ```
 

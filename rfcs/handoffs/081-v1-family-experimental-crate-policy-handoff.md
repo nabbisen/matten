@@ -19,8 +19,8 @@ one reviewable slice.
 
 ```text
 RFC-081 and this handoff accepted
-RFC-080 committed (b0c7c0c) — matten-mlprep is production-ready
-0.39.0 post-release alignment committed (dcd005a) — matten-stats recorded as published
+RFC-080 committed (91496bd) — matten-mlprep is production-ready
+0.39.0 post-release alignment committed (1da1e3f) — matten-stats recorded as published
 working tree clean; version stays 0.39.0
 ```
 
