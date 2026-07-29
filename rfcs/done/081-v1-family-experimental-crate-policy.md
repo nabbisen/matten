@@ -1,6 +1,8 @@
 # RFC-081: `Experimental` Crates in a Lock-Step v1.0 Family
 
-**Status:** Proposed; policy decision only, no v1.0 release authorized
+**Status:** Implemented — the policy is decided and §6's mechanical RFC-076 inventory refresh is applied and
+committed (`5bc8a39`). No v1.0 release is authorized by this RFC. `matten-stats`'s exit was subsequently
+decided as **Exit A (promotion)**; the promotion itself lands under its own RFC, not this one
 **Target:** Post-`0.39.0` policy decision; unblocks RFC-076's rehabilitation
 **Theme:** Answer the question RFC-067 did not reach — may a lock-step v1.0 family include a crate
 labelled `Experimental`? — and refresh RFC-076's stale inventory
@@ -111,33 +113,48 @@ family. The obligation attaches only when a v1.0 release is actually proposed.
 
 ## 5. Rationale — why `Experimental` differs from `candidate`
 
-RFC-067 permitted candidates because the candidate label denotes *"an explicit scope or workflow caveat,
-not hidden API churn"* — the crate's surface is settled; only its recommendation breadth is qualified. That
-reasoning genuinely does not extend to `Experimental`:
+The rule rests on a contradiction between two of this project's own documents. It does not depend on
+agreeing with any particular view of what `Experimental` ought to mean.
 
-- **`Experimental` denotes an unsettled surface.** RFC-040 §9 assigned it to `matten-stats` precisely
-  because the crate had no usage history. RFC-078 §1 said so explicitly: a new crate's API benefits most
-  from being changeable.
-- **`1.0.0` is a compatibility commitment.** Shipping a crate whose label announces instability, inside a
-  family whose version number announces stability, is a contradiction users cannot reasonably resolve.
-  Lock-step versioning (RFC-030) makes it worse: `matten-stats 1.0.0` would carry the family's SemVer
-  promise while its own documentation says the surface may move.
-- **The `ddof` case is a live example, not a hypothetical.** `matten-stats`'s sample-vs-population divergence
-  from core has never been reviewed by anyone who did not propose it, and it is now shipped. Under
-  `Experimental` on `0.x`, changing it later is permitted and honestly signalled. Under a `1.0.0` family
-  label, it would be frozen by the same act that declared the family stable.
-- **The ladder would lose meaning.** RFC-058 §2 and RFC-080 §5 both rest on ladder discipline — crates
-  advance one rung at a time, on evidence. Admitting `Experimental` directly into a 1.0 family would let a
-  crate skip every rung by being adjacent to stable siblings.
+**The two documents.**
 
-**The counter-argument, stated fairly:** lock-step versioning already decouples version from maturity by
-design (RFC-030: "maturity is expressed by per-crate Status labels, not by separate version numbers"), and
-RFC-067 accepted exactly that decoupling for candidates. One could argue `Experimental` is just a further
-step along the same axis, adequately handled by documentation.
+```text
+crates/matten-stats/src/lib.rs:32-33
+  "**Experimental** (RFC-040 §9). This is a new crate with no usage history;
+   its surface may still change."
 
-This RFC rejects that, on the grounds that the decoupling has a limit and `Experimental` is past it: a
-candidate says *"this is finished, but we recommend it narrowly"*; `Experimental` says *"this is not
-finished."* A 1.0 family can honestly contain the first. It cannot honestly contain the second.
+docs/src/reference/compatibility.md, heading "## v0.x compatibility"
+  "**Breaking changes are allowed** but must be documented in CHANGELOG."
+```
+
+The permission to change a published surface is scoped, by its own heading, to the `v0.x` line.
+`matten-stats`'s doc comment claims exactly that latitude. Under lock-step versioning (RFC-030) every
+crate in the family carries one version, so at `1.0.0` the crate would still be making the claim while no
+longer being on the line that grants it. Both statements would ship in the same release, about the same
+crate, and a reader cannot act on both.
+
+That is checkable by opening the two files. Anyone can confirm or refute it without reference to this
+RFC's reasoning.
+
+**Why the same argument does not reach `production-ready candidate`.** RFC-067 permitted candidates
+because that label denotes *"an explicit scope or workflow caveat, not hidden API churn"* — it qualifies
+how broadly the crate is recommended, not whether its surface may move. A candidate's documentation and a
+`1.0.0` compatibility promise make compatible claims; they can both be true in one release.
+`Experimental`'s text cannot, because it asserts the specific latitude that leaving `0.x` withdraws.
+
+**Consequence for the maturity ladder.** RFC-058 §2 and RFC-080 §5 both rest on crates advancing one rung
+at a time, on evidence. Admitting `Experimental` straight into a `1.0.0` family would let a crate skip
+every rung by being adjacent to stable siblings. This is a consequence of the rule, not a second
+independent reason for it.
+
+**The alternative reading, recorded so it is not mistaken for an oversight.** Lock-step versioning already
+decouples version from maturity by design (RFC-030: *"maturity is expressed by per-crate Status labels, not
+by separate version numbers"*), and RFC-067 accepted that decoupling for candidates. One could argue
+`Experimental` is a further step along the same axis, adequately handled by documentation. This RFC does
+not follow that reading, for a reason specific to the two documents above rather than to the principle: the
+decoupling holds only while the per-crate label and the family version make compatible claims. Here they do
+not, so there is nothing left for documentation to reconcile — one of the two statements must change before
+`1.0.0`. That is exactly what §3's two exits provide.
 
 ## 6. RFC-076 inventory refresh (mechanical consequences)
 
