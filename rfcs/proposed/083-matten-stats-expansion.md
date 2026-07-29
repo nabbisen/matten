@@ -1,6 +1,7 @@
 # RFC-083: `matten-stats` Expansion — Population Covariance, Skewness, Kurtosis
 
-**Status:** Proposed; additive API only, no release executed, no maturity change
+**Status:** `proposed/` by folder (not yet implemented); **reviewed and accepted 2026-07-29** —
+implementation authorized under the handoff. Additive API only, no release executed, no maturity change
 **Target:** Post-`0.39.0` feature work on the `0.x` line
 **Theme:** Grow `matten-stats` from three functions to six, along the axis RFC-078 §7 deferred, and
 settle the estimator question RFC-078 §4.1 left partially open
