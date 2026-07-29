@@ -94,6 +94,16 @@ jobs:
       - name: matten-data anti-scope guard (RFC-042)
         run: bash scripts/check-matten-data-scope.sh
 
+  stats:
+    name: matten-stats
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo test -p matten-stats
+      - run: cargo test -p matten-stats --features dynamic
+      - run: cargo test -p matten-stats --doc
+
   msrv:
     name: MSRV 1.85
     runs-on: ubuntu-latest
