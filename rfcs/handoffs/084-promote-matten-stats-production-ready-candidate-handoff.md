@@ -3,8 +3,15 @@
 **Project:** `matten`
 **Governing RFC:** `rfcs/proposed/084-promote-matten-stats-production-ready-candidate.md`
 **Document kind:** Detailed implementation handoff
-**Status:** Proposed; inherits RFC-084's state. Not authorized for implementation until accepted
+**Status:** Inherits RFC-084's state — **accepted 2026-07-29; implementation authorized**
 **Date:** 2026-07-29
+
+> **PART 1 IS ALREADY PARTLY DONE — read §3 before repeating it.** The `matten-stats` CI job (§3.1)
+> landed in commit *"Draft RFC-084: promote matten-stats to production-ready candidate"*, before this
+> RFC was accepted; the owner authorized it retroactively rather than reverting. The four example
+> smoke runs (§3.2) and the release-checklist entry (§3.3) were also written and are, at the time of
+> writing, **uncommitted in the working tree**. Verify what is already present before adding
+> anything, and commit the remainder rather than re-creating it.
 
 ---
 
