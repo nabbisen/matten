@@ -1,9 +1,11 @@
 # RFC-084: Promote `matten-stats` to Production-Ready Candidate
 
-**Status:** `proposed/` by folder (not yet implemented); **reviewed and accepted 2026-07-29** —
-implementation authorized under the handoff. Maturity promotion, **not** label-only (§5). No release,
-no version bump. Part of §5's PART 1 landed early, before this acceptance, in commit
-*"Draft RFC-084: promote matten-stats to production-ready candidate"*; the acceptance authorizes it
+**Status:** Implemented — commit *"Promote matten-stats to production-ready candidate (RFC-084)"*;
+implementation reviewed and approved 2026-07-30 after one correction (the promotion guard's first
+check was over-broad and rejected legitimate maturity-history prose; narrowed to a present-tense
+label claim). `matten-stats` is **production-ready candidate**; RFC-081 §3 Exit A is discharged. No
+release, no version bump, no API change. Part of §5's PART 1 landed early, before acceptance, in
+commit *"Draft RFC-084: promote matten-stats to production-ready candidate"* and was authorized
 retroactively (owner decision, 2026-07-29)
 **Target:** Post-`0.39.0`, on the `0.x` line
 **Theme:** Discharge RFC-081 §3's **Exit A** for `matten-stats`, audited against the RFC-057 bar as

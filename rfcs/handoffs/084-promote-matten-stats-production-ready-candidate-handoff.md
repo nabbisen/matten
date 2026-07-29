@@ -3,7 +3,8 @@
 **Project:** `matten`
 **Governing RFC:** `rfcs/proposed/084-promote-matten-stats-production-ready-candidate.md`
 **Document kind:** Detailed implementation handoff
-**Status:** Inherits RFC-084's state — **accepted 2026-07-29; implementation authorized**
+**Status:** Inherits RFC-084's state — **implemented and reviewed 2026-07-30**. Both parts landed;
+`matten-stats` is production-ready candidate and RFC-081 §3 Exit A is discharged
 **Date:** 2026-07-29
 
 > **PART 1 IS ALREADY PARTLY DONE — read §3 before repeating it.** The `matten-stats` CI job (§3.1)
