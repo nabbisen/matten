@@ -70,17 +70,22 @@ local path). This is a maintenance policy (RFC-064): it reduces version-line
 churn in member manifests while keeping release identity, maturity labels, and
 user-facing install guidance tied to the lock-step family.
 
-## `matten-stats` — a deliberate `ddof` divergence (RFC-078)
+## `matten-stats` — a deliberate `ddof` divergence (RFC-078, RFC-083, RFC-084)
 
-`matten-stats` is a new companion crate at **Experimental** maturity (no usage
-history yet). Its `covariance` and `correlation` functions use the **sample**
-estimator (`ddof = 1`, i.e. divide by `n - 1`), diverging deliberately from
-core `matten`'s **population** `var`/`std` (`ddof = 0`). This matches the
+`matten-stats` is a companion crate at **production-ready candidate** maturity
+(RFC-084, promoted from Experimental once its six-function surface settled —
+no usage-history claim is made; that is what the candidate label is for). Its
+`covariance` and `correlation` functions use the **sample** estimator
+(`ddof = 1`, i.e. divide by `n - 1`), diverging deliberately from core
+`matten`'s **population** `var`/`std` (`ddof = 0`). This matches the
 near-universal default in inferential statistics (NumPy, R, pandas) and is
 the only behavioral divergence between a companion and core in the family.
 `correlation` is unaffected by the choice — the `n - 1` factors cancel — so
 only `covariance`'s numeric output actually differs from what core's
-population convention would produce. See RFC-078 §4.1 for the full rationale.
+population convention would produce. `covariance_population` (RFC-083) gives
+the population estimator explicitly, and `skewness`/`kurtosis` (RFC-083) each
+match their own ecosystem default rather than always bias-correcting. See
+RFC-078 §4.1 and RFC-083 §4.1 for the full rationale.
 
 ## v1.0 requirements
 
@@ -185,7 +190,8 @@ production-ready candidates.
 RFC-077 added `train_test_split_seeded`, closing the ordered-only-split caveat that held the
 promotion at candidate. Label/docs only — no API, runtime, error-variant, dependency, or version
 change, and no other crate's maturity changes. `matten-data` remains production-ready candidate
-for its own separate reasons; `matten-stats` remains Experimental.
+for its own separate reasons; `matten-stats` was Experimental at this point and was later promoted
+to production-ready candidate as well, once its surface settled (RFC-083, RFC-084).
 
 The **v0.28 family** moves the `matten-ndarray` bridge to **`ndarray` 0.17** (RFC-062): the
 supported requirement changes from the `0.16` minor to `0.17` (CI targets `0.17.2`). Because

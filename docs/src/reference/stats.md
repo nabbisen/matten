@@ -101,9 +101,10 @@ least three clearly-useful, well-scoped APIs were accepted, and that companion â
 `matten-stats` â€” now exists (RFC-078, expanded by RFC-083; see below). Some
 (`z-score`) overlap with `matten-mlprep` and must not be duplicated there.
 
-## The `matten-stats` companion (RFC-078, RFC-083)
+## The `matten-stats` companion (RFC-078, RFC-083, RFC-084)
 
-`matten-stats` is a separate, `Experimental` companion crate providing six
+`matten-stats` is a separate, `production-ready candidate` companion crate
+(promoted in RFC-084 once its surface settled) providing six
 `Tensor -> f64` scalar statistics that core deliberately excludes: `covariance`,
 `covariance_population`, `correlation`, `quantile`, `skewness`, `kurtosis`. Its
 estimator conventions differ per function, matching what each function's name is

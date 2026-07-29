@@ -42,9 +42,12 @@
 //!
 //! # Status
 //!
-//! **Experimental** (RFC-040 §9). This is a new crate with no usage history;
-//! its surface may still change. Neither RFC-078 nor RFC-083 promotes it
-//! further.
+//! **Production-ready candidate** (RFC-084), promoted once the six-function
+//! surface settled (RFC-083). The candidate label denotes a settled surface
+//! and a narrowed recommendation, not field-tested usage history — this
+//! crate has none. Under lock-step family versioning (RFC-030) the crate
+//! shares the workspace family version; maturity is the Status label, not the
+//! version number.
 //!
 //! ```
 //! use matten::Tensor;

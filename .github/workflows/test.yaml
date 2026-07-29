@@ -186,6 +186,11 @@ jobs:
       - run: cargo run -p matten-data --example data_04_to_tensor
       - run: cargo run -p matten-data --example data_05_errors
       - run: cargo run -p matten-data --example data_06_visual_readiness_summary
+      # matten-stats
+      - run: cargo run -p matten-stats --example stats_covariance
+      - run: cargo run -p matten-stats --example stats_correlation
+      - run: cargo run -p matten-stats --example stats_quantile
+      - run: cargo run -p matten-stats --example stats_expansion
       # local tools
       - run: cargo check --manifest-path tools/matten-report/Cargo.toml
       - run: cargo test --manifest-path tools/matten-report/Cargo.toml

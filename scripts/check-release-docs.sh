@@ -110,21 +110,40 @@ if grep -niE 'matten-data.*\((Experimental|Beta)\)' docs/src/examples/companions
   FAIL=1
 fi
 
-echo "=== Checking matten-stats declares Experimental status (RFC-078) ==="
-# Unlike the other companions, Experimental IS the correct current label for
-# matten-stats — it is a brand-new crate with no usage history. This check is
-# the positive counterpart of the staleness checks above: it fails if the
-# label is ever silently dropped (e.g. a doc edit that forgets it) rather than
-# deliberately promoted through a reviewed maturity decision.
-if [ -d "$STATS" ]; then
-  if ! grep -qi "Experimental" "$STATS/README.md" 2>/dev/null; then
-    echo "ERROR: matten-stats README does not declare Experimental status"
-    FAIL=1
-  fi
-  if ! grep -q "Experimental" "$STATS/src/lib.rs" 2>/dev/null; then
-    echo "ERROR: matten-stats lib.rs does not declare Experimental status"
-    FAIL=1
-  fi
+echo "=== Checking matten-stats declares production-ready candidate, not Experimental (RFC-084) ==="
+# matten-stats: Experimental (RFC-078) -> production-ready candidate (RFC-084), once its
+# six-function surface settled (RFC-083). Its own current-status LABEL and the matten-stats
+# rows/sections of current-status shared docs must reflect the current rung. Context-aware:
+# the historical "Experimental" narrative in rfcs/, CHANGELOG.md, and ROADMAP.md is allowed, as
+# is per-family history in compatibility.md.
+#
+# This targets a current-tense label claim only ("... is a separate, `Experimental` companion
+# crate ..."), not a promotion-history sentence ("promoted from Experimental in RFC-084") and not
+# an unrelated use of the word "experimental" elsewhere on this general reference page. A blanket
+# ban on the word anywhere in the file was tried and rejected: it also rejects legitimate
+# maturity-history prose, which is the tail wagging the dog (RFC-084 review C1).
+if grep -nE '`Experimental`[[:space:]]*companion' docs/src/reference/stats.md 2>/dev/null; then
+  echo "ERROR: docs/src/reference/stats.md still describes matten-stats as an Experimental companion crate (now production-ready candidate)"
+  FAIL=1
+fi
+# Current LABEL must not be Experimental: the lead README banner, the lib.rs Status line, or
+# the Cargo.toml description.
+if grep -nE '^> \*\*Experimental \(' "$STATS/README.md" 2>/dev/null \
+   || grep -nE '^//! \*\*Experimental' "$STATS/src/lib.rs" 2>/dev/null \
+   || grep -niE 'experimental' "$STATS/Cargo.toml" 2>/dev/null; then
+  echo "ERROR: stale Experimental maturity LABEL in matten-stats status files (now production-ready candidate)"
+  FAIL=1
+fi
+if ! grep -qi "production-ready candidate" "$STATS/README.md" 2>/dev/null; then
+  echo "ERROR: matten-stats README does not declare production-ready candidate status"
+  FAIL=1
+fi
+# Current-status shared docs (NOT compatibility.md — it carries allowed per-family history).
+if grep -niE 'matten-stats.*\(Experimental\)' docs/src/examples/companions.md docs/src/examples/index.md 2>/dev/null \
+   || grep -niE 'matten-stats.*\| experimental \|' README.md 2>/dev/null \
+   || grep -niE 'matten-stats` is (a )?\*\*Experimental\*\*' docs/src/examples/companions.md docs/src/reference/stats.md 2>/dev/null; then
+  echo "ERROR: a current-status shared doc still marks matten-stats Experimental (should be production-ready candidate)"
+  FAIL=1
 fi
 
 # ---------------------------------------------------------------------------

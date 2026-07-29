@@ -154,6 +154,7 @@ cargo public-api --manifest-path crates/matten/Cargo.toml
 cargo public-api --manifest-path crates/matten-ndarray/Cargo.toml
 cargo public-api --manifest-path crates/matten-mlprep/Cargo.toml
 cargo public-api --manifest-path crates/matten-data/Cargo.toml
+cargo public-api --manifest-path crates/matten-stats/Cargo.toml
 ```
 
 Wiring this into CI (toolchain pinning, nightly requirements) is a separate,

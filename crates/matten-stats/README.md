@@ -4,9 +4,10 @@
 [![Docs.rs](https://docs.rs/matten-stats/badge.svg)](https://docs.rs/matten-stats)
 [![license](https://img.shields.io/crates/l/matten-stats.svg)](../../LICENSE)
 
-> **Experimental (`0.39.x` family).** A companion crate with no usage history (RFC-078,
-> RFC-083). The six-function surface is small and deliberately scoped, but has not yet
-> earned a higher maturity label. Pin the exact version.
+> **Production-ready candidate (`0.39.x` family).** A companion crate (RFC-078), promoted
+> in RFC-084 once its six-function surface settled (RFC-083). The candidate label denotes
+> a settled surface and a narrowed recommendation, not field-tested usage history — this
+> crate has none. Pin the exact version.
 
 Part of the [`matten` workspace](../../README.md) — see it for the full family.
 

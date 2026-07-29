@@ -34,8 +34,8 @@ retarget every current-family version string, 0.38.0 / 0.38.x -> 1.0.0 / 1.0.x
   (29 strings across 14 files, §7)
 bump the lock-step family version 0.38.0 -> 1.0.0
 add CHANGELOG release notes stating each companion's actual maturity label explicitly
-  (matten-mlprep is no longer a candidate — RFC-080 — and matten-stats's resolved
-  RFC-081 exit must be named)
+  (matten-mlprep is no longer a candidate — RFC-080 — and matten-stats ships at
+  production-ready candidate, having taken Exit A via RFC-084)
 run the complete gate set RFC-074's documentation-only re-audit did not run
 ```
 
@@ -60,13 +60,14 @@ change is a stability record most projects cannot demonstrate mechanically. But 
 *decision*; it does not substitute for the *verification*, which RFC-074 deliberately did not perform
 because it was a documentation-only audit. This RFC performs it.
 
-**PRECONDITION (RFC-081 §3, added by the RFC-081 inventory refresh):** no crate in the lock-step family
-may be labelled `Experimental` at `1.0.0`. `matten-stats` currently is. Before this RFC can be executed,
-`matten-stats` must take Exit A (promotion to at least production-ready candidate, via its own promotion
-RFC) or Exit B (removal from the lock-step family, via a separate RFC amending RFC-030's membership), and
-this RFC must record which. This precondition is independent of the family-size and maturity-label
-corrections elsewhere in this refresh — those are inventory fixes; this is a gate this RFC cannot pass
-until someone resolves it.
+**PRECONDITION (RFC-081 §3, added by the RFC-081 inventory refresh): DISCHARGED (RFC-084, 2026-07-29).**
+No crate in the lock-step family may be labelled `Experimental` at `1.0.0`. `matten-stats` was the only
+such crate; it has since taken **Exit A** — promoted to production-ready candidate by its own promotion
+RFC (RFC-084) — so this precondition no longer blocks RFC-076's execution. This does **not** mean RFC-076
+is now authorized to proceed: it remains deferred for the separate, unrelated reason that **v1.0 is not
+currently wanted** (owner decision, 2026-07-29). The family-size and maturity-label corrections elsewhere
+in this refresh (§5-§7) still need re-verification against the now-six-function `matten-stats` surface and
+the current version line whenever this RFC is next revised for execution.
 
 ## 3. Scope
 
@@ -204,7 +205,7 @@ RFC-067 by pointer rather than by content.
 | `matten-ndarray` | `1.0.0` | production-ready (RFC-057) | Stable; zero churn | none | **Include** |
 | `matten-mlprep` | `1.0.0` | production-ready (RFC-080) | Stable; zero churn | none — RFC-077 added `train_test_split_seeded`, closing the ordered-only-split caveat; RFC-080 promoted the crate on that basis, prior to this RFC | **Include** |
 | `matten-data` | `1.0.0` | production-ready candidate (RFC-059) | Stable; zero churn | CSV-only ingestion; explicitly not a dataframe engine; no streaming (RFC-042 scope lock, CI-enforced by `scripts/check-matten-data-scope.sh`; RFC-037). Documented scope limit, not hidden churn | **Include, at candidate label** |
-| `matten-stats` | `1.0.0` | **Experimental** (RFC-078) | Published `0.39.0`; API not yet settled | Unsettled surface (RFC-040 §9); the `ddof = 1` divergence from core shipped in `0.39.0` without external review — changing it now would break adopters | **Blocked** — RFC-081 §3 forbids an `Experimental` crate in a `1.0.0` family; must take Exit A (promotion) or Exit B (removal from lock-step) before this RFC can proceed |
+| `matten-stats` | `1.0.0` | production-ready candidate (RFC-084) | Published `0.39.0`; surface settled at six functions (RFC-083) | Estimator conventions per function, stated explicitly and verified by execution (RFC-083 §4.1); no external statistical review obtained — candidate label carries that, not a hidden gap | **Include, at candidate label** — RFC-081 §3's precondition is discharged: `matten-stats` took Exit A (RFC-084), prior to this RFC |
 
 Per-crate RFC-067 checklist (lines 87-91), and its `matten-stats` counterpart under RFC-081 §3:
 
@@ -225,19 +226,22 @@ matten-data
                                                     to a separate later review
 
 matten-stats
-  RFC-067 candidate conditions apply?             no — matten-stats is labelled Experimental,
-                                                   not production-ready candidate. RFC-067
-                                                   never addressed Experimental crates
-  may it enter the 1.0.0 family as-is?            no — RFC-081 §3: no Experimental crate may
-                                                   ship in a lock-step 1.0 family. Blocked
-                                                   until it takes Exit A or Exit B
+  RFC-067 candidate conditions apply?             yes — promoted to production-ready candidate
+                                                   by RFC-084, prior to this RFC (was Experimental,
+                                                   which RFC-067 never addressed; now resolved)
+  candidate label an acceptable documented caveat? yes — no usage history, no external ddof
+                                                    review; both are what the candidate label
+                                                    exists to carry, per RFC-084 §3
+  separate promotion RFC required before v1.0?     already happened (RFC-084) — not by
+                                                    this RFC, and not required again
 ```
 
 **`matten-data` is not promoted by this RFC** and enters the `1.0.0` family at `production-ready
 candidate`; the release notes must say so explicitly (§6.3). **`matten-mlprep` enters at
 production-ready**, promoted separately by RFC-080 before this RFC — no re-announcement of a
-promotion is needed, only a correct label. **`matten-stats` may not enter while `Experimental`**
-(RFC-081 §3); this RFC cannot proceed until that is resolved.
+promotion is needed, only a correct label. **`matten-stats` enters at production-ready candidate**,
+promoted separately by RFC-084 before this RFC (Exit A under RFC-081 §3) — no re-announcement of a
+promotion is needed, only a correct label.
 
 ## 6. Documentation Changes
 
@@ -260,8 +264,8 @@ lock-step family policy: all five crates share the version (RFC-030), and the
   RFC-075 §3.1 local-tool-only justification requirement remains in force
 maturity labels: matten-mlprep ships at production-ready (promoted separately by
   RFC-080); matten-data ships at candidate label with the caveats in §5;
-  matten-stats's resolved RFC-081 exit must be stated explicitly — it cannot
-  still be Experimental if this RFC is executed
+  matten-stats ships at production-ready candidate (promoted separately by
+  RFC-084, Exit A under RFC-081 §3), with the caveats in §5
 ```
 
 ### 6.2 The `pre-1.0` / `0.x` sweep — 19 sites across 9 files
@@ -321,7 +325,9 @@ no public API, runtime, dependency, feature-flag, or MSRV change from 0.38.0
 matten-data ships at production-ready candidate, named explicitly with its
   caveat (RFC-067 "no wording implies silent promotion"); matten-mlprep's
   production-ready label predates this release (RFC-080) and needs no
-  re-announcement; matten-stats's resolved RFC-081 exit is named explicitly
+  re-announcement; matten-stats's production-ready candidate label likewise
+  predates this release (RFC-084, Exit A under RFC-081 §3) and needs no
+  re-announcement, named explicitly with its own caveat (RFC-067)
 what the 1.0 promise covers and what it excludes, pointing at compatibility.md
 ```
 
@@ -412,7 +418,7 @@ must remain at 69 tests. This release touches no tool code; any anchor movement 
 | Feature flags | None |
 | Dependencies | None |
 | MSRV | None (`1.85`) |
-| Maturity labels | None from this release. `matten-mlprep` production-ready (unchanged by this release — RFC-080 already promoted it); `matten-data` production-ready candidate (unchanged); `matten-stats` per its resolved RFC-081 exit |
+| Maturity labels | None from this release. `matten-mlprep` production-ready (unchanged by this release — RFC-080 already promoted it); `matten-data` production-ready candidate (unchanged); `matten-stats` production-ready candidate (unchanged by this release — RFC-084 already promoted it) |
 | Version | `0.38.0` → `1.0.0` |
 | **Compatibility promise** | **Changes fundamentally.** `0.x` promised nothing; `1.0.0` commits the covered surface under SemVer (§6.1) |
 
@@ -431,7 +437,7 @@ The last row is the entire point of this release and the only thing about it tha
 [ ] migration.md's compatibility-promise section points at compatibility.md rather than
     stating a second, independent compatibility claim
 [ ] all 29 current-family version strings across 14 files retarget to 1.0.0 / 1.0.x
-[ ] CHANGELOG names matten-data's candidate label and matten-stats's resolved RFC-081 exit explicitly
+[ ] CHANGELOG names matten-data's candidate label and matten-stats's candidate label (RFC-084) explicitly
 [ ] cargo metadata shows a single family version 1.0.0 with the lock in sync
 [ ] the only .rs change is the install-pin doc comment
 [ ] the complete §8 gate set passes and is reported
@@ -463,8 +469,8 @@ a separate maintainer-authorized step:
 ```text
 1. tag 1.0.0 — bare SemVer, no v prefix
 2. publish in dependency order: matten, then the companions (matten-ndarray, matten-mlprep,
-   matten-data, and matten-stats *if and only if* it took Exit A and remains in the lock-step
-   family — RFC-081 §3; if Exit B, it is excluded from this list entirely)
+   matten-data, and matten-stats — the latter took Exit A via RFC-084 and remains in the
+   lock-step family, RFC-081 §3)
 3. post-release status alignment commit: RFC-076 status, ROADMAP Status line and
    release-table row, each with its own history row
 ```
