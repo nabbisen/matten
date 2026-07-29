@@ -53,7 +53,12 @@ off by default behind the `streaming` feature — the `csv` feature is implied, 
 new dependency. This is a memory strategy, not a dataframe engine: no schema
 evolution, no lenient/skip-malformed mode, no streaming numeric conversion, and
 no async. A batch is exactly a `Table`; concatenating every batch reproduces
-`Table::from_csv_path`'s output exactly.
+`Table::from_csv_path`'s output for ordinary input. Two malformed-input edge
+cases deliberately diverge from `Table::from_csv_path` (a file that is blank
+but not empty — one that trims to nothing but contains at least one
+whitespace character other than a line terminator, such as a space or tab —
+and invalid UTF-8) — see `CsvBatchReader`'s own documentation for the exact
+behavior.
 
 ```toml
 [dependencies]

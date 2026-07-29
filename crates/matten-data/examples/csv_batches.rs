@@ -18,7 +18,10 @@
 use matten_data::CsvBatchReader;
 
 fn main() -> Result<(), matten_data::MattenDataError> {
-    let path = std::env::temp_dir().join("matten_data_csv_batches_example.csv");
+    let path = std::env::temp_dir().join(format!(
+        "matten_data_csv_batches_example_{}.csv",
+        std::process::id()
+    ));
     std::fs::write(&path, "sales,cost\n100,40\n150,45\n120,55\n90,30\n200,60").unwrap();
 
     let mut reader = CsvBatchReader::open(&path, 2)?;

@@ -4,9 +4,11 @@
 small table-like input (such as a CSV) and a numeric [`matten::Tensor`]. It is a
 conversion helper, **not** a dataframe library or query engine.
 
-For joins, group-by, lazy queries, datetime handling, or large/streaming data, use
+For joins, group-by, lazy queries, or datetime handling, use
 [Polars](https://pola.rs), [DataFusion](https://datafusion.apache.org), or Pandas.
-`matten-data` deliberately does none of those.
+`matten-data` deliberately does none of those. Row-count-bounded batched CSV
+reading is available behind the optional `streaming` feature (RFC-082) — see
+below.
 
 ## Install
 
@@ -166,10 +168,42 @@ boundary between "table-like text" and "numbers" honest and visible.
 ## Limitations
 
 `matten-data` has no joins, group-by, pivot, query DSL, lazy execution,
-indexing/`loc`/`iloc`, rolling/window operations, datetime engine, categorical dtype
-system, or large-data streaming. It is for small, application-validated or trusted
-data. When you need those capabilities, reach for a dataframe/query engine
-(Polars, DataFusion, Pandas) instead.
+indexing/`loc`/`iloc`, rolling/window operations, datetime engine, or categorical
+dtype system. It is for small, application-validated or trusted data. When you
+need those capabilities, reach for a dataframe/query engine (Polars, DataFusion,
+Pandas) instead.
+
+## Streaming (optional, `streaming` feature)
+
+`CsvBatchReader` (RFC-082) reads a CSV file in row-count-bounded `Table` batches,
+off by default behind the `streaming` feature — the `csv` feature is implied, no
+new dependency. This is a memory strategy, not a dataframe engine: no schema
+evolution, no lenient/skip-malformed mode, no streaming numeric conversion, and
+no async. A batch is exactly a `Table`; concatenating every batch reproduces
+`Table::from_csv_path`'s output for ordinary input. Two malformed-input edge
+cases deliberately diverge from `Table::from_csv_path` (a file that is blank
+but not empty — one that trims to nothing but contains at least one
+whitespace character other than a line terminator, such as a space or tab —
+and invalid UTF-8) — see `CsvBatchReader`'s own documentation for the exact
+behavior.
+
+```toml
+[dependencies]
+matten-data = { version = "0.39.0", features = ["streaming"] }
+```
+
+```rust
+use matten_data::CsvBatchReader;
+
+# fn main() -> Result<(), matten_data::MattenDataError> {
+# let path = std::path::Path::new("large.csv");
+let mut reader = CsvBatchReader::open(path, 10_000)?;
+while let Some(batch) = reader.next_batch()? {
+    // process one Table batch at a time
+}
+# Ok(())
+# }
+```
 
 ## Status and maturity
 

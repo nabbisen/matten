@@ -27,7 +27,7 @@ use crate::table::{CellValue, Table};
 /// # fn main() -> Result<(), matten_data::MattenDataError> {
 /// use matten_data::CsvBatchReader;
 ///
-/// # let path = std::env::temp_dir().join("matten_data_stream_doctest.csv");
+/// # let path = std::env::temp_dir().join(format!("matten_data_stream_doctest_{}.csv", std::process::id()));
 /// # std::fs::write(&path, "a,b\n1,2\n3,4\n5,6").unwrap();
 /// let mut reader = CsvBatchReader::open(&path, 2)?;
 /// let first = reader.next_batch()?.expect("first batch");
@@ -60,9 +60,28 @@ impl CsvBatchReader {
     /// - [`MattenDataError::InvalidBatchSize`] if `batch_rows == 0`.
     /// - [`MattenDataError::Io`] if the file cannot be opened, or an I/O error
     ///   occurs while reading the header.
-    /// - [`MattenDataError::EmptyInput`] if the file has no header row.
-    /// - [`MattenDataError::Csv`] for a malformed header (empty column name, or a
-    ///   parser-level problem).
+    /// - [`MattenDataError::EmptyInput`] if the file is completely empty (zero
+    ///   bytes), or contains only line terminators (e.g. `"\n"`, `"\n\n"`,
+    ///   `"\r\n"`) — this matches [`Table::from_csv_path`] exactly.
+    ///
+    ///   **Known divergence from [`Table::from_csv_path`]:** a file that is
+    ///   *blank but not empty* — containing at least one whitespace character
+    ///   other than a line terminator (a space or tab being the common cases,
+    ///   but any other Unicode whitespace such as U+00A0 also counts), anywhere,
+    ///   alongside any number of line terminators (e.g. `"   \n"`, a lone
+    ///   `"\t"`) — is `EmptyInput` on `from_csv_path` (which checks whether the
+    ///   *entire* input trims to empty before parsing begins) but
+    ///   [`MattenDataError::Csv`] here. This reader has no equivalent upfront
+    ///   check — doing one would require reading the file ahead of time, which
+    ///   defeats the point of streaming — so it parses the first line as a
+    ///   header record and reports `Csv` (empty column name) instead. Accepted
+    ///   as-is (RFC-082 §4.3): the trade of introducing a *new* divergence to
+    ///   close this one (treating an all-empty header as `EmptyInput`) was
+    ///   evaluated and rejected, since it would make `",,\n1,2,3"` diverge in
+    ///   the other direction instead.
+    /// - [`MattenDataError::Csv`] for a malformed header (empty column name —
+    ///   including the blank-but-not-empty case above — or a parser-level
+    ///   problem).
     /// - [`MattenDataError::DuplicateColumn`] if the header repeats a column name.
     pub fn open(path: &Path, batch_rows: usize) -> Result<Self, MattenDataError> {
         if batch_rows == 0 {
@@ -130,9 +149,25 @@ impl CsvBatchReader {
     ///
     /// - [`MattenDataError::RaggedRow`] if a data row has a different field count
     ///   than the header — the same variant and one-based line number
-    ///   [`Table::from_csv_path`] reports for the same file.
-    /// - [`MattenDataError::Csv`] for a parser-level problem (e.g. invalid UTF-8).
-    /// - [`MattenDataError::Io`] for an I/O error while reading.
+    ///   [`Table::from_csv_path`] reports for the same file, including when the
+    ///   offending row falls in a later batch, past a batch boundary.
+    /// - [`MattenDataError::Csv`] for a parser-level problem, **including invalid
+    ///   UTF-8**.
+    ///
+    ///   **Known divergence from [`Table::from_csv_path`]:** that path validates
+    ///   UTF-8 for the whole file upfront (via `std::fs::read_to_string`) and
+    ///   reports invalid UTF-8 as [`MattenDataError::Io`], before returning any
+    ///   data. This reader parses incrementally, so invalid UTF-8 is a mid-stream
+    ///   *parser* error here (`Csv`, not `Io`) — and because parsing is
+    ///   incremental, **one or more valid batches may already have been returned**
+    ///   by the time a later batch hits the bad bytes. A caller must not assume
+    ///   "if a batch was returned, the whole file is valid UTF-8." This is
+    ///   accepted as-is (RFC-082 §4.3): `Csv` is the more accurate classification
+    ///   for malformed content in either case; `from_csv_path` only reports `Io`
+    ///   as an artifact of reading the whole file through `read_to_string` first.
+    /// - [`MattenDataError::Io`] for a genuine I/O error while reading (for
+    ///   example the underlying file becoming unreadable after `open` already
+    ///   succeeded).
     pub fn next_batch(&mut self) -> Result<Option<Table>, MattenDataError> {
         if self.done {
             return Ok(None);

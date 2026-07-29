@@ -141,6 +141,37 @@ Matching the existing non-streaming behaviour is the point: a user who moves fro
 `CsvBatchReader` should not silently acquire different error semantics. A lenient mode is a separate
 decision (§5).
 
+**Two accepted exceptions, found during implementation review and recorded here rather than left
+implicit** (both documented in `CsvBatchReader`'s own doc comments, and locked by dedicated tests):
+
+```text
+blank-but-not-empty file (NOT merely "whitespace-only" -- see the precise
+  boundary below): Table::from_csv_path checks whether the WHOLE input trims
+  to empty before parsing and returns EmptyInput. A file containing ONLY line
+  terminators (e.g. "\n", "\n\n", "\r\n") trims to empty, so both paths agree:
+  EmptyInput. Divergence requires at least one whitespace character other
+  than a line terminator somewhere in the file (a space or tab being the
+  common cases, but any other Unicode whitespace such as U+00A0 also counts;
+  e.g. "   \n", a lone "\t") -- CsvBatchReader has no
+  upfront whole-file check -- doing one would require buffering the file
+  ahead of time, defeating the point of streaming -- so it parses the first
+  line as a header record and reports Csv (empty column name) instead. The
+  tempting fix (treat an all-empty header as EmptyInput) was evaluated and
+  rejected: it would trade this divergence for a new one (",,\n1,2,3" would
+  become EmptyInput where from_csv_path gives Csv). Accepted as-is on a
+  degenerate input.
+
+invalid UTF-8: Table::from_csv_path validates UTF-8 for the whole file upfront
+  (via read_to_string) and reports invalid UTF-8 as Io, before returning any
+  data. CsvBatchReader parses incrementally, so invalid UTF-8 is a mid-stream
+  Csv error here, not Io -- and because parsing is incremental, one or more
+  valid batches may already have been returned before a later batch hits the
+  bad bytes. Csv is judged the more accurate classification for malformed
+  content in either case; from_csv_path's Io is an artifact of reading the
+  whole file through read_to_string first. Kept as-is; the divergence and its
+  timing consequence are both documented on next_batch().
+```
+
 ### 4.4 Sync vs async
 
 ```text

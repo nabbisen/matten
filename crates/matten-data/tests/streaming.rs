@@ -23,6 +23,17 @@ fn temp_csv(content: &str) -> PathBuf {
     path
 }
 
+/// Same as [`temp_csv`], but for raw bytes that may not be valid UTF-8.
+fn temp_csv_bytes(content: &[u8]) -> PathBuf {
+    let n = COUNTER.fetch_add(1, Ordering::Relaxed);
+    let path = std::env::temp_dir().join(format!(
+        "matten_data_streaming_test_{}_{n}.csv",
+        std::process::id()
+    ));
+    std::fs::write(&path, content).unwrap();
+    path
+}
+
 /// Flattens a `Table` to a numeric `Vec<f64>` via the same conversion path every
 /// other test in the workspace uses (`try_numeric` then `to_tensor`).
 fn numeric_flat(table: &Table) -> Vec<f64> {
@@ -160,6 +171,145 @@ fn equivalence_blank_line_before_end() {
 
     assert_eq!(batched_rows, whole.row_count());
     assert_eq!(batched_flat, whole_flat);
+}
+
+#[test]
+fn equivalence_non_numeric_columns_via_debug() {
+    // The other equivalence tests compare via try_numeric().to_tensor(), which
+    // only proves parity for all-numeric data. This test covers a text column,
+    // a bool column, and a missing value, compared at full fidelity via Table's
+    // Debug derive -- no new public API needed to see raw cell values.
+    //
+    // Per-batch technique (proves multi-batch x non-numeric, without adding a
+    // public Table merge/slice accessor): for each batch CsvBatchReader
+    // produces, write a separate temp file containing just the header plus
+    // that batch's own data lines, load it via Table::from_csv_path, and
+    // Debug-compare it against the batch. CSV quoting here is line-local (no
+    // field spans multiple physical lines), so slicing by physical line and
+    // reloading each slice independently is a valid comparison.
+    let header = "name,active,note";
+    let data_lines = [
+        "alice,true,hello",
+        "bob,false,",
+        "café,true,\"a, b\"",
+        "dan,false,world",
+    ];
+    let content = format!("{header}\n{}", data_lines.join("\n"));
+    let path = temp_csv(&content);
+
+    let whole = Table::from_csv_path(&path).unwrap();
+
+    let mut reader = CsvBatchReader::open(&path, 2).unwrap();
+    let mut start = 0;
+    while let Some(batch) = reader.next_batch().unwrap() {
+        let end = start + batch.row_count();
+        // data_lines[start..end] indexes by data row, which only lines up with
+        // CsvBatchReader's row count because this fixture has no blank lines
+        // (a blank line is skipped as a stray empty record but still consumes
+        // a slot in `data_lines`, which would desync the two indices).
+        let sub_file = format!("{header}\n{}", data_lines[start..end].join("\n"));
+        let sub_path = temp_csv(&sub_file);
+        let sub_table = Table::from_csv_path(&sub_path).unwrap();
+
+        assert_eq!(
+            format!("{batch:?}"),
+            format!("{sub_table:?}"),
+            "batch covering rows {start}..{end} must be Debug-identical to \
+             Table::from_csv_path loading just those rows"
+        );
+
+        start = end;
+    }
+    assert_eq!(start, whole.row_count());
+
+    // Also keep the cheap single-batch-covers-everything compare.
+    let mut single_batch_reader = CsvBatchReader::open(&path, 100).unwrap();
+    let single_batch = single_batch_reader
+        .next_batch()
+        .unwrap()
+        .expect("one batch covering the whole file");
+    assert!(single_batch_reader.next_batch().unwrap().is_none());
+    assert_eq!(format!("{single_batch:?}"), format!("{whole:?}"));
+}
+
+// ── documented divergences from Table::from_csv_path (RFC-082 §4.3) ────────
+
+#[test]
+fn only_line_terminators_is_empty_input_on_both_paths() {
+    // The non-diverging side of the boundary: a file containing ONLY line
+    // terminators trims to empty, so both paths agree on EmptyInput. This
+    // must keep passing so the diverging case below cannot be misread as
+    // "any blank-looking file diverges".
+    let content = "\n\n";
+    let path = temp_csv(content);
+
+    assert!(matches!(
+        Table::from_csv_path(&path),
+        Err(MattenDataError::EmptyInput)
+    ));
+    assert!(matches!(
+        CsvBatchReader::open(&path, 10),
+        Err(MattenDataError::EmptyInput)
+    ));
+}
+
+#[test]
+fn blank_but_not_empty_file_diverges_from_from_csv_path_documented() {
+    // Table::from_csv_path checks whether the WHOLE input trims to empty
+    // before parsing; str::trim() strips spaces and tabs along with line
+    // terminators, so a file with a stray space or tab still trims to empty
+    // and from_csv_path still reports EmptyInput. CsvBatchReader has no such
+    // upfront whole-file check (it would require buffering the file first)
+    // and instead parses the first line as a header record with one
+    // empty-named column, reporting Csv -- this is where the two paths
+    // actually diverge. Documented, accepted divergence (stream.rs doc
+    // comments); lock BOTH sides here so it cannot drift unnoticed. See the
+    // test above for the boundary's non-diverging side (line terminators
+    // alone, with no space or tab).
+    let content = "   \n  \n";
+    let path = temp_csv(content);
+
+    assert!(matches!(
+        Table::from_csv_path(&path),
+        Err(MattenDataError::EmptyInput)
+    ));
+    assert!(matches!(
+        CsvBatchReader::open(&path, 10),
+        Err(MattenDataError::Csv { .. })
+    ));
+}
+
+#[test]
+fn invalid_utf8_diverges_in_variant_and_timing_documented() {
+    // Table::from_csv_path validates UTF-8 for the whole file upfront
+    // (read_to_string) and reports invalid UTF-8 as Io, before returning any
+    // data. CsvBatchReader parses incrementally, so invalid UTF-8 is a
+    // mid-stream Csv error, and a valid batch may already have been returned
+    // before the bad bytes are reached. Lock both the variant difference and
+    // the timing difference.
+    let mut content = b"a,b\n1,2\n3,4\n".to_vec();
+    content.extend_from_slice(b"\xff\xfe,6\n"); // invalid UTF-8 in a later row
+    let path = temp_csv_bytes(&content);
+
+    assert!(matches!(
+        Table::from_csv_path(&path),
+        Err(MattenDataError::Io { .. })
+    ));
+
+    let mut reader = CsvBatchReader::open(&path, 2).unwrap();
+    // batch_rows = 2 covers rows 1-2 ("1,2" and "3,4"), both valid and BEFORE
+    // the bad bytes -- this batch must be delivered successfully first.
+    let first = reader
+        .next_batch()
+        .unwrap()
+        .expect("valid batch delivered before the bad bytes");
+    assert_eq!(first.row_count(), 2);
+
+    // The next call reaches the invalid UTF-8 row and fails as Csv, not Io.
+    assert!(matches!(
+        reader.next_batch(),
+        Err(MattenDataError::Csv { .. })
+    ));
 }
 
 // ── malformed-row policy (RFC-082 §4.3) ─────────────────────────────────────
