@@ -3,8 +3,8 @@
 **Project:** `matten`
 **Governing RFC:** `rfcs/proposed/083-matten-stats-expansion.md` — the design authority
 **Document kind:** Detailed implementation handoff
-**Status:** Inherits RFC-083's state — **accepted 2026-07-29; implementation authorized**. Ends at a
-reviewed commit: no release, no version bump, no tag, no publish, no maturity change
+**Status:** Inherits RFC-083's state — **implemented and reviewed 2026-07-29**. All three functions
+landed with 12 new tests; no release, version bump, tag, publish, or maturity change
 **Date:** 2026-07-29
 
 ---
