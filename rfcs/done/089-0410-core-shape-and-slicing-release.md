@@ -1,8 +1,15 @@
 # RFC-089: `0.41.0` — Core Shape and Slicing Release
 
-**Status:** `proposed/` by folder (not yet implemented); **reviewed and accepted 2026-07-31** —
-implementation authorized under the handoff. Release preparation only; tag and publish remain
-separate owner actions, and unlike `0.40.0` there is no blocking precondition
+**Status:** Prepared — commit *"Prepare 0.41.0: core shape and slicing release (RFC-089)"*;
+reviewed and approved 2026-07-31 after one correction. The family is at `0.41.0` in the tree.
+**NOT YET TAGGED OR PUBLISHED** — separate owner actions, with no blocking precondition this time.
+§7's execution sequence remains outstanding.
+
+The correction (C1) was not in the implementation: `ROADMAP.md`'s Status paragraph carried a stale
+clause attributing RFC-077's seeded split — `0.39.0`'s content — to `0.40.0`, because an earlier
+partial edit at ROADMAP `3.39.0` had replaced only that sentence's opening. A mechanical version
+retarget then swept the leftover up. Re-anchored to `0.40.0`'s actual content, with `0.39.0`'s own
+story delegated to rows `3.25.0`/`3.26.0` rather than restated
 **Target:** `0.41.0`, on the `0.x` line
 **Theme:** Release RFC-087 and RFC-088 — the first two themes chosen against §1.1's planning baseline
 **Depends on:** RFC-030, RFC-064, RFC-067, RFC-086, RFC-087, RFC-088

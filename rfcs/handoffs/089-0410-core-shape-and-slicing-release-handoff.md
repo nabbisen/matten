@@ -3,7 +3,7 @@
 **Project:** `matten`
 **Governing RFC:** `rfcs/proposed/089-0410-core-shape-and-slicing-release.md`
 **Document kind:** Detailed implementation handoff
-**Status:** Inherits RFC-089's state — **accepted 2026-07-31; implementation authorized**
+**Status:** Inherits RFC-089's state — **implemented and reviewed 2026-07-31** (approved after one correction). Preparation complete; tagging and publishing remain outstanding owner actions
 **Date:** 2026-07-31
 
 ---
