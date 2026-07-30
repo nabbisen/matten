@@ -45,6 +45,7 @@ assert!(scalar_result.is_scalar());  // both axes indexed out → shape []
 let row  = t.slice_str("0, :")?;      // first row
 let top2 = t.slice_str("0:2, :")?;   // first two rows
 let step = t.slice_str("::2")?;      // every other element in a 1-D tensor
+let last = t.slice_str("-1, :")?;    // last row (RFC-088)
 ```
 
 Grammar:
@@ -52,17 +53,49 @@ Grammar:
 | Pattern | Meaning |
 |---|---|
 | `:` | all (`All`) |
-| `n` | single index (`Index(n)`) |
-| `start:end` | half-open range |
+| `n` or `-n` | single index (`Index(n)`); a leading `-` counts from the end |
+| `start:end` | half-open range; either bound may have a leading `-` |
 | `start:` | from start to axis end |
 | `:end` | from axis start to end |
-| `start:end:step` | stepped range |
+| `start:end:step` | stepped range (`step` is always positive; a leading `-` on `step` is a parse error) |
 
 Whitespace around tokens is ignored: `"0:2, :"` and `" 0:2 , : "` are
 equivalent.
 
 `slice_str` **always returns `Result`** and never panics on malformed input.
 It rejects specs longer than 512 bytes.
+
+### Negative indices (RFC-088)
+
+`index`, `start`, and `end` accept an optional leading `-`, matching Python's
+convention: `-1` is the last element along that axis, `-2` the second to
+last, and so on. A negative value is resolved as `dim + i` before the usual
+bounds check.
+
+```rust
+let t = Tensor::new(vec![1.0, 2.0, 3.0], &[3]);
+assert_eq!(t.slice_str("-1")?.as_slice(), &[3.0]);       // last element
+assert_eq!(t.slice_str("0:-1")?.as_slice(), &[1.0, 2.0]); // everything but the last
+assert_eq!(t.slice_str("-2:")?.as_slice(), &[2.0, 3.0]);  // last two
+```
+
+**Out-of-range negatives error; they do not clamp.** `slice_str("-10")` or
+`slice_str("-10:")` on an axis of size 3 is an error — unlike Python, which
+clamps a negative slice bound silently (`a[-10:]` on a 3-element list returns
+the whole list). `matten` already errors on positive out-of-range values
+(`"0:100"` on size 3 errors too), so a spec string is not validated by two
+different rules depending on its sign. The error message names both the
+written form and what it resolved to, e.g. `index -10 (resolves to -7) is
+out of range for axis 0 with size 3`.
+
+**The builder does not accept negative indices.** `SliceBuilder::index` and
+`.range()` take `usize` only; a caller with `len` in hand writes `len - 1`
+directly. Adding signed range support to the builder would make every
+existing `range(1..3)` call ambiguous between `usize` and `isize` inference —
+a source-breaking change RFC-088 declines to make for a convenience feature.
+
+**Negative step ("reversal") is not implemented.** `step` stays positive-only;
+`"::-1"` remains a parse error, not a reversed slice.
 
 ## Builder vs `slice_str`
 

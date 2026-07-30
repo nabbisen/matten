@@ -15,18 +15,32 @@ use crate::limits::MAX_SLICE_STR_BYTES;
 // ---- Internal slice specification ---------------------------------------
 
 /// One per-axis slice specification (internal).
+///
+/// `Index`/`Range.start`/`Range.end` are signed (RFC-088): a negative value is
+/// resolved against the axis size at validation time (`resolve_spec`), not at
+/// parse time, since parsing is per-axis-string and the axis size is only known
+/// once the target tensor's shape is available. `step` stays unsigned — RFC-088
+/// only extends `index`/`start`/`end`, never `step` (no negative-step reversal).
 #[derive(Debug, Clone)]
 pub(crate) enum SliceSpec {
     All,
-    Index(usize),
+    Index(isize),
     Range {
-        start: Option<usize>,
-        end: Option<usize>,
+        start: Option<isize>,
+        end: Option<isize>,
         step: usize,
     },
 }
 
 // ---- Shared execution ---------------------------------------------------
+
+/// Resolves a signed index/bound against `dim` (RFC-088 §5): negative values
+/// count from the end (`resolved = dim + i`), non-negative values pass through
+/// unchanged. The result may itself be negative (too-negative input) — the
+/// caller is responsible for treating that as out of range.
+fn resolve_signed(i: isize, dim: usize) -> isize {
+    if i < 0 { dim as isize + i } else { i }
+}
 
 fn resolve_spec(
     spec: &SliceSpec,
@@ -41,16 +55,53 @@ fn resolve_spec(
     match spec {
         SliceSpec::All => Ok(((0..dim).collect(), true)),
         SliceSpec::Index(i) => {
-            if *i >= dim {
+            let i = *i;
+            let resolved = resolve_signed(i, dim);
+            // A negative resolved value can only come from a negative `i` (a
+            // non-negative `i` resolves to itself); a resolved value >= dim can
+            // only come from a non-negative `i` (resolving a negative `i` always
+            // yields something < dim). So the two branches below are mutually
+            // exclusive, and each names exactly what the reader needs: the
+            // written form plus, only when it changed, what it resolved to.
+            if resolved < 0 {
+                return Err(err(format!(
+                    "index {i} (resolves to {resolved}) is out of range for axis {axis} with size {dim}"
+                )));
+            }
+            if resolved as usize >= dim {
                 return Err(err(format!(
                     "index {i} is out of range for axis {axis} with size {dim}"
                 )));
             }
-            Ok((vec![*i], false))
+            Ok((vec![resolved as usize], false))
         }
         SliceSpec::Range { start, end, step } => {
-            let s = start.unwrap_or(0);
-            let e = end.unwrap_or(dim);
+            let resolved_start = start.map(|i| (i, resolve_signed(i, dim)));
+            let resolved_end = end.map(|i| (i, resolve_signed(i, dim)));
+
+            // Negative bound resolves to a negative value: out of range, and the
+            // reader needs to see both the written form and the resolution.
+            if let Some((written, resolved)) = resolved_start {
+                if resolved < 0 {
+                    return Err(err(format!(
+                        "range start {written} (resolves to {resolved}) is out of range \
+                         for axis {axis} with size {dim} in {operation}"
+                    )));
+                }
+            }
+            if let Some((written, resolved)) = resolved_end {
+                if resolved < 0 {
+                    return Err(err(format!(
+                        "range end {written} (resolves to {resolved}) is out of range \
+                         for axis {axis} with size {dim} in {operation}"
+                    )));
+                }
+            }
+
+            // Both bounds are now known non-negative (or absent, using the
+            // existing defaults) — feed the EXISTING bounds validation, unchanged.
+            let s = resolved_start.map_or(0, |(_, r)| r as usize);
+            let e = resolved_end.map_or(dim, |(_, r)| r as usize);
             if s > dim || e > dim {
                 return Err(err(format!(
                     "range {s}..{e} is out of range for axis {axis} with size {dim} \
@@ -58,8 +109,20 @@ fn resolve_spec(
                 )));
             }
             if s > e {
+                // Byte-identical to the pre-RFC-088 message when neither bound was
+                // written negative (s/e already equal what was written, or the
+                // default, in that case) — negatives make the plain numbers no
+                // longer correspond to anything the caller typed, so name the
+                // written form alongside the resolution for whichever bound(s)
+                // were actually negative.
+                let describe = |written: Option<isize>, resolved: usize| match written {
+                    Some(w) if w < 0 => format!("{w} (resolves to {resolved})"),
+                    _ => resolved.to_string(),
+                };
                 return Err(err(format!(
-                    "range start {s} > end {e} for axis {axis} in {operation}"
+                    "range start {} > end {} for axis {axis} in {operation}",
+                    describe(*start, s),
+                    describe(*end, e),
                 )));
             }
             if *step == 0 {
@@ -197,8 +260,8 @@ impl IntoSliceRange for std::ops::RangeInclusive<usize> {}
 impl SliceConvert for std::ops::Range<usize> {
     fn into_repr(self) -> SliceSpecRepr {
         SliceSpecRepr(SliceSpec::Range {
-            start: Some(self.start),
-            end: Some(self.end),
+            start: Some(self.start as isize),
+            end: Some(self.end as isize),
             step: 1,
         })
     }
@@ -206,7 +269,7 @@ impl SliceConvert for std::ops::Range<usize> {
 impl SliceConvert for std::ops::RangeFrom<usize> {
     fn into_repr(self) -> SliceSpecRepr {
         SliceSpecRepr(SliceSpec::Range {
-            start: Some(self.start),
+            start: Some(self.start as isize),
             end: None,
             step: 1,
         })
@@ -216,7 +279,7 @@ impl SliceConvert for std::ops::RangeTo<usize> {
     fn into_repr(self) -> SliceSpecRepr {
         SliceSpecRepr(SliceSpec::Range {
             start: None,
-            end: Some(self.end),
+            end: Some(self.end as isize),
             step: 1,
         })
     }
@@ -231,8 +294,8 @@ impl SliceConvert for std::ops::RangeInclusive<usize> {
         // Use saturating_add to avoid overflow on usize::MAX..=usize::MAX;
         // the resulting spec will fail bounds-checking at build() time.
         SliceSpecRepr(SliceSpec::Range {
-            start: Some(*self.start()),
-            end: Some(self.end().saturating_add(1)),
+            start: Some(*self.start() as isize),
+            end: Some(self.end().saturating_add(1) as isize),
             step: 1,
         })
     }
@@ -281,8 +344,11 @@ impl<'a> SliceBuilder<'a> {
 
     /// Selects a single element along the next axis. That axis is removed from
     /// the output shape.
+    ///
+    /// The builder takes `usize` only — negative indices are a `slice_str`-only
+    /// convenience (RFC-088 §4); a caller with `len` in hand writes `len - 1`.
     pub fn index(mut self, index: usize) -> Self {
-        self.specs.push(SliceSpec::Index(index));
+        self.specs.push(SliceSpec::Index(index as isize));
         self
     }
 
@@ -309,6 +375,11 @@ impl<'a> SliceBuilder<'a> {
 // ---- slice_str parser ---------------------------------------------------
 
 /// Parses a NumPy-like slice string into a list of [`SliceSpec`]s.
+///
+/// `index`, `start`, and `end` accept an optional leading `-` (RFC-088); `step`
+/// does not — negative-step reversal is a separate, unimplemented feature, and
+/// `"::-1"` must remain a parse error (the `-1` there is parsed as `step`, which
+/// only ever accepts `usize`).
 pub(crate) fn parse_slice_str(spec: &str) -> Result<Vec<SliceSpec>, MattenError> {
     let err = |msg: String| MattenError::Slice {
         input: Some(spec.to_string()),
@@ -332,7 +403,7 @@ fn parse_axis_spec(part: &str, full: &str) -> Result<SliceSpec, MattenError> {
         message: msg,
     };
 
-    if let Ok(n) = part.parse::<usize>() {
+    if let Ok(n) = part.parse::<isize>() {
         return Ok(SliceSpec::Index(n));
     }
     if !part.contains(':') {
@@ -340,12 +411,12 @@ fn parse_axis_spec(part: &str, full: &str) -> Result<SliceSpec, MattenError> {
     }
 
     let segments: Vec<&str> = part.splitn(3, ':').collect();
-    let parse_opt = |s: &str| -> Result<Option<usize>, MattenError> {
+    let parse_opt = |s: &str| -> Result<Option<isize>, MattenError> {
         let s = s.trim();
         if s.is_empty() {
             Ok(None)
         } else {
-            s.parse::<usize>()
+            s.parse::<isize>()
                 .map(Some)
                 .map_err(|_| err(format!("expected integer, got {s:?}")))
         }

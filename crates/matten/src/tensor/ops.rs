@@ -263,6 +263,18 @@ impl Tensor {
     /// This is a convenience wrapper over the builder API. It always returns
     /// `Result` and never panics on malformed input.
     ///
+    /// `index`, `start`, and `end` accept an optional leading `-` (RFC-088):
+    /// `-1` means the last element along that axis, resolved as `dim + i`
+    /// before the usual bounds check. `step` does **not** accept a sign —
+    /// `"::-1"` (reversal) is not implemented and remains a parse error.
+    ///
+    /// **Negative bounds do not clamp on out-of-range, unlike Python.**
+    /// `"-10"` on an axis of size 3 is an error, naming both the written form
+    /// and what it resolved to — the same policy `matten` already applies to
+    /// positive out-of-range values (`"0:100"` on size 3 also errors, never
+    /// silently truncates). The builder does not accept negative indices; a
+    /// caller with `len` in hand writes `len - 1` directly.
+    ///
     /// # Errors
     ///
     /// Returns [`MattenError::Slice`] for any parse or bounds error.
@@ -272,6 +284,12 @@ impl Tensor {
     /// let t = Tensor::new(vec![1.0,2.0,3.0,4.0,5.0,6.0], &[2, 3]);
     /// let top = t.slice_str("0, :").unwrap();
     /// assert_eq!(top.as_slice(), &[1.0, 2.0, 3.0]);
+    ///
+    /// // Negative indices count from the end.
+    /// let last_row = t.slice_str("-1, :").unwrap();
+    /// assert_eq!(last_row.as_slice(), &[4.0, 5.0, 6.0]);
+    /// let all_but_last_col = t.slice_str(":, 0:-1").unwrap();
+    /// assert_eq!(all_but_last_col.as_slice(), &[1.0, 2.0, 4.0, 5.0]);
     /// ```
     pub fn slice_str(&self, spec: &str) -> Result<Tensor, MattenError> {
         let specs = crate::slice::parse_slice_str(spec)?;
