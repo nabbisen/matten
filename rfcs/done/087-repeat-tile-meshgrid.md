@@ -1,8 +1,14 @@
 # RFC-087: `repeat`, `tile`, and `meshgrid`
 
-**Status:** `proposed/` by folder (not yet implemented); **reviewed and accepted 2026-07-30** —
-implementation authorized under the handoff. Additive core API; a real core public-surface change,
-so `public-api-snapshot.md` moves. No release, no version bump
+**Status:** Implemented — commit *"Add repeat, tile, and meshgrid to core matten (RFC-087)"*;
+reviewed and **approved with no corrections** 2026-07-30. Core `matten` gains eight functions and
+`public-api-snapshot.md` moves with them — the first core public-surface change since `0.38.0`.
+Unreleased: the family stays at `0.40.0` pending a release decision.
+
+**Correction to §7, recorded rather than edited away:** §7 names `Axis` as an error category while
+also stating "No new `MattenError` variant". Those contradict — `MattenError::Axis` does not exist,
+and every axis-range check in the crate reports through `MattenError::Shape`. The implementation used
+`Shape` throughout, matching precedent. "Axis" here is a category label, not a variant name
 **Target:** Post-`0.40.0`, on the `0.x` line
 **Theme:** Close RFC-039 §8's three deferred shape-composition APIs, the first work selected against
 the §1.1 planning baseline

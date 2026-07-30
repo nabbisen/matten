@@ -3,7 +3,10 @@
 **Project:** `matten`
 **Governing RFC:** `rfcs/proposed/087-repeat-tile-meshgrid.md`
 **Document kind:** Detailed implementation handoff
-**Status:** Inherits RFC-087's state — **accepted 2026-07-30; implementation authorized**
+**Status:** Inherits RFC-087's state — **implemented and reviewed 2026-07-30** (approved, no
+corrections). Two of this handoff's own instructions were found wrong against the codebase and
+correctly not followed: `crates/matten/README.md` has no public-API section to update, and core's
+`Cargo.toml` needs no `[[example]]` entry for an auto-discovered, feature-free example
 **Date:** 2026-07-30
 
 ---
