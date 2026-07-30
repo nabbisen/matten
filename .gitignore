@@ -38,6 +38,13 @@ target
 # its Cargo.lock is regenerated on demand and must not be tracked.
 /tools/matten-migrate/Cargo.lock
 
+# mdbook's build output. `mdbook build docs` writes here (no build-dir override in
+# docs/book.toml, so this is mdbook's default). Never tracked; every verification
+# block in the RFC handoffs runs `mdbook build docs && rm -rf docs/book` precisely
+# because it was not ignored, which left it showing as `??` in every git status and
+# one `git add -A` away from being committed.
+/docs/book/
+
 # custom
 /.git-exclude/
 
