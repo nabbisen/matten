@@ -1,9 +1,15 @@
 # RFC-086: `0.40.0` — Feature and Maturity Release
 
-**Status:** `proposed/` by folder (not yet implemented); **reviewed and accepted 2026-07-30** —
-implementation authorized under the handoff. Release preparation only; tag and publish remain a
-separate authorized step, and tagging is blocked until §3's precondition is resolved. §10's
-release-readiness proposal is **not** adopted by this acceptance — it is a separate owner decision
+**Status:** Prepared — commit *"Prepare 0.40.0: feature and maturity release (RFC-086)"*;
+implementation reviewed and **approved with no corrections** 2026-07-30. The family is at `0.40.0` in
+the tree. **NOT YET TAGGED OR PUBLISHED**: those are separate owner actions, and tagging is still
+blocked by §3's precondition (the orphaned `0.38.0`/`0.39.0` tags). This RFC is complete as
+*preparation*; §8's execution sequence remains outstanding.
+
+Correction to §6, recorded rather than edited away: the retarget was **37 strings across 17 files**,
+not 36/16. The measurement pattern `0\.39\.[0x]` could not match `docs/src/introduction.md`'s bare
+*"the current 0.39 release family"*; `check-release-docs.sh` caught it. Use `0\.NN\b` next time.
+§10's release-readiness proposal is **not** adopted — it remains a separate owner decision
 **Target:** `0.40.0`, on the `0.x` line
 **Theme:** Ship the accumulated user-facing work of RFC-082 through RFC-085, and close the release-cadence
 gap that let it accumulate unnoticed

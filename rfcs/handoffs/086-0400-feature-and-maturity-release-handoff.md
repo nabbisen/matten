@@ -3,8 +3,9 @@
 **Project:** `matten`
 **Governing RFC:** `rfcs/proposed/086-0400-feature-and-maturity-release.md`
 **Document kind:** Detailed implementation handoff
-**Status:** Inherits RFC-086's state — **accepted 2026-07-30; implementation authorized**. Tagging and
-publishing remain out of scope and blocked; see §2
+**Status:** Inherits RFC-086's state — **implemented and reviewed 2026-07-30** (approved, no
+corrections). Preparation is complete; tagging and publishing remain outstanding owner actions, and
+tagging is still blocked by RFC-086 §3
 **Date:** 2026-07-30
 
 ---
