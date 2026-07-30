@@ -45,7 +45,7 @@ cargo run -p matten-mlprep --example mlprep_train_test_split
 cargo run -p matten-mlprep --example mlprep_visual_standardize_summary
 ```
 
-## `matten-data` — table-to-Tensor (production-ready candidate)
+## `matten-data` — table-to-Tensor (production-ready)
 
 | Example | What it shows |
 |---|---|
@@ -58,7 +58,7 @@ cargo run -p matten-mlprep --example mlprep_visual_standardize_summary
 | [`data_06_visual_readiness_summary`](https://github.com/nabbisen/matten/blob/main/crates/matten-data/examples/data_06_visual_readiness_summary.rs) | Readability summary for table-to-Tensor readiness |
 | [`csv_to_tensor`](https://github.com/nabbisen/matten/blob/main/crates/matten-data/examples/csv_to_tensor.rs) | Comprehensive overview of the whole workflow |
 
-`matten-data` is a **production-ready candidate** and intentionally small. It is **not** a dataframe:
+`matten-data` is **production-ready** (RFC-085) and intentionally small. It is **not** a dataframe:
 no group-by, join, merge, pivot, or query. Missing values and numeric conversion are
 explicit, never silent. See [matten-data: table to Tensor](./data.md) for the full guide.
 

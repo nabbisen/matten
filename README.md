@@ -27,7 +27,7 @@ This repository is a Cargo workspace, where core `matten` stays small and depend
 | [`matten`](./crates/matten) | 0.39.x family | stable (v0.x) | The core `f64` tensor library: construction, shape ops, broadcasting, slicing, reductions, matmul, JSON/CSV boundary APIs, and an optional `dynamic` ingestion on-ramp. |
 | [`matten-ndarray`](./crates/matten-ndarray) | 0.39.x family | production-ready | Conversion bridge between `matten::Tensor` and `ndarray::ArrayD<f64>`. |
 | [`matten-mlprep`](./crates/matten-mlprep) | 0.39.x family | production-ready | Transparent, deterministic preprocessing helpers (standardize, min-max scale, bias column, train/test split). |
-| [`matten-data`](./crates/matten-data) | 0.39.x family | production-ready candidate | Small, honest CSV→tensor ingestion (`Table` with explicit missing-value handling and strict numeric conversion). Deliberately not a dataframe library. |
+| [`matten-data`](./crates/matten-data) | 0.39.x family | production-ready | Small, honest CSV→tensor ingestion (`Table` with explicit missing-value handling and strict numeric conversion). Deliberately not a dataframe library. |
 | [`matten-stats`](./crates/matten-stats) | 0.39.x family | production-ready candidate | Small, explicit scalar statistics (`covariance`, `covariance_population`, `correlation`, `quantile`, `skewness`, `kurtosis`) over `matten::Tensor`. Estimator conventions differ per function, matching each function's own ecosystem default. |
 
 All crates share one **family version** (RFC-030): matching numbers mean a

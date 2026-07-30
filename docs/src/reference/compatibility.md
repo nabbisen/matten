@@ -189,8 +189,9 @@ production-ready candidates.
 **production-ready** (RFC-080), now that RFC-058 §5.1's Option B exit criterion is satisfied:
 RFC-077 added `train_test_split_seeded`, closing the ordered-only-split caveat that held the
 promotion at candidate. Label/docs only — no API, runtime, error-variant, dependency, or version
-change, and no other crate's maturity changes. `matten-data` remains production-ready candidate
-for its own separate reasons; `matten-stats` was Experimental at this point and was later promoted
+change, and no other crate's maturity changes. `matten-data` was production-ready candidate at this
+point and was later promoted to production-ready as well (RFC-085), once RFC-059 §6's deferred
+full-production review ran; `matten-stats` was Experimental at this point and was later promoted
 to production-ready candidate as well, once its surface settled (RFC-083, RFC-084).
 
 The **v0.28 family** moves the `matten-ndarray` bridge to **`ndarray` 0.17** (RFC-062): the

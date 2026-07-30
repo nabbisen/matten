@@ -80,33 +80,60 @@ if grep -in "Experimental (0\." "$MLPREP/src/lib.rs"; then
   FAIL=1
 fi
 
-echo "=== Checking matten-data declares production-ready candidate, not Experimental/Beta (RFC-059 / v0.27.0) ==="
+echo "=== Checking matten-data declares production-ready, not candidate/Experimental/Beta (RFC-059, RFC-085) ==="
 # matten-data: Experimental -> Beta (v0.22.0, RFC-036) -> production-ready candidate (v0.27.0,
-# RFC-059). Its own current-status LABEL and the matten-data rows/sections of current-status
-# shared docs must reflect the current rung. Context-aware: the historical "promoted to Beta in
-# v0.22.0" narrative in the README body is allowed, as are per-family entries in compatibility.md
-# and references in rfcs/, CHANGELOG.md, ROADMAP.md.
-if grep -rIni "experimental" "$DATA/README.md" "$DATA/src/lib.rs" docs/src/examples/data.md "$DATA/examples" 2>/dev/null; then
-  echo "ERROR: matten-data current docs still say Experimental (now production-ready candidate as of v0.27.0)"
+# RFC-059) -> production-ready (RFC-085), closing RFC-059 SS6's deferred full-production review.
+# Its own current-status LABEL and the matten-data rows/sections of current-status shared docs
+# must reflect the current rung. Context-aware: the historical "promoted to Beta in v0.22.0, then
+# to production-ready candidate in v0.27.0" narrative in the README body is allowed, as are
+# per-family entries in compatibility.md and references in rfcs/, CHANGELOG.md, ROADMAP.md.
+#
+# An earlier blanket `grep -rIni "experimental"` check across four whole paths (including general
+# reference pages) was tried and rejected (RFC-084 review C1 for matten-stats): it also rejects
+# legitimate maturity-history prose. Replacing it with nothing was ALSO tried and found wrong by a
+# later review round (RFC-085 review C1): docs/src/examples/data.md and crates/matten-data/examples/
+# are not otherwise covered by the anchored checks above (those only look at README.md/lib.rs), so
+# removing the blanket check silently dropped real coverage -- confirmed live, since
+# crates/matten-data/examples/csv_to_tensor.rs still said "matten-data is **Beta**" at the time.
+# The correct middle ground: a PRESENT-TENSE claim only ("is"/"remains"/"stays" ... LABEL), which
+# rejects "is Experimental" / "is currently ... candidate" while accepting "was promoted from ..."
+# and an unrelated "an experimental approach to ...". Only articles/adverbs may sit between the
+# verb and the label (a/an/the/still/currently/now/at/only) -- an earlier "any 50 characters"
+# version let an unrelated "experimental" mentioned anywhere downstream of any "is" false-positive
+# on ordinary prose (RFC-085 review round-2 R1).
+if grep -nEi '\b(is|remains|stays)\b( +(a|an|the|still|currently|now|at|only))* +\*{0,2}(Experimental|Beta|production-ready candidate)\*{0,2}\b' \
+     docs/src/examples/data.md "$DATA"/examples/*.rs 2>/dev/null; then
+  echo "ERROR: matten-data current docs/examples still say Experimental/Beta/candidate (now production-ready)"
   FAIL=1
 fi
-# Current LABEL must not be Beta/Experimental: the lead README badge, the lib.rs Status line, or
-# the Cargo.toml description. The historical Beta mention in the README body is NOT a lead label.
-if grep -nE '^> \*\*(Beta|Experimental) \(' "$DATA/README.md" 2>/dev/null \
-   || grep -nE '^//! \*\*(Beta|Experimental)\.' "$DATA/src/lib.rs" 2>/dev/null \
-   || grep -niE 'experimental|beta' "$DATA/Cargo.toml" 2>/dev/null; then
-  echo "ERROR: stale Beta/Experimental maturity LABEL in matten-data status files (now production-ready candidate)"
+#
+# "production-ready candidate" CONTAINS "production-ready" as a substring, and matten-data's own
+# README/lib.rs legitimately narrate "then to production-ready candidate in v0.27.0 (RFC-059)" as
+# HISTORY mid-sentence (the same shape as the pre-existing "promoted to Beta" allowance below) --
+# so the candidate check, like Beta/Experimental, must be anchored to the banner/Status-line START,
+# not a blanket whole-file substring search that would also reject that legitimate sentence.
+if grep -niE '^> \*\*(Beta|Experimental|Production-ready candidate)\b' "$DATA/README.md" 2>/dev/null \
+   || grep -niE '^//! \*\*(Beta|Experimental|Production-ready candidate)\b' "$DATA/src/lib.rs" 2>/dev/null \
+   || grep -niE 'experimental|beta|candidate' "$DATA/Cargo.toml" 2>/dev/null; then
+  echo "ERROR: stale Beta/Experimental/candidate maturity LABEL in matten-data status files (now production-ready)"
   FAIL=1
 fi
-if ! grep -qi "production-ready candidate" "$DATA/README.md"; then
-  echo "ERROR: matten-data README does not declare production-ready candidate status"
+# Anchored to the ACTUAL banner shape in each file, not just the word-boundary after
+# "Production-ready" -- `\bProduction-ready\b` alone also matches "Production-ready candidate"
+# (matched at the space), so it cannot tell the two labels apart on its own (RFC-085 review C2).
+if ! grep -qE '^> \*\*Production-ready \(' "$DATA/README.md" 2>/dev/null; then
+  echo "ERROR: matten-data README does not declare production-ready status at its banner"
+  FAIL=1
+fi
+if ! grep -qiE '^//! \*\*Production-ready\*\* \(' "$DATA/src/lib.rs" 2>/dev/null; then
+  echo "ERROR: matten-data lib.rs does not declare production-ready status at its Status line"
   FAIL=1
 fi
 # Current-status shared docs (NOT compatibility.md — it carries allowed per-family history).
-if grep -niE 'matten-data.*\((Experimental|Beta)\)' docs/src/examples/companions.md docs/src/examples/index.md 2>/dev/null \
-   || grep -niE 'matten-data.*\| (experimental|beta) \|' README.md 2>/dev/null \
-   || grep -niE 'matten-data` is (a )?\*\*(Experimental|Beta)\*\*' docs/src/examples/companions.md docs/src/examples/data.md 2>/dev/null; then
-  echo "ERROR: a current-status shared doc still marks matten-data Experimental/Beta (should be production-ready candidate)"
+if grep -niE 'matten-data.*\((Experimental|Beta|production-ready candidate)\)' docs/src/examples/companions.md docs/src/examples/index.md 2>/dev/null \
+   || grep -niE 'matten-data.*\| (experimental|beta|production-ready candidate) \|' README.md 2>/dev/null \
+   || grep -niE 'matten-data` is (a )?\*\*(Experimental|Beta|production-ready candidate)\*\*' docs/src/examples/companions.md docs/src/examples/data.md 2>/dev/null; then
+  echo "ERROR: a current-status shared doc still marks matten-data Experimental/Beta/candidate (should be production-ready)"
   FAIL=1
 fi
 

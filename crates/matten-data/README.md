@@ -2,10 +2,10 @@
 
 [![license](https://img.shields.io/crates/l/matten-data.svg)](../../LICENSE)
 
-> **Production-ready candidate (`0.39.x` family).** A scope-locked companion crate (RFC-033).
+> **Production-ready (`0.39.x` family).** A scope-locked companion crate (RFC-033).
 > The table-to-Tensor API (CSV ingestion, schema summary, column selection,
 > missing-value handling, explicit numeric conversion) shipped in v0.20.1
-> (RFC-034, RFC-035) and was promoted to Beta in v0.22.0 (RFC-036), then to production-ready candidate in v0.27.0 (RFC-059). The API is
+> (RFC-034, RFC-035) and was promoted to Beta in v0.22.0 (RFC-036), then to production-ready candidate in v0.27.0 (RFC-059), then to production-ready (RFC-085). The API is
 > mostly stable but pre-1.0; pin the minor version.
 
 Part of the [`matten` workspace](../../README.md) — see it for the full family.
@@ -58,7 +58,10 @@ cases deliberately diverge from `Table::from_csv_path` (a file that is blank
 but not empty — one that trims to nothing but contains at least one
 whitespace character other than a line terminator, such as a space or tab —
 and invalid UTF-8) — see `CsvBatchReader`'s own documentation for the exact
-behavior.
+behavior. This crate's production-ready promotion (RFC-085) covers the `streaming`
+feature too: stable in what it does — its two methods and their semantics are
+settled — but its scope may still grow (RFC-082 §5 defers nine further items,
+including async and resumability).
 
 ```toml
 [dependencies]
@@ -88,7 +91,7 @@ expose a second computation engine.
 
 ## Status and scope
 
-- **Maturity:** production-ready candidate. The table-to-Tensor API is mostly stable but pre-1.0; pin the release explicitly.
+- **Maturity:** production-ready (RFC-085). The table-to-Tensor API is mostly stable but pre-1.0; pin the release explicitly.
 - **Scope lock:** table-to-Tensor preparation only (RFC-033, RFC-042).
 - **Dependency direction:** `matten-data` depends on core `matten`; core never
   depends on `matten-data` (enforced by the dependency-boundary CI check).

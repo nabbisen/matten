@@ -1,6 +1,6 @@
 # `matten-data` — table to `Tensor`
 
-`matten-data` is a small, **production-ready candidate** companion crate for the boring step between a
+`matten-data` is a small, **production-ready** (RFC-085) companion crate for the boring step between a
 small table-like input (such as a CSV) and a numeric [`matten::Tensor`]. It is a
 conversion helper, **not** a dataframe library or query engine.
 
@@ -185,7 +185,9 @@ cases deliberately diverge from `Table::from_csv_path` (a file that is blank
 but not empty — one that trims to nothing but contains at least one
 whitespace character other than a line terminator, such as a space or tab —
 and invalid UTF-8) — see `CsvBatchReader`'s own documentation for the exact
-behavior.
+behavior. `matten-data`'s production-ready promotion (RFC-085) covers this
+feature too: stable in what it does, but its scope may still grow (RFC-082 §5
+defers nine further items, including async and resumability).
 
 ```toml
 [dependencies]
@@ -207,6 +209,6 @@ while let Some(batch) = reader.next_batch()? {
 
 ## Status and maturity
 
-**Production-ready candidate** (`0.39.x` family). The table-to-Tensor API is mostly stable but pre-1.0;
+**Production-ready** (`0.39.x` family, RFC-085). The table-to-Tensor API is mostly stable but pre-1.0;
 pin the release explicitly. The crate's scope is locked and enforced in CI (RFC-042), and
 core `matten` never depends on it (RFC-022).

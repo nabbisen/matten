@@ -3,7 +3,7 @@
 //!
 //! # Status
 //!
-//! **Production-ready candidate.** This is a scope-locked companion (RFC-033) for the boring
+//! **Production-ready** (RFC-085). This is a scope-locked companion (RFC-033) for the boring
 //! step between table-like input and a numeric [`matten::Tensor`]. The API is
 //! mostly stable but pre-1.0; pin the minor version. Under lock-step family versioning
 //! (RFC-030) the crate shares the workspace family version; maturity is the Status
@@ -57,6 +57,9 @@
 //! strategy, not a dataframe engine: batches carry no schema evolution, no
 //! lenient/skip-malformed mode, and no streaming numeric conversion — a batch is
 //! exactly a `Table`, and every existing `Table` operation works on it unchanged.
+//! This crate's production-ready promotion (RFC-085) covers this feature too:
+//! stable in what it does, but its scope may still grow (RFC-082 §5 defers nine
+//! further items, including async and resumability).
 //!
 //! # Relationship to core `dynamic`
 //!
