@@ -1,8 +1,9 @@
 # RFC-088: Negative Indices in `slice_str`
 
-**Status:** `proposed/` by folder (not yet implemented); **reviewed and accepted 2026-07-30** —
-implementation authorized under the handoff. Grammar extension to `slice_str` only; no public item
-changes, so `public-api-snapshot.md` does not move. No release, no version bump
+**Status:** Implemented — commit *"Add negative slice indices to slice_str (RFC-088)"*; reviewed
+and approved 2026-07-30 after one should-fix (the inverted-range error message lost the caller's
+written form once bounds could be negative). No public item changed, so `public-api-snapshot.md`
+correctly did not move. **Unreleased**: the family stays at `0.40.0`
 **Target:** Post-`0.40.0`, on the `0.x` line
 **Theme:** Close RFC-008's `0.1.0` deferral of negative indices, for the reader who arrives from Python
 **Depends on:** RFC-005, RFC-008, RFC-015, RFC-018

@@ -3,7 +3,7 @@
 **Project:** `matten`
 **Governing RFC:** `rfcs/proposed/088-negative-slice-indices.md`
 **Document kind:** Detailed implementation handoff
-**Status:** Inherits RFC-088's state — **accepted 2026-07-30; implementation authorized**
+**Status:** Inherits RFC-088's state — **implemented and reviewed 2026-07-30** (approved after one should-fix on error-message wording)
 **Date:** 2026-07-30
 
 ---
