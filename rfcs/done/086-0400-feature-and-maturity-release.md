@@ -1,10 +1,13 @@
 # RFC-086: `0.40.0` — Feature and Maturity Release
 
-**Status:** Prepared — commit *"Prepare 0.40.0: feature and maturity release (RFC-086)"*;
-implementation reviewed and **approved with no corrections** 2026-07-30. The family is at `0.40.0` in
-the tree. **NOT YET TAGGED OR PUBLISHED**: those are separate owner actions, and tagging is still
-blocked by §3's precondition (the orphaned `0.38.0`/`0.39.0` tags). This RFC is complete as
-*preparation*; §8's execution sequence remains outstanding.
+**Status:** **Released** — prepared in commit *"Prepare 0.40.0: feature and maturity release
+(RFC-086)"*, reviewed and **approved with no corrections**, then tagged `0.40.0` and published to
+crates.io on 2026-07-30. All five crates are live at `0.40.0`, **matching the planned scope exactly** —
+unlike `0.39.0`, no post-release correction was needed.
+
+§3's precondition is **discharged**: `0.38.0` and `0.39.0` were re-tagged onto branch history
+(`16356bd`, `041c115`), `main` was pushed, and all 100 tags now resolve to ancestors of `origin/main`
+with the 100/100 GPG-signed invariant intact. §8's execution sequence is complete.
 
 Correction to §6, recorded rather than edited away: the retarget was **37 strings across 17 files**,
 not 36/16. The measurement pattern `0\.39\.[0x]` could not match `docs/src/introduction.md`'s bare
