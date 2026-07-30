@@ -1,9 +1,10 @@
 # RFC-089: `0.41.0` — Core Shape and Slicing Release
 
-**Status:** Prepared — commit *"Prepare 0.41.0: core shape and slicing release (RFC-089)"*;
-reviewed and approved 2026-07-31 after one correction. The family is at `0.41.0` in the tree.
-**NOT YET TAGGED OR PUBLISHED** — separate owner actions, with no blocking precondition this time.
-§7's execution sequence remains outstanding.
+**Status:** **Released** — prepared in commit *"Prepare 0.41.0: core shape and slicing release
+(RFC-089)"*, reviewed and approved after one correction, then tagged `0.41.0` (signed, on the
+*Prepare* commit) and published to crates.io on 2026-07-31. All five crates live at `0.41.0`,
+verified against the registry; the release **matched the planned scope exactly**, needing no
+post-release correction. §7's execution sequence is complete.
 
 The correction (C1) was not in the implementation: `ROADMAP.md`'s Status paragraph carried a stale
 clause attributing RFC-077's seeded split — `0.39.0`'s content — to `0.40.0`, because an earlier

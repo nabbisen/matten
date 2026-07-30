@@ -3,7 +3,7 @@
 **Project:** `matten`
 **Governing RFC:** `rfcs/proposed/089-0410-core-shape-and-slicing-release.md`
 **Document kind:** Detailed implementation handoff
-**Status:** Inherits RFC-089's state — **implemented and reviewed 2026-07-31** (approved after one correction). Preparation complete; tagging and publishing remain outstanding owner actions
+**Status:** Inherits RFC-089's state — **implemented and reviewed 2026-07-31** (approved after one correction). `0.41.0` tagged and published to crates.io 2026-07-31
 **Date:** 2026-07-31
 
 ---
