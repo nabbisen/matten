@@ -14,9 +14,8 @@ This book is organized by reader:
 - **Reference** — the rules that shape the public API.
 - **Contributors** — project layout, milestones, and process.
 
-> This documentation tracks the current 0.40 release family, an RFC-086 release
-> publishing `matten-data`'s `CsvBatchReader` (RFC-082), `matten-stats`'s
-> `covariance_population`/`skewness`/`kurtosis` (RFC-083), and three maturity
-> promotions (`matten-mlprep` production-ready, `matten-stats` production-ready
-> candidate, `matten-data` production-ready) without any other public API,
-> dependency, or runtime behavior change.
+> This documentation tracks the current 0.41 release family, an RFC-089 release
+> publishing two core `matten` additions: `repeat`/`repeat_axis`/`tile`/`meshgrid`
+> (RFC-087) and negative indices in `slice_str` (RFC-088, `"-1"` for the last
+> element, out of range errors rather than clamping) — without any other public
+> API, dependency, or runtime behavior change.

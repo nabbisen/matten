@@ -26,6 +26,34 @@ crates are expressed by per-crate status labels, not by separate version numbers
 > trigger — unfired across eight consecutive releases before RFC-074 found
 > it — a mandatory per-entry check rather than a rule that only an RFC states.
 
+## [0.41.0] - 2026-07-31
+
+RFC-089 core shape and slicing release. Publishes RFC-087 and RFC-088, both core `matten`
+public-surface changes — the first two themes chosen against RFC-086's release-readiness planning
+baseline. No maturity-label, dependency, feature, edition, or MSRV change.
+
+### Added
+
+- Core `matten`: `repeat`/`try_repeat`, `repeat_axis`/`try_repeat_axis`, `tile`/`try_tile`, and
+  `meshgrid`/`try_meshgrid` (RFC-087). **`repeat` repeats elements; `tile` repeats the whole
+  tensor** — `Tensor::new(vec![1.0, 2.0], &[2]).repeat(2)` gives `[1, 1, 2, 2]` (each element
+  repeated in place), while `.tile(&[2])` gives `[1, 2, 1, 2]` (the tensor repeated as a block).
+  `meshgrid` uses NumPy's `xy` indexing: for `x` of length `m` and `y` of length `n`, both outputs
+  have shape `[n, m]`. `tile` rejects a `reps` slice longer than the tensor's rank, deliberately
+  diverging from NumPy's silent rank promotion.
+
+### Changed
+
+- Core `matten`: `slice_str` accepts a leading `-` on `index`, `start`, and `end`, resolved as
+  `dim + i` (RFC-088) — `"-1"` is the last element along an axis, matching Python's convention.
+  **`slice_str` only; the builder is unchanged and takes no negatives.** An out-of-range negative
+  **errors; it does not clamp**, diverging from Python's silent clamping of range bounds.
+
+### Version
+
+- Release bump `0.40.0` -> `0.41.0`. Lock-step family versioning applies to all five published
+  crates.
+
 ## [0.40.0] - 2026-07-30
 
 RFC-086 feature and maturity release. Publishes the accumulated user-facing content of RFC-082

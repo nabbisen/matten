@@ -1,11 +1,13 @@
 # Public API snapshot
 
-This page lists every public item in `matten` at the current v0.40 release
+This page lists every public item in `matten` at the current v0.41 release
 family. It serves as the baseline for tracking breaking changes toward v1.0.0
 and as the review gate required by RFC-015. Core `matten`'s public API changed
 in RFC-087, which added `repeat`, `repeat_axis`, `tile`, and `meshgrid` (see the
 shape composition section below) — the first change to this page in a while.
-The RFC-082 streaming feature and RFC-083 functions before it were
+RFC-088 followed with negative indices in `slice_str`, but changed no public
+item — a signature-level grammar extension behind an existing method, not a
+new row here. The RFC-082 streaming feature and RFC-083 functions before it were
 companion-crate (`matten-data`/`matten-stats`) additions, and the
 RFC-080/084/085 maturity promotions were label changes; neither touched core
 `matten`'s root exports.
