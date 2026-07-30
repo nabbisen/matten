@@ -1,8 +1,11 @@
 # RFC-085: Promote `matten-data` to Production-Ready
 
-**Status:** `proposed/` by folder (not yet implemented); **reviewed and accepted 2026-07-30** —
-implementation authorized under the handoff. Maturity promotion, label/docs/guard only; see §5 for the
-one substantive question and the residual risk accepted with it
+**Status:** Implemented — commit *"Promote matten-data to production-ready (RFC-085)"*; implementation
+reviewed and approved 2026-07-30 over two rounds (guard-coverage and regex-precision corrections; no
+change to the promotion decision itself). `matten-data` is **production-ready**; RFC-059 §6's deferred
+full-production review is closed. Label/docs/guard only — no code, API, version, or release change; the
+RFC-042 scope lock is untouched. See §5 for the substantive question and the residual risk accepted
+with it
 **Target:** Post-`0.39.0`, on the `0.x` line
 **Theme:** Close RFC-059 §6's deferred full-production review, audited against the RFC-057 bar as
 RFC-057, RFC-080 and RFC-084 were

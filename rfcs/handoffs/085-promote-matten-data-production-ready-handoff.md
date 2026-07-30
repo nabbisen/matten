@@ -3,7 +3,8 @@
 **Project:** `matten`
 **Governing RFC:** `rfcs/proposed/085-promote-matten-data-production-ready.md`
 **Document kind:** Detailed implementation handoff
-**Status:** Inherits RFC-085's state — **accepted 2026-07-30; implementation authorized**
+**Status:** Inherits RFC-085's state — **implemented and reviewed 2026-07-30**. `matten-data` is
+production-ready; RFC-059 §6's deferred review is closed
 **Date:** 2026-07-30
 
 ---
