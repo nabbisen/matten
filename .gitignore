@@ -44,4 +44,4 @@ target
 # Claude Code project-local config (settings.local.json etc.) — machine/session-specific,
 # must never be tracked or pushed. Previously relied only on a personal global gitignore;
 # that is not portable to another clone or contributor.
-/.claude/
+*.local.json
