@@ -1,6 +1,8 @@
 # RFC-089: `0.41.0` — Core Shape and Slicing Release
 
-**Status:** Proposed; release preparation only. Tag and publish remain a separate authorized step
+**Status:** `proposed/` by folder (not yet implemented); **reviewed and accepted 2026-07-31** —
+implementation authorized under the handoff. Release preparation only; tag and publish remain
+separate owner actions, and unlike `0.40.0` there is no blocking precondition
 **Target:** `0.41.0`, on the `0.x` line
 **Theme:** Release RFC-087 and RFC-088 — the first two themes chosen against §1.1's planning baseline
 **Depends on:** RFC-030, RFC-064, RFC-067, RFC-086, RFC-087, RFC-088
