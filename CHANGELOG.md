@@ -7,8 +7,8 @@ follows [Semantic Versioning](https://semver.org/).
 Entries are ordered by release milestone (which is also the tarball version).
 The workspace uses **lock-step family versioning** (RFC-030): every crate shares
 one version, so each entry applies to the whole family — core `matten`,
-`matten-ndarray`, `matten-mlprep`, and `matten-data`. Maturity differences between crates are
-expressed by per-crate status labels, not by separate version numbers. Through
+`matten-ndarray`, `matten-mlprep`, `matten-data`, and `matten-stats`. Maturity differences between
+crates are expressed by per-crate status labels, not by separate version numbers. Through
 `0.16.0` the project was the single `matten` crate.
 
 > **Convention (resolved in v0.19.0, RFC-022 §12).** While the crates ship
@@ -25,6 +25,51 @@ expressed by per-crate status labels, not by separate version numbers. Through
 > despite no published-crate change. This makes RFC-071 §6's reconsideration
 > trigger — unfired across eight consecutive releases before RFC-074 found
 > it — a mandatory per-entry check rather than a rule that only an RFC states.
+
+## [0.40.0] - 2026-07-30
+
+RFC-086 feature and maturity release. Publishes the accumulated user-facing content of RFC-082
+through RFC-085: two new features and three maturity promotions, none of which were visible to
+users before this release. No API, dependency, feature, edition, or MSRV change beyond what is
+listed below; no scope expansion for any crate.
+
+### Added
+
+- `matten-data`: `CsvBatchReader::{open, next_batch}` (RFC-082), reading a CSV file in
+  row-count-bounded `Table` batches. Off by default behind the `streaming` feature (implies
+  `csv`; no new dependency). **Not equivalent to `Table::from_csv_path`** on malformed input:
+  two accepted divergences are documented (RFC-082 §4.3) — a file that is blank but not empty,
+  and invalid UTF-8.
+- `matten-stats`: `covariance_population` (population estimator, `ddof = 0`, the counterpart to
+  `covariance`'s sample `ddof = 1`), `skewness`, and `kurtosis` (RFC-083). Both `skewness` and
+  `kurtosis` are the **uncorrected** (SciPy-default) estimator; `kurtosis` reports **excess**
+  (Fisher) — a normal distribution scores `0.0`, not `3.0`. `matten-stats` goes from three public
+  functions to six.
+
+### Changed
+
+- `matten-data`: `MattenDataError` gains `InvalidBatchSize` (`streaming` feature only), additive
+  and non-breaking under `#[non_exhaustive]`.
+
+### Maturity
+
+Three promotions, named explicitly per RFC-067 (no wording implies a silent promotion):
+
+- `matten-mlprep`: production-ready candidate → **production-ready** (RFC-080), closing RFC-058
+  §5.1's Option B exit criterion via the seeded train/test split.
+- `matten-stats`: Experimental → **production-ready candidate** (RFC-084), discharging RFC-081 §3's
+  Exit A. **Not** production-ready — no usage history is claimed; the candidate label is what
+  carries that.
+- `matten-data`: production-ready candidate → **production-ready** (RFC-085), closing RFC-059 §6's
+  deferred full-production review.
+
+Resulting family: `matten` stable; `matten-ndarray`, `matten-mlprep`, `matten-data`
+production-ready; `matten-stats` production-ready candidate.
+
+### Version
+
+- Release bump `0.39.0` -> `0.40.0`. Lock-step family versioning applies to all five published
+  crates.
 
 ## [0.39.0] - 2026-07-28
 

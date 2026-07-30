@@ -14,7 +14,9 @@ This book is organized by reader:
 - **Reference** — the rules that shape the public API.
 - **Contributors** — project layout, milestones, and process.
 
-> This documentation tracks the current 0.39 release family, an RFC-079 release
-> adding `matten_mlprep::train_test_split_seeded` (a reproducible, seeded
-> shuffled train/test split) without changing existing public APIs, published
-> dependencies, core runtime behavior, or maturity labels.
+> This documentation tracks the current 0.40 release family, an RFC-086 release
+> publishing `matten-data`'s `CsvBatchReader` (RFC-082), `matten-stats`'s
+> `covariance_population`/`skewness`/`kurtosis` (RFC-083), and three maturity
+> promotions (`matten-mlprep` production-ready, `matten-stats` production-ready
+> candidate, `matten-data` production-ready) without any other public API,
+> dependency, or runtime behavior change.

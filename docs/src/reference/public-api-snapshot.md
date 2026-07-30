@@ -1,9 +1,12 @@
 # Public API snapshot
 
-This page lists every public item in `matten` at the current v0.38 release
+This page lists every public item in `matten` at the current v0.40 release
 family. It serves as the baseline for tracking breaking changes toward v1.0.0
-and as the review gate required by RFC-015. The public API did not change for
-the 0.39.0 local-tool JSON release.
+and as the review gate required by RFC-015. Core `matten`'s public API has not
+changed since this snapshot was taken: the RFC-082 streaming feature and
+RFC-083 functions are companion-crate (`matten-data`/`matten-stats`) additions,
+and the RFC-080/084/085 maturity promotions are label changes — none touch
+core `matten`'s root exports below.
 
 ## Root exports
 
