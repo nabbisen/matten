@@ -2,11 +2,13 @@
 
 This page lists every public item in `matten` at the current v0.40 release
 family. It serves as the baseline for tracking breaking changes toward v1.0.0
-and as the review gate required by RFC-015. Core `matten`'s public API has not
-changed since this snapshot was taken: the RFC-082 streaming feature and
-RFC-083 functions are companion-crate (`matten-data`/`matten-stats`) additions,
-and the RFC-080/084/085 maturity promotions are label changes — none touch
-core `matten`'s root exports below.
+and as the review gate required by RFC-015. Core `matten`'s public API changed
+in RFC-087, which added `repeat`, `repeat_axis`, `tile`, and `meshgrid` (see the
+shape composition section below) — the first change to this page in a while.
+The RFC-082 streaming feature and RFC-083 functions before it were
+companion-crate (`matten-data`/`matten-stats`) additions, and the
+RFC-080/084/085 maturity promotions were label changes; neither touched core
+`matten`'s root exports.
 
 ## Root exports
 
@@ -120,8 +122,17 @@ a borrowed slice `&[&Tensor]` and reject dynamic inputs.
 | `try_concatenate(tensors, axis)` | `Result<Tensor, MattenError>` | `InvalidArgument` if empty; `Shape` on rank/dim/axis (`0..rank`); `Unsupported` on dynamic; `Allocation` if oversized |
 | `stack(tensors, axis)` | `Tensor` | joins a new axis (rank + 1); panics on empty/shape/axis error or dynamic |
 | `try_stack(tensors, axis)` | `Result<Tensor, MattenError>` | `InvalidArgument` if empty; `Shape` if shapes differ or `axis > rank`; `Unsupported` on dynamic; `Allocation` if oversized |
+| `repeat(n)` | `Tensor` | repeats each element `n` times, flattens to rank 1; panics on `n = 0` or dynamic |
+| `try_repeat(n)` | `Result<Tensor, MattenError>` | `Shape` if `n = 0`; `Unsupported` on dynamic; `Allocation` if oversized |
+| `repeat_axis(n, axis)` | `Tensor` | repeats each element `n` times along `axis`, rank preserved; panics on rank-0 input, `axis` out of range, `n = 0`, or dynamic |
+| `try_repeat_axis(n, axis)` | `Result<Tensor, MattenError>` | `Shape` on rank-0 input, `axis >= rank`, or `n = 0`; `Unsupported` on dynamic; `Allocation` if oversized |
+| `tile(reps)` | `Tensor` | repeats the whole tensor per `reps` (padded with leading 1s if shorter than rank); panics on empty/zero `reps`, `reps` longer than rank, or dynamic |
+| `try_tile(reps)` | `Result<Tensor, MattenError>` | `Shape` on empty/zero `reps` or `reps` longer than rank (no rank promotion); `Unsupported` on dynamic; `Allocation` if oversized |
+| `meshgrid(x, y)` (associated fn) | `(Tensor, Tensor)` | builds `xy`-indexed coordinate grids from rank-1 `x`/`y`, both shape `[y.len(), x.len()]`; panics on non-rank-1 input or dynamic |
+| `try_meshgrid(x, y)` (associated fn) | `Result<(Tensor, Tensor), MattenError>` | `Shape` if either input is not rank-1; `Unsupported` on dynamic; `Allocation` if oversized |
 
-`repeat`/`tile`/`meshgrid` are deferred (RFC-039 §8) and not part of the API.
+`repeat`, `tile`, and `meshgrid` were added in RFC-087, closing RFC-039 §8's three
+deferred shape-composition APIs.
 
 ## `Tensor` — slicing (numeric Tensor)
 

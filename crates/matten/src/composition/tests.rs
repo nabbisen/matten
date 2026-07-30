@@ -1,4 +1,5 @@
-//! Tests for shape composition (`concatenate`/`stack`, RFC-039).
+//! Tests for shape composition (`concatenate`/`stack`, RFC-039;
+//! `repeat`/`tile`/`meshgrid`, RFC-087).
 //!
 //! Validates the design specification: borrowed-slice input, output shape and
 //! row-major data order, the empty/rank/dimension/axis error policy, single-input
@@ -289,6 +290,305 @@ fn concatenate_and_stack_reject_dynamic() {
         s,
         MattenError::Unsupported {
             operation: "stack",
+            ..
+        }
+    ));
+}
+
+// ===== repeat / repeat_axis / tile / meshgrid (RFC-087) =====
+
+// ----- repeat vs tile: the exact-value pair that prevents the classic swap -----
+
+#[test]
+fn repeat_repeats_each_element() {
+    let a = Tensor::from_vec(vec![1.0, 2.0, 3.0]);
+    let r = a.repeat(2);
+    assert_eq!(r.shape(), &[6]);
+    assert_eq!(r.as_slice(), &[1.0, 1.0, 2.0, 2.0, 3.0, 3.0]);
+}
+
+#[test]
+fn tile_repeats_the_whole_tensor() {
+    let a = Tensor::from_vec(vec![1.0, 2.0, 3.0]);
+    let t = a.tile(&[2]);
+    assert_eq!(t.shape(), &[6]);
+    assert_eq!(t.as_slice(), &[1.0, 2.0, 3.0, 1.0, 2.0, 3.0]);
+}
+
+// ----- repeat: rank-2 flattens; repeat_axis preserves rank -----
+
+#[test]
+fn repeat_on_rank2_input_flattens_to_rank1() {
+    let a = Tensor::new(vec![1.0, 2.0, 3.0, 4.0], &[2, 2]);
+    let r = a.repeat(2);
+    assert_eq!(r.shape(), &[8]);
+    assert_eq!(r.as_slice(), &[1.0, 1.0, 2.0, 2.0, 3.0, 3.0, 4.0, 4.0]);
+}
+
+#[test]
+fn repeat_axis0_and_axis1_of_the_same_matrix() {
+    let a = Tensor::new(vec![1.0, 2.0, 3.0, 4.0], &[2, 2]);
+
+    let r0 = a.repeat_axis(2, 0);
+    assert_eq!(r0.shape(), &[4, 2]);
+    assert_eq!(r0.as_slice(), &[1.0, 2.0, 1.0, 2.0, 3.0, 4.0, 3.0, 4.0]);
+
+    let r1 = a.repeat_axis(2, 1);
+    assert_eq!(r1.shape(), &[2, 4]);
+    assert_eq!(r1.as_slice(), &[1.0, 1.0, 2.0, 2.0, 3.0, 3.0, 4.0, 4.0]);
+}
+
+#[test]
+fn repeat_axis_on_rank0_scalar_is_shape_error() {
+    let s = Tensor::scalar(3.0);
+    let err = Tensor::try_repeat_axis(&s, 2, 0).unwrap_err();
+    assert!(matches!(
+        err,
+        MattenError::Shape {
+            operation: "repeat_axis",
+            ..
+        }
+    ));
+}
+
+#[test]
+fn repeat_on_rank0_scalar_produces_rank1() {
+    let s = Tensor::scalar(7.0);
+    let r = s.repeat(3);
+    assert_eq!(r.shape(), &[3]);
+    assert_eq!(r.as_slice(), &[7.0, 7.0, 7.0]);
+}
+
+// ----- tile: reps shorter than rank prepends 1s; longer than rank errors -----
+
+#[test]
+fn tile_reps_shorter_than_rank_prepends_ones() {
+    // [[1, 2]] shape [1, 2]; reps = [2] pads to [1, 2] -> out shape [1, 4].
+    let a = Tensor::new(vec![1.0, 2.0], &[1, 2]);
+    let t = a.tile(&[2]);
+    assert_eq!(t.shape(), &[1, 4]);
+    assert_eq!(t.as_slice(), &[1.0, 2.0, 1.0, 2.0]);
+}
+
+#[test]
+fn tile_reps_matching_rank_two_by_two() {
+    // RFC-087 §4 example: tile(&[2, 1]) on [[1, 2]] -> [[1, 2], [1, 2]].
+    let a = Tensor::new(vec![1.0, 2.0], &[1, 2]);
+    let t = a.tile(&[2, 1]);
+    assert_eq!(t.shape(), &[2, 2]);
+    assert_eq!(t.as_slice(), &[1.0, 2.0, 1.0, 2.0]);
+}
+
+#[test]
+fn tile_reps_longer_than_rank_is_shape_error_naming_both_lengths() {
+    let a = Tensor::new(vec![1.0, 2.0, 3.0, 4.0], &[2, 2]); // rank 2
+    let err = Tensor::try_tile(&a, &[1, 1, 1]).unwrap_err(); // reps len 3
+    match err {
+        MattenError::Shape { operation, message } => {
+            assert_eq!(operation, "tile");
+            assert!(
+                message.contains('3'),
+                "message should name reps length 3: {message}"
+            );
+            assert!(
+                message.contains('2'),
+                "message should name rank 2: {message}"
+            );
+        }
+        other => panic!("expected MattenError::Shape, got {other:?}"),
+    }
+}
+
+// ----- repeat / repeat_axis / tile: n = 0, empty reps, rep = 0 -----
+
+#[test]
+fn repeat_n_zero_is_shape_error() {
+    let a = Tensor::from_vec(vec![1.0, 2.0]);
+    let err = Tensor::try_repeat(&a, 0).unwrap_err();
+    assert!(matches!(
+        err,
+        MattenError::Shape {
+            operation: "repeat",
+            ..
+        }
+    ));
+}
+
+#[test]
+fn repeat_axis_n_zero_is_shape_error() {
+    let a = Tensor::new(vec![1.0, 2.0, 3.0, 4.0], &[2, 2]);
+    let err = Tensor::try_repeat_axis(&a, 0, 0).unwrap_err();
+    assert!(matches!(
+        err,
+        MattenError::Shape {
+            operation: "repeat_axis",
+            ..
+        }
+    ));
+}
+
+#[test]
+fn repeat_axis_out_of_range_is_shape_error() {
+    let a = Tensor::new(vec![1.0, 2.0, 3.0, 4.0], &[2, 2]); // rank 2, valid 0..2
+    let err = Tensor::try_repeat_axis(&a, 2, 2).unwrap_err();
+    assert!(matches!(
+        err,
+        MattenError::Shape {
+            operation: "repeat_axis",
+            ..
+        }
+    ));
+}
+
+#[test]
+fn tile_empty_reps_is_shape_error() {
+    let a = Tensor::from_vec(vec![1.0, 2.0]);
+    let err = Tensor::try_tile(&a, &[]).unwrap_err();
+    assert!(matches!(
+        err,
+        MattenError::Shape {
+            operation: "tile",
+            ..
+        }
+    ));
+}
+
+#[test]
+fn tile_rep_zero_is_shape_error() {
+    let a = Tensor::from_vec(vec![1.0, 2.0]);
+    let err = Tensor::try_tile(&a, &[0]).unwrap_err();
+    assert!(matches!(
+        err,
+        MattenError::Shape {
+            operation: "tile",
+            ..
+        }
+    ));
+}
+
+// ----- meshgrid -----
+
+#[test]
+fn meshgrid_with_unequal_input_lengths_pins_xy_indexing() {
+    // The mandatory test (RFC-087 §5): equal-length inputs cannot distinguish
+    // xy from ij indexing (they differ only by a transpose, same shape either
+    // way). Unequal lengths make a transposed (ij) implementation fail on shape
+    // alone.
+    let x = Tensor::from_vec(vec![1.0, 2.0, 3.0]); // len 3
+    let y = Tensor::from_vec(vec![10.0, 20.0]); // len 2
+    let (gx, gy) = Tensor::meshgrid(&x, &y);
+
+    assert_eq!(gx.shape(), &[2, 3]); // NOT [3, 2]
+    assert_eq!(gy.shape(), &[2, 3]);
+
+    // out_x[i][j] == x[j]: each row is a full copy of x.
+    assert_eq!(gx.as_slice(), &[1.0, 2.0, 3.0, 1.0, 2.0, 3.0]);
+    // out_y[i][j] == y[i]: each row is constant, equal to y[i].
+    assert_eq!(gy.as_slice(), &[10.0, 10.0, 10.0, 20.0, 20.0, 20.0]);
+}
+
+#[test]
+fn meshgrid_rank2_input_is_shape_error_not_flattened() {
+    let matrix = Tensor::new(vec![1.0, 2.0, 3.0, 4.0], &[2, 2]);
+    let vector = Tensor::from_vec(vec![1.0, 2.0]);
+
+    let err_x = Tensor::try_meshgrid(&matrix, &vector).unwrap_err();
+    assert!(matches!(
+        err_x,
+        MattenError::Shape {
+            operation: "meshgrid",
+            ..
+        }
+    ));
+
+    let err_y = Tensor::try_meshgrid(&vector, &matrix).unwrap_err();
+    assert!(matches!(
+        err_y,
+        MattenError::Shape {
+            operation: "meshgrid",
+            ..
+        }
+    ));
+}
+
+// ----- allocation guard: checked product trips Allocation, never a huge alloc -----
+
+#[test]
+fn repeat_respects_allocation_limit() {
+    let a = Tensor::from_vec(vec![1.0]); // 1 element
+    let n = crate::MattenLimits::default().max_elements + 1;
+    let err = Tensor::try_repeat(&a, n).unwrap_err();
+    assert!(matches!(err, MattenError::Allocation { .. }));
+}
+
+#[test]
+fn repeat_axis_respects_allocation_limit() {
+    let a = Tensor::new(vec![1.0, 2.0], &[1, 2]);
+    let n = crate::MattenLimits::default().max_elements + 1;
+    let err = Tensor::try_repeat_axis(&a, n, 0).unwrap_err();
+    assert!(matches!(err, MattenError::Allocation { .. }));
+}
+
+#[test]
+fn tile_respects_allocation_limit() {
+    let a = Tensor::from_vec(vec![1.0, 2.0]); // 2 elements
+    let reps = crate::MattenLimits::default().max_elements + 1;
+    let err = Tensor::try_tile(&a, &[reps]).unwrap_err();
+    assert!(matches!(err, MattenError::Allocation { .. }));
+}
+
+#[test]
+fn meshgrid_respects_allocation_limit() {
+    // m * n must exceed max_elements without either input itself being huge.
+    let x = Tensor::new((0..2000).map(f64::from).collect(), &[2000]);
+    let y = Tensor::new((0..600).map(f64::from).collect(), &[600]);
+    assert!(2000usize * 600 > crate::MattenLimits::default().max_elements);
+    let err = Tensor::try_meshgrid(&x, &y).unwrap_err();
+    assert!(matches!(err, MattenError::Allocation { .. }));
+}
+
+// ----- dynamic rejection -----
+
+#[cfg(feature = "dynamic")]
+#[test]
+fn repeat_tile_meshgrid_reject_dynamic() {
+    use crate::dynamic::Element;
+    let numeric = Tensor::from_vec(vec![1.0, 2.0]);
+    let dynamic = Tensor::from_elements(vec![Element::Float(1.0), Element::Float(2.0)], &[2]);
+    assert!(dynamic.is_dynamic());
+
+    assert!(matches!(
+        Tensor::try_repeat(&dynamic, 2).unwrap_err(),
+        MattenError::Unsupported {
+            operation: "repeat",
+            ..
+        }
+    ));
+    assert!(matches!(
+        Tensor::try_repeat_axis(&dynamic, 2, 0).unwrap_err(),
+        MattenError::Unsupported {
+            operation: "repeat_axis",
+            ..
+        }
+    ));
+    assert!(matches!(
+        Tensor::try_tile(&dynamic, &[2]).unwrap_err(),
+        MattenError::Unsupported {
+            operation: "tile",
+            ..
+        }
+    ));
+    assert!(matches!(
+        Tensor::try_meshgrid(&dynamic, &numeric).unwrap_err(),
+        MattenError::Unsupported {
+            operation: "meshgrid",
+            ..
+        }
+    ));
+    assert!(matches!(
+        Tensor::try_meshgrid(&numeric, &dynamic).unwrap_err(),
+        MattenError::Unsupported {
+            operation: "meshgrid",
             ..
         }
     ));

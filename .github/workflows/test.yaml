@@ -155,6 +155,7 @@ jobs:
       - run: cargo run -p matten --example 55_moving_average
       - run: cargo run -p matten --example 56_rolling_windows_basic
       - run: cargo run -p matten --example 57_visual_shape_axis_summary
+      - run: cargo run -p matten --example 58_repeat_tile_meshgrid
       - run: cargo run -p matten --example dynamic_00_quickstart --features dynamic,json,csv
       - run: cargo run -p matten --example dynamic_05_dirty_csv_cleanup --features dynamic,json,csv
       - run: cargo run -p matten --example 13_resource_limits
