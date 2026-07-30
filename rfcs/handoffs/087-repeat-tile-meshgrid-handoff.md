@@ -3,7 +3,7 @@
 **Project:** `matten`
 **Governing RFC:** `rfcs/proposed/087-repeat-tile-meshgrid.md`
 **Document kind:** Detailed implementation handoff
-**Status:** Proposed; inherits RFC-087's state. Not authorized for implementation until accepted
+**Status:** Inherits RFC-087's state — **accepted 2026-07-30; implementation authorized**
 **Date:** 2026-07-30
 
 ---

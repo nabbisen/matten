@@ -1,6 +1,8 @@
 # RFC-087: `repeat`, `tile`, and `meshgrid`
 
-**Status:** Proposed; additive core API. No release, no version bump
+**Status:** `proposed/` by folder (not yet implemented); **reviewed and accepted 2026-07-30** —
+implementation authorized under the handoff. Additive core API; a real core public-surface change,
+so `public-api-snapshot.md` moves. No release, no version bump
 **Target:** Post-`0.40.0`, on the `0.x` line
 **Theme:** Close RFC-039 §8's three deferred shape-composition APIs, the first work selected against
 the §1.1 planning baseline
