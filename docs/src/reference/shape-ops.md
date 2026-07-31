@@ -162,15 +162,20 @@ dynamic tensors (call `try_numeric()` first).
 
 ## Element access
 
-```rust,ignore
+```rust
+# use matten::Tensor;
 let t = Tensor::new(vec![1.0, 2.0, 3.0, 4.0], &[2, 2]);
 
-t.get(&[0, 1])  // Some(2.0)
-t.get(&[5, 0])  // None — out of bounds
-t.get(&[0])     // None — rank mismatch
+t.get(&[0, 1]);  // Some(2.0)
+t.get(&[5, 0]);  // None — out of bounds
+t.get(&[0]);     // None — rank mismatch
 
 // Scalar element
-Tensor::scalar(99.0).get(&[])  // Some(99.0)
+Tensor::scalar(99.0).get(&[]);  // Some(99.0)
+# assert_eq!(t.get(&[0, 1]), Some(2.0));
+# assert_eq!(t.get(&[5, 0]), None);
+# assert_eq!(t.get(&[0]), None);
+# assert_eq!(Tensor::scalar(99.0).get(&[]), Some(99.0));
 ```
 
 `get` returns `Option<f64>` and never panics. There is no mutable element

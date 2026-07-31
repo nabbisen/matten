@@ -194,7 +194,7 @@ defers nine further items, including async and resumability).
 matten-data = { version = "0.41.0", features = ["streaming"] }
 ```
 
-```rust
+```rust,no_run
 use matten_data::CsvBatchReader;
 
 # fn main() -> Result<(), matten_data::MattenDataError> {

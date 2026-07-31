@@ -6,15 +6,19 @@ always requires `matmul` or `dot`.
 
 ## Whole-tensor reductions
 
-```rust,ignore
+```rust
 use matten::Tensor;
 
 let v = Tensor::from_vec(vec![1.0, 2.0, 3.0, 4.0]);
 
-v.sum()   // 10.0
-v.mean()  // 2.5
-v.min()   // 1.0
-v.max()   // 4.0
+v.sum();   // 10.0
+v.mean();  // 2.5
+v.min();   // 1.0
+v.max();   // 4.0
+# assert_eq!(v.sum(), 10.0);
+# assert_eq!(v.mean(), 2.5);
+# assert_eq!(v.min(), 1.0);
+# assert_eq!(v.max(), 4.0);
 ```
 
 All four return `f64`. `sum` and `mean` propagate `NaN` naturally (IEEE 754).
@@ -63,14 +67,22 @@ return `MattenError::Unsupported`; call `try_numeric()` first.)
 
 ## Axis reductions
 
-```rust,ignore
+```rust
 // [[1,2,3],[4,5,6]]
 let m = Tensor::new(vec![1.0,2.0,3.0,4.0,5.0,6.0], &[2,3]);
 
-m.sum_axis(0)   // column sums  -> shape [3]  -> [5,7,9]
-m.sum_axis(1)   // row sums     -> shape [2]  -> [6,15]
-m.mean_axis(0)  // column means -> shape [3]  -> [2.5,3.5,4.5]
-m.mean_axis(1)  // row means    -> shape [2]  -> [2.0,5.0]
+m.sum_axis(0);   // column sums  -> shape [3]  -> [5,7,9]
+m.sum_axis(1);   // row sums     -> shape [2]  -> [6,15]
+m.mean_axis(0);  // column means -> shape [3]  -> [2.5,3.5,4.5]
+m.mean_axis(1);  // row means    -> shape [2]  -> [2.0,5.0]
+# assert_eq!(m.sum_axis(0).shape(), &[3]);
+# assert_eq!(m.sum_axis(0).to_vec(), vec![5.0, 7.0, 9.0]);
+# assert_eq!(m.sum_axis(1).shape(), &[2]);
+# assert_eq!(m.sum_axis(1).to_vec(), vec![6.0, 15.0]);
+# assert_eq!(m.mean_axis(0).shape(), &[3]);
+# assert_eq!(m.mean_axis(0).to_vec(), vec![2.5, 3.5, 4.5]);
+# assert_eq!(m.mean_axis(1).shape(), &[2]);
+# assert_eq!(m.mean_axis(1).to_vec(), vec![2.0, 5.0]);
 ```
 
 The reduced axis is removed from the output shape. Reducing a vector along its
@@ -167,16 +179,20 @@ Batched matmul (rank > 2) is out of scope for the numeric core.
 `min_axis` and `max_axis` reduce along an axis, removing it from the output
 shape, and propagate `NaN` the same way `min` and `max` do.
 
-```rust,ignore
+```rust
 use matten::Tensor;
 
 // [[3,1,4],[1,5,9]]
 let m = Tensor::new(vec![3.0,1.0,4.0,1.0,5.0,9.0], &[2,3]);
 
-m.min_axis(0)  // column minimums -> shape [3] -> [1.0, 1.0, 4.0]
-m.max_axis(0)  // column maximums -> shape [3] -> [3.0, 5.0, 9.0]
-m.min_axis(1)  // row minimums   -> shape [2] -> [1.0, 1.0]
-m.max_axis(1)  // row maximums   -> shape [2] -> [4.0, 9.0]
+m.min_axis(0);  // column minimums -> shape [3] -> [1.0, 1.0, 4.0]
+m.max_axis(0);  // column maximums -> shape [3] -> [3.0, 5.0, 9.0]
+m.min_axis(1);  // row minimums   -> shape [2] -> [1.0, 1.0]
+m.max_axis(1);  // row maximums   -> shape [2] -> [4.0, 9.0]
+# assert_eq!(m.min_axis(0).to_vec(), vec![1.0, 1.0, 4.0]);
+# assert_eq!(m.max_axis(0).to_vec(), vec![3.0, 5.0, 9.0]);
+# assert_eq!(m.min_axis(1).to_vec(), vec![1.0, 1.0]);
+# assert_eq!(m.max_axis(1).to_vec(), vec![4.0, 9.0]);
 ```
 
 NaN propagation: if any element along the reduced axis is `NaN`, the output

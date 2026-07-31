@@ -59,12 +59,16 @@ while IFS= read -r md; do
     /^```rust/ {
       info = substr($0, 8)
       # Skip fences the book marks as illustrative or non-Rust.
-      if (info ~ /ignore|text|compile_fail|no_compile/) { skip = 1 } else { skip = 0; inblk = 1; start = NR; n = 0 }
+      if (info ~ /ignore|text|compile_fail|no_compile/) { skip = 1 } else { skip = 0; inblk = 1; start = NR; n = 0; norun = (info ~ /no_run/) }
       next
     }
     /^```/ && (inblk || skip) {
       if (inblk) {
-        f = out "/" stem "__L" start ".rs"
+        # `no_run` blocks are compiled but not executed, exactly as rustdoc treats them:
+        # they are legitimate documentation that cannot run here (missing input files,
+        # network, or a deliberately panicking demonstration). Encoded in the file name
+        # so the runner below can skip them without re-parsing the book.
+        f = out "/" (norun ? "norun__" : "") stem "__L" start ".rs"
         # rustdoc convention: a line beginning "# " is hidden in the rendered book but is
         # part of the compiled program. Strip the marker, keep the code.
         body = ""
@@ -110,9 +114,7 @@ if [ "$COUNT" -eq 0 ]; then
 fi
 
 BUILD_LOG="$WORK/build.log"
-if (cd "$WORK" && cargo build --bins --keep-going --message-format=short) >"$BUILD_LOG" 2>&1; then
-  echo "All $COUNT documented code blocks compile."
-else
+if ! (cd "$WORK" && cargo build --bins --keep-going --message-format=short) >"$BUILD_LOG" 2>&1; then
   grep -E 'error' "$BUILD_LOG" || cat "$BUILD_LOG"
   echo ""
   echo "ERROR: a documented code block does not compile against the current API."
@@ -120,3 +122,36 @@ else
   echo "       or mark the fence \`\`\`rust,ignore if it is deliberately illustrative."
   exit 1
 fi
+
+# Compiling is not enough. Several pages state results as `expr(); // value` with the
+# assertion on a following `#`-hidden line, which mdbook omits from the rendered page --
+# the claim and its check are then the same source, rather than a doc copy of a fact the
+# tests own separately. A hidden assert_eq! that is built but never EXECUTED proves
+# nothing about the value, so every runnable block is run.
+RAN=0
+NOTRUN=0
+FAILED_RUN=""
+for bin in "$WORK"/src/bin/*.rs; do
+  name="$(basename "$bin" .rs)"
+  case "$name" in
+    norun__*) NOTRUN=$((NOTRUN + 1)); continue ;;
+  esac
+  if (cd "$WORK" && cargo run --quiet --bin "$name") >"$WORK/run.log" 2>&1; then
+    RAN=$((RAN + 1))
+  else
+    FAILED_RUN="$FAILED_RUN $name"
+    echo "--- $name ---"
+    tail -5 "$WORK/run.log"
+  fi
+done
+
+if [ -n "$FAILED_RUN" ]; then
+  echo ""
+  echo "ERROR: a documented code block compiled but failed when run —"
+  echo "       a stated result does not match what the code actually produces."
+  echo "       Fix the book, or mark the fence \`\`\`rust,no_run if it legitimately"
+  echo "       cannot execute here (missing input file, deliberate panic)."
+  exit 1
+fi
+
+echo "All $COUNT documented code blocks compile; $RAN ran clean, $NOTRUN marked no_run."

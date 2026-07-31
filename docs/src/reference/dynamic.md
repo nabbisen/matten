@@ -72,16 +72,25 @@ let t = Tensor::try_from_elements(data, &[2, 3])?;
 
 ## Element predicates and coercion
 
-```rust,ignore
-Element::None.is_none()         // true
-Element::Float(1.0).is_numeric() // true
-Element::Int(42).is_numeric()   // true
-Element::Bool(true).is_numeric() // false — no silent bool coercion
+```rust
+# use matten::Element;
+Element::None.is_none();         // true
+Element::Float(1.0).is_numeric(); // true
+Element::Int(42).is_numeric();   // true
+Element::Bool(true).is_numeric(); // false — no silent bool coercion
 
-Element::Float(1.5).try_as_f64()  // Some(1.5)
-Element::Int(7).try_as_f64()      // Some(7.0)
-Element::text("3").try_as_f64()   // None — no silent text coercion
-Element::None.try_as_f64()        // None
+Element::Float(1.5).try_as_f64();  // Some(1.5)
+Element::Int(7).try_as_f64();      // Some(7.0)
+Element::text("3").try_as_f64();   // None — no silent text coercion
+Element::None.try_as_f64();        // None
+# assert!(Element::None.is_none());
+# assert!(Element::Float(1.0).is_numeric());
+# assert!(Element::Int(42).is_numeric());
+# assert!(!Element::Bool(true).is_numeric());
+# assert_eq!(Element::Float(1.5).try_as_f64(), Some(1.5));
+# assert_eq!(Element::Int(7).try_as_f64(), Some(7.0));
+# assert_eq!(Element::text("3").try_as_f64(), None);
+# assert_eq!(Element::None.try_as_f64(), None);
 ```
 
 ## Coercion policy (RFC-011 §11)

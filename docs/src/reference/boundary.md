@@ -53,7 +53,7 @@ assert_eq!(t, t2);
 
 ### File loading
 
-```rust
+```rust,no_run
 let t = Tensor::load_json("examples/data/tensor_2x2.json")?;
 ```
 
@@ -76,7 +76,7 @@ Errors include row and column context:
 matten csv parse error: at row 1, column 1: expected f64, got "active"
 ```
 
-```rust
+```rust,no_run
 let t = Tensor::load_csv("examples/data/numeric_2x3.csv")?;
 ```
 
