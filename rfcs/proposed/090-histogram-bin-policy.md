@@ -1,6 +1,8 @@
 # RFC-090: Histogram — Bin-Selection Policy and `matten-stats::histogram`
 
-**Status:** Proposed; resolves RFC-040 §8's deferral and adds one function. No release, no version bump
+**Status:** `proposed/` by folder (not yet implemented); **reviewed and accepted 2026-07-31** —
+implementation authorized under the handoff. Resolves RFC-040 §8's deferral and adds one function;
+amends RFC-078 §5's companion boundary (§5). No release, no version bump
 **Target:** Post-`0.41.0`, on the `0.x` line
 **Theme:** Close the oldest open policy question in the statistics line, chosen against §1.1's baseline
 **Depends on:** RFC-018, RFC-031, RFC-040, RFC-078, RFC-083, RFC-087
