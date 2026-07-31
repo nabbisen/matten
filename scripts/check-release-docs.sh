@@ -84,21 +84,59 @@ CLAIM_LEAD='\b(is|remains|stays)\b( +(a|an|the|still|currently|now|at|only))* +'
 LABELS_FOR_PRODUCTION_READY='(\*\*([Ee]xperimental|[Bb]eta|[Pp]roduction-ready candidate)\*\*|(Experimental|Beta|[Pp]roduction-ready candidate)\b)'
 LABELS_FOR_CANDIDATE='(\*\*([Ee]xperimental|[Bb]eta)\*\*|(Experimental|Beta)\b)'
 
-echo "=== Checking matten-ndarray does not claim Experimental status ==="
-if grep -in "experimental" "$NDARRAY/src/lib.rs" | grep -v "//\|#\["; then
-  echo "ERROR: matten-ndarray lib.rs still claims Experimental status (should be production-ready candidate)"
-  FAIL=1
-fi
-if grep -i "experimental" "$NDARRAY/Cargo.toml" | grep "description"; then
-  echo "ERROR: matten-ndarray Cargo.toml description still says Experimental"
-  FAIL=1
-fi
+# Every companion that has reached production-ready is checked by one function, so the
+# four assertions below cannot drift apart per crate and a future promotion inherits them
+# by adding a call. This replaces four hand-rolled variants that had drifted badly:
+# matten-ndarray's lib.rs check was DEAD (it piped through `grep -v "//"`, which strips
+# every `//!` doc-comment line in the file, so no doc comment could ever trip it), neither
+# matten-ndarray nor matten-mlprep checked its README banner for Experimental at all, and
+# neither had any positive assertion -- deleting the declaration outright passed. All three
+# proven by deliberate injection before this function was written. Provenance of the checks
+# folded in here: RFC-029/RFC-031 (original), RFC-057 (ndarray production-ready),
+# RFC-058/RFC-080 (mlprep), RFC-059/RFC-085 (data).
+#
+# Historical contexts (CHANGELOG, rfcs/, ROADMAP, compatibility.md) are deliberately NOT
+# scanned, and within these files a promotion narrative is allowed: the negative checks are
+# anchored to the banner/Status-line START, and the body is checked only for a PRESENT-TENSE
+# claim. A whole-file word ban was tried for these crates and is what this replaces -- it
+# works only while the file happens to contain no maturity history, and booby-traps the
+# first person to add some (RFC-084 review C1: rejecting legitimate history is the tail
+# wagging the dog).
+check_production_ready_crate() {
+  local crate="$1" dir="crates/$1"
+  # 1. Banner/Status line must not carry a superseded label.
+  if grep -niE '^> \*\*(Beta|Experimental|Production-ready candidate)\b' "$dir/README.md" 2>/dev/null \
+     || grep -niE '^//! \*\*(Beta|Experimental|Production-ready candidate)\b' "$dir/src/lib.rs" 2>/dev/null \
+     || grep -niE 'experimental|beta|candidate' "$dir/Cargo.toml" 2>/dev/null; then
+    echo "ERROR: stale Beta/Experimental/candidate maturity LABEL in $crate status files (now production-ready)"
+    FAIL=1
+  fi
+  # 2. Body prose must not claim one either. Present-tense only, so "promoted from Beta in
+  #    v0.22.0" survives. This is the coverage a banner anchor alone loses.
+  if grep -nE "${CLAIM_LEAD}${LABELS_FOR_PRODUCTION_READY}" "$dir/README.md" "$dir/src/lib.rs" 2>/dev/null; then
+    echo "ERROR: $crate body prose still claims Experimental/Beta/candidate (now production-ready)"
+    FAIL=1
+  fi
+  # 3./4. The declaration must be PRESENT, not merely not-wrong -- an absent label is a
+  #    different failure from a stale one. Anchored to the real banner shapes: `\bProduction-ready\b`
+  #    alone also matches "Production-ready candidate" at the space (RFC-085 review C2), so the
+  #    README form requires the " (" that only the bare label is followed by, and the lib.rs form
+  #    requires "." or "*" immediately after -- matten-data writes "**Production-ready** (RFC-085)"
+  #    while ndarray and mlprep write "**Production-ready.**", and both must pass.
+  if ! grep -qE '^> \*\*Production-ready \(' "$dir/README.md" 2>/dev/null; then
+    echo "ERROR: $crate README does not declare production-ready status at its banner"
+    FAIL=1
+  fi
+  if ! grep -qE '^//! \*\*Production-ready[.*]' "$dir/src/lib.rs" 2>/dev/null; then
+    echo "ERROR: $crate lib.rs does not declare production-ready status at its Status line"
+    FAIL=1
+  fi
+}
 
-echo "=== Checking matten-mlprep does not claim Experimental status ==="
-if grep -in "Experimental (0\." "$MLPREP/src/lib.rs"; then
-  echo "ERROR: matten-mlprep lib.rs still claims Experimental (0.x) status (should be production-ready)"
-  FAIL=1
-fi
+echo "=== Checking production-ready companions declare that label, and no superseded one ==="
+check_production_ready_crate matten-ndarray
+check_production_ready_crate matten-mlprep
+check_production_ready_crate matten-data
 
 echo "=== Checking matten-data declares production-ready, not candidate/Experimental/Beta (RFC-059, RFC-085) ==="
 # matten-data: Experimental -> Beta (v0.22.0, RFC-036) -> production-ready candidate (v0.27.0,
@@ -140,23 +178,7 @@ fi
 # HISTORY mid-sentence (the same shape as the pre-existing "promoted to Beta" allowance below) --
 # so the candidate check, like Beta/Experimental, must be anchored to the banner/Status-line START,
 # not a blanket whole-file substring search that would also reject that legitimate sentence.
-if grep -niE '^> \*\*(Beta|Experimental|Production-ready candidate)\b' "$DATA/README.md" 2>/dev/null \
-   || grep -niE '^//! \*\*(Beta|Experimental|Production-ready candidate)\b' "$DATA/src/lib.rs" 2>/dev/null \
-   || grep -niE 'experimental|beta|candidate' "$DATA/Cargo.toml" 2>/dev/null; then
-  echo "ERROR: stale Beta/Experimental/candidate maturity LABEL in matten-data status files (now production-ready)"
-  FAIL=1
-fi
-# Anchored to the ACTUAL banner shape in each file, not just the word-boundary after
-# "Production-ready" -- `\bProduction-ready\b` alone also matches "Production-ready candidate"
-# (matched at the space), so it cannot tell the two labels apart on its own (RFC-085 review C2).
-if ! grep -qE '^> \*\*Production-ready \(' "$DATA/README.md" 2>/dev/null; then
-  echo "ERROR: matten-data README does not declare production-ready status at its banner"
-  FAIL=1
-fi
-if ! grep -qiE '^//! \*\*Production-ready\*\* \(' "$DATA/src/lib.rs" 2>/dev/null; then
-  echo "ERROR: matten-data lib.rs does not declare production-ready status at its Status line"
-  FAIL=1
-fi
+# matten-data's own status files are covered by check_production_ready_crate above.
 # Current-status shared docs (NOT compatibility.md — it carries allowed per-family history).
 if grep -niE 'matten-data.*\((Experimental|Beta|production-ready candidate)\)' docs/src/examples/companions.md docs/src/examples/index.md 2>/dev/null \
    || grep -niE 'matten-data.*\| (experimental|beta|production-ready candidate) \|' README.md 2>/dev/null \
@@ -487,44 +509,6 @@ if [ -z "$RM_HEADER_VERSION" ] || [ -z "$RM_HEADER_DATE" ] || [ -z "$RM_LAST_VER
   FAIL=1
 elif [ "$RM_HEADER_VERSION" != "$RM_LAST_VERSION" ] || [ "$RM_HEADER_DATE" != "$RM_LAST_DATE" ]; then
   echo "ERROR: ROADMAP.md header (Document Version $RM_HEADER_VERSION / Date $RM_HEADER_DATE) does not match the last document-history row ($RM_LAST_VERSION / $RM_LAST_DATE)"
-  FAIL=1
-fi
-
-# ---------------------------------------------------------------------------
-# matten-ndarray maturity-label freshness (RFC-057)
-# ---------------------------------------------------------------------------
-# matten-ndarray is production-ready as of v0.25.0. Its own current-status files
-# (crate README, lib.rs, Cargo.toml description) must not still call it a
-# "candidate". Historical contexts (CHANGELOG, rfcs/, migration narrative) are
-# intentionally NOT scanned here, so prior-status references remain intact.
-if grep -rInE 'production-ready candidate' \
-     crates/matten-ndarray/README.md \
-     crates/matten-ndarray/src/lib.rs \
-     crates/matten-ndarray/Cargo.toml 2>/dev/null; then
-  echo "ERROR: stale 'production-ready candidate' label in matten-ndarray status files (now production-ready)"
-  FAIL=1
-fi
-
-# ---------------------------------------------------------------------------
-# matten-mlprep maturity-label freshness (RFC-058, RFC-080)
-# ---------------------------------------------------------------------------
-# matten-mlprep was production-ready candidate as of v0.26.0 (RFC-058), then promoted to
-# production-ready (RFC-080), now that RFC-058 §5.1's Option B exit criterion (a shuffled/seeded
-# split, RFC-077) is satisfied. Its own current-status files must not regress to "Beta" (two
-# rungs back) or still claim "candidate" (one rung back). Historical contexts (CHANGELOG, rfcs/,
-# maturity-progression narrative) are intentionally NOT scanned.
-if grep -rInE '\bBeta\b' \
-     crates/matten-mlprep/README.md \
-     crates/matten-mlprep/src/lib.rs \
-     crates/matten-mlprep/Cargo.toml 2>/dev/null; then
-  echo "ERROR: stale 'Beta' label in matten-mlprep status files (now production-ready)"
-  FAIL=1
-fi
-if grep -rInEi 'production-ready candidate' \
-     crates/matten-mlprep/README.md \
-     crates/matten-mlprep/src/lib.rs \
-     crates/matten-mlprep/Cargo.toml 2>/dev/null; then
-  echo "ERROR: stale 'production-ready candidate' label in matten-mlprep status files (now production-ready)"
   FAIL=1
 fi
 
