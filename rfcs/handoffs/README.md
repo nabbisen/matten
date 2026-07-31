@@ -79,6 +79,8 @@ working documents for the implementation team and may be revised as work proceed
 
 | `089-0410-core-shape-and-slicing-release-handoff.md` | Accepted RFC-089 handoff; implemented, reviewed, and released as `0.41.0` on 2026-07-31. Release preparation only: version bump, 37 measured retargets, and the `[0.41.0]` CHANGELOG entry. Measure with `0\.40\b`, never the suffixed form — the suffixed pattern misses two sites that need **content** updates rather than a number swap, `introduction.md` (still describing RFC-086's release) and `public-api-snapshot.md`'s framing sentence. Five CHANGELOG claims are called out as publishable falsehoods if got wrong, the headline being that **none of this is "NumPy-compatible"** — `tile`'s rank rule and negative indices' non-clamping both diverge deliberately |
 
+| `090-histogram-bin-policy-handoff.md` | **Proposed** — inherits RFC-090's state. One new module in `matten-stats`, one new error variant (`InvalidBinCount`, modelled on `matten-data`'s `InvalidBatchSize`), and the crate's first use of `MattenLimits`. The load-bearing test is the **sum invariant** — `counts.iter().sum() == x.len()` with a maximum landing exactly on the final edge, which is what proves the closed last bin; without it an off-by-one silently drops the max. Also names the **five sites across three files** carrying the old `Tensor -> f64` framing, since stopping at the first per file would leave the crate documenting a rule its own API breaks |
+
 ## Documentation-governance handoffs
 
 These translate the specs supersession analysis into design-team work. They are not tied to a
