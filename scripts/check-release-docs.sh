@@ -64,6 +64,26 @@ fi
 # Companion maturity-label checks (RFC-029, RFC-031)
 # ---------------------------------------------------------------------------
 
+# Shared present-tense maturity-CLAIM pattern, used by the matten-data docs check and by
+# the companion example check at the end of this section. Split into a verb lead and a
+# per-crate label set, because the correct label differs by crate and a check must not
+# reject a crate for stating its own true one.
+#
+# A label is matched only as this project writes labels: bolded (**Experimental**), or
+# bare but capitalised as a proper noun (Experimental), which is the banner form. Bare
+# lowercase "experimental"/"beta" is deliberately NOT matched -- that is ordinary prose,
+# as in "an experimental approach to schema inference". "production-ready candidate" gets
+# no such carve-out: it is multi-word with no innocent adjectival reading, so it is
+# rejected in either case.
+CLAIM_LEAD='\b(is|remains|stays)\b( +(a|an|the|still|currently|now|at|only))* +'
+# Each set carries its own trailing boundary, so call sites must NOT append one: a `\b`
+# after the closing `**` can never match, since `*` and the following `.` or space are both
+# non-word characters. Appending it silently killed the bolded branch -- the most common way
+# a label is actually written -- while the bare branch kept working, so the check looked
+# alive. Caught by probing each shape separately rather than trusting one passing probe.
+LABELS_FOR_PRODUCTION_READY='(\*\*([Ee]xperimental|[Bb]eta|[Pp]roduction-ready candidate)\*\*|(Experimental|Beta|[Pp]roduction-ready candidate)\b)'
+LABELS_FOR_CANDIDATE='(\*\*([Ee]xperimental|[Bb]eta)\*\*|(Experimental|Beta)\b)'
+
 echo "=== Checking matten-ndarray does not claim Experimental status ==="
 if grep -in "experimental" "$NDARRAY/src/lib.rs" | grep -v "//\|#\["; then
   echo "ERROR: matten-ndarray lib.rs still claims Experimental status (should be production-ready candidate)"
@@ -101,9 +121,17 @@ echo "=== Checking matten-data declares production-ready, not candidate/Experime
 # verb and the label (a/an/the/still/currently/now/at/only) -- an earlier "any 50 characters"
 # version let an unrelated "experimental" mentioned anywhere downstream of any "is" false-positive
 # on ordinary prose (RFC-085 review round-2 R1).
-if grep -nEi '\b(is|remains|stays)\b( +(a|an|the|still|currently|now|at|only))* +\*{0,2}(Experimental|Beta|production-ready candidate)\*{0,2}\b' \
-     docs/src/examples/data.md "$DATA"/examples/*.rs 2>/dev/null; then
-  echo "ERROR: matten-data current docs/examples still say Experimental/Beta/candidate (now production-ready)"
+#
+# The claim pattern is shared, defined just above, and case-SENSITIVE for the one-word
+# labels: the case-insensitive version this check shipped with rejected "is an experimental
+# approach to schema inference", the very sentence the paragraph above claims it accepts.
+# Scope note: this check now owns only the shared docs page. Every companion's
+# examples/*.rs is covered uniformly by the example-label check further below, which
+# reuses the same pattern -- keeping matten-data's example directory here as well would
+# double-report the same line.
+if grep -nE "${CLAIM_LEAD}${LABELS_FOR_PRODUCTION_READY}" \
+     docs/src/examples/data.md 2>/dev/null; then
+  echo "ERROR: matten-data current docs still say Experimental/Beta/candidate (now production-ready)"
   FAIL=1
 fi
 #
@@ -165,6 +193,16 @@ if ! grep -qi "production-ready candidate" "$STATS/README.md" 2>/dev/null; then
   echo "ERROR: matten-stats README does not declare production-ready candidate status"
   FAIL=1
 fi
+# matten-data has had a POSITIVE lib.rs Status-line check since RFC-085; matten-stats did
+# not, so deleting its declaration outright passed silently (proven by deliberate removal
+# before this check was written). The negative check above only fires on a WRONG label --
+# an absent one is a different failure and needs its own assertion. Not anchored to the
+# file head: the declaration sits below the boundary and estimator sections, unlike
+# matten-data's, which leads its module doc.
+if ! grep -qE '^//! \*\*Production-ready candidate\*\* \(' "$STATS/src/lib.rs" 2>/dev/null; then
+  echo "ERROR: matten-stats lib.rs does not declare production-ready candidate status"
+  FAIL=1
+fi
 # Current-status shared docs (NOT compatibility.md — it carries allowed per-family history).
 if grep -niE 'matten-stats.*\(Experimental\)' docs/src/examples/companions.md docs/src/examples/index.md 2>/dev/null \
    || grep -niE 'matten-stats.*\| experimental \|' README.md 2>/dev/null \
@@ -172,6 +210,39 @@ if grep -niE 'matten-stats.*\(Experimental\)' docs/src/examples/companions.md do
   echo "ERROR: a current-status shared doc still marks matten-stats Experimental (should be production-ready candidate)"
   FAIL=1
 fi
+
+# ---------------------------------------------------------------------------
+# Companion example-file maturity claims (RFC-084 review C1, RFC-085 review C1/R1)
+# ---------------------------------------------------------------------------
+# The per-crate blocks above check each companion's own README banner, lib.rs Status line
+# and Cargo.toml description, plus named current-status shared docs. Until now only ONE of
+# the four also checked crates/*/examples/*.rs: matten-data, and it got that coverage only
+# because RFC-085 review C1 caught csv_to_tensor.rs still asserting "matten-data is
+# **Beta**" long after the promotion. The hole was left open for the other three. It was
+# reachable, not theoretical: an example line reading "`matten-stats` is **Experimental**"
+# was injected into crates/matten-stats/examples/histogram.rs and this script still exited
+# 0. Enumerating the sites one promotion at a time is what rule 002 warns against, so all
+# four are covered in one loop and a new companion inherits the check by existing.
+#
+# Same present-tense pattern as the matten-data docs check above -- only a CLAIM
+# ("is"/"remains"/"stays", optional article or adverb, LABEL) is rejected, so
+# promotion-history prose ("promoted from Experimental in RFC-084") and unrelated wording
+# ("an experimental approach to ...") still pass. The forbidden set is per-crate because
+# the correct answer differs: matten-stats sits at production-ready candidate, so that
+# label is banned for the other three only -- banning it everywhere would reject
+# matten-stats for being right.
+check_example_labels() {
+  local crate="$1" labels="$2"
+  if grep -nE "${CLAIM_LEAD}${labels}" "crates/$crate"/examples/*.rs 2>/dev/null; then
+    echo "ERROR: a $crate example claims a stale maturity label (see that crate's Status line for the current one)"
+    FAIL=1
+  fi
+}
+echo "=== Checking companion examples claim no stale maturity label (RFC-084, RFC-085) ==="
+check_example_labels matten-ndarray "$LABELS_FOR_PRODUCTION_READY"
+check_example_labels matten-mlprep  "$LABELS_FOR_PRODUCTION_READY"
+check_example_labels matten-data    "$LABELS_FOR_PRODUCTION_READY"
+check_example_labels matten-stats   "$LABELS_FOR_CANDIDATE"
 
 # ---------------------------------------------------------------------------
 # Companion dynamic-rejection guard soundness (RFC-031)
