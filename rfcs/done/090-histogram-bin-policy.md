@@ -1,8 +1,16 @@
 # RFC-090: Histogram — Bin-Selection Policy and `matten-stats::histogram`
 
-**Status:** `proposed/` by folder (not yet implemented); **reviewed and accepted 2026-07-31** —
-implementation authorized under the handoff. Resolves RFC-040 §8's deferral and adds one function;
-amends RFC-078 §5's companion boundary (§5). No release, no version bump
+**Status:** Implemented — commit *"Add histogram to matten-stats (RFC-090)"*; reviewed and approved
+2026-07-31 after one correction. Resolves RFC-040 §8's deferral, open since v0.21.2 and the oldest
+question in the project, and amends RFC-078 §5's companion boundary (§5). `matten-stats` now exposes
+seven functions. **Unreleased**: the family stays at `0.41.0`.
+
+**Correction (C1), recorded rather than edited away:** the first implementation returned `Ok` with
+`edges = [NaN, inf, inf, inf, …]` when every input was finite but the derived `hi - lo` overflowed.
+The `NonFiniteValue` guard checks inputs; nothing checked the derived range, and the sum invariant
+this RFC specified as load-bearing still passed, so the test suite was blind to it. Fixed by
+rejecting a non-finite range, with `NonFiniteValue`'s message broadened to *"found in the input, or
+produced by a computation over it"* so it stays true for both cases
 **Target:** Post-`0.41.0`, on the `0.x` line
 **Theme:** Close the oldest open policy question in the statistics line, chosen against §1.1's baseline
 **Depends on:** RFC-018, RFC-031, RFC-040, RFC-078, RFC-083, RFC-087

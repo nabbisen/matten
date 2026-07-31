@@ -3,7 +3,10 @@
 **Project:** `matten`
 **Governing RFC:** `rfcs/proposed/090-histogram-bin-policy.md`
 **Document kind:** Detailed implementation handoff
-**Status:** Inherits RFC-090's state — **accepted 2026-07-31; implementation authorized**
+**Status:** Inherits RFC-090's state — **implemented and reviewed 2026-07-31** (approved after one
+correction). This handoff's own §3 edge formula was found to be wrong — `(range * bins) / bins` can
+overflow before the division recovers — and the implementer's pinning of `edges[bins] = hi` was a
+correctness fix rather than the tidy-up the formula implied
 **Date:** 2026-07-31
 
 ---
