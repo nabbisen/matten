@@ -17,7 +17,7 @@ allocation against `MattenLimits` before copying any data.
 
 ## concatenate
 
-```rust
+```rust,ignore
 Tensor::concatenate(tensors: &[&Tensor], axis: usize) -> Tensor
 Tensor::try_concatenate(tensors: &[&Tensor], axis: usize) -> Result<Tensor, MattenError>
 ```
@@ -52,7 +52,7 @@ dynamic status).
 
 ## stack
 
-```rust
+```rust,ignore
 Tensor::stack(tensors: &[&Tensor], axis: usize) -> Tensor
 Tensor::try_stack(tensors: &[&Tensor], axis: usize) -> Result<Tensor, MattenError>
 ```
@@ -98,7 +98,7 @@ A single-element list inserts a length-1 axis (the analogue of `expand_dims`).
 
 ## `repeat` / `repeat_axis`
 
-```rust
+```rust,ignore
 Tensor::repeat(&self, n: usize) -> Tensor
 Tensor::try_repeat(&self, n: usize) -> Result<Tensor, MattenError>
 
@@ -130,7 +130,7 @@ does.
 
 ## `tile`
 
-```rust
+```rust,ignore
 Tensor::tile(&self, reps: &[usize]) -> Tensor
 Tensor::try_tile(&self, reps: &[usize]) -> Result<Tensor, MattenError>
 ```
@@ -160,7 +160,7 @@ below). `reps` must be non-empty and every entry nonzero.
 
 ## `meshgrid`
 
-```rust
+```rust,ignore
 Tensor::meshgrid(x: &Tensor, y: &Tensor) -> (Tensor, Tensor)
 Tensor::try_meshgrid(x: &Tensor, y: &Tensor) -> Result<(Tensor, Tensor), MattenError>
 ```

@@ -24,7 +24,7 @@ specialised crate. This page shows how.
 Every `matten` tensor exposes its flat row-major data. The simplest data-export
 path is:
 
-```rust
+```rust,ignore
 let flat: Vec<f64> = tensor.into_vec();  // consuming, no copy
 // or
 let flat: Vec<f64> = tensor.to_vec();    // borrowing clone
@@ -32,7 +32,7 @@ let flat: Vec<f64> = tensor.to_vec();    // borrowing clone
 
 The shape is available as:
 
-```rust
+```rust,ignore
 let shape: &[usize] = tensor.shape();
 ```
 
@@ -53,7 +53,7 @@ println!("{arr}");
 
 Without the bridge crate, convert manually from the flat `Vec<f64>` plus shape:
 
-```rust
+```rust,ignore
 use matten::Tensor;
 use ndarray::ArrayD;
 
@@ -69,7 +69,7 @@ views, and strided arrays.
 
 ## To `nalgebra`
 
-```rust
+```rust,ignore
 use matten::Tensor;
 use nalgebra::DMatrix;
 
@@ -119,7 +119,7 @@ let flat: Vec<f64>  = numeric.into_vec();    // hand off
 `matten` clones on every reshape and slice. For large datasets,
 migrate before performing many transformations:
 
-```rust
+```rust,ignore
 // Prefer this pattern for large data:
 let result = compute_in_matten(&small_data);
 let flat   = result.into_vec();

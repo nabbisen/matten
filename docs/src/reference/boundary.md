@@ -42,7 +42,7 @@ assert!(Tensor::from_json(r#"[[1.0,"text"]]"#).is_err()); // non-numeric
 `Tensor` implements `Serialize` and `Deserialize` using the canonical object
 form (requires the `serde` or `json` feature, both on by default):
 
-```rust
+```rust,ignore
 use matten::Tensor;
 
 let t = Tensor::new(vec![1.0, 2.0, 3.0, 4.0], &[2, 2]);

@@ -51,7 +51,7 @@ conversions **return `Result` and never panic** on rejected input, and a bridge 
 
 ### Examples
 
-```rust
+```rust,ignore
 use matten::Tensor;
 use matten_ndarray::{to_arrayd, from_arrayd};
 

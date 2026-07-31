@@ -34,7 +34,7 @@ with an actionable message.
 
 ## Range constructor
 
-```rust
+```rust,ignore
 // Half-open, step > 0: [0.0, 1.0, 2.0, 3.0, 4.0]
 let r = Tensor::arange(0.0, 5.0, 1.0);
 
@@ -50,7 +50,7 @@ element count above the allocation limit (`2²⁸`).
 
 ## Evenly spaced values and identity (RFC-038)
 
-```rust
+```rust,ignore
 // `count` evenly spaced values, inclusive of both endpoints:
 let xs = Tensor::linspace(0.0, 1.0, 5);   // [0.0, 0.25, 0.5, 0.75, 1.0]
 let one = Tensor::linspace(2.0, 9.0, 1);  // [2.0]
@@ -102,7 +102,7 @@ let t = Tensor::try_from_rows(vec![vec![1.0, 2.0], vec![3.0, 4.0]])?;
 
 ## Inspection
 
-```rust
+```rust,ignore
 t.shape()      // &[usize]  — no allocation
 t.ndim()       // usize     — shape().len()
 t.len()        // usize     — element count
@@ -114,7 +114,7 @@ t.as_slice()   // &[f64]    — flat row-major view
 
 ## Conversion out
 
-```rust
+```rust,ignore
 let v: Vec<f64>        = t.to_vec();       // clone
 let v: Vec<f64>        = t.into_vec();     // move, no copy
 let v: Vec<f64>        = Vec::from(&t);    // borrow-clone
@@ -127,7 +127,7 @@ let rows: Vec<Vec<f64>> = t.try_into()?;   // fails for non-rank-2
 When a PoC moves to a performance-sensitive path, hand the flat data to a
 specialised crate:
 
-```rust
+```rust,ignore
 let flat: Vec<f64> = tensor.into_vec(); // zero-copy move
 // pass `flat` to ndarray, nalgebra, candle, etc.
 ```

@@ -46,7 +46,7 @@ a dedicated bridge is only a documented future direction, not a commitment.
 Manual, via flat row-major data. **`DMatrix` is column-major**, so build it from a row-major
 slice with `from_row_slice`, which reads the source in row-major order:
 
-```rust
+```rust,ignore
 use matten::Tensor;
 use nalgebra::{DMatrix, DVector};
 

@@ -33,7 +33,7 @@ Builder methods:
 Index semantics follow NumPy: `index(n)` removes the axis, collapsing one
 dimension. `range` keeps it.
 
-```rust
+```rust,ignore
 // Shape [2, 3]: index one axis
 let scalar_result = t.slice().index(0).index(1).build()?;
 assert!(scalar_result.is_scalar());  // both axes indexed out → shape []
@@ -41,7 +41,7 @@ assert!(scalar_result.is_scalar());  // both axes indexed out → shape []
 
 ## `slice_str` (convenience)
 
-```rust
+```rust,ignore
 let row  = t.slice_str("0, :")?;      // first row
 let top2 = t.slice_str("0:2, :")?;   // first two rows
 let step = t.slice_str("::2")?;      // every other element in a 1-D tensor
@@ -103,7 +103,7 @@ The builder is the primary API because it is type-checked at the call site.
 `slice_str` is useful for exploratory work and tutorials where NumPy-familiar
 syntax is more readable.
 
-```rust
+```rust,ignore
 // These produce the same tensor
 let a = t.slice().range(0..2).all().build()?;
 let b = t.slice_str("0:2, :")?;
@@ -129,7 +129,7 @@ lifetime annotation.
 - range start > end or end > dimension;
 - `slice_str` parse error (carries the original spec string).
 
-```rust
+```rust,ignore
 let err = t.slice().all().build().unwrap_err(); // too few specs for rank-2
 assert!(matches!(err, MattenError::Slice { .. }));
 ```

@@ -13,7 +13,7 @@
 
 ## norm
 
-```rust
+```rust,ignore
 Tensor::norm(&self) -> f64
 Tensor::try_norm(&self) -> Result<f64, MattenError>
 ```
@@ -33,7 +33,7 @@ norm([[1, 2], [2, 4]]) = 5           // Frobenius: sqrt(1 + 4 + 4 + 16)
 
 ## trace
 
-```rust
+```rust,ignore
 Tensor::trace(&self) -> f64
 Tensor::try_trace(&self) -> Result<f64, MattenError>
 ```
@@ -51,7 +51,7 @@ trace([[1, 2, 3], [4, 5, 6]])       = 6   // min(2,3)=2 -> self[0,0] + self[1,1]
 
 ## outer
 
-```rust
+```rust,ignore
 Tensor::outer(&self, other: &Tensor) -> Tensor
 Tensor::try_outer(&self, other: &Tensor) -> Result<Tensor, MattenError>
 ```

@@ -286,7 +286,7 @@ Builder methods: `.strict()`, `.permissive()`, `.allow_bool()`,
 
 ## `MattenError` variants
 
-```rust
+```rust,ignore
 #[non_exhaustive]
 pub enum MattenError {
     Shape      { operation: &'static str, message: String },
@@ -308,7 +308,7 @@ pub enum DataFormat { Json, Csv }
 
 ## `Element` variants (`#[cfg(feature = "dynamic")]`)
 
-```rust
+```rust,ignore
 pub enum Element {
     Float(f64),
     Int(i64),

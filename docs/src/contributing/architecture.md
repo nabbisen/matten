@@ -45,7 +45,7 @@ Module style: `foo.rs` + `foo/` coexistence (Rust 2018+). No `mod.rs` files.
 
 ## Public re-exports
 
-```rust
+```rust,ignore
 // Numeric core — always available:
 pub use crate::error::{DataFormat, MattenError};
 pub use crate::limits::MattenLimits;

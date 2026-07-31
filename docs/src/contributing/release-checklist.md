@@ -19,6 +19,7 @@ bash scripts/check-matten-data-scope.sh          # RFC-042 matten-data anti-scop
 bash scripts/check-benchmark-dependency-sync.sh  # benchmark harness ndarray pin == workspace requirement
 bash scripts/check-streaming-scope.sh            # RFC-037 streaming / large-CSV anti-scope guard
 bash scripts/check-release-docs.sh               # doc-truth + examples naming-band guards
+bash scripts/check-doc-code.sh                   # every non-ignored ```rust block in docs/src compiles
 cargo clippy --all-targets --all-features -- -D warnings
 cargo clippy --all-targets --no-default-features -- -D warnings
 cargo clippy --all-targets --no-default-features --features dynamic -- -D warnings

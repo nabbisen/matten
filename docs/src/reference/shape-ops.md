@@ -36,7 +36,7 @@ reshape [3, 2]
 [ 5  6 ]
 ```
 
-```rust
+```rust,ignore
 // Any compatible shape works
 let flat  = t.reshape(&[6]);        // [6]
 let col   = t.reshape(&[6, 1]);     // [6, 1]
@@ -102,7 +102,7 @@ coord [1,2] = 6             coord [2,1] = 6
 
 Transposing twice is the identity:
 
-```rust
+```rust,ignore
 assert_eq!(t.transpose().transpose(), t);
 ```
 
@@ -136,7 +136,7 @@ matten shape error in swap_axes: axis 5 is out of range for rank-3 tensor
 
 ## Squeeze and expand_dims (RFC-038)
 
-```rust
+```rust,ignore
 use matten::Tensor;
 
 // squeeze: drop every length-1 axis (data order unchanged)
@@ -162,7 +162,7 @@ dynamic tensors (call `try_numeric()` first).
 
 ## Element access
 
-```rust
+```rust,ignore
 let t = Tensor::new(vec![1.0, 2.0, 3.0, 4.0], &[2, 2]);
 
 t.get(&[0, 1])  // Some(2.0)

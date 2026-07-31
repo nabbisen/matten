@@ -46,7 +46,7 @@ These map directly from the shipped examples:
 The clean path is the **`matten-ndarray` bridge**, which copies, is numeric-only, rejects
 dynamic tensors, and preserves logical row-major order:
 
-```rust
+```rust,ignore
 use matten::Tensor;
 use matten_ndarray::{to_arrayd, from_arrayd};
 

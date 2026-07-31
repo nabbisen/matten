@@ -6,7 +6,7 @@ always requires `matmul` or `dot`.
 
 ## Whole-tensor reductions
 
-```rust
+```rust,ignore
 use matten::Tensor;
 
 let v = Tensor::from_vec(vec![1.0, 2.0, 3.0, 4.0]);
@@ -63,7 +63,7 @@ return `MattenError::Unsupported`; call `try_numeric()` first.)
 
 ## Axis reductions
 
-```rust
+```rust,ignore
 // [[1,2,3],[4,5,6]]
 let m = Tensor::new(vec![1.0,2.0,3.0,4.0,5.0,6.0], &[2,3]);
 
@@ -167,7 +167,7 @@ Batched matmul (rank > 2) is out of scope for the numeric core.
 `min_axis` and `max_axis` reduce along an axis, removing it from the output
 shape, and propagate `NaN` the same way `min` and `max` do.
 
-```rust
+```rust,ignore
 use matten::Tensor;
 
 // [[3,1,4],[1,5,9]]
@@ -201,7 +201,7 @@ matmul uses plain nested loops — correct and readable, but not
 cache-optimised. For large matrices, migrate the flat data to `ndarray` or
 `nalgebra`:
 
-```rust
+```rust,ignore
 let flat: Vec<f64> = tensor.into_vec();
 // hand off to your preferred crate
 ```

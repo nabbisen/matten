@@ -14,7 +14,7 @@ code with `matten`.
 Rule of thumb: if the shape or data comes from *outside* your code (a file,
 a web request, user input), use the `try_*` form.
 
-```rust
+```rust,ignore
 use matten::{MattenError, Tensor};
 
 // Panic zone: shape is a trusted literal

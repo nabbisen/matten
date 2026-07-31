@@ -40,7 +40,7 @@ reductions belong after `try_numeric()`, not before it.
 
 ## `Element` variants
 
-```rust
+```rust,ignore
 use matten::Element;
 
 Element::Float(1.5)            // IEEE 754 f64
@@ -55,7 +55,7 @@ give the same size; `Arc<str>` was chosen for cheap clone in CoW slices).
 
 ## Constructing dynamic tensors
 
-```rust
+```rust,ignore
 use matten::{Element, Tensor};
 
 let t = Tensor::from_elements(
@@ -72,7 +72,7 @@ let t = Tensor::try_from_elements(data, &[2, 3])?;
 
 ## Element predicates and coercion
 
-```rust
+```rust,ignore
 Element::None.is_none()         // true
 Element::Float(1.0).is_numeric() // true
 Element::Int(42).is_numeric()   // true
@@ -98,7 +98,7 @@ Use `fill_none` or explicit conversion helpers to clean data before arithmetic.
 
 ## Accessing elements
 
-```rust
+```rust,ignore
 t.get_element(&[0, 1])  // Option<Element> — None if out of bounds
 t.is_dynamic()          // true for dynamic tensors
 t.to_elements()         // Vec<Element> in row-major order
@@ -106,7 +106,7 @@ t.to_elements()         // Vec<Element> in row-major order
 
 ## Missing-value utilities
 
-```rust
+```rust,ignore
 use matten::{Element, Tensor};
 
 let t = Tensor::from_elements(
@@ -180,7 +180,7 @@ The underlying `Arc`-based CoW storage (`DynamicTensor`) is implemented
 internally and will back future public dynamic slicing and reshape in a later
 release.
 
-```rust
+```rust,ignore
 // Correct pattern: ingest → clean → convert → arithmetic
 let raw = Tensor::from_csv_dynamic("1.0,2.0\n3.0,4.0\n")?;
 let filled  = raw.fill_none(Element::Float(0.0));

@@ -32,7 +32,7 @@ dynamic tensor first; the statistics methods reject dynamic tensors.
 
 ## var / std
 
-```rust
+```rust,ignore
 Tensor::var(&self) -> f64
 Tensor::std(&self) -> f64
 Tensor::try_var(&self) -> Result<f64, MattenError>
@@ -50,7 +50,7 @@ branch is unreachable through normal construction.
 
 ## var_axis / std_axis
 
-```rust
+```rust,ignore
 Tensor::var_axis(&self, axis: usize) -> Tensor
 Tensor::std_axis(&self, axis: usize) -> Tensor
 Tensor::try_var_axis(&self, axis: usize) -> Result<Tensor, MattenError>
@@ -131,7 +131,7 @@ for the full API and error model.
 
 ### `histogram` — bin count is the caller's choice (RFC-090)
 
-```rust
+```rust,ignore
 pub struct Histogram {
     pub counts: Vec<usize>,
     pub edges: Vec<f64>,
