@@ -1,6 +1,9 @@
 # RFC-091: `0.42.0` — Statistics Release
 
-**Status:** Proposed
+**Status:** `proposed/` by folder (not yet implemented); **reviewed and accepted 2026-08-01** —
+preparation authorized under the handoff. Records in §2 that the recorded §6.4 trigger did NOT fire:
+no second theme landed, and the owner overrode a recommendation to wait. **No tag, no publish** — both
+remain separately authorized (§7)
 **Target:** `0.42.0`, on the `0.x` line
 **Theme:** Release RFC-090 — `matten-stats` gains `histogram`, and two existing error messages change
 **Depends on:** RFC-030, RFC-064, RFC-067, RFC-086, RFC-089, RFC-090

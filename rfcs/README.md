@@ -109,7 +109,7 @@ The broader documentation ownership model is recorded in
 | ID | Title | Scope |
 |---:|---|---|
 | 076 | [v1.0 Release Preparation](./proposed/076-v1-release-preparation.md) | Reviewed and accepted (GO, no conditions); its inventory refreshed by RFC-081 (five-crate family, matten-mlprep production-ready, matten-stats row added, RFC-081 §3 precondition added). RFC-081's precondition is now **discharged** — `matten-stats` took **Exit A (promotion)** via RFC-084 — but this RFC remains deferred and no implementation is authorized: v1.0 is not currently wanted, a separate and unrelated reason |
-| 091 | [`0.42.0` — Statistics Release](./proposed/091-0420-statistics-release.md) | Proposed. Releases RFC-090's `histogram` — the smallest release the project has cut, one companion function. Records plainly that the recorded §6.4 trigger did **not** fire: no second theme landed, and the release proceeds under the owner's override of a recommendation to wait. Not an Added-only release — RFC-090 also changed two error messages on functions that shipped in `0.41.0`, so a `Changed` section is mandatory |
+| 091 | [`0.42.0` — Statistics Release](./proposed/091-0420-statistics-release.md) | **Accepted 2026-08-01**; preparation authorized, not yet implemented. Releases RFC-090's `histogram` — the smallest release the project has cut, one companion function. Records plainly that the recorded §6.4 trigger did **not** fire: no second theme landed, and the release proceeds under the owner's override of a recommendation to wait. Not an Added-only release — RFC-090 also changed two error messages on functions that shipped in `0.41.0`, so a `Changed` section is mandatory |
 
 ## Remaining Themes And Issues
 
