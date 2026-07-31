@@ -1,16 +1,19 @@
-//! `matten-stats` — small, explicit scalar statistics over [`matten::Tensor`].
+//! `matten-stats` — small, explicit statistics over [`matten::Tensor`].
 //!
-//! This companion crate (RFC-078, RFC-083) provides six statistics APIs
-//! RFC-040 §8 deliberately kept out of core: [`covariance`],
+//! This companion crate (RFC-078, RFC-083, RFC-090) provides seven statistics
+//! APIs RFC-040 §8 deliberately kept out of core: [`covariance`],
 //! [`covariance_population`], [`correlation`], [`quantile`], [`skewness`],
-//! and [`kurtosis`]. It depends only on core `matten` (no default features) —
-//! no third-party dependency of any kind.
+//! [`kurtosis`], and [`histogram`]. It depends only on core `matten` (no
+//! default features) — no third-party dependency of any kind.
 //!
-//! # The `matten-mlprep` boundary (RFC-078 §5)
+//! # The `matten-mlprep` boundary (RFC-078 §5, amended RFC-090 §5)
 //!
 //! `matten-mlprep` transforms tensors for ML pipelines: `Tensor -> Tensor`.
-//! `matten-stats` computes scalar statistical summaries: `Tensor -> f64`. No
-//! function appears in both crates.
+//! `matten-stats` computes **statistical summaries** of a `Tensor`: a summary
+//! is returned as `f64` where it is scalar, and as a small owned struct
+//! (e.g. [`Histogram`]) where it is inherently vector-valued.
+//! **`matten-stats` never returns a `Tensor`.** No function appears in both
+//! crates.
 //!
 //! # Estimator conventions (RFC-078 §4.1, RFC-083 §4.1)
 //!
@@ -67,10 +70,12 @@
 
 mod covariance;
 mod error;
+mod histogram;
 mod moments;
 mod quantile;
 
 pub use crate::covariance::{correlation, covariance, covariance_population};
 pub use crate::error::MattenStatsError;
+pub use crate::histogram::{Histogram, histogram};
 pub use crate::moments::{kurtosis, skewness};
 pub use crate::quantile::quantile;

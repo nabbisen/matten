@@ -5,9 +5,10 @@
 //! crate's entire purpose is a small set of public functions, so exercising
 //! them through the public surface is exactly what should be verified.
 
-use matten::Tensor;
+use matten::{MattenLimits, Tensor};
 use matten_stats::{
-    MattenStatsError, correlation, covariance, covariance_population, kurtosis, quantile, skewness,
+    MattenStatsError, correlation, covariance, covariance_population, histogram, kurtosis,
+    quantile, skewness,
 };
 
 fn approx(a: f64, b: f64) {
@@ -436,6 +437,128 @@ fn skewness_and_kurtosis_non_finite_input_is_an_error() {
     ));
 }
 
+// ── histogram (RFC-090) ───────────────────────────────────────────────────
+
+#[test]
+fn histogram_shape_invariant() {
+    let x = vec_tensor(vec![1.0, 2.0, 3.0, 4.0, 5.0]);
+    let h = histogram(&x, 4).unwrap();
+    assert_eq!(h.counts.len(), 4);
+    assert_eq!(h.edges.len(), 5);
+}
+
+#[test]
+fn histogram_sum_invariant_including_max_on_final_edge() {
+    // The maximum value (5.0) lands exactly on `edges[bins]`. Without the
+    // closed-last-bin rule (RFC-090 §4.3) it would fall in no bin and the
+    // sum would be x.len() - 1, not x.len().
+    let x = vec_tensor(vec![1.0, 2.0, 3.0, 4.0, 5.0]);
+    let h = histogram(&x, 4).unwrap();
+    assert_eq!(h.counts.iter().sum::<usize>(), x.len());
+
+    // A second shape: non-round bin count, so no value lands on an interior
+    // edge except by construction of this exact case's max.
+    let y = vec_tensor(vec![0.0, 0.2, 0.5, 0.9, 1.0]);
+    let hy = histogram(&y, 3).unwrap();
+    assert_eq!(hy.counts.iter().sum::<usize>(), y.len());
+}
+
+#[test]
+fn histogram_hand_computed_counts_and_edges() {
+    // x in [0, 10], 5 bins -> width 2: edges [0, 2, 4, 6, 8, 10].
+    // Values:      0   1   2   3   5   7   9   10
+    // Bin index:   0   0   1   1   2   3   4   4 (10 clamped into the last bin)
+    let x = vec_tensor(vec![0.0, 1.0, 2.0, 3.0, 5.0, 7.0, 9.0, 10.0]);
+    let h = histogram(&x, 5).unwrap();
+    assert_eq!(h.edges, vec![0.0, 2.0, 4.0, 6.0, 8.0, 10.0]);
+    assert_eq!(h.counts, vec![2, 2, 1, 1, 2]);
+}
+
+#[test]
+fn histogram_edges_are_evenly_spaced_from_min_to_max() {
+    let x = vec_tensor(vec![3.0, 1.0, 4.0, 1.0, 5.0, 9.0, 2.0, 6.0]);
+    let h = histogram(&x, 7).unwrap();
+
+    assert_eq!(h.edges[0], 1.0); // min(x)
+    assert_eq!(*h.edges.last().unwrap(), 9.0); // max(x), exact (§3)
+
+    let widths: Vec<f64> = h.edges.windows(2).map(|w| w[1] - w[0]).collect();
+    for w in &widths {
+        approx(*w, widths[0]);
+    }
+}
+
+#[test]
+fn histogram_bins_one_puts_everything_in_one_bin() {
+    let x = vec_tensor(vec![1.0, 2.0, 3.0, 4.0, 5.0]);
+    let h = histogram(&x, 1).unwrap();
+    assert_eq!(h.counts, vec![5]);
+    assert_eq!(h.edges, vec![1.0, 5.0]);
+}
+
+#[test]
+fn histogram_bins_zero_is_invalid_bin_count() {
+    let x = vec_tensor(vec![1.0, 2.0, 3.0]);
+    assert!(matches!(
+        histogram(&x, 0).unwrap_err(),
+        MattenStatsError::InvalidBinCount
+    ));
+}
+
+#[test]
+fn histogram_constant_input_is_zero_variance_not_a_widened_range() {
+    // NumPy would widen this to (5.0 - 0.5, 5.0 + 0.5); matten-stats errors
+    // instead (RFC-090 §4.4).
+    let x = vec_tensor(vec![5.0, 5.0, 5.0]);
+    assert!(matches!(
+        histogram(&x, 4).unwrap_err(),
+        MattenStatsError::ZeroVariance
+    ));
+}
+
+#[test]
+fn histogram_non_finite_input_is_an_error() {
+    let nan = vec_tensor(vec![1.0, f64::NAN, 3.0]);
+    assert!(matches!(
+        histogram(&nan, 2).unwrap_err(),
+        MattenStatsError::NonFiniteValue
+    ));
+
+    let inf = vec_tensor(vec![1.0, f64::INFINITY, 3.0]);
+    assert!(matches!(
+        histogram(&inf, 2).unwrap_err(),
+        MattenStatsError::NonFiniteValue
+    ));
+}
+
+#[test]
+fn histogram_overflowing_range_is_rejected_not_silently_corrupted() {
+    // Every element is finite, but max(x) - min(x) overflows to infinity.
+    // Before the C1 fix this returned Ok with edges [NaN, inf, inf, inf,
+    // 1.7e308] and counts summing correctly to x.len() -- a corrupt result
+    // the existing sum-invariant test could not detect.
+    let x = vec_tensor(vec![-1.7e308, 0.0, 1.7e308]);
+    let err = histogram(&x, 4).unwrap_err();
+    assert!(matches!(err, MattenStatsError::NonFiniteValue));
+}
+
+#[test]
+fn histogram_huge_bins_is_rejected_without_allocating() {
+    // If this attempted the allocation, an over-budget `bins` would hang or
+    // exhaust memory rather than fail fast; asserting the error variant is
+    // itself the proof no allocation was attempted.
+    let x = vec_tensor(vec![1.0, 2.0, 3.0]);
+    let limit = MattenLimits::default().max_elements;
+    let err = histogram(&x, limit + 1).unwrap_err();
+    assert!(matches!(
+        err,
+        MattenStatsError::AllocationLimit {
+            requested_bins,
+            limit: reported_limit,
+        } if requested_bins == limit + 1 && reported_limit == limit
+    ));
+}
+
 // ── shared ─────────────────────────────────────────────────────────────────
 
 // NOTE: RFC-078 handoff §6 (and RFC-083 handoff §6 for the three new
@@ -450,11 +573,12 @@ fn skewness_and_kurtosis_non_finite_input_is_an_error() {
 // `covariance_fewer_than_two_elements_is_an_error` and
 // `skewness_and_kurtosis_single_element_is_empty`. `quantile`'s `x.len() ==
 // 0` branch is unreachable dead code under matten's current shape model, and
-// so is `covariance_population`'s (its minimum is 1, not 0).
+// so is `covariance_population`'s (its minimum is 1, not 0) and
+// `histogram`'s (RFC-090's minimum is also 1, not 0).
 
 #[cfg(feature = "dynamic")]
 #[test]
-fn dynamic_tensor_is_rejected_for_all_six() {
+fn dynamic_tensor_is_rejected_for_all_seven() {
     use matten::Element;
 
     let dynamic = Tensor::from_elements(vec![Element::Float(1.0), Element::Float(2.0)], &[2]);
@@ -480,6 +604,10 @@ fn dynamic_tensor_is_rejected_for_all_six() {
     ));
     assert!(matches!(
         quantile(&dynamic, 0.5).unwrap_err(),
+        MattenStatsError::DynamicTensor
+    ));
+    assert!(matches!(
+        histogram(&dynamic, 4).unwrap_err(),
         MattenStatsError::DynamicTensor
     ));
 }

@@ -32,13 +32,35 @@ pub enum MattenStatsError {
         /// Element count of the right (`y`) input.
         right: usize,
     },
-    /// An input value was not finite (`NaN` or infinite).
+    /// An input value was not finite (`NaN` or infinite), or a value derived
+    /// from otherwise-finite input was not finite — `histogram`'s `max(x) -
+    /// min(x)` can overflow to infinity even though every element of `x` is
+    /// finite (RFC-090 §4.4's follow-up: NumPy's invented `±0.5` range on
+    /// constant input is rejected for producing an uninterpretable plot;
+    /// `NaN`/`inf` edges from an overflowing range are strictly worse and
+    /// must not be returned silently either).
     NonFiniteValue,
     /// `correlation` was asked to divide by a zero standard deviation in
     /// either input.
     ZeroVariance,
     /// `quantile`'s `q` was not finite or not in `[0.0, 1.0]`.
     InvalidQuantile(f64),
+    /// `histogram`'s `bins` was `0`. Follows `matten-data`'s
+    /// `InvalidBatchSize` precedent (RFC-082): a required count argument
+    /// that cannot be zero earns its own variant.
+    InvalidBinCount,
+    /// `histogram`'s `bins` would allocate more elements than
+    /// `matten::MattenLimits::default().max_elements` permits. Checked
+    /// before allocating `Histogram::counts`/`edges` — unlike [`Empty`],
+    /// which means too few elements, this means too many were requested.
+    ///
+    /// [`Empty`]: MattenStatsError::Empty
+    AllocationLimit {
+        /// The `bins` value that was requested.
+        requested_bins: usize,
+        /// `matten::MattenLimits::default().max_elements`, the ceiling that was exceeded.
+        limit: usize,
+    },
 }
 
 impl fmt::Display for MattenStatsError {
@@ -62,16 +84,29 @@ impl fmt::Display for MattenStatsError {
             ),
             MattenStatsError::NonFiniteValue => write!(
                 f,
-                "matten-stats error: input contains a non-finite value (NaN or infinite)"
+                "matten-stats error: a non-finite value (NaN or infinite) was found in \
+                 the input, or produced by a computation over it"
             ),
             MattenStatsError::ZeroVariance => write!(
                 f,
-                "matten-stats error: correlation is undefined when either input \
+                "matten-stats error: this operation is undefined when an input \
                  has zero variance"
             ),
             MattenStatsError::InvalidQuantile(q) => write!(
                 f,
                 "matten-stats error: q must be finite and in [0.0, 1.0], got {q}"
+            ),
+            MattenStatsError::InvalidBinCount => {
+                write!(f, "matten-stats error: bins must be greater than 0")
+            }
+            MattenStatsError::AllocationLimit {
+                requested_bins,
+                limit,
+            } => write!(
+                f,
+                "matten-stats error: bins ({requested_bins}) would exceed the allocation \
+                 limit of {limit} (matten::MattenLimits::max_elements); use fewer bins or \
+                 a larger limit"
             ),
         }
     }

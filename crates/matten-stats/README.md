@@ -13,18 +13,20 @@ Part of the [`matten` workspace](../../README.md) — see it for the full family
 
 ## Overview
 
-`matten-stats` provides small, explicit scalar statistics over [`matten::Tensor`]:
-`covariance`, `covariance_population`, `correlation`, `quantile`, `skewness`, and
-`kurtosis`. These are statistics APIs RFC-040 §8 deliberately kept out of core
-`matten`, accepted into their own companion once RFC-040 §9's gate was cleared
-(RFC-078), then expanded (RFC-083). It depends only on core `matten` (no default
-features) — no third-party dependency of any kind.
+`matten-stats` provides small, explicit statistics over [`matten::Tensor`]:
+`covariance`, `covariance_population`, `correlation`, `quantile`, `skewness`,
+`kurtosis`, and `histogram`. These are statistics APIs RFC-040 §8 deliberately
+kept out of core `matten`, accepted into their own companion once RFC-040 §9's
+gate was cleared (RFC-078), then expanded (RFC-083, RFC-090). It depends only on
+core `matten` (no default features) — no third-party dependency of any kind.
 
 ## The `matten-mlprep` boundary
 
 ```text
-matten-mlprep  transforms tensors for ML pipelines: Tensor -> Tensor
-matten-stats   computes scalar statistical summaries: Tensor -> f64
+matten-mlprep  transforms tensors for ML pipelines:  Tensor -> Tensor
+matten-stats   computes statistical summaries:        f64, or a small owned
+               struct where the summary is inherently vector-valued (e.g.
+               Histogram) -- never a Tensor
 ```
 
 No function appears in both crates.
@@ -55,7 +57,9 @@ divergence from the rest of the family, not an oversight.
 
 ```rust
 use matten::Tensor;
-use matten_stats::{correlation, covariance, covariance_population, kurtosis, quantile, skewness};
+use matten_stats::{
+    correlation, covariance, covariance_population, histogram, kurtosis, quantile, skewness,
+};
 
 let x = Tensor::new(vec![1.0, 2.0, 3.0, 4.0], &[4]);
 let y = Tensor::new(vec![2.0, 4.0, 6.0, 8.0], &[4]);
@@ -66,6 +70,7 @@ let r = correlation(&x, &y)?;              // Pearson correlation, ddof-invarian
 let median = quantile(&x, 0.5)?;           // linear interpolation
 let skew = skewness(&x)?;                  // uncorrected g1
 let kurt = kurtosis(&x)?;                  // uncorrected excess (Fisher) g2
+let h = histogram(&x, 2)?;                 // caller-chosen bin count, no automatic rule
 # Ok::<(), matten_stats::MattenStatsError>(())
 ```
 
@@ -77,13 +82,17 @@ let kurt = kurtosis(&x)?;                  // uncorrected excess (Fisher) g2
 - **Non-finite input values are rejected explicitly**, never silently
   propagated as `NaN`.
 - **Zero variance is an explicit error**
-  (`MattenStatsError::ZeroVariance`) in `correlation`, `skewness`, and
-  `kurtosis`, not a silent `NaN`.
+  (`MattenStatsError::ZeroVariance`) in `correlation`, `skewness`,
+  `kurtosis`, and `histogram`, not a silent `NaN` or (for `histogram`) an
+  invented range.
 - **`covariance`/`covariance_population`/`correlation` accept any
   equal-length pair** — shape beyond element count is not constrained; values
   are read in row-major order.
 - **`covariance_population` accepts a single-element pair** and returns
   `0.0` — unlike `covariance`, whose `n - 1` divisor would be zero.
+- **`histogram` has no automatic bin-count rule** — not Sturges, not
+  Freedman-Diaconis, not Scott, no `"auto"`. `bins` is a required argument
+  (RFC-090 §4.1).
 - **Dynamic tensors are rejected, not panicked**, regardless of whether the
   `dynamic` feature is enabled.
 
@@ -98,6 +107,12 @@ pub fn correlation(x: &Tensor, y: &Tensor)           -> Result<f64, MattenStatsE
 pub fn quantile(x: &Tensor, q: f64)                  -> Result<f64, MattenStatsError>;
 pub fn skewness(x: &Tensor)                          -> Result<f64, MattenStatsError>;
 pub fn kurtosis(x: &Tensor)                          -> Result<f64, MattenStatsError>;
+pub fn histogram(x: &Tensor, bins: usize)            -> Result<Histogram, MattenStatsError>;
+
+pub struct Histogram {
+    pub counts: Vec<usize>,
+    pub edges: Vec<f64>,
+}
 
 #[non_exhaustive]
 pub enum MattenStatsError {
@@ -107,16 +122,21 @@ pub enum MattenStatsError {
     NonFiniteValue,
     ZeroVariance,
     InvalidQuantile(f64),
+    InvalidBinCount,
+    AllocationLimit { requested_bins: usize, limit: usize },
 }
 ```
 
 ## Limitations
 
-- **No histogram, z-score, mode, matrix-wide/axis-wise forms, or percentile
-  aliases.** RFC-040 §8 left histogram's bin-selection policy unresolved;
-  z-score belongs to `matten-mlprep`'s `Tensor -> Tensor` shape instead
-  (`standardize_columns`); the others were never proposed or were rejected as
-  pure sugar (RFC-083 §6).
+- **No automatic histogram bin-count rule, z-score, mode, matrix-wide/axis-wise
+  forms, or percentile aliases.** RFC-090 resolved histogram's bin-selection
+  policy as "the caller decides" rather than an automatic rule; z-score belongs
+  to `matten-mlprep`'s `Tensor -> Tensor` shape instead (`standardize_columns`);
+  the others were never proposed or were rejected as pure sugar (RFC-083 §6).
+- **No histogram range parameter, density normalisation, or N-D histograms.**
+  The range is always `[min(x), max(x)]`; counts are raw, not normalised; only
+  1-D input is accepted (RFC-090 §4.2, §9).
 - **No bias-corrected `skewness`/`kurtosis` variant.** Both are the
   uncorrected (SciPy-default) estimator only; a bias-corrected form is a
   purely additive follow-up if ever wanted (RFC-083 §4.1).

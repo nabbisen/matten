@@ -192,6 +192,7 @@ jobs:
       - run: cargo run -p matten-stats --example stats_correlation
       - run: cargo run -p matten-stats --example stats_quantile
       - run: cargo run -p matten-stats --example stats_expansion
+      - run: cargo run -p matten-stats --example stats_histogram
       # local tools
       - run: cargo check --manifest-path tools/matten-report/Cargo.toml
       - run: cargo test --manifest-path tools/matten-report/Cargo.toml

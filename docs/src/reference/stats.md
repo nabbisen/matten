@@ -101,12 +101,16 @@ least three clearly-useful, well-scoped APIs were accepted, and that companion �
 `matten-stats` — now exists (RFC-078, expanded by RFC-083; see below). Some
 (`z-score`) overlap with `matten-mlprep` and must not be duplicated there.
 
-## The `matten-stats` companion (RFC-078, RFC-083, RFC-084)
+## The `matten-stats` companion (RFC-078, RFC-083, RFC-084, RFC-090)
 
 `matten-stats` is a separate, `production-ready candidate` companion crate
-(promoted in RFC-084 once its surface settled) providing six
-`Tensor -> f64` scalar statistics that core deliberately excludes: `covariance`,
-`covariance_population`, `correlation`, `quantile`, `skewness`, `kurtosis`. Its
+(promoted in RFC-084 once its surface settled) computing **statistical
+summaries** that core deliberately excludes: `covariance`,
+`covariance_population`, `correlation`, `quantile`, `skewness`, `kurtosis`, and
+`histogram`. A summary is returned as `f64` where it is scalar, and as a small
+owned struct (`Histogram`) where it is inherently vector-valued —
+`matten-stats` never returns a `Tensor` (RFC-090 §5 amended the original
+`Tensor -> f64` framing to make room for `histogram`'s non-scalar result). Its
 estimator conventions differ per function, matching what each function's name is
 expected to mean in the wider ecosystem (NumPy/SciPy/R/pandas):
 
@@ -125,7 +129,33 @@ this divergence is deliberate, not an oversight. See the crate's own
 [README](https://github.com/nabbisen/matten/blob/main/crates/matten-stats/README.md)
 for the full API and error model.
 
+### `histogram` — bin count is the caller's choice (RFC-090)
+
+```rust
+pub struct Histogram {
+    pub counts: Vec<usize>,
+    pub edges: Vec<f64>,
+}
+
+pub fn histogram(x: &Tensor, bins: usize) -> Result<Histogram, MattenStatsError>;
+```
+
+**There is no automatic bin-count rule** — not Sturges, not Freedman-Diaconis,
+not Scott, no `"auto"`. `bins` is required because bin count is a genuine
+analytical choice; a histogram whose bin count was picked for the caller
+teaches the wrong lesson (RFC-090 §4.1).
+
+The range is always `[min(x), max(x)]`; there is no `range` parameter. The last
+bin is **closed** at the top (`[edges[bins - 1], edges[bins]]`), unlike every
+other bin (`[edges[i], edges[i + 1])`, half-open) — otherwise the maximum value
+would fall in no bin and silently vanish from the counts. A **constant input
+errors** (`ZeroVariance`) rather than widening the range the way NumPy does
+(`(v - 0.5, v + 0.5)`); that `0.5` comes from nowhere in the data.
+
 ## Example
 
 See [`16_variance_std.rs`](https://github.com/nabbisen/matten/blob/main/crates/matten/examples/16_variance_std.rs)
-for a runnable walkthrough.
+for a runnable walkthrough of core's `var`/`std`, and
+[`histogram.rs`](https://github.com/nabbisen/matten/blob/main/crates/matten-stats/examples/histogram.rs)
+(`cargo run -p matten-stats --example stats_histogram`) for `matten-stats`'s
+`histogram`.
