@@ -99,11 +99,11 @@ A single-element list inserts a length-1 axis (the analogue of `expand_dims`).
 ## `repeat` / `repeat_axis`
 
 ```rust
-Tensor::repeat(n: usize) -> Tensor
-Tensor::try_repeat(n: usize) -> Result<Tensor, MattenError>
+Tensor::repeat(&self, n: usize) -> Tensor
+Tensor::try_repeat(&self, n: usize) -> Result<Tensor, MattenError>
 
-Tensor::repeat_axis(n: usize, axis: usize) -> Tensor
-Tensor::try_repeat_axis(n: usize, axis: usize) -> Result<Tensor, MattenError>
+Tensor::repeat_axis(&self, n: usize, axis: usize) -> Tensor
+Tensor::try_repeat_axis(&self, n: usize, axis: usize) -> Result<Tensor, MattenError>
 ```
 
 `repeat` repeats each **element** `n` times, flattening the result to rank 1:
@@ -131,8 +131,8 @@ does.
 ## `tile`
 
 ```rust
-Tensor::tile(reps: &[usize]) -> Tensor
-Tensor::try_tile(reps: &[usize]) -> Result<Tensor, MattenError>
+Tensor::tile(&self, reps: &[usize]) -> Tensor
+Tensor::try_tile(&self, reps: &[usize]) -> Result<Tensor, MattenError>
 ```
 
 `tile` repeats the **whole tensor**, one repetition factor per axis:

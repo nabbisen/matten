@@ -277,6 +277,50 @@ check_example_labels matten-data    "$LABELS_FOR_PRODUCTION_READY"
 check_example_labels matten-stats   "$LABELS_FOR_CANDIDATE"
 
 # ---------------------------------------------------------------------------
+# Documented Tensor signatures must match the code
+# ---------------------------------------------------------------------------
+# docs/src/reference/ lists API signatures as bare `Tensor::name(args) -> Ret` lines in
+# rust code fences. Nothing compiled or checked them, and they had drifted: repeat,
+# try_repeat, repeat_axis, try_repeat_axis, tile and try_tile were all documented as
+# ASSOCIATED FUNCTIONS when every one of them takes &self, so a reader following the page
+# wrote `Tensor::repeat(3)` and got a type error. Found by coercing each documented
+# signature to a function pointer and compiling; the six that lied failed to compile while
+# the other twenty matched exactly. That full check needs a compiler, which is heavier than
+# this script's contract, so what is enforced here is the part that actually broke: whether
+# the doc agrees with the code about the RECEIVER. Argument-type drift is not covered.
+echo "=== Checking documented Tensor signatures agree with the code on the receiver ==="
+while IFS= read -r sig; do
+  [ -n "$sig" ] || continue
+  fn_name="${sig#Tensor::}"; fn_name="${fn_name%%(*}"
+  doc_args="${sig#*(}"; doc_args="${doc_args%%)*}"
+  case "$doc_args" in \&self*|\&mut\ self*) doc_self=yes ;; *) doc_self=no ;; esac
+  # The real definition, from the first matching `pub fn <name>(` in core. The `|| true`
+  # is load-bearing: under `set -e` an assignment from a command substitution takes the
+  # substitution's exit status, so a grep that finds nothing aborts the ENTIRE script at
+  # this line -- silently skipping every later check and reporting only a bare non-zero
+  # exit. That is exactly what the first draft of this guard did, caught by probing a
+  # documented method that does not exist.
+  real_line="$(grep -rhoE "pub fn ${fn_name}\([^)]*" "$CORE/src" 2>/dev/null | head -1 || true)"
+  if [ -z "$real_line" ]; then
+    echo "ERROR: docs document Tensor::${fn_name}, which has no 'pub fn ${fn_name}(' in $CORE/src"
+    FAIL=1
+    continue
+  fi
+  real_args="${real_line#*(}"
+  case "$real_args" in \&self*|\&mut\ self*) real_self=yes ;; *) real_self=no ;; esac
+  if [ "$doc_self" != "$real_self" ]; then
+    if [ "$real_self" = yes ]; then
+      echo "ERROR: docs show Tensor::${fn_name} as an associated function, but it takes &self (add '&self' to the documented signature)"
+    else
+      echo "ERROR: docs show Tensor::${fn_name} as taking &self, but it is an associated function"
+    fi
+    FAIL=1
+  fi
+done <<EOF_SIGS
+$(grep -rhoE '^Tensor::[a-z_0-9]+\([^)]*\) *-> *.+$' docs/src --include='*.md' | sort -u)
+EOF_SIGS
+
+# ---------------------------------------------------------------------------
 # Companion dynamic-rejection guard soundness (RFC-031)
 # ---------------------------------------------------------------------------
 
