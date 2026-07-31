@@ -16,7 +16,17 @@ STATS="crates/matten-stats"
 # ---------------------------------------------------------------------------
 
 echo "=== Checking for stale runtime 'matten 0.x' version strings ==="
-if grep -rn "matten 0\." "$CORE/src/" | grep -v "CHANGELOG\|#\[\|0\.1\.x\|0\.x" | grep -v "^Binary"; then
+# The attribute exclusion is anchored to the START of the matched source line (after the
+# `path:lineno:` prefix `grep -rn` prints), not applied to the line as a whole. A bare
+# `grep -v '#\['` drops any line that mentions `#[` ANYWHERE, so a genuine stale string
+# sharing a line with an attribute escaped the check entirely -- proven by injecting
+# `//! #[derive] note: matten 0.41 is current.`, which passed. Same shape as the dead
+# matten-ndarray check removed at 3.49.0: an over-broad `grep -v` that silently eats the
+# very lines the check exists to catch.
+if grep -rn "matten 0\." "$CORE/src/" \
+   | grep -v "CHANGELOG\|0\.1\.x\|0\.x" \
+   | grep -vE '^[^:]+:[0-9]+:[[:space:]]*#\[' \
+   | grep -v "^Binary"; then
   echo "ERROR: versioned wording found in runtime code"
   FAIL=1
 fi
@@ -409,7 +419,15 @@ echo "=== Checking benchmark docs do not describe Phase 2 as unimplemented ==="
 # (rfcs/) or CHANGELOG, where staged-rollout wording is legitimately preserved. Phase 3/4
 # deferral wording is allowed; only Phase 2-as-unimplemented is flagged.
 BENCH_DOCS_DIR="docs/src/benchmarks"
-if [ -d "$BENCH_DOCS_DIR" ]; then
+# A missing target must FAIL rather than skip. The bare `if [ -d ... ]` this replaces
+# turned "the directory moved" into "the check silently disappeared" -- renaming
+# docs/src/migration made its whole block evaporate with the script still exiting 0
+# (proven by renaming it). A guard that vanishes when its subject moves is the same
+# failure as a guard that cannot fire.
+if [ ! -d "$BENCH_DOCS_DIR" ]; then
+  echo "ERROR: $BENCH_DOCS_DIR not found — the benchmark-docs checks would silently vanish"
+  FAIL=1
+else
   if grep -RInE 'Only \*\*Phase 1.*implemented today' "$BENCH_DOCS_DIR" \
      || grep -RInE 'Phase 2[^.]*(not yet implemented|not implemented|is deferred|remains deferred|still deferred|not yet authorized)' "$BENCH_DOCS_DIR"; then
     echo "ERROR: benchmark docs still describe Phase 2 as unimplemented/deferred (it shipped in v0.22.4)"
@@ -424,7 +442,10 @@ echo "=== Checking migration docs avoid overclaim phrases ==="
 # to docs/src/migration/ only (NOT rfcs/ history or CHANGELOG). The one phrase that may
 # legitimately appear in RFC-054 (matten-migrate) future/deferred context is allowed there.
 MIG_DOCS_DIR="docs/src/migration"
-if [ -d "$MIG_DOCS_DIR" ]; then
+if [ ! -d "$MIG_DOCS_DIR" ]; then
+  echo "ERROR: $MIG_DOCS_DIR not found — the migration-overclaim checks would silently vanish"
+  FAIL=1
+else
   if grep -RInE 'faster than|drop-in replacement|automatically convert|replace matten with|matten is better than|production-ready replacement' "$MIG_DOCS_DIR"; then
     echo "ERROR: migration docs contain an overclaim/ranking phrase (positioning, not ranking)"
     FAIL=1
@@ -520,7 +541,10 @@ fi
 # files, so the book summary cannot outlive the reports it cites. (Checks ID
 # presence, not the numeric values — humans curate those.)
 RESULTS_PAGE="docs/src/benchmarks/results.md"
-if [ -f "$RESULTS_PAGE" ]; then
+if [ ! -f "$RESULTS_PAGE" ]; then
+  echo "ERROR: $RESULTS_PAGE not found — the benchmark-ID freshness check would silently vanish"
+  FAIL=1
+else
   for pair in \
     "matten-rfc049-internal-baseline-v0.1:benchmarks/reports/internal-baseline-v0.1.md" \
     "matten-rfc049-rust-peer-comparison-v0.1:benchmarks/reports/peer-comparison-v0.1.md" \
