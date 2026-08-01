@@ -153,6 +153,16 @@ burden with no payoff.
 This RFC is written for the 4-folder variant. The 5-folder
 variant works identically with one extra transition.
 
+> **Amended by RFC-092 (2026-08-01).** This project has adopted
+> the 5-folder variant. The criterion above resolved the other
+> way once sign-off and implementation became separate events
+> performed by different parties: accepted RFCs were sitting in
+> `proposed/` carrying hand-written Status qualifiers, which is
+> the folder-vs-Status contradiction this policy exists to
+> prevent. `accepted/` is now live; the transition is
+> `proposed/` → `accepted/` → `done/`. RFC-000 is **amended, not
+> superseded**, and remains authoritative on everything else.
+
 ## Status field inside each RFC
 
 Each RFC carries a `Status` field at the top, alongside other
@@ -278,10 +288,15 @@ operations:
 - **Open.** New file in `proposed/` (or `draft/` if used).
   Triggered by an author opening a pull request adding the
   file.
-- **Accept and ship.** RFC is implemented; the implementer or
-  maintainer moves the file from `proposed/` to `done/` and
-  updates the Status field with the release tag. Done in the
-  same commit (or commit series) that ships the implementation.
+- **Accept.** *(5-folder variant; adopted here by RFC-092.)* The
+  maintainer signs the design off. Move the file from `proposed/`
+  to `accepted/`, set Status to `Accepted` with the date, and
+  point at the Developer Handoff. Implementation may start.
+- **Ship.** RFC is implemented; the implementer or maintainer
+  moves the file from `accepted/` to `done/` (from `proposed/`
+  in the 4-folder variant) and updates the Status field with the
+  release tag. Done in the same commit (or commit series) that
+  ships the implementation.
 - **Withdraw.** The author or maintainer decides not to pursue
   the RFC. Move to `archive/` with Status updated and a brief
   reason added in the file.

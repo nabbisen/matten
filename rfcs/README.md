@@ -4,6 +4,11 @@ Design decisions for `matten` are tracked here using the lifecycle policy in
 [RFC-000](./done/000-rfc-lifecycle-policy.md). The folder is the source of truth
 for RFC state; the Status field inside each file mirrors the folder.
 
+The project uses the **5-folder variant** (RFC-092): `proposed/` → `accepted/` →
+`done/`, because owner sign-off and implementation are separate events performed by
+different parties. See [`accepted/README.md`](./accepted/README.md). `archive/` and
+`draft/` exist in the policy but are unused here.
+
 The broader documentation ownership model is recorded in
 [`docs/design/README.md`](../docs/design/README.md): RFCs are canonical normative decisions,
 `docs/src/` is the evergreen user contract, `ROADMAP.md` owns schedule/history, and
@@ -104,6 +109,17 @@ The broader documentation ownership model is recorded in
 | 089 | [`0.41.0` — Core Shape and Slicing Release](./done/089-0410-core-shape-and-slicing-release.md) | **Released** — tagged and published to crates.io 2026-07-31, all five crates live at `0.41.0`, matching the planned scope exactly. Reviewed and approved after one correction. Releases RFC-087 and RFC-088 — the first two themes chosen against §1.1's planning baseline. No blocking precondition, the `0.40.0` tag-defect repair having discharged it. Triggered by the release-readiness check answering **yes** at RFC-088's disposition after **not yet** at RFC-087's, with the condition written down — both answers on consecutive uses. 37 strings across 17 files, measured with `0\.40\b`; the suffixed pattern would have found 35, missing exactly the two bare-form sites that also needed content updates. The one correction was not in the implementation: a stale Status clause attributed RFC-077's seeded split (`0.39.0`'s content) to `0.40.0`, left by an earlier partial edit and swept up by a mechanical retarget — re-anchored, with `0.39.0`'s story delegated to its history rows |
 | 090 | [Histogram — Bin-Selection Policy](./done/090-histogram-bin-policy.md) | Implemented and reviewed (approved after one correction). Resolves the policy RFC-040 §8 left open in v0.21.2 — the oldest question in the project — and adds the function it blocked; `matten-stats` now exposes seven. **Unreleased.** The policy: **no automatic bin rule**, `bins` is required, because each of Sturges / Freedman–Diaconis / Scott is a statistical assumption wearing a default's clothing. Matches NumPy on the closed last bin (an open one silently drops the maximum), diverges on constant input (errors rather than inventing a `±0.5` range) — both decided by RFC-087 §6's silent-vs-visible rule, now on its third RFC. **Amends RFC-078 §5's boundary** to "scalar where scalar, a small owned struct where inherently vector-valued, never a `Tensor`", which deliberately does not unblock the matrix-wide forms RFC-083 §6 deferred. Review found a silent-wrong-answer defect the specified tests could not see: finite inputs whose derived `hi - lo` overflowed returned `Ok` with `NaN`/`inf` edges while the sum invariant still passed |
 | 091 | [`0.42.0` — Statistics Release](./done/091-0420-statistics-release.md) | 0.42.0 (released 2026-08-01). The smallest release the project has cut — one companion function. Records in §2 that the recorded §6.4 trigger did **not** fire: no second theme landed, and the owner overrode a recommendation to wait. Not Added-only — RFC-090 also changed two `Display` strings on functions that shipped in `0.41.0`, so a `Changed` section is mandatory. Review found one correction, on a page neither the RFC nor the handoff pointed at: `introduction.md` carried an inherited *"no other runtime behavior change"* clause, true for `0.41.0` and false here, contradicting the CHANGELOG of the same commit |
+| 092 | [Adopt the 5-Folder RFC Lifecycle Variant](./done/092-five-folder-rfc-lifecycle.md) | Process change; unreleased and unversioned. Adds `accepted/` between review and implementation, because owner sign-off and implementer completion became separate events performed by different parties — RFC-000's own criterion for the variant, which resolved the other way when it was written. The cost was already in the corpus: RFC-090 and RFC-091 were both accepted while sitting in `proposed/`, each carrying a hand-written Status qualifier to reconcile the contradiction RFC-000 exists to prevent. Amends RFC-000, does not supersede it |
+
+## Accepted
+
+Signed off, implementation authorized, not yet shipped. See
+[`accepted/README.md`](./accepted/README.md). Empty means no RFC is currently between
+sign-off and implementation — not that the state is unused.
+
+| ID | Title | Handoff |
+|---:|---|---|
+| — | *(none at present)* | — |
 
 ## Proposed
 
