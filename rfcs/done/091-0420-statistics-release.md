@@ -1,9 +1,15 @@
 # RFC-091: `0.42.0` — Statistics Release
 
-**Status:** `proposed/` by folder (not yet implemented); **reviewed and accepted 2026-08-01** —
-preparation authorized under the handoff. Records in §2 that the recorded §6.4 trigger did NOT fire:
-no second theme landed, and the owner overrode a recommendation to wait. **No tag, no publish** — both
-remain separately authorized (§7)
+**Status:** **Prepared, not yet tagged** — implemented in commit *"Prepare 0.42.0: statistics
+release (RFC-091)"*, reviewed and approved after one correction. All five crates are at `0.42.0`
+with every live version string retargeted; the tag and the publish remain unexecuted and require
+the owner's separate authorization (§7). C1 was on a page neither this RFC nor its handoff pointed
+at: `introduction.md`'s inherited clause *"without any other public API, dependency, or runtime
+behavior change"* was accurate for `0.41.0` but denied this release's two `matten-stats` error
+message changes — the same changes §6.1 made a mandatory `Changed` section for. Narrowed, and the
+two messages now named with a pointer to the CHANGELOG. O1 (adding RFC-090 to
+`public-api-snapshot.md`'s companion-additions enumeration) was offered as optional and declined;
+it carries to the next release RFC
 **Target:** `0.42.0`, on the `0.x` line
 **Theme:** Release RFC-090 — `matten-stats` gains `histogram`, and two existing error messages change
 **Depends on:** RFC-030, RFC-064, RFC-067, RFC-086, RFC-089, RFC-090
