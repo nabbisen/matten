@@ -26,6 +26,37 @@ crates are expressed by per-crate status labels, not by separate version numbers
 > trigger — unfired across eight consecutive releases before RFC-074 found
 > it — a mandatory per-entry check rather than a rule that only an RFC states.
 
+## [0.42.0] - 2026-08-01
+
+RFC-090 statistics release. Publishes `matten-stats`'s `histogram`, the smallest release the
+project has cut — a single companion-crate function. Core `matten` is untouched.
+
+### Added
+
+- `matten-stats`: `histogram`/`Histogram` (RFC-090), resolving RFC-040 §8's bin-selection
+  deferral. `bins` is a **required** argument — there is no automatic bin-count rule (no
+  Sturges, Freedman–Diaconis, Scott, Doane, or `"auto"`). The **last bin is closed** at the top
+  (`[edges[bins - 1], edges[bins]]`), matching NumPy, so the maximum value is never silently
+  dropped from the counts. A **constant input errors** (`ZeroVariance`) rather than inventing a
+  range the way NumPy widens one to `(v - 0.5, v + 0.5)`. Two new error variants,
+  `InvalidBinCount` and `AllocationLimit { requested_bins, limit }`, additive on the
+  `#[non_exhaustive]` `MattenStatsError` enum.
+
+### Changed
+
+- `matten-stats`: two existing error message strings changed. `ZeroVariance`'s text —
+  *"correlation is undefined when either input has zero variance"* — was already wrong for
+  `skewness` and `kurtosis`, which involve neither a correlation nor a second input; it now
+  reads *"this operation is undefined when an input has zero variance"*. `NonFiniteValue`'s
+  text gained *"or produced by a computation over it"*, so it stays true when every input value
+  is finite but a derived quantity (`histogram`'s `max(x) - min(x)`) overflows to infinity.
+  Neither is a type-level break, but both change strings a caller may be matching or logging.
+
+### Version
+
+- Release bump `0.41.0` -> `0.42.0`. Lock-step family versioning applies to all five published
+  crates; four of the five carry no change beyond the version number.
+
 ## [0.41.0] - 2026-07-31
 
 RFC-089 core shape and slicing release. Publishes RFC-087 and RFC-088, both core `matten`

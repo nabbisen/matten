@@ -1,6 +1,6 @@
 # Public API snapshot
 
-This page lists every public item in `matten` at the current v0.41 release
+This page lists every public item in `matten` at the current v0.42 release
 family. It serves as the baseline for tracking breaking changes toward v1.0.0
 and as the review gate required by RFC-015. Core `matten`'s public API changed
 in RFC-087, which added `repeat`, `repeat_axis`, `tile`, and `meshgrid` (see the

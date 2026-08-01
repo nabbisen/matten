@@ -14,8 +14,9 @@ This book is organized by reader:
 - **Reference** — the rules that shape the public API.
 - **Contributors** — project layout, milestones, and process.
 
-> This documentation tracks the current 0.41 release family, an RFC-089 release
-> publishing two core `matten` additions: `repeat`/`repeat_axis`/`tile`/`meshgrid`
-> (RFC-087) and negative indices in `slice_str` (RFC-088, `"-1"` for the last
-> element, out of range errors rather than clamping) — without any other public
-> API, dependency, or runtime behavior change.
+> This documentation tracks the current 0.42 release family, an RFC-090 release
+> publishing one `matten-stats` addition: `histogram` (`bins` is a required
+> argument; there is no automatic bin-count rule) — without any other public
+> API or dependency change. Core `matten`'s public surface is untouched by
+> this release. Two `matten-stats` error message strings also changed
+> (`ZeroVariance`, `NonFiniteValue`) — see the `[0.42.0]` CHANGELOG entry.
