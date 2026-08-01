@@ -78,7 +78,18 @@ while IFS= read -r md; do
           body = body l "\n"
         }
         printf "// from %s line %d\n", md, start > f
-        print "#![allow(unused_imports, unused_variables, dead_code, unused_mut, unused_parens)]" > f
+        # unused_must_use is load-bearing, not tidiness: the book states results as
+        # `v.sum();   // 10.0`, and sum/min/max/*_axis are #[must_use], so a bare call
+        # discards a must-use value. CI sets RUSTFLAGS="-D warnings" for the whole job,
+        # which promotes that warning to a hard error and failed this guard on the first
+        # push after it shipped -- it had only ever been verified locally, where RUSTFLAGS
+        # is unset. These are documentation snippets, not production code; the value being
+        # demonstrated is in the comment, and the hidden assert_eq! below it is what checks it.
+        # unexpected_cfgs likewise: blocks demonstrating the feature gates of matten itself write
+        # #[cfg(feature = "dynamic")] / "json" / "csv", which this generated crate does not
+        # declare, so every such block is a hard error under -D warnings. The cfg belongs to
+        # the crate being documented, not to the harness compiling the snippet.
+        print "#![allow(unused_imports, unused_variables, dead_code, unused_mut, unused_parens, unused_must_use, unexpected_cfgs)]" > f
         if (body !~ /use matten::/) {
           print "use matten::{Tensor, MattenError, DataFormat, SliceBuilder, MattenLimits};" > f
         }
