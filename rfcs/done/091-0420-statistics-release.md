@@ -1,15 +1,18 @@
 # RFC-091: `0.42.0` — Statistics Release
 
-**Status:** **Prepared, not yet tagged** — implemented in commit *"Prepare 0.42.0: statistics
-release (RFC-091)"*, reviewed and approved after one correction. All five crates are at `0.42.0`
-with every live version string retargeted; the tag and the publish remain unexecuted and require
-the owner's separate authorization (§7). C1 was on a page neither this RFC nor its handoff pointed
-at: `introduction.md`'s inherited clause *"without any other public API, dependency, or runtime
-behavior change"* was accurate for `0.41.0` but denied this release's two `matten-stats` error
-message changes — the same changes §6.1 made a mandatory `Changed` section for. Narrowed, and the
-two messages now named with a pointer to the CHANGELOG. O1 (adding RFC-090 to
-`public-api-snapshot.md`'s companion-additions enumeration) was offered as optional and declined;
-it carries to the next release RFC
+**Status:** **Released** — prepared in commit *"Prepare 0.42.0: statistics release (RFC-091)"*,
+reviewed and approved after one correction, then tagged `0.42.0` (signed, on the *Prepare* commit)
+and published to crates.io on 2026-08-01. All five crates live at `0.42.0`, verified against the
+sparse index, none yanked; 102 of 102 tags resolve to ancestors of `main` and all are annotated and
+signed.
+
+Two corrections, neither in the implementation. C1: `introduction.md` carried an inherited clause,
+*"without any other public API, dependency, or runtime behavior change"*, accurate for `0.41.0` and
+false here — it denied the two `matten-stats` error message changes §6.1 made a mandatory `Changed`
+section for. **§7's publish sequence was also wrong, and the owner caught it before the first
+upload:** publishing crate-by-crate risks a permanently half-published family, since crates.io has
+no unpublish. `cargo publish --workspace` verifies all five before uploading any. §7 is superseded
+by the release checklist's rewritten publishing section
 **Target:** `0.42.0`, on the `0.x` line
 **Theme:** Release RFC-090 — `matten-stats` gains `histogram`, and two existing error messages change
 **Depends on:** RFC-030, RFC-064, RFC-067, RFC-086, RFC-089, RFC-090

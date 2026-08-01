@@ -236,15 +236,39 @@ Companion crates inherit core `matten` through `[workspace.dependencies]` as
 docs and examples still show explicit matched release pins so downstreams see the
 supported family set.
 
-Before release, verify that package dry-runs account for publish ordering:
+### Publishing: one workspace command, not five per-crate ones
 
-- `matten` must be published first.
-- Companion package dry-runs may fail before core is visible on crates.io if they
-  need to resolve the just-released core version; record that as a sequencing
-  caveat rather than a dependency-policy failure.
-- If the broad requirement is intentionally changed, update RFC-030/RFC-064,
-  this checklist, companion README compatibility notes, and package dry-run
-  expectations in the same review slice.
+```bash
+cargo publish --workspace --dry-run
+cargo publish --workspace
+```
+
+**Publish the whole workspace in one invocation.** Cargo resolves the order itself and — the reason
+this matters — **verifies every crate before uploading any**, so a failure in the last companion
+aborts before core is irreversibly live. crates.io has no unpublish, only yank, which makes a
+half-published family a permanent artifact of the registry rather than a mistake you can undo.
+
+This supersedes the older instruction to publish `matten` first and then each companion in
+dependency order. That sequence predates `cargo publish --workspace` and carried exactly the
+partial-publication hazard above; it was still being followed as late as the `0.42.0` release, where
+the owner stopped it before the first upload. Keep the following in mind, but do not turn them back
+into a manual sequence:
+
+- `matten` is still published before the companions — cargo does this for you.
+- A companion dry-run run *on its own* may fail before core is visible on crates.io. That is a
+  sequencing artifact, not a dependency-policy failure, and `--workspace` avoids it entirely.
+- If the broad `version = "0"` requirement is intentionally changed, update RFC-030/RFC-064,
+  this checklist, companion README compatibility notes, and package dry-run expectations in the
+  same review slice.
+
+Verify afterwards against the **sparse index**, not the JSON API:
+
+```bash
+curl -s https://index.crates.io/ma/tt/matten-stats | grep '"vers":"<version>"'
+```
+
+`https://crates.io/api/v1/crates/<name>` now returns **HTTP 403** under the crates.io data-access
+policy, so a verification step built on it reports nothing and looks like a failed publish.
 
 ---
 
