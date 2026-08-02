@@ -126,6 +126,7 @@ sign-off and implementation — not that the state is unused.
 | ID | Title | Scope |
 |---:|---|---|
 | 076 | [v1.0 Release Preparation](./proposed/076-v1-release-preparation.md) | Reviewed and accepted (GO, no conditions); its inventory refreshed by RFC-081 (five-crate family, matten-mlprep production-ready, matten-stats row added, RFC-081 §3 precondition added). RFC-081's precondition is now **discharged** — `matten-stats` took **Exit A (promotion)** via RFC-084 — but this RFC remains deferred and no implementation is authorized: v1.0 is not currently wanted, a separate and unrelated reason |
+| 093 | [Browser Shape Playground](./proposed/093-browser-shape-playground.md) | Proposed. An interactive page in the already-deployed book where shapes, broadcasting, reductions and `matmul` resolve live, powered by a WebAssembly build of core `matten` in a workspace-excluded `publish = false` crate. Two enabling facts were **verified, not assumed**: core builds clean for `wasm32-unknown-unknown` (its only `std::fs` uses are behind `json`/`csv`), and `docs.yaml` already deploys the book to GitHub Pages. Commits **no public API surface**, which is what RFC-070 actually declined — but it overlaps RFC-070's refusal of "browser integration", and §3 argues that overlap openly rather than stepping around it. Carries an RFC-042-style lock: **text only, no pixels that represent data**, because the path from this to the `matten-viz` RFC-070 refused is short and every step on it looks reasonable |
 
 ## Remaining Themes And Issues
 
