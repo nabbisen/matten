@@ -3,6 +3,13 @@
 This page documents the steps required before publishing any `matten` release.
 It is the canonical gate referenced by RFC-015.
 
+**This page covers *whether* a release is fit to go out. It does not decide *when* one happens** —
+that is RFC-094's release cadence policy: a correctness fix to published code is a patch and ships
+as soon as it is reviewed; anything adding public API is a minor and batches until two or more
+themes have landed, 28 days have passed, or the owner asks; and a change that does not reach
+crates.io is not a release at all. The last is testable rather than editorial — if
+`git diff --name-only <last-tag>..HEAD -- crates/` is empty, there is nothing to release.
+
 ## Before every release
 
 Release tags use bare SemVer with no `v` prefix, for example `0.42.0`.

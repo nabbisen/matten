@@ -111,6 +111,7 @@ The broader documentation ownership model is recorded in
 | 091 | [`0.42.0` — Statistics Release](./done/091-0420-statistics-release.md) | 0.42.0 (released 2026-08-01). The smallest release the project has cut — one companion function. Records in §2 that the recorded §6.4 trigger did **not** fire: no second theme landed, and the owner overrode a recommendation to wait. Not Added-only — RFC-090 also changed two `Display` strings on functions that shipped in `0.41.0`, so a `Changed` section is mandatory. Review found one correction, on a page neither the RFC nor the handoff pointed at: `introduction.md` carried an inherited *"no other runtime behavior change"* clause, true for `0.41.0` and false here, contradicting the CHANGELOG of the same commit |
 | 092 | [Adopt the 5-Folder RFC Lifecycle Variant](./done/092-five-folder-rfc-lifecycle.md) | Process change; unreleased and unversioned. Adds `accepted/` between review and implementation, because owner sign-off and implementer completion became separate events performed by different parties — RFC-000's own criterion for the variant, which resolved the other way when it was written. The cost was already in the corpus: RFC-090 and RFC-091 were both accepted while sitting in `proposed/`, each carrying a hand-written Status qualifier to reconcile the contradiction RFC-000 exists to prevent. Amends RFC-000, does not supersede it |
 | 093 | [Browser Shape Playground](./done/093-browser-shape-playground.md) | Unreleased and unversioned; lands on the deployed book. Interactive shape/broadcast/reduction page, WebAssembly core, binding crate workspace-excluded and `publish = false`. **Its own §4 safety claim was false** — `wasm-bindgen` was on neither published-crate guard's blocklist, so both would have passed a direct leak; the implementation checked rather than trusted, and fixed them. Review added C1: the reproduced panic text was hand-transcribed, so a reword in core would have left the page quoting matten as saying something it no longer says, with the test still green — now asserted against the live panic payload |
+| 094 | [Release Cadence Policy](./done/094-release-cadence-policy.md) | Process policy; unreleased and unversioned. RFC-015 owned *whether* a release is fit and RFC-030 owns lock-step, but **nothing owned *when***, so it was renegotiated per release — four minors in five days, two on one day, and eight no-change crate versions republished across three releases. Patch releases had also silently lapsed: 14 minors and zero patches since `0.28.5`. Patches now ship as soon as reviewed with no batching; minors batch on two-themes / 28-days / owner-asks; documentation-only work never releases, tested by whether `git diff -- crates/` is empty |
 
 ## Accepted
 
@@ -120,7 +121,7 @@ sign-off and implementation — not that the state is unused.
 
 | ID | Title | Handoff |
 |---:|---|---|
-| 094 | [Release Cadence Policy](./accepted/094-release-cadence-policy.md) — patches ship immediately, minors batch on three named triggers, documentation never releases | *(none — governance editing, implemented by the high-capability model)* |
+| — | *(none at present)* | — |
 
 ## Proposed
 

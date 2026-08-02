@@ -28,6 +28,12 @@ The project is now useful enough that accidental public API drift becomes more d
 - This RFC does not promote dynamic tensors to a peer computation engine.
 - This RFC does not introduce dataframe, ML, or bridge-crate APIs.
 
+> **Amended by RFC-094 (2026-08-02).** This RFC owns the release *gates* — whether a release is
+> fit to go out. It has never said **when** one happens, so that was decided per release in
+> conversation. RFC-094 supplies the trigger: patches ship as soon as reviewed, minors batch on
+> two-themes / 28-days / owner-asks, and work that does not reach crates.io never releases at
+> all. RFC-015 is **amended, not superseded**, and remains authoritative on the gates themselves.
+
 ## 4. External design
 
 ### 4.1 User-facing model
