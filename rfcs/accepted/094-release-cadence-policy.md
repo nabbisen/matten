@@ -1,6 +1,9 @@
 # RFC-094: Release Cadence Policy
 
-**Status:** Proposed
+**Status:** **Accepted** 2026-08-02. Implementation is governance-document editing — RFC-015's
+reciprocal note, the release checklist, and the org §6.4 checkpoint — which sits with the
+high-capability model rather than the implementation agent, so there is **no Developer Handoff**
+for this one; see the note added to `accepted/README.md`
 **Target:** Process policy; no version, no release
 **Theme:** Replace per-release negotiation with a written trigger, and say what a patch release is for
 **Amends:** RFC-015 §4 (release gates) — adds *when* to release; RFC-015 keeps owning *whether it is fit to*

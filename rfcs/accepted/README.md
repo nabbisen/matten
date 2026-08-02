@@ -17,6 +17,11 @@ done/      ← shipped
 An RFC whose design has been accepted and whose implementation has not landed. Its `Status` field
 says `Accepted`, with the acceptance date, and points at its Developer Handoff in `../handoffs/`.
 
+**Not every accepted RFC has a handoff.** A handoff is the interface to the implementation agent,
+so work the high-capability model performs itself — amending RFC and governance documents, for
+example — has none, and says so in its Status instead. RFC-094 is the first such case. The state
+is still real: the design was signed off before the editing began.
+
 ## What does not
 
 - **Proposed but deferred.** An RFC nobody has signed off on stays in `proposed/`, however long it
