@@ -127,6 +127,7 @@ sign-off and implementation — not that the state is unused.
 | ID | Title | Scope |
 |---:|---|---|
 | 076 | [v1.0 Release Preparation](./proposed/076-v1-release-preparation.md) | Reviewed and accepted (GO, no conditions); its inventory refreshed by RFC-081 (five-crate family, matten-mlprep production-ready, matten-stats row added, RFC-081 §3 precondition added). RFC-081's precondition is now **discharged** — `matten-stats` took **Exit A (promotion)** via RFC-084 — but this RFC remains deferred and no implementation is authorized: v1.0 is not currently wanted, a separate and unrelated reason |
+| 094 | [Release Cadence Policy](./proposed/094-release-cadence-policy.md) | Proposed. RFC-015 §4 says *whether* a release is fit to go; RFC-030 says every crate shares one version; **nothing said when**, so the decision was renegotiated per release. Measured cost of that gap: four minors in five days, two on one day, and **eight no-change crate versions republished across three releases** — permanent, since crates.io has no unpublish. Patch releases had also quietly stopped existing: 14 minors and zero patches since `0.28.5`, with no decision behind it. Sets three minor triggers (two themes landed / 28 days / owner asks), makes patches ship immediately without batching, and states mechanically that documentation-only work never releases — if `git diff -- crates/` is empty there is nothing to release |
 
 ## Remaining Themes And Issues
 
