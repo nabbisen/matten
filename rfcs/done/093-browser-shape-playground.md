@@ -126,10 +126,24 @@ a tag, a publish, or a release
 page" to it is short and each step looks reasonable: shapes → a little bar for each value → a chart →
 a chart library → a rendering API → the crate RFC-070 refused.
 
-**So the lock is stated as a rule, in the RFC-042 style: the playground renders text, and only text.**
-Numbers, shapes, and prose glosses. No pixels that represent data. A change that draws data — bars,
-axes, lines, colour scales, an SVG element — is out of scope regardless of how small, and needs its
-own RFC that argues against this section by name.
+**So the lock is stated as a rule, in the RFC-042 style.** A change that crosses it is out of scope
+regardless of how small, and needs its own RFC that argues against this section by name.
+
+> **Amended by RFC-095 (2026-08-02).** The original wording was *"the playground renders text, and
+> only text. Numbers, shapes, and prose glosses. No pixels that represent data."* That drew the line
+> in the wrong place in **both** directions: a bar chart made of `#` characters is text and would have
+> been permitted, while a grid of plain numbers was arguably forbidden as "drawing". The rule is now:
+>
+> - **Representation — permitted.** Showing the tensor's own structure: rows as rows, columns as
+>   columns, numbers as numbers. It adds no information not already in the shape and the values.
+> - **Visualization — forbidden.** Encoding a value as visual *magnitude* or colour: bars,
+>   sparklines, heat maps, axes, lines, colour scales, SVG, canvas. Forbidden **in any medium** — an
+>   ASCII bar chart is visualization.
+> - **The test:** does the rendering encode a value as something other than that value? A grid does
+>   not. A bar does, however it is drawn.
+>
+> This is **narrower** than the wording it replaces, not wider: it newly forbids ASCII charts. The
+> path to the `matten-viz` crate RFC-070 refused is cut at the same place, more cleanly.
 
 ## 7. Risks, stated up front
 

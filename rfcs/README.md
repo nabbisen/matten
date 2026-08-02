@@ -121,14 +121,13 @@ sign-off and implementation — not that the state is unused.
 
 | ID | Title | Handoff |
 |---:|---|---|
-| — | *(none at present)* | — |
+| 095 | [Two-Dimensional Matrix Rendering in the Playground](./accepted/095-matrix-grid-rendering.md) — rank-2 grid so reshape stops printing two identical lists; amends RFC-093 §6 to a representation-vs-visualization rule | [handoff](./handoffs/095-matrix-grid-rendering-handoff.md) |
 
 ## Proposed
 
 | ID | Title | Scope |
 |---:|---|---|
 | 076 | [v1.0 Release Preparation](./proposed/076-v1-release-preparation.md) | Reviewed and accepted (GO, no conditions); its inventory refreshed by RFC-081 (five-crate family, matten-mlprep production-ready, matten-stats row added, RFC-081 §3 precondition added). RFC-081's precondition is now **discharged** — `matten-stats` took **Exit A (promotion)** via RFC-084 — but this RFC remains deferred and no implementation is authorized: v1.0 is not currently wanted, a separate and unrelated reason |
-| 095 | [Two-Dimensional Matrix Rendering in the Playground](./proposed/095-matrix-grid-rendering.md) | Proposed. Reshape currently prints two **identical** value lists, so the one thing it teaches — that the arrangement changes — is what the output hides; a rank-2 grid fixes that. **Argues RFC-093 §6 by name rather than claiming permission**, and proposes replacing *"text only"* with a representation-versus-visualization line, on the grounds that the current wording permits an ASCII bar chart while arguably forbidding a grid of plain numbers. The replacement is **narrower**, not wider. Inherits the report tool's three display constants verbatim, including the `-0.000` clamp, so the two surfaces RFC-093 §8 would put on one site cannot disagree about what a tensor looks like. Rank >2 stays flat as a boundary, not a deferral |
 
 ## Remaining Themes And Issues
 

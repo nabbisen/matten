@@ -1,6 +1,9 @@
 # RFC-095: Two-Dimensional Matrix Rendering in the Playground
 
-**Status:** Proposed
+**Status:** **Accepted** 2026-08-02 — implementation authorized under
+[the handoff](../handoffs/095-matrix-grid-rendering-handoff.md). RFC-093 §6 was amended at
+acceptance (governance editing, performed by the high-capability model); the code and the page
+restatement are the implementation's
 **Target:** Playground crate only; no published-crate change, no version, no release
 **Theme:** Show a matrix as a matrix, so reshape and broadcasting stop being invisible
 **Amends:** RFC-093 §6 — argued in §3, not assumed
