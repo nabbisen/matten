@@ -1,0 +1,24 @@
+[package]
+name        = "matten-playground"
+description = "Local-only WebAssembly binding for the browser shape playground (RFC-093)."
+version                 = "0.0.0"
+edition                 = "2024"
+rust-version            = "1.85"
+license                 = "Apache-2.0"
+authors                 = ["nabbisen"]
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+# This tool is workspace-excluded and publish = false. Path-only local
+# dependency so prerelease family-version bumps do not require tool manifest
+# churn; API drift is caught by cargo build/clippy via --manifest-path.
+matten                      = { path = "../../crates/matten", default-features = false }
+
+# Pinned exactly: the wasm-bindgen crate and the wasm-bindgen-cli
+# post-processing tool must be the SAME version, or the build fails outright.
+# CI installs this exact version (.github/workflows/docs.yaml); bump both
+# together, never independently.
+wasm-bindgen = "=0.2.126"

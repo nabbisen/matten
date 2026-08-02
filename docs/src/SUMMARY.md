@@ -11,6 +11,10 @@
 
 - [Start here](./tutorial/start-here.md)
 
+# Playground
+
+- [Shape playground](./playground.md)
+
 # Examples
 
 - [Examples index](./examples/index.md)

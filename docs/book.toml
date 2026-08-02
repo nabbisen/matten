@@ -7,3 +7,8 @@ src = "src"
 
 [output.html]
 git-repository-url = "https://github.com/nabbisen/matten"
+# RFC-093: DOM-wiring glue for the shape playground page. The Rust binding
+# crate (tools/matten-playground) does the actual parsing/computation/error
+# formatting; this file only reads inputs, calls the wasm exports, and
+# writes results into the page.
+additional-js = ["theme/playground.js"]

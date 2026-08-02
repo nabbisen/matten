@@ -25,6 +25,12 @@ FORBIDDEN=(
   matten-data
   matten-stats
   criterion
+  # RFC-093 §4: wasm-bindgen must enter only the workspace-excluded playground
+  # binding crate, never core. Added 2026-08-02 alongside the same addition to
+  # check-published-dependency-isolation.sh — this list had the identical gap
+  # (confirmed by injecting wasm-bindgen into core and observing this script
+  # exit 0 before the fix).
+  wasm-bindgen
 )
 
 if ! command -v cargo >/dev/null 2>&1; then

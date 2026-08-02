@@ -34,6 +34,30 @@ jobs:
       - name: Install mdBook
         run: cargo install mdbook --no-default-features --features search --vers "^0.5" --locked
 
+      # RFC-093: the shape playground's wasm module. Built before `mdbook
+      # build` since mdBook copies docs/src/playground/*.js/.wasm verbatim
+      # into the book output; this job runs with working-directory: docs, so
+      # this step overrides back to the repo root explicitly (handoff §4).
+      - name: Install wasm32 target
+        working-directory: .
+        run: rustup target add wasm32-unknown-unknown
+
+      - name: Install wasm-bindgen-cli
+        working-directory: .
+        # Must match tools/matten-playground/Cargo.toml's pinned wasm-bindgen
+        # version exactly, or wasm-bindgen refuses to process the module.
+        run: cargo install wasm-bindgen-cli --version 0.2.126 --locked
+
+      - name: Build the shape playground wasm module
+        working-directory: .
+        run: |
+          cargo build --manifest-path tools/matten-playground/Cargo.toml \
+            --target wasm32-unknown-unknown --release
+          wasm-bindgen --target web \
+            --out-dir docs/src/playground \
+            --out-name matten_playground \
+            tools/matten-playground/target/wasm32-unknown-unknown/release/matten_playground.wasm
+
       - name: Build book
         run: mdbook build
 
