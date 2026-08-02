@@ -1,6 +1,8 @@
 # RFC-093: Browser Shape Playground
 
-**Status:** Proposed
+**Status:** **Accepted** 2026-08-01 — implementation authorized under
+[the handoff](../handoffs/093-browser-shape-playground-handoff.md). First RFC to occupy
+`accepted/`, the folder adopted by RFC-092 the same day. Phase 2 (§8) remains unauthorized
 **Target:** Documentation-site feature; no published-crate change, no version, no release
 **Theme:** Make the shape reasoning the `visual_*` examples print interactive, in the book that is already deployed
 **Depends on:** RFC-022, RFC-030, RFC-049 §B1, RFC-070
