@@ -1,8 +1,16 @@
 # RFC-093: Browser Shape Playground
 
-**Status:** **Accepted** 2026-08-01 — implementation authorized under
-[the handoff](../handoffs/093-browser-shape-playground-handoff.md). First RFC to occupy
-`accepted/`, the folder adopted by RFC-092 the same day. Phase 2 (§8) remains unauthorized
+**Status:** **Implemented** 2026-08-02 in commit *"Add browser shape playground (RFC-093)"*,
+reviewed and approved after one correction. Occupied `accepted/` first — the folder RFC-092
+adopted the previous day — so its acceptance was recorded by a folder move rather than a Status
+qualifier. **§4 of this RFC was wrong:** it asserted that
+`check-published-dependency-isolation.sh` already covered a `wasm-bindgen` leak. It did not —
+the name was on neither published-crate guard's blocklist, so both would have passed with
+`wasm-bindgen` injected straight into a published crate. The implementation read the guard
+instead of trusting the RFC, exactly as §4's own escape clause required, and fixed both lists.
+C1 made the reproduced panic text self-checking against the live panic rather than a frozen
+transcription. Phase 2 (§8) remains unauthorized. Unreleased: no version, no tag, no publish —
+but the book deploys from a push to `main`, so this lands on the site
 **Target:** Documentation-site feature; no published-crate change, no version, no release
 **Theme:** Make the shape reasoning the `visual_*` examples print interactive, in the book that is already deployed
 **Depends on:** RFC-022, RFC-030, RFC-049 §B1, RFC-070
