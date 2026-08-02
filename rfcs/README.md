@@ -121,7 +121,7 @@ sign-off and implementation — not that the state is unused.
 
 | ID | Title | Handoff |
 |---:|---|---|
-| 095 | [Two-Dimensional Matrix Rendering in the Playground](./accepted/095-matrix-grid-rendering.md) — rank-2 grid so reshape stops printing two identical lists; amends RFC-093 §6 to a representation-vs-visualization rule | [handoff](./handoffs/095-matrix-grid-rendering-handoff.md) |
+| 095 | [Two-Dimensional Matrix Rendering in the Playground](./accepted/095-matrix-grid-rendering.md) — rank-2 grid so reshape stops printing two identical lists; amends RFC-093 §6 to a representation-vs-visualization rule; **scope widened 2026-08-02** to the page's presentation and discoverability | [handoff](./handoffs/095-matrix-grid-rendering-handoff.md) |
 
 ## Proposed
 

@@ -3,7 +3,9 @@
 **Status:** **Accepted** 2026-08-02 — implementation authorized under
 [the handoff](../handoffs/095-matrix-grid-rendering-handoff.md). RFC-093 §6 was amended at
 acceptance (governance editing, performed by the high-capability model); the code and the page
-restatement are the implementation's
+restatement are the implementation's. **Scope widened 2026-08-02 at the owner's request**
+to include the page's presentation and discoverability (§5.1), after they tried the deployed
+page; widened before implementation began, so no work is invalidated
 **Target:** Playground crate only; no published-crate change, no version, no release
 **Theme:** Show a matrix as a matrix, so reshape and broadcasting stop being invisible
 **Amends:** RFC-093 §6 — argued in §3, not assumed
@@ -122,6 +124,68 @@ bars, charts, colour, SVG, canvas — forbidden by §3's replacement rule
 the report tool, its HTML, and phase 2
 ```
 
+## 5.1 Page presentation and discoverability (added 2026-08-02)
+
+Added at the owner's request after using the deployed page. Presentation only — no new capability,
+no change to what is computed.
+
+**The page buries its own purpose.** It opens with 28 lines before the first input: a four-line
+intro, a **nineteen-line blockquote** on building the WebAssembly module locally, and a five-line
+paragraph restating the scope rule. Both blocks are meta-information for people working *on* the
+page, placed above the thing the page is *for*. A reader arrives and sees contributor instructions.
+
+```text
+now                              wanted
+  title                            title
+  intro                            one orienting sentence
+  19-line build note               THE FOUR FORMS
+  scope-rule paragraph             ---
+  the four forms                   Notes for contributors
+                                     build note, scope rule
+```
+
+**There is no CSS.** `book.toml` declares `additional-js` only, so the controls are unstyled: labels
+do not align, inputs vary in width, and each Run button sits flush against the left margin.
+
+**Nothing links to it.** `README.md`, `introduction.md` and `quick-start.md` do not mention the page;
+the book's navigation is its only route in. The nav also reads `Playground › Shape playground`, which
+is redundant.
+
+### Decisions
+
+```text
+ORDER      title, one orienting sentence, the four forms, then a "Notes for contributors"
+           section at the bottom holding the build note and the scope-rule restatement
+
+NAME       "Shape playground" -> "Playground", and the nav section stops repeating itself.
+           "Shape" was a scope signal, but RFC-093 §6 now states the boundary explicitly and
+           a title is a weak place to keep a lock. The opening sentence says what it covers.
+
+STYLE      docs/theme/playground.css via [output.html] additional-css. Aligned label/input
+           rows, consistent input widths, the Run button not flush left, styled output blocks.
+
+REACH      link from README.md, introduction.md and quick-start.md; move the Playground nav
+           section above Tutorial.
+```
+
+### The one constraint on styling
+
+RFC-093 §6, as amended by §3, still applies to CSS. **Styling chrome is permitted; styling that
+encodes a value is not.** A colour scale keyed to magnitude, a bar whose width tracks a number, a
+cell shaded by sign — all are visualization however they are produced, and CSS is a medium like any
+other. Layout, spacing, borders, and monospacing are chrome.
+
+### Theme compatibility is a requirement, not a nicety
+
+mdBook ships **light, rust, coal, navy and ayu**. Hardcoded colours look broken in at least three of
+them. The stylesheet must use mdBook's own CSS variables so the page follows the reader's theme.
+
+### Note on README.md
+
+`README.md` ships inside the published `matten` crate, so this link becomes crates.io front-page
+content at the next release. That is intended — it is the one route that reaches people who never
+open the book — but it is the only part of this section that leaves the documentation site.
+
 ## 6. Why rank > 2 is left alone
 
 A three-dimensional tensor has no honest two-dimensional arrangement. Rendering it as stacked blocks
@@ -162,6 +226,12 @@ core Debug/Display pretty-printing, e.g. honouring {:#?} — RFC-020 territory
 [ ] tests assert exact rendered strings, including padding
 [ ] RFC-093 §6 is amended with §3's rule, and docs/src/playground.md's restatement of
     it is updated to match — the page currently states the old wording
+[ ] the four forms appear BEFORE the build note and the scope paragraph (§5.1)
+[ ] the page and nav are renamed to "Playground", without repetition
+[ ] playground.css exists, is wired via additional-css, and uses mdBook theme
+    variables — verified by eye in a dark theme, not only the default
+[ ] no CSS encodes a value: no magnitude-keyed colour, width, or shading (§5.1)
+[ ] README.md, introduction.md and quick-start.md link to the page
 [ ] no published crate touched: git diff --name-only -- crates/ is empty
 [ ] all seven guards pass; check-doc-code.sh under RUSTFLAGS="-D warnings"
 [ ] no tag, no publish, no version change

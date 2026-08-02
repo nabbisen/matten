@@ -1,6 +1,8 @@
 # RFC-095 Matrix Grid Rendering: Implementation Handoff
 
 **Status:** Issued 2026-08-02. Implementation authorized under RFC-095, accepted the same day.
+**Scope widened 2026-08-02** (RFC-095 §5.1): the page's presentation and discoverability are now
+part of this work — see §5a below. Widened before implementation began.
 **Design authority:** `rfcs/accepted/095-matrix-grid-rendering.md`. Where this handoff and the RFC
 disagree, the RFC wins — report the discrepancy rather than resolving it silently.
 
@@ -91,6 +93,51 @@ final sentence's force: a change that crosses it still needs its own RFC arguing
 Leaving the page on the old wording would put the deployed site in direct contradiction with the RFC
 it cites, which is the defect class found on `introduction.md` during the `0.42.0` release.
 
+## 5a. Page presentation (RFC-095 §5.1)
+
+Same commit as the rendering work — the two touch the same file and must not be split across two
+sessions.
+
+**Reorder first; it is the change with the most effect.** The page currently puts 28 lines of
+contributor prose above the first input: the nineteen-line WebAssembly build blockquote and the
+scope-rule paragraph. Move both to a `## Notes for contributors` section at the **bottom**. What
+remains at the top is the title, one sentence saying what the page covers, and then the four forms.
+
+Do not delete either block. The build note is the only place the manual `wasm-bindgen` step is
+written down, and the scope paragraph is required by §5 of this handoff to be rewritten — it just
+belongs after the forms, not before them.
+
+**Rename** `# Shape playground` to `# Playground`, and fix `SUMMARY.md` so the nav stops reading
+`Playground › Shape playground`. Keep the filename `playground.md` — the deployed URL
+`playground.html` must not change; it has been given out.
+
+**Style** via a new `docs/theme/playground.css`, wired with `additional-css` in `docs/book.toml`
+alongside the existing `additional-js`:
+
+```text
+label/input rows aligned, inputs of consistent width
+the Run button no longer flush against the left margin
+output <pre> visually distinct from the inputs
+```
+
+Two hard constraints:
+
+```text
+1. USE MDBOOK'S CSS VARIABLES. The book ships light, rust, coal, navy and ayu. Hardcoded
+   colours look broken in at least three. Check one dark theme by eye before reporting.
+
+2. NO CSS MAY ENCODE A VALUE. RFC-093 §6 as amended applies to stylesheets too: a colour
+   scale keyed to magnitude, a bar whose width tracks a number, a cell shaded by sign are
+   all visualization, whatever produces them. Layout, spacing, borders, monospacing are
+   chrome and are fine.
+```
+
+**Discoverability:** add a link from `README.md`, `docs/src/introduction.md` and
+`docs/src/quick-start.md`, and move the `# Playground` nav section above `# Tutorial`.
+
+`README.md` ships in the published crate, so that line reaches crates.io at the next release. Keep it
+to one sentence and a URL; it is the only part of this work that leaves the documentation site.
+
 ## 6. Verification
 
 ```bash
@@ -116,6 +163,9 @@ git diff --name-only -- crates/    # expect EMPTY
 - tests that check "contains" rather than the exact padded block
 - leaving docs/src/playground.md quoting the superseded rule (§5)
 - touching core matten's Debug — RFC-020 governs it, explicitly out of scope
+- renaming the FILE, which would break the deployed playground.html URL
+- hardcoded colours that break the coal/navy/ayu themes
+- deleting the build note instead of moving it — it is the only record of the step
 ```
 
 ## 8. What the review request must report
@@ -125,6 +175,9 @@ git diff --name-only -- crates/    # expect EMPTY
 - confirmation the three report-tool constants are used, and where they are cited
 - the rank-3 regression test showing the flat form is unchanged
 - the rewritten playground.md paragraph, quoted
+- the new page order, as a heading list, showing forms above the contributor notes
+- a screenshot or description of the styled forms in a DARK mdBook theme
+- the three links added, quoted
 - full gate output, seven guards, check-doc-code.sh under -D warnings
 - git diff --name-only -- crates/ showing EMPTY
 - confirmation that no tag was created and nothing was published
