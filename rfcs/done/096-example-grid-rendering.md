@@ -1,10 +1,12 @@
 # RFC-096: Grid Rendering in the Shape and Axis Example
 
-**Status:** **Accepted** 2026-08-02 — implementation authorized under
-[the handoff](../handoffs/096-example-grid-rendering-handoff.md). Amended before acceptance with
-§4's self-assertion requirement, after the owner asked whether the design was safe and it turned
-out not to be: the recommended local formatter would have sat where its own required test cannot
-run
+**Status:** **Implemented** 2026-08-02 in commit *"Render matrices as a grid in the shape and
+axis example (RFC-096)"*, reviewed and approved after one correction. One file, no `pub fn`, and
+**eight** exact-string assertions where the criteria asked for two. C1 was caused by this RFC's own
+wording: §5 said *"natural float rendering"*, which `Display` satisfies while dropping the `.0`, so
+the grid printed `1 2 3` for `f64` data — misleading in a way the flat list it replaced was not, and
+contradicted twenty lines below by an axis line reading `[2.5, 3.5, 4.5]`. Fixed with `{:?}`.
+Unreleased: it reaches users at the next release, and deploys nothing
 **Target:** `crates/matten/examples/57_visual_shape_axis_summary.rs`; no API change, no version, no release
 **Theme:** Apply RFC-095's fix where more people see it — a shipped example, not only the web page
 **Related:** RFC-002, RFC-020, RFC-021, RFC-043, RFC-093 §6, RFC-095, RFC-094

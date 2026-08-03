@@ -113,6 +113,7 @@ The broader documentation ownership model is recorded in
 | 093 | [Browser Shape Playground](./done/093-browser-shape-playground.md) | Unreleased and unversioned; lands on the deployed book. Interactive shape/broadcast/reduction page, WebAssembly core, binding crate workspace-excluded and `publish = false`. **Its own §4 safety claim was false** — `wasm-bindgen` was on neither published-crate guard's blocklist, so both would have passed a direct leak; the implementation checked rather than trusted, and fixed them. Review added C1: the reproduced panic text was hand-transcribed, so a reword in core would have left the page quoting matten as saying something it no longer says, with the test still green — now asserted against the live panic payload |
 | 094 | [Release Cadence Policy](./done/094-release-cadence-policy.md) | Process policy; unreleased and unversioned. RFC-015 owned *whether* a release is fit and RFC-030 owns lock-step, but **nothing owned *when***, so it was renegotiated per release — four minors in five days, two on one day, and eight no-change crate versions republished across three releases. Patch releases had also silently lapsed: 14 minors and zero patches since `0.28.5`. Patches now ship as soon as reviewed with no batching; minors batch on two-themes / 28-days / owner-asks; documentation-only work never releases, tested by whether `git diff -- crates/` is empty |
 | 095 | [Two-Dimensional Matrix Rendering in the Playground](./done/095-matrix-grid-rendering.md) | Unreleased and unversioned; deploys with the book. Rank ≤ 2 renders as an aligned grid, so Reshape stops printing two identical value lists — the defect the owner found by using the page. **Amends RFC-093 §6** from *"text only"* to representation-versus-visualization, a **narrower** rule that newly forbids ASCII charts. Inherits the report tool's three display constants verbatim. Scope widened mid-flight to the page's presentation: forms above contributor notes, a stylesheet using mdBook theme variables, and links from `README.md`, `introduction.md` and `quick-start.md` |
+| 096 | [Grid Rendering in the Shape and Axis Example](./done/096-example-grid-rendering.md) | **Unreleased** — reaches users at the next release; deploys nothing. RFC-095's fix applied to shipped code, where a `cargo run` reaches people a URL does not. Formatter kept **local**, which was only legal because the example **asserts its own rendered blocks** — a `#[test]` inside an example runs zero tests, and CI catches a panic but not a mis-aligned grid. Eight assertions where two were required. Review found one defect caused by the RFC's own wording: *"natural float rendering"* admitted `Display`, which printed `1 2 3` for `f64` data and contradicted the axis line in the same output |
 
 ## Accepted
 
@@ -122,7 +123,7 @@ sign-off and implementation — not that the state is unused.
 
 | ID | Title | Handoff |
 |---:|---|---|
-| 096 | [Grid Rendering in the Shape and Axis Example](./accepted/096-example-grid-rendering.md) — RFC-095's fix applied to a shipped example; formatter stays local, and the example asserts its own rendered block | [handoff](./handoffs/096-example-grid-rendering-handoff.md) |
+| — | *(none at present)* | — |
 
 ## Proposed
 
