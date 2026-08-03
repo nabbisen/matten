@@ -1,0 +1,77 @@
+/* Shape playground styling (RFC-095 §5.1). Layout chrome only: alignment,
+ * spacing, borders, monospacing. No rule here reads a value the playground
+ * computed — nothing is keyed to magnitude, sign, or any other data the
+ * page renders. That is the one hard constraint (RFC-093 §6, as amended by
+ * RFC-095 §3): styling that encoded a value would be visualization, not
+ * chrome, however small.
+ *
+ * Uses mdBook's own theme variables (docs/book/css/variables.css) rather
+ * than hardcoded colours, so the page follows the reader's theme across all
+ * five mdBook ships: light, rust, coal, navy, ayu.
+ */
+
+#shape-playground {
+  margin-top: 1em;
+}
+
+#shape-playground .pg-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5em;
+  margin: 0.35em 0;
+}
+
+#shape-playground .pg-row label {
+  min-width: 6em;
+  text-align: right;
+  color: var(--fg);
+}
+
+#shape-playground input[type="text"],
+#shape-playground select {
+  font-family: var(--mono-font);
+  font-size: var(--code-font-size);
+  background: var(--bg);
+  color: var(--fg);
+  border: 1px solid var(--table-border-color);
+  border-radius: 3px;
+  padding: 0.25em 0.5em;
+}
+
+#shape-playground input[type="text"] {
+  width: 16ch;
+}
+
+#shape-playground button {
+  display: block;
+  /* Aligned under the input column, not flush against the label column. */
+  margin: 0.8em 0 1em 6.5em;
+  padding: 0.35em 1.2em;
+  background: var(--links);
+  color: var(--bg);
+  border: none;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+#shape-playground button:hover {
+  background: var(--sidebar-active);
+}
+
+#shape-playground pre {
+  background: var(--quote-bg);
+  border: 1px solid var(--quote-border);
+  border-radius: 4px;
+  padding: 0.8em 1em;
+  font-family: var(--mono-font);
+  white-space: pre-wrap;
+  overflow-x: auto;
+}
+
+#pg-status {
+  min-height: 1.2em;
+  font-style: italic;
+  opacity: 0.75;
+}

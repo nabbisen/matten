@@ -12,3 +12,7 @@ git-repository-url = "https://github.com/nabbisen/matten"
 # formatting; this file only reads inputs, calls the wasm exports, and
 # writes results into the page.
 additional-js = ["theme/playground.js"]
+# RFC-095 §5.1: playground layout chrome only (alignment, spacing, borders) --
+# uses mdBook's own CSS variables so it follows the reader's theme, and never
+# styles based on a value the playground computed.
+additional-css = ["theme/playground.css"]

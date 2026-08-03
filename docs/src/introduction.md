@@ -11,6 +11,8 @@ data exploration, and early prototypes.
 This book is organized by reader:
 
 - **New users** — philosophy and a quick start.
+- **Playground** — try broadcasting, reshape, axis reductions, and `matmul` in the browser,
+  no install required: [Playground](./playground.md).
 - **Reference** — the rules that shape the public API.
 - **Contributors** — project layout, milestones, and process.
 

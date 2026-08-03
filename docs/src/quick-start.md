@@ -13,3 +13,5 @@ Install the lean core only:
 ```toml
 matten = { version = "0.42.0", default-features = false }
 ```
+
+Want to try shape reasoning first, with nothing to install? See the [Playground](./playground.md).

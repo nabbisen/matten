@@ -6,14 +6,11 @@
 
 - [Philosophy](./philosophy.md)
 - [Quick start](./quick-start.md)
+- [Playground](./playground.md)
 
 # Tutorial
 
 - [Start here](./tutorial/start-here.md)
-
-# Playground
-
-- [Shape playground](./playground.md)
 
 # Examples
 

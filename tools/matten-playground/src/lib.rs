@@ -12,6 +12,9 @@
 use matten::{MattenError, Tensor};
 use wasm_bindgen::prelude::*;
 
+mod render;
+use render::format_tensor_block;
+
 // ---- input parsing --------------------------------------------------------
 
 /// Parses a comma-separated list of non-negative integers, e.g. `"2, 3"`.
@@ -48,17 +51,6 @@ fn build_tensor(shape_str: &str, values_str: &str) -> Result<Tensor, String> {
 }
 
 // ---- output formatting -----------------------------------------------------
-
-/// `"{label:<16} shape={:?} values={:?}"` — the exact line shape used by
-/// `print_tensor_line` in example 57, mirrored so the page and the example
-/// teach in one vocabulary.
-fn format_tensor_line(label: &str, t: &Tensor) -> String {
-    format!(
-        "{label:<16} shape={:?} values={:?}",
-        t.shape(),
-        t.as_slice()
-    )
-}
 
 fn error_block(message: &str) -> String {
     format!("Error: {message}")
@@ -170,9 +162,9 @@ pub fn playground_broadcast(
 
     format!(
         "{}\n{}\n{}\nmeaning          {}",
-        format_tensor_line("input A", &a),
-        format_tensor_line("input b", &b),
-        format_tensor_line("A + b", &sum),
+        format_tensor_block("input A", &a),
+        format_tensor_block("input b", &b),
+        format_tensor_block("A + b", &sum),
         describe_broadcast(a.shape(), b.shape(), &result_shape)
     )
 }
@@ -195,8 +187,8 @@ pub fn playground_reshape(shape: &str, values: &str, target_shape: &str) -> Stri
     match t.try_reshape(&target) {
         Ok(reshaped) => format!(
             "{}\n{}\nmeaning          row-major values stay in the same order",
-            format_tensor_line("input", &t),
-            format_tensor_line("reshaped", &reshaped)
+            format_tensor_block("input", &t),
+            format_tensor_block("reshaped", &reshaped)
         ),
         Err(e) => error_block(&format_matten_error(&e)),
     }
@@ -248,10 +240,10 @@ pub fn playground_axis_reduce(shape: &str, values: &str, axis: &str, op: &str) -
 
     match result {
         Ok(reduced) => format!(
-            "{}\n{op}_axis({axis_n})    {} -> {}",
-            format_tensor_line("input", &t),
+            "{}\n{op}_axis({axis_n})    {}\n{}",
+            format_tensor_block("input", &t),
             describe_axis_reduction(rank, axis_n),
-            format_tensor_line("result", &reduced)
+            format_tensor_block("result", &reduced)
         ),
         Err(e) => error_block(&format_matten_error(&e)),
     }
@@ -348,9 +340,9 @@ pub fn playground_matmul(
 
     format!(
         "{}\n{}\n{}\nmeaning          {:?} x {:?} -> {:?}",
-        format_tensor_line("left", &a),
-        format_tensor_line("right", &b),
-        format_tensor_line("left.matmul", &product),
+        format_tensor_block("left", &a),
+        format_tensor_block("right", &b),
+        format_tensor_block("left.matmul", &product),
         a.shape(),
         b.shape(),
         product.shape()
@@ -456,14 +448,36 @@ mod tests {
     #[test]
     fn broadcast_compatible_shapes_computes_the_real_sum() {
         let out = playground_broadcast("2,3", "1,2,3,4,5,6", "3", "10,20,30");
-        assert!(out.contains("shape=[2, 3] values=[11.0, 22.0, 33.0, 14.0, 25.0, 36.0]"));
-        assert!(out.contains("right repeats along axis 0"));
+        assert_eq!(
+            out,
+            "input A          shape=[2, 3]\n\
+             1.000 2.000 3.000\n\
+             4.000 5.000 6.000\n\
+             input b          shape=[3]\n\
+             10.000 20.000 30.000\n\
+             A + b            shape=[2, 3]\n\
+             11.000 22.000 33.000\n\
+             14.000 25.000 36.000\n\
+             meaning          right repeats along axis 0"
+        );
     }
 
     #[test]
     fn broadcast_identical_shapes_reports_no_broadcasting() {
         let out = playground_broadcast("2,2", "1,2,3,4", "2,2", "1,1,1,1");
-        assert!(out.contains("shapes already match; no broadcasting"));
+        assert_eq!(
+            out,
+            "input A          shape=[2, 2]\n\
+             1.000 2.000\n\
+             3.000 4.000\n\
+             input b          shape=[2, 2]\n\
+             1.000 1.000\n\
+             1.000 1.000\n\
+             A + b            shape=[2, 2]\n\
+             2.000 3.000\n\
+             4.000 5.000\n\
+             meaning          shapes already match; no broadcasting"
+        );
     }
 
     #[test]
@@ -485,8 +499,17 @@ mod tests {
     #[test]
     fn reshape_preserves_row_major_values() {
         let out = playground_reshape("2,3", "1,2,3,4,5,6", "3,2");
-        assert!(out.contains("shape=[3, 2] values=[1.0, 2.0, 3.0, 4.0, 5.0, 6.0]"));
-        assert!(out.contains("row-major values stay in the same order"));
+        assert_eq!(
+            out,
+            "input            shape=[2, 3]\n\
+             1.000 2.000 3.000\n\
+             4.000 5.000 6.000\n\
+             reshaped         shape=[3, 2]\n\
+             1.000 2.000\n\
+             3.000 4.000\n\
+             5.000 6.000\n\
+             meaning          row-major values stay in the same order"
+        );
     }
 
     #[test]
@@ -503,14 +526,29 @@ mod tests {
     #[test]
     fn axis_reduce_mean_axis_0_matches_hand_computed_values() {
         let out = playground_axis_reduce("2,3", "1,2,3,4,5,6", "0", "mean");
-        assert!(out.contains("collapse rows, keep columns"));
-        assert!(out.contains("shape=[3] values=[2.5, 3.5, 4.5]"));
+        assert_eq!(
+            out,
+            "input            shape=[2, 3]\n\
+             1.000 2.000 3.000\n\
+             4.000 5.000 6.000\n\
+             mean_axis(0)    collapse rows, keep columns\n\
+             result           shape=[3]\n\
+             2.500 3.500 4.500"
+        );
     }
 
     #[test]
     fn axis_reduce_axis_1_uses_the_columns_gloss() {
         let out = playground_axis_reduce("2,3", "1,2,3,4,5,6", "1", "sum");
-        assert!(out.contains("collapse columns, keep rows"));
+        assert_eq!(
+            out,
+            "input            shape=[2, 3]\n\
+             1.000 2.000 3.000\n\
+             4.000 5.000 6.000\n\
+             sum_axis(1)    collapse columns, keep rows\n\
+             result           shape=[2]\n \
+             6.000 15.000"
+        );
     }
 
     #[test]
@@ -553,21 +591,62 @@ mod tests {
     #[test]
     fn matmul_2x2_matches_hand_computed_product() {
         let out = playground_matmul("2,2", "1,2,3,4", "2,2", "5,6,7,8");
-        assert!(out.contains("shape=[2, 2] values=[19.0, 22.0, 43.0, 50.0]"));
-        assert!(out.contains("[2, 2] x [2, 2] -> [2, 2]"));
+        assert_eq!(
+            out,
+            "left             shape=[2, 2]\n\
+             1.000 2.000\n\
+             3.000 4.000\n\
+             right            shape=[2, 2]\n\
+             5.000 6.000\n\
+             7.000 8.000\n\
+             left.matmul      shape=[2, 2]\n\
+             19.000 22.000\n\
+             43.000 50.000\n\
+             meaning          [2, 2] x [2, 2] -> [2, 2]"
+        );
     }
 
     #[test]
     fn matmul_mv_and_vm_and_vv_all_compute() {
         // [m,n] x [n] -> [m]
         let mv = playground_matmul("2,3", "1,2,3,4,5,6", "3", "1,2,3");
-        assert!(mv.contains("shape=[2] values=[14.0, 32.0]"));
+        assert_eq!(
+            mv,
+            "left             shape=[2, 3]\n\
+             1.000 2.000 3.000\n\
+             4.000 5.000 6.000\n\
+             right            shape=[3]\n\
+             1.000 2.000 3.000\n\
+             left.matmul      shape=[2]\n\
+             14.000 32.000\n\
+             meaning          [2, 3] x [3] -> [2]"
+        );
         // [n] x [n,p] -> [p]
         let vm = playground_matmul("3", "1,2,3", "3,2", "1,2,3,4,5,6");
-        assert!(vm.contains("shape=[2]"));
+        assert_eq!(
+            vm,
+            "left             shape=[3]\n\
+             1.000 2.000 3.000\n\
+             right            shape=[3, 2]\n\
+             1.000 2.000\n\
+             3.000 4.000\n\
+             5.000 6.000\n\
+             left.matmul      shape=[2]\n\
+             22.000 28.000\n\
+             meaning          [3] x [3, 2] -> [2]"
+        );
         // [n] x [n] -> [] (scalar)
         let vv = playground_matmul("3", "1,2,3", "3", "1,2,3");
-        assert!(vv.contains("shape=[] values=[14.0]"));
+        assert_eq!(
+            vv,
+            "left             shape=[3]\n\
+             1.000 2.000 3.000\n\
+             right            shape=[3]\n\
+             1.000 2.000 3.000\n\
+             left.matmul      shape=[]\n\
+             14.000\n\
+             meaning          [3] x [3] -> []"
+        );
     }
 
     #[test]

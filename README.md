@@ -220,6 +220,8 @@ More examples are [here](crates/matten-mlprep/examples/).
 ## More detail
 
 - Documentation: [nabbisen.github.io/matten](https://nabbisen.github.io/matten/) (mdBook).
+- Playground: try broadcasting, reshape, axis reductions, and `matmul` in the browser —
+  [nabbisen.github.io/matten/playground.html](https://nabbisen.github.io/matten/playground.html).
 - Roadmap: [`ROADMAP.md`](./ROADMAP.md) (canonical for v0.16+).
 - Design decisions: [`rfcs/`](./rfcs) — see RFC-022 (boundary policy), RFC-025
   (bridge policy), RFC-030 (family versioning).
