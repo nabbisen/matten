@@ -1,6 +1,9 @@
 # RFC-097: Report Demos as Generated Book Pages
 
-**Status:** Proposed
+**Status:** **Accepted** 2026-08-02 — implementation authorized under
+[the handoff](../handoffs/097-report-demos-on-the-site-handoff.md). Supersedes RFC-093 §8's HTML
+sketch on both counts: Markdown rather than HTML, and the tool's own rendering fixed before
+anything is published
 **Target:** `docs/`, `tools/matten-report`; no published-crate change, no version, no release
 **Theme:** RFC-093 §8's phase 2 — make the report tool's demos readable without a checkout
 **Related:** RFC-069, RFC-070, RFC-071, RFC-073, RFC-093 §8, RFC-095, RFC-096, RFC-094
