@@ -1,9 +1,16 @@
 # RFC-097: Report Demos as Generated Book Pages
 
-**Status:** **Accepted** 2026-08-02 — implementation authorized under
-[the handoff](../handoffs/097-report-demos-on-the-site-handoff.md). Supersedes RFC-093 §8's HTML
-sketch on both counts: Markdown rather than HTML, and the tool's own rendering fixed before
-anything is published
+**Status:** **Implemented** 2026-08-04 in commit *"Render matrices as a grid and publish report
+demos as book pages (RFC-097)"*, reviewed and **approved with no corrections**. Five demos publish
+as generated Markdown pages, committed with a working freshness guard.
+
+**§5.1's illustration was wrong and the implementation was right to go past it.** It named
+`data-readiness` and `dynamic-readiness` as carrying only *"column statistics — lists of per-column
+numbers, not matrices"*. Neither demo has any such field: `Table::to_tensor()` builds
+`[rows, cols]` unconditionally and `none_mask()`/`numeric_mask()` preserve their input's shape, so
+both demos, and `educational-path` which builds the same tensor, carry rank-2 values. **15 defect
+sites, not the 9 the illustration listed** — following it literally would have published six
+genuine defects. The rule in §5 was right; only the enumeration was short
 **Target:** `docs/`, `tools/matten-report`; no published-crate change, no version, no release
 **Theme:** RFC-093 §8's phase 2 — make the report tool's demos readable without a checkout
 **Related:** RFC-069, RFC-070, RFC-071, RFC-073, RFC-093 §8, RFC-095, RFC-096, RFC-094

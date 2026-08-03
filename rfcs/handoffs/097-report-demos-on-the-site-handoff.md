@@ -34,8 +34,17 @@ CORRECT — leave exactly as they are
   shape-flow    mean_axis(0): [2.5, 3.5, 4.5]   a rank-1 result IS a list
   shape-flow    mean_axis(1): [2.0, 5.0]
   data-readiness / dynamic-readiness: column statistics — lists of per-column
-                                       numbers, not matrices
+                                       numbers, not matrices      <-- WRONG, see below
 ```
+
+> **Correction, 2026-08-04 — the last line of that table is false.** Neither demo has a
+> column-statistics field. `Table::to_tensor()` builds `[rows, cols]` unconditionally
+> (`crates/matten-data/src/numeric.rs`), and `none_mask()`/`numeric_mask()` preserve their input's
+> shape (`crates/matten/src/dynamic/tensor_ext.rs`), whose demo input is `[2, 3]`. So
+> `data-readiness`'s tensor preview and both `dynamic-readiness` masks are **rank 2**, as are the
+> same two masks inside `educational-path`. There were **15** defect sites, not the 9 illustrated.
+> The implementation read the report builders instead of trusting this table, and was right to.
+> Retained rather than deleted, because it is what the implementation was given.
 
 If you cannot tell from the renderer whether a value is rank 2, that is the question to answer before
 writing the change — not something to infer from how the list looks.
