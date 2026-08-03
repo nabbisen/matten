@@ -11,6 +11,11 @@ instead of trusting the RFC, exactly as §4's own escape clause required, and fi
 C1 made the reproduced panic text self-checking against the live panic rather than a frozen
 transcription. Phase 2 (§8) remains unauthorized. Unreleased: no version, no tag, no publish —
 but the book deploys from a push to `main`, so this lands on the site
+**Browser verification closed 2026-08-02 (RFC-095).** This RFC shipped with real-browser behaviour
+unverified — no automation tool was connected. During RFC-095 the implementation drove the served
+page over the Chrome DevTools Protocol: the module loaded, real DOM clicks on the Run buttons
+produced correct output, and an incompatible shape produced matten's exact error text. What stays
+unverified is layout coherence at varying widths, which no tool available here can settle.
 **Target:** Documentation-site feature; no published-crate change, no version, no release
 **Theme:** Make the shape reasoning the `visual_*` examples print interactive, in the book that is already deployed
 **Depends on:** RFC-022, RFC-030, RFC-049 §B1, RFC-070

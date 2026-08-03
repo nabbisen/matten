@@ -1,11 +1,12 @@
 # RFC-095: Two-Dimensional Matrix Rendering in the Playground
 
-**Status:** **Accepted** 2026-08-02 — implementation authorized under
-[the handoff](../handoffs/095-matrix-grid-rendering-handoff.md). RFC-093 §6 was amended at
-acceptance (governance editing, performed by the high-capability model); the code and the page
-restatement are the implementation's. **Scope widened 2026-08-02 at the owner's request**
-to include the page's presentation and discoverability (§5.1), after they tried the deployed
-page; widened before implementation began, so no work is invalidated
+**Status:** **Implemented** 2026-08-02 in commit *"Render matrices as a grid in the playground
+(RFC-095)"*, reviewed and approved after one correction. Rank ≤ 2 renders as an aligned grid;
+rank > 2 is byte-identical to the pre-RFC-095 flat form, proven at the source rather than by
+sampled output. RFC-093 §6 was amended at acceptance. C1 was the nav still repeating —
+`Playground › Playground` rather than the old `Playground › Shape playground` — fixed by folding
+the page into `New users` and deleting the one-item section. Unreleased and unversioned, but the
+page deploys from a push to `main`, and the `README.md` link reaches crates.io at the next release
 **Target:** Playground crate only; no published-crate change, no version, no release
 **Theme:** Show a matrix as a matrix, so reshape and broadcasting stop being invisible
 **Amends:** RFC-093 §6 — argued in §3, not assumed

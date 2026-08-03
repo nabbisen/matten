@@ -112,6 +112,7 @@ The broader documentation ownership model is recorded in
 | 092 | [Adopt the 5-Folder RFC Lifecycle Variant](./done/092-five-folder-rfc-lifecycle.md) | Process change; unreleased and unversioned. Adds `accepted/` between review and implementation, because owner sign-off and implementer completion became separate events performed by different parties — RFC-000's own criterion for the variant, which resolved the other way when it was written. The cost was already in the corpus: RFC-090 and RFC-091 were both accepted while sitting in `proposed/`, each carrying a hand-written Status qualifier to reconcile the contradiction RFC-000 exists to prevent. Amends RFC-000, does not supersede it |
 | 093 | [Browser Shape Playground](./done/093-browser-shape-playground.md) | Unreleased and unversioned; lands on the deployed book. Interactive shape/broadcast/reduction page, WebAssembly core, binding crate workspace-excluded and `publish = false`. **Its own §4 safety claim was false** — `wasm-bindgen` was on neither published-crate guard's blocklist, so both would have passed a direct leak; the implementation checked rather than trusted, and fixed them. Review added C1: the reproduced panic text was hand-transcribed, so a reword in core would have left the page quoting matten as saying something it no longer says, with the test still green — now asserted against the live panic payload |
 | 094 | [Release Cadence Policy](./done/094-release-cadence-policy.md) | Process policy; unreleased and unversioned. RFC-015 owned *whether* a release is fit and RFC-030 owns lock-step, but **nothing owned *when***, so it was renegotiated per release — four minors in five days, two on one day, and eight no-change crate versions republished across three releases. Patch releases had also silently lapsed: 14 minors and zero patches since `0.28.5`. Patches now ship as soon as reviewed with no batching; minors batch on two-themes / 28-days / owner-asks; documentation-only work never releases, tested by whether `git diff -- crates/` is empty |
+| 095 | [Two-Dimensional Matrix Rendering in the Playground](./done/095-matrix-grid-rendering.md) | Unreleased and unversioned; deploys with the book. Rank ≤ 2 renders as an aligned grid, so Reshape stops printing two identical value lists — the defect the owner found by using the page. **Amends RFC-093 §6** from *"text only"* to representation-versus-visualization, a **narrower** rule that newly forbids ASCII charts. Inherits the report tool's three display constants verbatim. Scope widened mid-flight to the page's presentation: forms above contributor notes, a stylesheet using mdBook theme variables, and links from `README.md`, `introduction.md` and `quick-start.md` |
 
 ## Accepted
 
@@ -121,7 +122,7 @@ sign-off and implementation — not that the state is unused.
 
 | ID | Title | Handoff |
 |---:|---|---|
-| 095 | [Two-Dimensional Matrix Rendering in the Playground](./accepted/095-matrix-grid-rendering.md) — rank-2 grid so reshape stops printing two identical lists; amends RFC-093 §6 to a representation-vs-visualization rule; **scope widened 2026-08-02** to the page's presentation and discoverability | [handoff](./handoffs/095-matrix-grid-rendering-handoff.md) |
+| — | *(none at present)* | — |
 
 ## Proposed
 
