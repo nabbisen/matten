@@ -50,7 +50,7 @@ crates/matten/examples/57_visual_shape_axis_summary.rs   74 lines
 ```
 
 A repository-wide grep for the `shape=… values=…` form across all 78 example programs returns this
-one file. There is no sweep to do, and §7 records the guard that keeps it that way.
+one file. There is no sweep to do — and §7 records why nothing guards it against recurring.
 
 ## 4. Where the formatter lives — the actual decision
 
@@ -74,6 +74,30 @@ A self-contained example is also *better teaching*, not merely cheaper: a reader
 `57_visual_shape_axis_summary` to learn how shapes work can see how the alignment is produced instead
 of calling into a helper whose behaviour is elsewhere. RFC-043's example-structure policy already
 favours readable, self-contained programs.
+
+### (c) is only acceptable because the example self-asserts
+
+This qualification is load-bearing and was missing from the first draft of this RFC.
+
+Option (c) moves logic that has **nine unit tests** in `tools/matten-playground` into a file that
+cannot hold effective ones. Verified rather than assumed: a `#[test]` injected into this example and
+run with `cargo test -p matten --examples` reports **0 tests run** — examples build as binaries and
+their inner tests do not execute.
+
+CI does run the example (`test.yaml:159`), so a panic or an out-of-bounds index is caught. **A
+mis-aligned grid is not.** It renders, the example exits 0, and CI is green — which is precisely the
+hazard RFC-095 §7 named as *"a mis-padded column still renders, it just misleads"*, and the reason
+exact-string tests were mandatory there. Recommending (c) without addressing this would have put that
+same logic where its own required test cannot run.
+
+**The example must therefore assert its own rendered output.** The convention already exists here: 49
+of 56 core examples contain assertions, and this file already asserts shapes and values at lines
+29–30 and 38. The formatter builds its string, the example `assert_eq!`s it against the expected
+block **including padding**, and then prints it. CI's `cargo run` executes those assertions on every
+push.
+
+That is the same shape as the book's self-verifying code blocks — the claim and its check in one
+source — and it is what makes a local formatter defensible rather than a regression in coverage.
 
 ## 5. It does not inherit the playground's constants, deliberately
 
@@ -145,6 +169,9 @@ Whether to cut a release remains RFC-094's decision at the next disposition poin
 [ ] Reshape's two blocks visibly differ in arrangement — the defect in §2 is gone
 [ ] rank 1 renders as a row; rank 0 as the scalar; rank >2 arm present and unchanged
 [ ] natural float rendering, NOT {:.3} (§5)
+[ ] the example ASSERTS its own rendered block, padding included, before printing it —
+    exact-string assert_eq!, not a shape/value spot check (§4)
+[ ] at least one assertion covers the rank-2 grid and one the rank-1 row
 [ ] no new public API: git diff shows no `pub fn` added in any crate
 [ ] the example still ends with its "57_visual_shape_axis_summary: OK" line
 [ ] cargo run -p matten --example 57_visual_shape_axis_summary succeeds
