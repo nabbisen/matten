@@ -122,14 +122,13 @@ sign-off and implementation — not that the state is unused.
 
 | ID | Title | Handoff |
 |---:|---|---|
-| — | *(none at present)* | — |
+| 096 | [Grid Rendering in the Shape and Axis Example](./accepted/096-example-grid-rendering.md) — RFC-095's fix applied to a shipped example; formatter stays local, and the example asserts its own rendered block | [handoff](./handoffs/096-example-grid-rendering-handoff.md) |
 
 ## Proposed
 
 | ID | Title | Scope |
 |---:|---|---|
 | 076 | [v1.0 Release Preparation](./proposed/076-v1-release-preparation.md) | Reviewed and accepted (GO, no conditions); its inventory refreshed by RFC-081 (five-crate family, matten-mlprep production-ready, matten-stats row added, RFC-081 §3 precondition added). RFC-081's precondition is now **discharged** — `matten-stats` took **Exit A (promotion)** via RFC-084 — but this RFC remains deferred and no implementation is authorized: v1.0 is not currently wanted, a separate and unrelated reason |
-| 096 | [Grid Rendering in the Shape and Axis Example](./proposed/096-example-grid-rendering.md) | Proposed. The defect the owner found on the playground still ships in `57_visual_shape_axis_summary`: Reshape prints two identical value lists while a `meaning` line asserts what the output should have shown. Reaches further than RFC-095 did — an example runs from a `cargo run` in an installed crate, where the page needs a reader to find a URL. **Scope is one function**: a repo-wide grep across all 78 examples finds this form in exactly one file. Keeps the formatter **local to the example** rather than adding a public helper to core (RFC-002 minimalism; it would be core's first formatting API) or importing the playground's (workspace-excluded and `publish = false`). Deliberately does **not** inherit the report-tool constants: truncation at 12 columns is dead code for 3-column tensors, and `{:.3}` adds noise to hand-chosen values. Amended before acceptance with the qualification its first draft missed: a local formatter moves logic that has **nine unit tests** into a file that cannot hold effective ones — a `#[test]` injected into an example and run with `cargo test --examples` executes **0 tests** — so the example must **assert its own rendered block**, padding included, which CI's `cargo run` then executes. Records honestly that it adds **no guard**, with the reason |
 
 ## Remaining Themes And Issues
 
