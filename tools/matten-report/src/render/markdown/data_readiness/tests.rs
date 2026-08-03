@@ -53,7 +53,12 @@ strict conversion: success
 
 ## Tensor preview
 shape: [3, 2]
-row-major values: [100.0, 40.0, 150.0, 45.0, 120.0, 55.0]
+row-major values:
+```text
+100.0 40.0
+150.0 45.0
+120.0 55.0
+```
 "
     );
 }

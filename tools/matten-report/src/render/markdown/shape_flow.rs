@@ -1,6 +1,7 @@
 use std::error::Error;
 use std::fmt::Write as _;
 
+use super::grid::{debug_cell, render_matrix_block};
 use crate::report::shape_flow::ShapeFlowReportData;
 use crate::request::KIND_SHAPE_FLOW;
 
@@ -26,7 +27,17 @@ pub(crate) fn render(data: &ShapeFlowReportData) -> Result<String, Box<dyn Error
         "shape flow: {:?} + {:?} -> {:?}",
         data.broadcast.input_a_shape, data.broadcast.input_b_shape, data.broadcast.result_shape
     )?;
-    writeln!(report, "result values: {:?}", data.broadcast.result_values)?;
+    writeln!(report, "result values:")?;
+    writeln!(
+        report,
+        "{}",
+        render_matrix_block(
+            data.broadcast.result_shape[0],
+            data.broadcast.result_shape[1],
+            &data.broadcast.result_values,
+            debug_cell
+        )
+    )?;
     writeln!(report)?;
 
     writeln!(report, "## Reshape")?;
@@ -37,7 +48,17 @@ pub(crate) fn render(data: &ShapeFlowReportData) -> Result<String, Box<dyn Error
         "shape flow: {:?} -> {:?}",
         data.reshape.input_shape, data.reshape.result_shape
     )?;
-    writeln!(report, "result values: {:?}", data.reshape.result_values)?;
+    writeln!(report, "result values:")?;
+    writeln!(
+        report,
+        "{}",
+        render_matrix_block(
+            data.reshape.result_shape[0],
+            data.reshape.result_shape[1],
+            &data.reshape.result_values,
+            debug_cell
+        )
+    )?;
     writeln!(report)?;
 
     writeln!(report, "## Axis reductions")?;
@@ -73,7 +94,17 @@ pub(crate) fn render(data: &ShapeFlowReportData) -> Result<String, Box<dyn Error
         "shape flow: {:?} @ {:?} -> {:?}",
         data.matmul.left_shape, data.matmul.right_shape, data.matmul.result_shape
     )?;
-    writeln!(report, "result values: {:?}", data.matmul.result_values)?;
+    writeln!(report, "result values:")?;
+    writeln!(
+        report,
+        "{}",
+        render_matrix_block(
+            data.matmul.result_shape[0],
+            data.matmul.result_shape[1],
+            &data.matmul.result_values,
+            debug_cell
+        )
+    )?;
 
     Ok(report)
 }

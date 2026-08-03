@@ -1,6 +1,7 @@
 use std::error::Error;
 use std::fmt::Write as _;
 
+use super::grid::{debug_cell, render_matrix_block};
 use crate::report::data_readiness::{DataReadinessConversion, DataReadinessReportData};
 
 pub(crate) fn render(data: &DataReadinessReportData) -> Result<String, Box<dyn Error>> {
@@ -42,7 +43,16 @@ pub(crate) fn render(data: &DataReadinessReportData) -> Result<String, Box<dyn E
             writeln!(report)?;
             writeln!(report, "## Tensor preview")?;
             writeln!(report, "shape: {tensor_shape:?}")?;
-            writeln!(report, "row-major values: {tensor_values:?}")?;
+            writeln!(report, "row-major values:")?;
+            // Table::to_tensor() always builds shape [rows, columns] (see
+            // crates/matten-data/src/numeric.rs) -- rank 2 unconditionally,
+            // for both this fixed demo and live --input mode, so this call
+            // is safe without a rank check.
+            writeln!(
+                report,
+                "{}",
+                render_matrix_block(tensor_shape[0], tensor_shape[1], tensor_values, debug_cell)
+            )?;
         }
         DataReadinessConversion::Error { message } => {
             writeln!(report, "strict conversion: error: {message}")?;

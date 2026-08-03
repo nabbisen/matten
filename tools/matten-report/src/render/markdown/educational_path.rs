@@ -1,6 +1,7 @@
 use std::error::Error;
 use std::fmt::Write as _;
 
+use super::grid::{debug_cell, render_matrix_block};
 use crate::render::common::format_fixed_values;
 use crate::report::educational_path::EducationalPathReportData;
 use crate::request::KIND_EDUCATIONAL_PATH;
@@ -32,7 +33,17 @@ pub(crate) fn render(data: &EducationalPathReportData) -> Result<String, Box<dyn
     )?;
     writeln!(report, "axis 1: left repeats across 4 columns")?;
     writeln!(report, "axis 0: right repeats across 3 rows")?;
-    writeln!(report, "result values: {:?}", data.broadcast.result_values)?;
+    writeln!(report, "result values:")?;
+    writeln!(
+        report,
+        "{}",
+        render_matrix_block(
+            data.broadcast.result_shape[0],
+            data.broadcast.result_shape[1],
+            &data.broadcast.result_values,
+            debug_cell
+        )
+    )?;
     writeln!(report)?;
 
     writeln!(report, "## Reshape and transpose")?;
@@ -41,20 +52,32 @@ pub(crate) fn render(data: &EducationalPathReportData) -> Result<String, Box<dyn
         "reshape: {:?} -> {:?}",
         data.reshape_transpose.input_shape, data.reshape_transpose.reshape_shape
     )?;
+    writeln!(report, "reshape values:")?;
     writeln!(
         report,
-        "reshape values: {:?}",
-        data.reshape_transpose.reshape_values
+        "{}",
+        render_matrix_block(
+            data.reshape_transpose.reshape_shape[0],
+            data.reshape_transpose.reshape_shape[1],
+            &data.reshape_transpose.reshape_values,
+            debug_cell
+        )
     )?;
     writeln!(
         report,
         "transpose: {:?} -> {:?}",
         data.reshape_transpose.input_shape, data.reshape_transpose.transpose_shape
     )?;
+    writeln!(report, "transpose values:")?;
     writeln!(
         report,
-        "transpose values: {:?}",
-        data.reshape_transpose.transpose_values
+        "{}",
+        render_matrix_block(
+            data.reshape_transpose.transpose_shape[0],
+            data.reshape_transpose.transpose_shape[1],
+            &data.reshape_transpose.transpose_values,
+            debug_cell
+        )
     )?;
     writeln!(
         report,
@@ -96,20 +119,42 @@ pub(crate) fn render(data: &EducationalPathReportData) -> Result<String, Box<dyn
         "shared inner dimension: {}",
         data.matmul.shared_inner_dimension
     )?;
-    writeln!(report, "result values: {:?}", data.matmul.result_values)?;
+    writeln!(report, "result values:")?;
+    writeln!(
+        report,
+        "{}",
+        render_matrix_block(
+            data.matmul.result_shape[0],
+            data.matmul.result_shape[1],
+            &data.matmul.result_values,
+            debug_cell
+        )
+    )?;
     writeln!(report)?;
 
     writeln!(report, "## Dynamic readiness")?;
     writeln!(report, "dynamic shape: {:?}", data.dynamic_readiness.shape)?;
+    writeln!(report, "none mask:")?;
     writeln!(
         report,
-        "none mask: {:?}",
-        data.dynamic_readiness.none_mask_values
+        "{}",
+        render_matrix_block(
+            data.dynamic_readiness.shape[0],
+            data.dynamic_readiness.shape[1],
+            &data.dynamic_readiness.none_mask_values,
+            debug_cell
+        )
     )?;
+    writeln!(report, "numeric mask: strict policy readiness")?;
     writeln!(
         report,
-        "numeric mask: strict policy readiness {:?}",
-        data.dynamic_readiness.numeric_mask_values
+        "{}",
+        render_matrix_block(
+            data.dynamic_readiness.shape[0],
+            data.dynamic_readiness.shape[1],
+            &data.dynamic_readiness.numeric_mask_values,
+            debug_cell
+        )
     )?;
     writeln!(
         report,

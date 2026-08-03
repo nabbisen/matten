@@ -1,14 +1,3 @@
-use super::render;
-
-#[test]
-fn educational_path_report_matches_expected_markdown() {
-    let data =
-        crate::report::educational_path::build().expect("educational-path data should build");
-    let report = render(&data).expect("educational-path report should render");
-
-    assert_eq!(
-        report,
-        "\
 # matten educational-path report
 
 ## Input
@@ -92,6 +81,3 @@ after column population std: [1.000, 1.000]
 - not source scanning
 - not a renderer
 - not model-quality analysis
-"
-    );
-}

@@ -1,14 +1,3 @@
-use super::render;
-
-#[test]
-fn mlprep_standardization_report_matches_expected_markdown() {
-    let data = crate::report::mlprep_standardization::build()
-        .expect("mlprep-standardization data should build");
-    let report = render(&data).expect("mlprep-standardization report should render");
-
-    assert_eq!(
-        report,
-        "\
 # matten mlprep-standardization report
 
 ## Input
@@ -45,6 +34,3 @@ column population std: [1.000, 1.000]
 shape flow: [3, 2] -> [3, 2]
 rows: samples unchanged
 columns: features unchanged
-"
-    );
-}

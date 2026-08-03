@@ -1,13 +1,3 @@
-use super::render;
-
-#[test]
-fn shape_flow_report_still_matches_expected_markdown() {
-    let data = crate::report::shape_flow::build();
-    let report = render(&data).expect("shape-flow report should render");
-
-    assert_eq!(
-        report,
-        "\
 # matten shape-flow report
 
 ## Input
@@ -53,6 +43,3 @@ result values:
 22.0 28.0
 49.0 64.0
 ```
-"
-    );
-}

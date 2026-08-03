@@ -66,6 +66,15 @@
 - [Methodology](./benchmarks/methodology.md)
 - [Results](./benchmarks/results.md)
 
+# Reports
+
+- [Overview](./reports/index.md)
+- [shape-flow](./reports/shape-flow.md)
+- [educational-path](./reports/educational-path.md)
+- [mlprep-standardization](./reports/mlprep-standardization.md)
+- [data-readiness](./reports/data-readiness.md)
+- [dynamic-readiness](./reports/dynamic-readiness.md)
+
 # Contributors
 
 - [Contributing](./contributing.md)

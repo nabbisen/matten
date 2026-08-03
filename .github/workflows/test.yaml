@@ -34,6 +34,8 @@ jobs:
         run: bash scripts/check-release-docs.sh
       - name: Book code blocks compile
         run: bash scripts/check-doc-code.sh
+      - name: Report demo freshness (RFC-097)
+        run: bash scripts/check-report-demos.sh
       - name: Clippy (workspace, all features)
         run: cargo clippy --workspace --all-targets --all-features -- -D warnings
       - name: Clippy core (no-default-features)

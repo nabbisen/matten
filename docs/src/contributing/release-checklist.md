@@ -27,6 +27,7 @@ bash scripts/check-benchmark-dependency-sync.sh  # benchmark harness ndarray pin
 bash scripts/check-streaming-scope.sh            # RFC-037 streaming / large-CSV anti-scope guard
 bash scripts/check-release-docs.sh               # doc-truth + examples naming-band guards
 bash scripts/check-doc-code.sh                   # every non-ignored ```rust block in docs/src compiles
+bash scripts/check-report-demos.sh               # docs/src/reports/*.md match matten-report's current output
 cargo clippy --all-targets --all-features -- -D warnings
 cargo clippy --all-targets --no-default-features -- -D warnings
 cargo clippy --all-targets --no-default-features --features dynamic -- -D warnings

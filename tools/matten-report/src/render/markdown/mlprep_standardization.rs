@@ -1,7 +1,8 @@
 use std::error::Error;
 use std::fmt::Write as _;
 
-use crate::render::common::format_fixed_values;
+use super::grid::render_matrix_block;
+use crate::render::common::{format_fixed_value, format_fixed_values};
 use crate::report::mlprep_standardization::MlprepStandardizationReportData;
 use crate::request::KIND_MLPREP_STANDARDIZATION;
 
@@ -28,10 +29,16 @@ pub(crate) fn render(data: &MlprepStandardizationReportData) -> Result<String, B
 
     writeln!(report, "## Before")?;
     writeln!(report, "shape: {:?}", data.input_shape)?;
+    writeln!(report, "row-major values:")?;
     writeln!(
         report,
-        "row-major values: {}",
-        format_fixed_values(&data.input_values)
+        "{}",
+        render_matrix_block(
+            data.input_shape[0],
+            data.input_shape[1],
+            &data.input_values,
+            format_fixed_value
+        )
     )?;
     writeln!(
         report,
@@ -47,10 +54,16 @@ pub(crate) fn render(data: &MlprepStandardizationReportData) -> Result<String, B
 
     writeln!(report, "## After")?;
     writeln!(report, "shape: {:?}", data.output_shape)?;
+    writeln!(report, "row-major values:")?;
     writeln!(
         report,
-        "row-major values: {}",
-        format_fixed_values(&data.output_values)
+        "{}",
+        render_matrix_block(
+            data.output_shape[0],
+            data.output_shape[1],
+            &data.output_values,
+            format_fixed_value
+        )
     )?;
     writeln!(
         report,

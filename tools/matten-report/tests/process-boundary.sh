@@ -124,7 +124,7 @@ assert_process_error() {
 }
 
 HELP_SHA256="0daaf8e57e0cc4471baa30d6b05bdef76efb265b665aa0ad3fd51e0415286930"
-MARKDOWN_SHA256="bdb6014f637455ed235af7eedcda0872b9161f76e362661bbbbe3fe8247e4c22"
+MARKDOWN_SHA256="b78cf8bdc12a74a33d6e0ad498e0be28405b3aed00f0cd098483addb26c5f5ac"
 JSON_SHA256="6491d3856293572e80f0388be6002703178336447f24afb330087c82ad680fac"
 INPUT_JSON_SHA256="84ec3f794c5ccf225bcf5fe88aa1f3d2043179492d776940fe5206c14cae7767"
 INPUT_ERROR_JSON_SHA256="f7c7125819e88635e21ab6c4a4769aee0f3a4ba3dc0e16dbfc20c1c82f267751"
@@ -148,7 +148,7 @@ cmp -s "$CASE_STDERR" "$CASE_DIR/html_requires_output.expected-stderr" ||
 
 run_case markdown_stdout --demo data-readiness
 assert_status markdown_stdout 0
-assert_fingerprint markdown_stdout "$CASE_STDOUT" 404 "$MARKDOWN_SHA256"
+assert_fingerprint markdown_stdout "$CASE_STDOUT" 409 "$MARKDOWN_SHA256"
 assert_empty markdown_stdout stderr "$CASE_STDERR"
 
 JSON_OUTPUT="$CASE_DIR/report.json"
