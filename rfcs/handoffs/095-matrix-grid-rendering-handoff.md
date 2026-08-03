@@ -138,6 +138,12 @@ Two hard constraints:
 `README.md` ships in the published crate, so that line reaches crates.io at the next release. Keep it
 to one sentence and a URL; it is the only part of this work that leaves the documentation site.
 
+> **Correction, 2026-08-02 — the paragraph above is wrong.** The ROOT `README.md` is not packaged.
+> Each crate's `readme` key resolves against its own directory, so `crates/matten/README.md` is
+> what ships; unpacking the built `.crate` shows zero playground links in it. The instruction as
+> written was followed correctly and reaches GitHub visitors only. Retained rather than rewritten,
+> because it is what the implementation was told.
+
 ## 6. Verification
 
 ```bash

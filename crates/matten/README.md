@@ -72,5 +72,6 @@ matten = { version = "0.42.0", default-features = false }
 ## More detail
 
 - Full documentation: [docs.rs](https://docs.rs/matten) (API reference) and [nabbisen.github.io/matten](https://nabbisen.github.io/matten/) (mdBook documentation).
+- Try it in the browser, nothing to install: the [Playground](https://nabbisen.github.io/matten/playground.html) runs a real WebAssembly build of this crate — broadcasting, reshape, axis reductions, and `matmul`, including the exact error text a shape mismatch produces.
 - Design and governance: the `rfcs/` pack and roadmap in the repository.
 - License: Apache-2.0 (see the root `LICENSE` and `NOTICE`).

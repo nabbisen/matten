@@ -6,7 +6,14 @@ rank > 2 is byte-identical to the pre-RFC-095 flat form, proven at the source ra
 sampled output. RFC-093 §6 was amended at acceptance. C1 was the nav still repeating —
 `Playground › Playground` rather than the old `Playground › Shape playground` — fixed by folding
 the page into `New users` and deleting the one-item section. Unreleased and unversioned, but the
-page deploys from a push to `main`, and the `README.md` link reaches crates.io at the next release
+page deploys from a push to `main`.
+
+**Correction, 2026-08-02.** This Status, §5.1 and the handoff all claimed the `README.md` link
+would reach crates.io at the next release. **It does not.** Each crate's `readme` key resolves
+relative to its own directory, so `crates/matten/README.md` is what is packaged — verified by
+unpacking the built `.crate`, where the link count is 0. The root `README.md` is GitHub-facing
+only. A separate link was added to `crates/matten/README.md` afterwards so the registry audience
+is actually reached; that one does ride to crates.io at the next release
 **Target:** Playground crate only; no published-crate change, no version, no release
 **Theme:** Show a matrix as a matrix, so reshape and broadcasting stop being invisible
 **Amends:** RFC-093 §6 — argued in §3, not assumed
