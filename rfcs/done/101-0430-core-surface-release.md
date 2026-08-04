@@ -1,10 +1,12 @@
 # RFC-101: `0.43.0` — Core Surface Release
 
-**Status:** **Prepared, not yet tagged** — implemented in commit *"Prepare 0.43.0 core surface
-release (RFC-101)"*, reviewed and **approved with no corrections**. All five crates at `0.43.0`,
-the measured strings retargeted with one correct exception (§5), the `[0.43.0]` CHANGELOG entry
-written `Added`-only. The tag and the publish remain unexecuted and require the owner's separate
-authorizations (§7)
+**Status:** **Released** — prepared in commit *"Prepare 0.43.0 core surface release (RFC-101)"*,
+reviewed and approved with no corrections, then tagged `0.43.0` (signed, on the *Prepare* commit)
+and published to crates.io on 2026-08-04. All five crates live at `0.43.0`, verified against the
+sparse index, none yanked; 103 of 103 tags resolve to ancestors of `main` and all are annotated.
+Published with a single `cargo publish --workspace`, the form that superseded RFC-091 §7's
+five-crate sequence. §5's table carried one error, corrected inline below: a historical narration
+counted as a live version pin, so 38 strings moved rather than 39
 **Target:** `0.43.0`, on the `0.x` line
 **Theme:** Release RFC-099 and RFC-100 — two additions to core's public surface
 **Depends on:** RFC-030, RFC-064, RFC-067, RFC-094, RFC-096, RFC-099, RFC-100
