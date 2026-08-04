@@ -1,6 +1,8 @@
 # RFC-101: `0.43.0` — Core Surface Release
 
-**Status:** Proposed
+**Status:** **Accepted** 2026-08-04 — preparation authorized under
+[the handoff](../handoffs/101-0430-core-surface-release-handoff.md). Preparation only: **no tag,
+no publish**, both separately authorized by the owner (§7)
 **Target:** `0.43.0`, on the `0.x` line
 **Theme:** Release RFC-099 and RFC-100 — two additions to core's public surface
 **Depends on:** RFC-030, RFC-064, RFC-067, RFC-094, RFC-096, RFC-099, RFC-100

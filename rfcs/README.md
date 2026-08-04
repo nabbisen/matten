@@ -127,7 +127,7 @@ sign-off and implementation — not that the state is unused.
 
 | ID | Title | Handoff |
 |---:|---|---|
-| — | *(none at present)* | — |
+| 101 | [`0.43.0` — Core Surface Release](./accepted/101-0430-core-surface-release.md) — the first release whose RFC-094 trigger fired on its own terms; Added-only, and the API snapshot needs content this time | [handoff](./handoffs/101-0430-core-surface-release-handoff.md) |
 
 ## Archive
 
@@ -143,7 +143,6 @@ Withdrawn or superseded. Numbers are never reused. See
 | ID | Title | Scope |
 |---:|---|---|
 | 076 | [v1.0 Release Preparation](./proposed/076-v1-release-preparation.md) | Reviewed and accepted (GO, no conditions); its inventory refreshed by RFC-081 (five-crate family, matten-mlprep production-ready, matten-stats row added, RFC-081 §3 precondition added). RFC-081's precondition is now **discharged** — `matten-stats` took **Exit A (promotion)** via RFC-084 — but this RFC remains deferred and no implementation is authorized: v1.0 is not currently wanted, a separate and unrelated reason |
-| 101 | [`0.43.0` — Core Surface Release](./proposed/101-0430-core-surface-release.md) | Proposed. **The first release whose RFC-094 trigger actually fired** — two themes landed unreleased, RFC-099's `try_dot`/`try_matmul` and RFC-100's `Display`, where `0.42.0` had to record an owner override because its trigger had not. Two things invert from that release and both are called out: it is **Added-only**, so no `Changed` section, and `public-api-snapshot.md` needs a **content** update rather than the number-only treatment RFC-091 §5 required, because core's surface genuinely changed this time. Carries RFC-093's O1 observation, now due, and the `crates/matten/README.md` playground link reaching crates.io for the first time. §7 records that publishing is now one `cargo publish --workspace` command, superseding RFC-091 §7's five-crate sequence |
 
 ## Remaining Themes And Issues
 
