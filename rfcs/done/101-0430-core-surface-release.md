@@ -1,8 +1,10 @@
 # RFC-101: `0.43.0` — Core Surface Release
 
-**Status:** **Accepted** 2026-08-04 — preparation authorized under
-[the handoff](../handoffs/101-0430-core-surface-release-handoff.md). Preparation only: **no tag,
-no publish**, both separately authorized by the owner (§7)
+**Status:** **Prepared, not yet tagged** — implemented in commit *"Prepare 0.43.0 core surface
+release (RFC-101)"*, reviewed and **approved with no corrections**. All five crates at `0.43.0`,
+the measured strings retargeted with one correct exception (§5), the `[0.43.0]` CHANGELOG entry
+written `Added`-only. The tag and the publish remain unexecuted and require the owner's separate
+authorizations (§7)
 **Target:** `0.43.0`, on the `0.x` line
 **Theme:** Release RFC-099 and RFC-100 — two additions to core's public surface
 **Depends on:** RFC-030, RFC-064, RFC-067, RFC-094, RFC-096, RFC-099, RFC-100
@@ -109,6 +111,13 @@ docs/src/reference/public-api-snapshot.md     1
 (11), `rfcs/**` (31).
 
 Re-measure before starting — this RFC's own text adds occurrences under `rfcs/`.
+
+> **Corrected 2026-08-04.** One of the 39 is **not** live. `release-checklist.md:261` narrates
+> *when* the five-crate publish sequence was replaced — *"as late as the `0.42.0` release"* —
+> so retargeting it would assert the switchover happened during this release rather than the
+> previous one. It was correctly left at `0.42.0`; **38** strings moved, not 39. A `0\.42\b`
+> measurement finds a version number but cannot tell a current-release citation from a
+> past-release narration, and this table did not account for that.
 
 ### 5.1 Both bare-form sites need CONTENT this time — the inverse of `0.42.0`
 
