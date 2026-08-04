@@ -125,7 +125,7 @@ sign-off and implementation — not that the state is unused.
 
 | ID | Title | Handoff |
 |---:|---|---|
-| — | *(none at present)* | — |
+| 099 | [Result-Form `try_matmul` and `try_dot`](./accepted/099-result-form-matmul.md) — close the last panic-only hole in core; every existing message byte-identical | [handoff](./handoffs/099-result-form-matmul-handoff.md) |
 
 ## Archive
 
@@ -141,7 +141,6 @@ Withdrawn or superseded. Numbers are never reused. See
 | ID | Title | Scope |
 |---:|---|---|
 | 076 | [v1.0 Release Preparation](./proposed/076-v1-release-preparation.md) | Reviewed and accepted (GO, no conditions); its inventory refreshed by RFC-081 (five-crate family, matten-mlprep production-ready, matten-stats row added, RFC-081 §3 precondition added). RFC-081's precondition is now **discharged** — `matten-stats` took **Exit A (promotion)** via RFC-084 — but this RFC remains deferred and no implementation is authorized: v1.0 is not currently wanted, a separate and unrelated reason |
-| 099 | [Result-Form `try_matmul` and `try_dot`](./proposed/099-result-form-matmul.md) | Proposed. **Robustness, not capability** — the split of RFC-098 after the owner asked whether that recommendation was oriented to safety or functionality; it was functionality, and bundling a fix to shipped API with a new feature meant declining the feature would decline the fix. `dot`/`matmul` are **2 of 43** core operations that panic with no `Result` form, a shape RFC-010 §167 specified years ago. The one real hazard is concrete and measured: `dot`'s dynamic guard is bespoke and differs from the shared helper, so the obvious refactor silently changes a user-visible message — and the verifier already exists, in the live `catch_unwind` tests RFC-095 C1 added |
 
 ## Remaining Themes And Issues
 
