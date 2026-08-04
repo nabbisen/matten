@@ -26,6 +26,32 @@ crates are expressed by per-crate status labels, not by separate version numbers
 > trigger — unfired across eight consecutive releases before RFC-074 found
 > it — a mandatory per-entry check rather than a rule that only an RFC states.
 
+## [0.43.0] - 2026-08-04
+
+Core surface release. Publishes RFC-099 and RFC-100, two additions to core `matten`'s public
+API, and carries RFC-096's grid rendering in `crates/matten/examples/57_visual_shape_axis_summary.rs`
+and the `crates/matten/README.md` playground link, both reaching crates.io for the first time.
+
+### Added
+
+- core `matten`: `try_dot`/`try_matmul` (RFC-099), returning `Result<Tensor, MattenError>`.
+  Core's last two panic-only operations gain Result forms, matching the 41 `try_*` functions
+  that already existed. The same inputs succeed and fail exactly as before — the panicking
+  `dot`/`matmul` are unchanged, including every message, verified against captures taken before
+  the work; what is new is being able to handle the failure instead of only catching a panic.
+- core `matten`: `Display for Tensor` (RFC-100). Rank ≤ 2 renders as a right-aligned grid,
+  `{:?}` per cell so a whole number renders `1.0`, never `1`; rank > 2 falls back to the
+  existing flat `shape=... values=...` form. A rank-1 row truncates past 12 values and a rank-2
+  grid past 12 columns; `{:#}` (the alternate flag) disables truncation. Dynamic tensors render
+  too, with `Float` kept visually distinct from `Int` at the same value. `Debug` is unchanged,
+  byte-for-byte — RFC-020 still owns it, and the two forms are deliberately different: `Debug`
+  for developers, `Display` for humans.
+
+### Version
+
+- Release bump `0.42.0` -> `0.43.0`. Lock-step family versioning applies to all five published
+  crates; none carries a behavior change beyond the two additions above.
+
 ## [0.42.0] - 2026-08-01
 
 RFC-090 statistics release. Publishes `matten-stats`'s `histogram`, the smallest release the

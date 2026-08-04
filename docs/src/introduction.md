@@ -16,9 +16,10 @@ This book is organized by reader:
 - **Reference** — the rules that shape the public API.
 - **Contributors** — project layout, milestones, and process.
 
-> This documentation tracks the current 0.42 release family, an RFC-090 release
-> publishing one `matten-stats` addition: `histogram` (`bins` is a required
-> argument; there is no automatic bin-count rule) — without any other public
-> API or dependency change. Core `matten`'s public surface is untouched by
-> this release. Two `matten-stats` error message strings also changed
-> (`ZeroVariance`, `NonFiniteValue`) — see the `[0.42.0]` CHANGELOG entry.
+> This documentation tracks the current 0.43 release family, an RFC-099 and
+> RFC-100 release adding two things to core `matten`'s public surface:
+> `try_dot`/`try_matmul` (Result forms for the last two panic-only operations;
+> the panicking `dot`/`matmul` are unchanged, including every message) and
+> `Display` for `Tensor` (an aligned grid for rank ≤ 2, the existing flat form
+> above it; `Debug` is unchanged). No existing behavior changed — see the
+> `[0.43.0]` CHANGELOG entry.
