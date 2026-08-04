@@ -52,6 +52,16 @@ when called on a dynamic tensor. Call `try_numeric()` to convert first.
 | `as_slice`, `to_vec`, `into_vec`, `get`, `get_flat` | panic |
 | `From<Tensor> for Vec<f64>`, `From<&Tensor>`, `TryFrom` | panic / `Err` |
 | `Serialize` | returns serde error |
+| `Display` | **renders**, not panic — the one group where dynamic is the intended use (RFC-100 §5.5); cells use `Element`'s own `Display`, except `Float`, which uses `{:?}` on the inner `f64` (review C1) so it stays distinct from `Int` |
+
+## `Tensor` — formatting (RFC-100)
+
+| Trait | Notes |
+|---|---|
+| `Debug` (`{:?}`) | single-line, truncated at 8 elements; unchanged by RFC-100 (RFC-020 owns it) |
+| `Display` (`{}`) | rank 0/1/2 as a right-aligned grid, `{:?}` per cell; rank > 2 falls back to `shape=... values=...`; rank-1 truncates past 12 values, rank-2 past 12 columns; `{:#}` disables truncation; renders on dynamic tensors using `Element`'s own `Display`, except `Float` (`{:?}` on the inner `f64`, so it stays distinct from `Int` — review C1) |
+
+See [Display / formatting](./math.md#display--formatting-rfc-100) for the full contract and examples.
 
 ## `Tensor` — construction
 

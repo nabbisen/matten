@@ -11,72 +11,21 @@ use matten::Tensor;
 /// Renders a tensor as an aligned rank-2 grid, a rank-1 row, or the rank-0
 /// scalar, so Reshape's two blocks visibly *look* different instead of
 /// printing two identical value lists (RFC-096, applying RFC-095's playground
-/// fix here too). Natural float rendering (`{:?}`, not `{:.3}`) — this file's
-/// values are hand-chosen teaching numbers like `1.0`, and forcing three
-/// decimal places would add noise for no gain (RFC-096 §5). `{:?}`, not `{}`:
-/// `matten`'s only element type is `f64`, and `Display` drops the `.0` on
-/// whole numbers, which would make a matrix of floats read as one of ints —
-/// worse than the flat list this RFC set out to fix. The rank > 2 arm is
-/// kept for safety even though no tensor in this file reaches it.
-///
-/// Deliberately local to this example, not a core `matten` public helper or
-/// an import of the playground's formatter (RFC-096 §4): a presentation
-/// concern for one example does not earn core public surface, and the
-/// playground crate is workspace-excluded and unpublishable. Because this
-/// logic cannot be unit-tested — examples build as binaries, so `#[test]`
-/// inside one never runs — every call site below asserts the exact rendered
-/// block, padding included, before printing it.
+/// fix here too). Uses core `Tensor`'s own `Display` (RFC-100) for the
+/// values; this file only adds the `label` / `shape=` header line Display
+/// deliberately does not print, since Display has no notion of a caller
+/// label. Rank ≤ 2's header is separate from the grid because `Display`
+/// itself omits shape for those ranks; rank > 2's `Display` already includes
+/// `shape=... values=...` (RFC-100 §5.3), so only the label is prepended
+/// there. Because this cannot be unit-tested — examples build as binaries,
+/// so `#[test]` inside one never runs — every call site below asserts the
+/// exact rendered block, padding included, before printing it.
 fn render_block(label: &str, t: &Tensor) -> String {
-    let shape = t.shape();
-    let header = format!("{label:<16} shape={shape:?}");
-    match shape.len() {
-        0 => format!("{header}\n{}", t.as_slice()[0]),
-        1 => format!("{header}\n{}", render_row(t.as_slice())),
-        2 => format!(
-            "{header}\n{}",
-            render_matrix(t.as_slice(), shape[0], shape[1])
-        ),
-        _ => format!("{label:<16} shape={shape:?} values={:?}", t.as_slice()),
+    if t.shape().len() <= 2 {
+        format!("{label:<16} shape={:?}\n{t}", t.shape())
+    } else {
+        format!("{label:<16} {t}")
     }
-}
-
-fn render_row(values: &[f64]) -> String {
-    let cells: Vec<String> = values.iter().map(|v| format!("{v:?}")).collect();
-    let width = cells.iter().map(String::len).max().unwrap_or(0);
-    cells
-        .iter()
-        .map(|c| format!("{c:>width$}"))
-        .collect::<Vec<_>>()
-        .join(" ")
-}
-
-fn render_matrix(values: &[f64], rows: usize, cols: usize) -> String {
-    let formatted: Vec<Vec<String>> = (0..rows)
-        .map(|r| {
-            (0..cols)
-                .map(|c| format!("{:?}", values[r * cols + c]))
-                .collect()
-        })
-        .collect();
-
-    let mut widths = vec![0usize; cols];
-    for row in &formatted {
-        for (c, cell) in row.iter().enumerate() {
-            widths[c] = widths[c].max(cell.len());
-        }
-    }
-
-    formatted
-        .iter()
-        .map(|row| {
-            row.iter()
-                .enumerate()
-                .map(|(c, cell)| format!("{cell:>w$}", w = widths[c]))
-                .collect::<Vec<_>>()
-                .join(" ")
-        })
-        .collect::<Vec<_>>()
-        .join("\n")
 }
 
 fn main() {

@@ -229,6 +229,87 @@ let flat: Vec<f64> = tensor.into_vec();
 // hand off to your preferred crate
 ```
 
+## Display / formatting (RFC-100)
+
+`Tensor` implements `Display` (`{}`) for a human-facing rendering, distinct from the
+single-line `Debug` (`{:?}`) used for diagnostics:
+
+```rust
+use matten::Tensor;
+
+let t = Tensor::new(vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0], &[2, 3]);
+assert_eq!(t.to_string(), "1.0 2.0 3.0\n4.0 5.0 6.0");
+assert_eq!(
+    format!("{t:?}"),
+    "Tensor(shape=[2, 3], data=[1.0, 2.0, 3.0, 4.0, 5.0, 6.0])"
+);
+```
+
+Rank 0 is the bare scalar; rank 1 is one right-aligned row; rank 2 is a right-aligned grid,
+per-column widths, no brackets and no commas — matching what this project already renders
+elsewhere rather than `ndarray`'s `[[1, 2], [3, 4]]` syntax:
+
+```rust
+use matten::Tensor;
+
+assert_eq!(Tensor::scalar(3.5).to_string(), "3.5");
+assert_eq!(Tensor::new(vec![1.0, 2.0, 3.0], &[3]).to_string(), "1.0 2.0 3.0");
+```
+
+Every cell uses `{:?}` (Debug) formatting, not bare `Display` — `matten`'s only element type
+is `f64`, and bare `Display` drops the `.0` on whole numbers, which would make a grid of
+floats read as one of integers:
+
+```rust
+use matten::Tensor;
+// Deliberately diverges from ndarray, which prints "1" here, not "1.0".
+assert_eq!(Tensor::new(vec![1.0, 2.0], &[2]).to_string(), "1.0 2.0");
+```
+
+Rank > 2 has no honest 2-D arrangement, so it falls back to the flat form used before this
+RFC existed:
+
+```rust
+use matten::Tensor;
+let t = Tensor::new((1..=8).map(|x| x as f64).collect(), &[2, 2, 2]);
+assert_eq!(
+    t.to_string(),
+    "shape=[2, 2, 2] values=[1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0]"
+);
+```
+
+A rank-1 row truncates past 12 values, and a rank-2 grid truncates past 12 columns, so
+`Display` on a huge tensor cannot flood a terminal. `{:#}` (the alternate flag) disables
+truncation:
+
+```rust
+use matten::Tensor;
+let row: Vec<f64> = (1..=13).map(|x| x as f64).collect();
+let t = Tensor::new(row, &[13]);
+assert!(t.to_string().ends_with("... 1 more values"));
+assert!(!format!("{t:#}").contains("more values"));
+```
+
+On a dynamic tensor (`#[cfg(feature = "dynamic")]`), each cell renders via `Element`'s own
+`Display` in the same grid, **except `Float`**, which uses `{:?}` on the inner `f64` instead
+so a whole-number float stays visibly distinct from an `Int` of the same value — a dynamic
+tensor exists precisely to carry mixed types in one grid, and `Element`'s own `Display`
+alone would render `Float(2.0)` and `Int(2)` identically as `2`:
+
+```rust
+use matten::{Element, Tensor};
+
+let t = Tensor::from_elements(
+    vec![Element::Float(2.0), Element::Int(2), Element::Float(1.5), Element::Int(7)],
+    &[2, 2],
+);
+assert_eq!(t.to_string(), "2.0 2\n1.5 7");
+```
+
+`Debug` is unchanged by this RFC — it stays the single-line, truncated-at-8 diagnostic form
+RFC-020 defined, and is still the better choice for logs. `Display` is for a human looking at
+the data.
+
 ## See also
 
 For the three linalg-adjacent helpers `norm`, `trace`, and `outer` — and the list

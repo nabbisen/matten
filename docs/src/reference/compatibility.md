@@ -107,10 +107,12 @@ future release; it will not be raised without a documented breaking change.
 
 ## Formatting contract
 
-`Tensor` implements `Debug` for compact inspection output. `Tensor` does not
-implement `Display`, and matrix-like display formatting is not part of the
-current public contract. Any future `Display` format should be designed
-separately because documented formatting becomes a compatibility surface.
+`Tensor` implements `Debug` for compact, single-line inspection output, and — as of RFC-100 —
+`Display` for a human-facing rendering: rank 0/1/2 as a right-aligned grid, rank > 2 as a flat
+`shape=... values=...` list, truncated past 12 values/columns unless `{:#}` is used. See
+[Display / formatting](./math.md#display--formatting-rfc-100) for the full contract. Both are
+now a documented compatibility surface — a change to either's exact output is a breaking
+change to be treated with the same care as any other public API.
 
 ## Deferred items
 
@@ -118,7 +120,7 @@ The following items were considered and explicitly deferred:
 
 | Item | Status | Reason |
 |---|---|---|
-| `Display` for `Tensor` | Not implemented | Formatting contract deferred to a future design decision. |
+| `Display` for `Tensor` | **Implemented** | RFC-100: rank ≤ 2 as a right-aligned grid, rank > 2 flat; see the Formatting contract section above. |
 | `is_empty()` | Deferred | Zero-sized dims rejected; always false. Future RFC. |
 | `set_flat` | Not implemented | Mutation API deferred. |
 | `arange` max elements | `1<<20` (~1 M) | Lowered from `1<<28` in v0.12.0 for OOM safety. |

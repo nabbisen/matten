@@ -495,6 +495,8 @@ fn arange_impl(
 
 // Shape operations, slicing, and boundary integration (split per 300-ELOC rule).
 mod ops;
+// Display (RFC-100), split per the same 300-ELOC rule. Debug stays here — RFC-020 owns it.
+mod display;
 
 #[cfg(test)]
 mod tests;
