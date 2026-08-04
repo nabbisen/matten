@@ -130,9 +130,15 @@ assert_eq!(d.as_slice(), &[32.0]); // 1*4 + 2*5 + 3*6
 
 `dot` on two vectors `[n]` and `[n]` returns a **scalar tensor** (shape `[]`).
 
+`try_dot` returns `Result<Tensor, MattenError>` instead of panicking: `MattenError::Shape`
+on incompatible shapes or an unsupported rank combination, `MattenError::Unsupported` on a
+dynamic tensor (call `try_numeric()` on each operand first). `dot` delegates to `try_dot`
+and panics with the same message on error.
+
 ## Matrix multiplication
 
-`matmul` is an alias for `dot`. Use whichever reads more clearly.
+`matmul` is an alias for `dot`, including its `try_matmul`/`try_dot` non-panicking form.
+Use whichever reads more clearly.
 
 | Left shape | Right shape | Result shape |
 |---|---|---|
@@ -170,7 +176,8 @@ let c = a.matmul(&b);
 assert_eq!(c.as_slice(), &[19.0, 22.0, 43.0, 50.0]);
 ```
 
-Incompatible shapes panic with an actionable message including both shapes.
+Incompatible shapes panic with an actionable message including both shapes, or with
+`try_matmul`, return `Err(MattenError::Shape { .. })` with the same message.
 Batched matmul (rank > 2) is out of scope for the numeric core.
 
 

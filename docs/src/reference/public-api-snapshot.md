@@ -48,7 +48,7 @@ when called on a dynamic tensor. Call `try_numeric()` to convert first.
 | `slice()` builder, `slice_str()` | returns `MattenError::Unsupported` |
 | Arithmetic operators, scalar operators | panic |
 | Reductions (`sum`, `mean`, `min`, `max`, `norm`, `*_axis`) | panic; non-panicking `try_*` forms return `Unsupported` (and `Shape` for axis) |
-| `dot` / `matmul` | panic |
+| `dot` / `matmul` | panic; non-panicking `try_dot` / `try_matmul` forms return `Unsupported` (bespoke `dot/matmul` message) and `Shape` |
 | `as_slice`, `to_vec`, `into_vec`, `get`, `get_flat` | panic |
 | `From<Tensor> for Vec<f64>`, `From<&Tensor>`, `TryFrom` | panic / `Err` |
 | `Serialize` | returns serde error |
@@ -192,6 +192,8 @@ All panic on dynamic tensors (except `try_clip`, which returns `Unsupported`).
 | `try_argmin()` / `try_argmax()` | `Result<usize>` | `InvalidArgument` on NaN; `Unsupported` on dynamic |
 | `dot(rhs)` | `Tensor` | 4 shape cases; panics on dynamic |
 | `matmul(rhs)` | `Tensor` | alias for `dot`; panics on dynamic |
+| `try_dot(rhs)` | `Result<Tensor, MattenError>` | `Shape` on the 4 shape cases; `Unsupported` on dynamic (bespoke `dot/matmul` message, RFC-099) |
+| `try_matmul(rhs)` | `Result<Tensor, MattenError>` | delegates to `try_dot` (RFC-099) |
 
 ## `Tensor` — linalg core-lite (numeric Tensor, RFC-041)
 

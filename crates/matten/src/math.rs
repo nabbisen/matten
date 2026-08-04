@@ -514,7 +514,8 @@ impl Tensor {
     ///
     /// # Panics
     ///
-    /// Panics on incompatible shapes or unsupported rank combinations.
+    /// Panics on incompatible shapes or unsupported rank combinations. For a
+    /// non-panicking form, see [`Tensor::try_dot`].
     ///
     /// ```
     /// use matten::Tensor;
@@ -535,11 +536,32 @@ impl Tensor {
     /// ```
     #[must_use]
     pub fn dot(&self, rhs: &Tensor) -> Tensor {
+        self.try_dot(rhs).unwrap_or_else(|e| panic!("{e}"))
+    }
+
+    /// Non-panicking [`Tensor::dot`].
+    ///
+    /// # Errors
+    /// Returns [`MattenError::Unsupported`] if either operand is a dynamic tensor
+    /// (call [`try_numeric`](crate::Tensor::try_numeric) on each operand first), or
+    /// [`MattenError::Shape`] on incompatible shapes or an unsupported rank
+    /// combination.
+    ///
+    /// ```
+    /// use matten::Tensor;
+    /// let a = Tensor::from_vec(vec![1.0, 2.0, 3.0]);
+    /// let b = Tensor::from_vec(vec![4.0, 5.0, 6.0]);
+    /// assert_eq!(a.try_dot(&b).unwrap().as_slice(), &[32.0]);
+    /// ```
+    pub fn try_dot(&self, rhs: &Tensor) -> Result<Tensor, MattenError> {
         #[cfg(feature = "dynamic")]
         if self.is_dynamic() || rhs.is_dynamic() {
-            panic!(
-                "matten unsupported error in dot/matmul: not supported on dynamic tensors; call try_numeric() on each operand first"
-            );
+            return Err(MattenError::Unsupported {
+                operation: "dot/matmul",
+                message:
+                    "not supported on dynamic tensors; call try_numeric() on each operand first"
+                        .to_string(),
+            });
         }
         matmul_dispatch(self, rhs, "dot")
     }
@@ -559,80 +581,98 @@ impl Tensor {
     /// ```
     #[must_use]
     pub fn matmul(&self, rhs: &Tensor) -> Tensor {
-        // Delegates to dot() which contains the dynamic guard.
-        self.dot(rhs)
+        self.try_matmul(rhs).unwrap_or_else(|e| panic!("{e}"))
+    }
+
+    /// Non-panicking [`Tensor::matmul`]; delegates to [`Tensor::try_dot`], which
+    /// contains the dynamic guard.
+    ///
+    /// # Errors
+    /// See [`Tensor::try_dot`].
+    ///
+    /// ```
+    /// use matten::Tensor;
+    /// let a = Tensor::new(vec![1.0,2.0,3.0,4.0], &[2,2]);
+    /// let b = Tensor::new(vec![5.0,6.0,7.0,8.0], &[2,2]);
+    /// assert_eq!(a.try_matmul(&b).unwrap().as_slice(), &[19.0, 22.0, 43.0, 50.0]);
+    /// ```
+    pub fn try_matmul(&self, rhs: &Tensor) -> Result<Tensor, MattenError> {
+        self.try_dot(rhs)
     }
 }
 
-fn matmul_dispatch(lhs: &Tensor, rhs: &Tensor, op: &'static str) -> Tensor {
+fn matmul_dispatch(lhs: &Tensor, rhs: &Tensor, op: &'static str) -> Result<Tensor, MattenError> {
     match (lhs.ndim(), rhs.ndim()) {
         (1, 1) => vv_dot(lhs, rhs, op),
         (2, 1) => mv_mul(lhs, rhs, op),
         (1, 2) => vm_mul(lhs, rhs, op),
         (2, 2) => mm_mul(lhs, rhs, op),
-        _ => panic!(
-            "matten shape error in {op}: unsupported rank combination \
-             (left rank {}, right rank {}); supported: [n]×[n], [m,n]×[n], [n]×[n,p], [m,n]×[n,p]",
-            lhs.ndim(),
-            rhs.ndim()
-        ),
+        _ => Err(MattenError::Shape {
+            operation: op,
+            message: format!(
+                "unsupported rank combination \
+                 (left rank {}, right rank {}); supported: [n]×[n], [m,n]×[n], [n]×[n,p], [m,n]×[n,p]",
+                lhs.ndim(),
+                rhs.ndim()
+            ),
+        }),
     }
 }
 
 /// `[n] · [n] -> []` scalar tensor.
-fn vv_dot(a: &Tensor, b: &Tensor, op: &'static str) -> Tensor {
+fn vv_dot(a: &Tensor, b: &Tensor, op: &'static str) -> Result<Tensor, MattenError> {
     let n = a.len();
     if b.len() != n {
-        panic!(
-            "matten shape error in {op}: vector lengths must match (left {n}, right {})",
-            b.len()
-        );
+        return Err(MattenError::Shape {
+            operation: op,
+            message: format!("vector lengths must match (left {n}, right {})", b.len()),
+        });
     }
     let v: f64 = a.data.iter().zip(&b.data).map(|(x, y)| x * y).sum();
-    Tensor::scalar(v)
+    Ok(Tensor::scalar(v))
 }
 
 /// `[m, n] × [n] -> [m]`.
-fn mv_mul(a: &Tensor, b: &Tensor, op: &'static str) -> Tensor {
-    let [m, n] = shape2(a, op);
-    dim_check(n, b.len(), "left columns", "right length", op);
+fn mv_mul(a: &Tensor, b: &Tensor, op: &'static str) -> Result<Tensor, MattenError> {
+    let [m, n] = shape2(a, op)?;
+    dim_check(n, b.len(), "left columns", "right length", op)?;
     let mut out = vec![0.0f64; m];
     for (i, o) in out.iter_mut().enumerate() {
         for k in 0..n {
             *o += a.data[i * n + k] * b.data[k];
         }
     }
-    Tensor {
+    Ok(Tensor {
         data: out,
         shape: vec![m],
         #[cfg(feature = "dynamic")]
         dynamic: None,
-    }
+    })
 }
 
 /// `[n] × [n, p] -> [p]`.
-fn vm_mul(a: &Tensor, b: &Tensor, op: &'static str) -> Tensor {
-    let [n, p] = shape2(b, op);
-    dim_check(a.len(), n, "left length", "right rows", op);
+fn vm_mul(a: &Tensor, b: &Tensor, op: &'static str) -> Result<Tensor, MattenError> {
+    let [n, p] = shape2(b, op)?;
+    dim_check(a.len(), n, "left length", "right rows", op)?;
     let mut out = vec![0.0f64; p];
     for k in 0..n {
         for (j, slot) in out.iter_mut().enumerate() {
             *slot += a.data[k] * b.data[k * p + j];
         }
     }
-    Tensor {
+    Ok(Tensor {
         data: out,
         shape: vec![p],
         #[cfg(feature = "dynamic")]
         dynamic: None,
-    }
+    })
 }
 
 /// `[m, n] × [n, p] -> [m, p]`.
-fn mm_mul(a: &Tensor, b: &Tensor, op: &'static str) -> Tensor {
-    let [m, n] = shape2(a, op);
-    let [nb, p] = shape2(b, op);
-    dim_check(n, nb, "left columns", "right rows", op);
+fn mm_mul(a: &Tensor, b: &Tensor, op: &'static str) -> Result<Tensor, MattenError> {
+    let [m, n] = shape2(a, op)?;
+    let [nb, p] = shape2(b, op)?;
+    dim_check(n, nb, "left columns", "right rows", op)?;
     let mut out = vec![0.0f64; m * p];
     for (i, row) in out.chunks_mut(p).enumerate() {
         for (j, slot) in row.iter_mut().enumerate() {
@@ -643,29 +683,40 @@ fn mm_mul(a: &Tensor, b: &Tensor, op: &'static str) -> Tensor {
             *slot = acc;
         }
     }
-    Tensor {
+    Ok(Tensor {
         data: out,
         shape: vec![m, p],
         #[cfg(feature = "dynamic")]
         dynamic: None,
-    }
+    })
 }
 
-/// Extracts shape `[d0, d1]` from a rank-2 tensor; panics on wrong rank.
-fn shape2(t: &Tensor, op: &'static str) -> [usize; 2] {
+/// Extracts shape `[d0, d1]` from a rank-2 tensor; errors on wrong rank.
+fn shape2(t: &Tensor, op: &'static str) -> Result<[usize; 2], MattenError> {
     match t.shape() {
-        [a, b] => [*a, *b],
-        s => panic!("matten shape error in {op}: expected rank-2 tensor, got shape {s:?}"),
+        [a, b] => Ok([*a, *b]),
+        s => Err(MattenError::Shape {
+            operation: op,
+            message: format!("expected rank-2 tensor, got shape {s:?}"),
+        }),
     }
 }
 
-/// Panics with an actionable message when two dimensions that must be equal differ.
-fn dim_check(left: usize, right: usize, left_name: &str, right_name: &str, op: &'static str) {
+/// Errors with an actionable message when two dimensions that must be equal differ.
+fn dim_check(
+    left: usize,
+    right: usize,
+    left_name: &str,
+    right_name: &str,
+    op: &'static str,
+) -> Result<(), MattenError> {
     if left != right {
-        panic!(
-            "matten shape error in {op}: {left_name} ({left}) must equal {right_name} ({right})"
-        );
+        return Err(MattenError::Shape {
+            operation: op,
+            message: format!("{left_name} ({left}) must equal {right_name} ({right})"),
+        });
     }
+    Ok(())
 }
 
 #[cfg(test)]
