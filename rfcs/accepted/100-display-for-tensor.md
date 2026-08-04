@@ -1,6 +1,9 @@
 # RFC-100: `Display` for `Tensor`
 
-**Status:** Proposed
+**Status:** **Accepted** 2026-08-04 — implementation authorized under
+[the handoff](../handoffs/100-display-for-tensor-handoff.md). §5.4's open question — whether
+`{:#}` means untruncated — was **not** resolved at acceptance and is carried into the handoff as
+an implementer decision to report, not to assume
 **Target:** core `matten`; a public API addition, so a minor release when it ships
 **Theme:** Decide the formatting contract that has been deferred since `0.1.0`, and stop the third-party duplication it caused
 **Related:** RFC-002, RFC-020, RFC-078 §4.1, RFC-087 §6, RFC-095, RFC-096, RFC-097, RFC-099
