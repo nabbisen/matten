@@ -142,6 +142,7 @@ Withdrawn or superseded. Numbers are never reused. See
 | ID | Title | Scope |
 |---:|---|---|
 | 076 | [v1.0 Release Preparation](./proposed/076-v1-release-preparation.md) | Reviewed and accepted (GO, no conditions); its inventory refreshed by RFC-081 (five-crate family, matten-mlprep production-ready, matten-stats row added, RFC-081 §3 precondition added). RFC-081's precondition is now **discharged** — `matten-stats` took **Exit A (promotion)** via RFC-084 — but this RFC remains deferred and no implementation is authorized: v1.0 is not currently wanted, a separate and unrelated reason |
+| 100 | [`Display` for `Tensor`](./proposed/100-display-for-tensor.md) | Proposed. **The contract is what was deferred, not the code** — `compatibility.md` says so in as many words — so the RFC is mostly §5, the decisions, and barely §7, the work. Fixes something wrong today: grid rendering exists **three times**, in the playground, the report tool and example 57, written independently over four days because core offers nothing, and all three can reach core. Each asserts its own output and **nothing compares them to each other**. Checked ndarray rather than assuming: multi-line `Display` is the ecosystem norm, but it renders `1` not `1.0` — matching that would reintroduce RFC-096 C1's defect verbatim, so this diverges knowingly under RFC-087 §6's rule. Rank >2 falls back to the flat form, the same boundary RFC-095 and RFC-096 drew |
 
 ## Remaining Themes And Issues
 
