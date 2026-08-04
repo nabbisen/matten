@@ -7,7 +7,8 @@ for RFC state; the Status field inside each file mirrors the folder.
 The project uses the **5-folder variant** (RFC-092): `proposed/` → `accepted/` →
 `done/`, because owner sign-off and implementation are separate events performed by
 different parties. See [`accepted/README.md`](./accepted/README.md). `archive/` and
-`draft/` exist in the policy but are unused here.
+`draft/` exists in the policy but is unused here; `archive/` holds withdrawn or superseded RFCs — see
+[`archive/README.md`](./archive/README.md).
 
 The broader documentation ownership model is recorded in
 [`docs/design/README.md`](../docs/design/README.md): RFCs are canonical normative decisions,
@@ -126,12 +127,21 @@ sign-off and implementation — not that the state is unused.
 |---:|---|---|
 | — | *(none at present)* | — |
 
+## Archive
+
+Withdrawn or superseded. Numbers are never reused. See
+[`archive/README.md`](./archive/README.md).
+
+| ID | Title | Disposition |
+|---:|---|---|
+| 098 | [Batched Matrix Multiplication](./archive/098-batched-matmul.md) | **Superseded by RFC-099** before acceptance. Bundled a robustness fix to shipped API with a new capability; split so the fix does not depend on the feature. Batched matmul returns to ROADMAP §3.1 |
+
 ## Proposed
 
 | ID | Title | Scope |
 |---:|---|---|
 | 076 | [v1.0 Release Preparation](./proposed/076-v1-release-preparation.md) | Reviewed and accepted (GO, no conditions); its inventory refreshed by RFC-081 (five-crate family, matten-mlprep production-ready, matten-stats row added, RFC-081 §3 precondition added). RFC-081's precondition is now **discharged** — `matten-stats` took **Exit A (promotion)** via RFC-084 — but this RFC remains deferred and no implementation is authorized: v1.0 is not currently wanted, a separate and unrelated reason |
-| 098 | [Batched Matrix Multiplication](./proposed/098-batched-matmul.md) | Proposed. The largest remaining gap in core's numeric surface and the first library capability since RFC-090. **Its deferral's stated basis has expired** — `compatibility.md` defers it as *"out of scope for `0.1.0`"*, and the family is at `0.42.0` — which is not a reason to act, but means the deferral rests on nothing. Drags in a second decision: `matmul`/`dot` **panic** and have no Result form, alone among 41 `try_*` functions, so extending them would widen the anomaly; RFC-010 §167 already anticipated `try_matmul`, and §4 argues it must ship here. Recommends **strict batch dims plus a shared rank-2 right operand**, rejecting full NumPy broadcasting because a rule a learner cannot restate is one they cannot debug (RFC-020). Carries an RFC-093 §6-style lock: batched matmul and **nothing else batched**, since this is the doorway to the framework scope RFC-047 declined |
+| 099 | [Result-Form `try_matmul` and `try_dot`](./proposed/099-result-form-matmul.md) | Proposed. **Robustness, not capability** — the split of RFC-098 after the owner asked whether that recommendation was oriented to safety or functionality; it was functionality, and bundling a fix to shipped API with a new feature meant declining the feature would decline the fix. `dot`/`matmul` are **2 of 43** core operations that panic with no `Result` form, a shape RFC-010 §167 specified years ago. The one real hazard is concrete and measured: `dot`'s dynamic guard is bespoke and differs from the shared helper, so the obvious refactor silently changes a user-visible message — and the verifier already exists, in the live `catch_unwind` tests RFC-095 C1 added |
 
 ## Remaining Themes And Issues
 

@@ -1,6 +1,18 @@
 # RFC-098: Batched Matrix Multiplication
 
-**Status:** Proposed
+**Status:** **Superseded by RFC-099** (2026-08-04), before acceptance. The owner asked whether
+this recommendation was oriented to safety or to functionality; the honest answer was
+functionality, and the split follows from that.
+
+This RFC bundled a **robustness fix to shipped API** — `matmul`/`dot` panicking with no `Result`
+form, alone among 41 `try_*` functions — with a **new capability** nobody is currently missing.
+Bundled that way, declining the capability would also decline the fix, which is backwards. §4 of
+this RFC is therefore taken up by RFC-099 on its own, and batched matmul returns to ROADMAP §3.1
+as a candidate needing a positive argument rather than the expired one it had.
+
+Preserved rather than deleted: §3's family-car argument, §5's semantics comparison and §9's scope
+lock are the substance any future batched-matmul RFC has to engage with, including the admission
+that §3 was written to persuade
 **Target:** core `matten`; a public API addition, so a minor release when it ships
 **Theme:** The largest remaining gap in core's numeric surface, and the first library capability since RFC-090
 **Related:** RFC-002, RFC-005, RFC-010, RFC-018, RFC-020, RFC-041, RFC-047, RFC-055, RFC-056, RFC-094, ROADMAP §1.1
