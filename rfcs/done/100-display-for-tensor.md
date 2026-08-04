@@ -1,9 +1,10 @@
 # RFC-100: `Display` for `Tensor`
 
-**Status:** **Accepted** 2026-08-04 — implementation authorized under
-[the handoff](../handoffs/100-display-for-tensor-handoff.md). §5.4's open question — whether
-`{:#}` means untruncated — was **not** resolved at acceptance and is carried into the handoff as
-an implementer decision to report, not to assume
+**Status:** **Implemented** 2026-08-04 in commit *"Implement Display for Tensor (RFC-100)"*,
+reviewed and approved after one correction. `{:#}` was decided by the implementer to mean
+untruncated, and confirmed. **Two claims in this RFC were wrong and are corrected inline below**
+— §2's migration count and §5.5's dynamic formatting, which contradicted §5.2. Unreleased: new
+public API, joining RFC-099 as RFC-094 minor-trigger content
 **Target:** core `matten`; a public API addition, so a minor release when it ships
 **Theme:** Decide the formatting contract that has been deferred since `0.1.0`, and stop the third-party duplication it caused
 **Related:** RFC-002, RFC-020, RFC-078 §4.1, RFC-087 §6, RFC-095, RFC-096, RFC-097, RFC-099
@@ -33,8 +34,13 @@ crates/matten/examples/57_visual_shape_axis_summary.rs  render_matrix / render_r
 path, and example 57 lives inside the crate. So the duplication is a real consequence of the missing
 contract, not an accident of packaging.
 
-**How much this actually fixes, stated honestly.** Two of the three collapse to `Display`. The report
-tool does not fully: its `render_matrix_block` takes a `format_cell` closure because two of its sites
+**How much this actually fixes.** *(Corrected 2026-08-04: this paragraph said two of the three
+collapse. Only **one** does — example 57. The playground has the identical `{:.3}`-with-clamp
+constraint, because RFC-095 §4 required it to inherit those exact constants from the report tool;
+the author of this RFC had that fact and did not connect it. Measured: swapping in `Display` fails
+8 of the playground's 9 render tests, one of them a real clamp regression putting `-0.0001` back on
+a deployed page. The deduplication argument is therefore weaker than this RFC claimed when it was
+accepted.)* The report tool does not collapse either: its `render_matrix_block` takes a `format_cell` closure because two of its sites
 render `{:.3}` with the `-0.000` clamp while the rest use `{:?}`. A fixed `Display` cannot serve
 both. So this removes the duplication for the default case and leaves the report tool a narrower
 reason to keep its own path — unless core also exposes a cell-format parameter, which §8 rejects as
@@ -129,6 +135,12 @@ escape hatch and costs one branch. I lean yes but have no precedent to point at.
 ### 5.5 Dynamic tensors
 
 Recommendation: **render them**, using `Element`'s own formatting, same grid.
+
+> **Corrected 2026-08-04.** This contradicted §5.2. `Element`'s `Display` renders `Float(v)` with
+> bare `{v}`, dropping the `.0`, so `Float(2.0)` and `Int(2)` both printed `2` — indistinguishable
+> in the one view built to show mixed types, which is worse than the numeric ambiguity §5.2
+> forbids. The tensor grid now renders `Float` via `{:?}` on the inner `f64` and leaves `Int`,
+> `Text`, `Bool` and `None` on `Element`'s `Display`. `Element`'s own impl is unchanged.
 
 A dynamic tensor is precisely the case where a human wants to look at the data — that is what the
 feature is for. Refusing to display it, or printing a placeholder, would make `Display` useless in

@@ -117,6 +117,7 @@ The broader documentation ownership model is recorded in
 | 096 | [Grid Rendering in the Shape and Axis Example](./done/096-example-grid-rendering.md) | **Unreleased** — reaches users at the next release; deploys nothing. RFC-095's fix applied to shipped code, where a `cargo run` reaches people a URL does not. Formatter kept **local**, which was only legal because the example **asserts its own rendered blocks** — a `#[test]` inside an example runs zero tests, and CI catches a panic but not a mis-aligned grid. Eight assertions where two were required. Review found one defect caused by the RFC's own wording: *"natural float rendering"* admitted `Display`, which printed `1 2 3` for `f64` data and contradicted the axis line in the same output |
 | 097 | [Report Demos as Generated Book Pages](./done/097-report-demos-on-the-site.md) | **Unreleased**; deploys with the book. Phase 2 of RFC-093. Five demos publish as generated Markdown pages, **committed with a freshness guard** because mdBook creates a missing page empty and exits 0. Approved with **no corrections** — the one departure from instructions was where the instructions were wrong: §5.1's illustration said two demos held only column statistics, but `to_tensor()` builds `[rows, cols]` unconditionally and the masks preserve shape, making **15** defect sites rather than 9. Also found that mdBook collapses whitespace outside code blocks, so every grid needed a fence or the alignment would have vanished on render |
 | 099 | [Result-Form `try_matmul` and `try_dot`](./done/099-result-form-matmul.md) | **Unreleased**; new public API, so it makes RFC-094's first minor trigger since `0.42.0` available. Robustness, not capability — the split of RFC-098 after the owner asked whether that recommendation was oriented to safety or functionality. Two of 43 core operations stopped being panic-only, **without altering a single observable string**, verified against pre-change captures rather than inferred from the `Display` impls. Approved with no corrections; the newly pinned dynamic-guard message was proven able to fail before being accepted as a net |
+| 100 | [`Display` for `Tensor`](./done/100-display-for-tensor.md) | **Unreleased**; new public API, joining RFC-099 as RFC-094 minor-trigger content. Settles the formatting contract deferred since `0.1.0`. **Two of its own claims were wrong and are corrected inline**: it said two of three formatters would collapse to `Display` when only one does — the playground carries the same `{:.3}`-with-clamp constraint RFC-095 §4 gave it — and §5.5 contradicted §5.2, since `Element`'s `Display` made `Float(2.0)` and `Int(2)` both print `2` in the one view built for mixed types |
 
 ## Accepted
 
@@ -126,7 +127,7 @@ sign-off and implementation — not that the state is unused.
 
 | ID | Title | Handoff |
 |---:|---|---|
-| 100 | [`Display` for `Tensor`](./accepted/100-display-for-tensor.md) — decide the formatting contract deferred since `0.1.0`; ends three duplicate grid formatters | [handoff](./handoffs/100-display-for-tensor-handoff.md) |
+| — | *(none at present)* | — |
 
 ## Archive
 
