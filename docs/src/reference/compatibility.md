@@ -123,10 +123,10 @@ The following items were considered and explicitly deferred:
 | `set_flat` | Not implemented | Mutation API deferred. |
 | `arange` max elements | `1<<20` (~1 M) | Lowered from `1<<28` in v0.12.0 for OOM safety. |
 | `get_flat` | **Implemented** | `Tensor::get_flat(index) -> Option<f64>` added in v0.11.0. |
-| Negative slice indices | Deferred | Not in RFC-008 grammar for `0.1.0`. |
+| Negative slice indices | **Supported** | Shipped in `0.41.0` (RFC-088). `slice_str("-1,:")` takes the last row; out-of-range errors rather than clamping. `slice()`'s builder does **not** accept them. |
 | Step slicing `::2` | Supported | `slice_str("0:10:2")` grammar works. |
 | Mutable element API | Deferred | Internal Arc-shared storage / CoW is implemented; the public mutation API that would expose CoW is intentionally deferred. |
-| Dynamic slicing via builder | Deferred | `slice().build()` works on numeric tensors only. Use `get_element` column-by-column for dynamic. |
+| Slicing on dynamic tensors | Deferred | **Both** `slice().build()` and `slice_str()` are numeric-only — they share one `execute_slice` path, which returns `Unsupported` for a dynamic tensor. Use `get_element` column-by-column, or `try_numeric()` first. |
 | Batched matmul (rank > 2) | Deferred | RFC-010 scope: `[m,n]×[n,p]` maximum. |
 | Axis reductions on dynamic | Not needed yet | Convert with `try_numeric()` first. |
 
