@@ -1,8 +1,12 @@
 # RFC-099: Result-Form `try_matmul` and `try_dot`
 
-**Status:** **Accepted** 2026-08-04 — implementation authorized under
-[the handoff](../handoffs/099-result-form-matmul-handoff.md). Robustness only: no capability
-changes, and every existing message must survive byte-identical
+**Status:** **Implemented** 2026-08-04 in commit *"Add try_dot/try_matmul result forms
+(RFC-099)"*, reviewed and **approved with no corrections**. Core's last two panic-only
+operations now have `Result` forms, using the pattern the other 41 already used, with **every
+observable string unchanged** — verified by diffing real captured panics against pre-change
+records from two independent sources, not by reasoning from the `Display` impls. `reject_dynamic`
+was correctly not used, and `matmul`'s errors still say `in dot` as before. **Unreleased**: this
+is new public API, so it makes RFC-094's first minor trigger since `0.42.0` available
 **Target:** core `matten`; a public API addition, so a minor release when it ships
 **Theme:** Close the last panic-only hole in core's numeric surface — robustness, not capability
 **Supersedes:** RFC-098 (in part; its batched-matmul half returns to ROADMAP §3.1)

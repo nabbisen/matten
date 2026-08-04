@@ -116,6 +116,7 @@ The broader documentation ownership model is recorded in
 | 095 | [Two-Dimensional Matrix Rendering in the Playground](./done/095-matrix-grid-rendering.md) | Unreleased and unversioned; deploys with the book. Rank ≤ 2 renders as an aligned grid, so Reshape stops printing two identical value lists — the defect the owner found by using the page. **Amends RFC-093 §6** from *"text only"* to representation-versus-visualization, a **narrower** rule that newly forbids ASCII charts. Inherits the report tool's three display constants verbatim. Scope widened mid-flight to the page's presentation: forms above contributor notes, a stylesheet using mdBook theme variables, and links from `README.md`, `introduction.md` and `quick-start.md` |
 | 096 | [Grid Rendering in the Shape and Axis Example](./done/096-example-grid-rendering.md) | **Unreleased** — reaches users at the next release; deploys nothing. RFC-095's fix applied to shipped code, where a `cargo run` reaches people a URL does not. Formatter kept **local**, which was only legal because the example **asserts its own rendered blocks** — a `#[test]` inside an example runs zero tests, and CI catches a panic but not a mis-aligned grid. Eight assertions where two were required. Review found one defect caused by the RFC's own wording: *"natural float rendering"* admitted `Display`, which printed `1 2 3` for `f64` data and contradicted the axis line in the same output |
 | 097 | [Report Demos as Generated Book Pages](./done/097-report-demos-on-the-site.md) | **Unreleased**; deploys with the book. Phase 2 of RFC-093. Five demos publish as generated Markdown pages, **committed with a freshness guard** because mdBook creates a missing page empty and exits 0. Approved with **no corrections** — the one departure from instructions was where the instructions were wrong: §5.1's illustration said two demos held only column statistics, but `to_tensor()` builds `[rows, cols]` unconditionally and the masks preserve shape, making **15** defect sites rather than 9. Also found that mdBook collapses whitespace outside code blocks, so every grid needed a fence or the alignment would have vanished on render |
+| 099 | [Result-Form `try_matmul` and `try_dot`](./done/099-result-form-matmul.md) | **Unreleased**; new public API, so it makes RFC-094's first minor trigger since `0.42.0` available. Robustness, not capability — the split of RFC-098 after the owner asked whether that recommendation was oriented to safety or functionality. Two of 43 core operations stopped being panic-only, **without altering a single observable string**, verified against pre-change captures rather than inferred from the `Display` impls. Approved with no corrections; the newly pinned dynamic-guard message was proven able to fail before being accepted as a net |
 
 ## Accepted
 
@@ -125,7 +126,7 @@ sign-off and implementation — not that the state is unused.
 
 | ID | Title | Handoff |
 |---:|---|---|
-| 099 | [Result-Form `try_matmul` and `try_dot`](./accepted/099-result-form-matmul.md) — close the last panic-only hole in core; every existing message byte-identical | [handoff](./handoffs/099-result-form-matmul-handoff.md) |
+| — | *(none at present)* | — |
 
 ## Archive
 
