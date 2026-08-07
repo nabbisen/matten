@@ -121,13 +121,13 @@ The following items were considered and explicitly deferred:
 | Item | Status | Reason |
 |---|---|---|
 | `Display` for `Tensor` | **Implemented** | RFC-100: rank ≤ 2 as a right-aligned grid, rank > 2 flat; see the Formatting contract section above. |
-| `is_empty()` | Deferred | Zero-sized dims rejected; always false. Future RFC. |
-| `set_flat` | Not implemented | Mutation API deferred. |
+| `is_empty()` | **Not planned** | The shape model rejects zero-sized dimensions in every form (`[0]`, `[0, 3]`, `[2, 0]` all error), and a scalar has `len() == 1`, so no `Tensor` can have length zero and `is_empty()` could only ever return `false`. A method with one possible answer carries no information; closed rather than left deferred. Reopen only if the shape model admits zero-sized dimensions. |
+| `set_flat` | Not implemented | Mutation API deferred — see the `Mutable element API` row below for why it is larger than it looks. |
 | `arange` max elements | `1<<20` (~1 M) | Lowered from `1<<28` in v0.12.0 for OOM safety. |
 | `get_flat` | **Implemented** | `Tensor::get_flat(index) -> Option<f64>` added in v0.11.0. |
 | Negative slice indices | **Supported** | Shipped in `0.41.0` (RFC-088). `slice_str("-1,:")` takes the last row; out-of-range errors rather than clamping. `slice()`'s builder does **not** accept them. |
 | Step slicing `::2` | Supported | `slice_str("0:10:2")` grammar works. |
-| Mutable element API | Deferred | Internal Arc-shared storage / CoW is implemented; the public mutation API that would expose CoW is intentionally deferred. |
+| Mutable element API | Deferred | **Numeric tensors have no shared storage to expose.** `Tensor` owns its `Vec<f64>` outright; the `Arc`-shared storage and copy-on-write exist only on the **dynamic** side (`DynamicTensor` holds `Arc<Vec<Element>>`). So a public mutation API is not a matter of exposing what is already there — for the numeric type it would mean changing the representation first, or designing mutation without CoW and reconciling the two halves. |
 | Slicing on dynamic tensors | Deferred | **Both** `slice().build()` and `slice_str()` are numeric-only — they share one `execute_slice` path, which returns `Unsupported` for a dynamic tensor. Use `get_element` column-by-column, or `try_numeric()` first. |
 | Batched matmul (rank > 2) | Deferred | RFC-010 scope: `[m,n]×[n,p]` maximum. |
 | Axis reductions on dynamic | Not needed yet | Convert with `try_numeric()` first. |
