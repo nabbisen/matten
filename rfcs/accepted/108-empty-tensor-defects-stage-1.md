@@ -107,6 +107,15 @@ the five axis reductions (RFC-106 Stage 2)
 Display on an empty tensor (RFC-106 §2.14)
 the serde round-trip (RFC-106 Finding A — resolves under Stage 3, not here)
 matten-ndarray's ZeroSizedAxis boundary (Stage 3)
+
+AMENDED 2026-08-08 at review: this list previously forbade "any companion-crate
+change". That was UNSATISFIABLE. Adding Tensor::is_empty() makes clippy::len_zero
+fire on every `tensor.len() == 0` in the workspace, and matten-stats has two
+(histogram.rs:73, quantile.rs:40) — so the CI gate
+`cargo clippy --workspace --all-targets --all-features -- -D warnings` FAILS
+unless they change. Verified by toggling: 0 errors without this RFC's diff, 4 with.
+Those two lines become `x.is_empty()` and are IN scope. Nothing else in any
+companion crate changes. The scope error was mine, not the implementer's.
 CHANGELOG.md — the release RFC writes it
 ```
 
