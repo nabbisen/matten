@@ -1,8 +1,9 @@
 # RFC-104: Mutable Element Access
 
-**Status:** Proposed
+**Status:** **Accepted** 2026-08-08 by the owner, with the §6.1 scope decision resolved to **WIDEN**:
+numeric and dynamic mutable access ship together. Not yet implemented.
 **Target:** core `matten`; new public API, so a minor release when it ships
-**Theme:** Mutable element access via `get_mut`; dynamic scope **open** (§6.1)
+**Theme:** Mutable element access via `get_mut` — numeric **and** dynamic
 **Related:** RFC-008, RFC-011, RFC-012, RFC-055, RFC-094, RFC-099, RFC-102
 
 ---
@@ -10,9 +11,8 @@
 ## 1. Summary
 
 Expose mutable element access on `Tensor` as `get_mut` / `get_flat_mut`, mirroring the existing
-`get` / `get_flat`. **Whether this RFC also covers dynamic tensors is an open decision for the owner
-(§6.1)** — an earlier version excluded them on a blocker that does not exist, and §6 records that
-correction rather than hiding it.
+`get` / `get_flat`. **Dynamic tensors are included** — the owner resolved §6.1 to widen. An earlier version excluded
+them on a blocker that does not exist, and §6 records that correction rather than hiding it.
 
 ## 2. The premise this was deferred on is wrong — and I proved it by building it
 
@@ -127,7 +127,7 @@ Consistency with the sibling getter is both the safer and the more honest choice
 
 ```text
 get_mut / get_flat_mut on numeric Tensor, per §4.3
-get_element_mut(&mut self, coord) -> Option<&mut Element>   IF widened (§6.1)
+get_element_mut(&mut self, coord) -> Option<&mut Element>   (§6.1, widened)
 tests per §8, both feature profiles
 docs: compatibility.md's `set_flat` and `Mutable element API` rows, plus a
       mutation section beside where get/get_flat are documented
@@ -189,24 +189,17 @@ one was found by a question I should have asked myself. The pattern is now speci
 **I reason forward from a probe's incidental output instead of asking what the type actually
 requires.**
 
-### 6.1 Open: does this RFC widen?
+### 6.1 RESOLVED — widened (owner, 2026-08-08)
 
-The split recommended to the owner rested on dynamic being blocked. It is not. **This is now an open
-scope decision, not a settled one**, and it belongs to the owner because the earlier choice was made
-on a false premise:
+The split originally recommended to the owner rested on dynamic being blocked. It is not, so the
+choice was re-put and resolved to **widen**: `get_mut` / `get_flat_mut` (numeric) and
+`get_element_mut` (dynamic) ship in one RFC. Same theme, same test shape, same `compatibility.md`
+row, and shipping numeric alone would leave a gap users hit immediately after RFC-102 handed them
+dynamic slices.
 
-```text
-WIDEN   get_mut/get_flat_mut (numeric) + get_element_mut (dynamic) in one RFC. Same theme, same
-        test shape, same compatibility.md row. Dynamic needs materialize(), already
-        PROVEN in §2's probe: shared_before=true -> shared_after=false, source intact.
-        Note: mutating a dynamic slice materializes it, which incidentally RELEASES
-        the parent allocation — the retention escape hatch of RFC-102 §8.1, arriving
-        as a side effect worth documenting.
-
-SPLIT   ship numeric now, dynamic as its own RFC. Smaller diff and review surface;
-        the CoW/retention interaction above gets its own attention rather than
-        riding along.
-```
+**One consequence worth documenting when it ships:** mutating a dynamic slice calls `materialize()`,
+which detaches its storage — so it *incidentally releases the parent allocation*. That is RFC-102
+§8.1's retention escape hatch arriving as a side effect of an unrelated operation.
 
 ## 7. Risks
 
@@ -219,7 +212,7 @@ SPLIT   ship numeric now, dynamic as its own RFC. Smaller diff and review surfac
    true of dynamic slices until RFC-102 made it false the same week.
 3. COORD VS FLAT. get_mut resolves through coord_to_flat; get_flat_mut does not.
    An off-by-one between them is invisible on a square tensor — test non-square.
-4. IF WIDENED: get_element_mut MUST materialize() before handing out &mut Element,
+4. get_element_mut MUST materialize() before handing out &mut Element,
    or a write reaches a shared parent. materialize() is a no-op when contiguous and
    unique, so the cost is paid only when it must be. Assert a slice's write does NOT
    reach its source, and assert storage identity BREAKS on first write.
@@ -235,7 +228,7 @@ SPLIT   ship numeric now, dynamic as its own RFC. Smaller diff and review surfac
     against the captured message, not merely "it panics"
 [ ] mutating a numeric slice leaves its source unchanged — asserted (risk 2)
 [ ] non-square tensor: get_mut(&[r,c]) and get_flat_mut agree (risk 3)
-[ ] IF WIDENED: get_element_mut materializes; a slice's write does not reach its
+[ ] get_element_mut materializes; a slice's write does not reach its
     source; Arc identity breaks on first write — all asserted (risk 4)
 [ ] no change to get / get_flat / get_element, to any operator, or to any result
 [ ] both feature profiles build

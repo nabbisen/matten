@@ -130,7 +130,7 @@ sign-off and implementation — not that the state is unused.
 
 | ID | Title | Handoff |
 |---:|---|---|
-| — | *(none at present)* | — |
+| 104 | [Mutable Element Access](./accepted/104-mutable-element-access.md) | [`104-…-handoff.md`](./handoffs/104-mutable-element-access-handoff.md) |
 
 ## Archive
 
