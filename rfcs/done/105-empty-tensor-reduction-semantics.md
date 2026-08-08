@@ -1,6 +1,9 @@
 # RFC-105: Empty-Tensor Reduction Semantics
 
-**Status:** **Accepted** 2026-08-08 by the owner. Not yet implemented. Handoff:
+**Status:** **Implemented** 2026-08-08 in commit *"Make reductions error on empty tensors instead of
+panicking or returning sentinels (RFC-105)"*, reviewed and approved with **no corrections**. Unreleased;
+the release decision is open under RFC-094. **§5's baseline claim about Rust was wrong and is corrected
+inline below.** Handoff:
 `rfcs/handoffs/105-empty-tensor-reduction-semantics-handoff.md`.
 **Target:** core `matten`; behaviour change to existing APIs, so a minor release when it ships
 **Theme:** Make reductions correct on empty tensors, which are reachable today
@@ -149,18 +152,18 @@ every form"*. **Leave that row to RFC-106** — it is about the shape model, not
 ## 9. Acceptance criteria
 
 ```text
-[ ] try_mean/try_min/try_max/try_argmin/try_argmax return Err on an empty tensor
-[ ] each message names the operation and says the result is undefined for an empty
+[x] try_mean/try_min/try_max/try_argmin/try_argmax return Err on an empty tensor
+[x] each message names the operation and says the result is undefined for an empty
     tensor, mirroring try_var's wording
-[ ] argmin()/argmax() panic with that sentence, NOT "index out of bounds" — asserted
+[x] argmin()/argmax() panic with that sentence, NOT "index out of bounds" — asserted
     against the captured message
-[ ] every fixture is a SLICED-EMPTY tensor, not a constructed one (risk 1)
-[ ] try_sum still returns a zero; §5 investigated and reported either way
-[ ] try_var/try_std unchanged — byte-identical
-[ ] no signature change; the panicking/try_ pairs are preserved
-[ ] all eight guards; check-doc-code.sh under RUSTFLAGS="-D warnings"
-[ ] §7's three code comments corrected; compatibility.md NOT touched (RFC-106 owns it)
-[ ] no version bump, tag, or publish
+[x] every fixture is a SLICED-EMPTY tensor, not a constructed one (risk 1)
+[x] try_sum still returns a zero; §5 investigated and reported either way
+[x] try_var/try_std unchanged — byte-identical
+[x] no signature change; the panicking/try_ pairs are preserved
+[x] all eight guards; check-doc-code.sh under RUSTFLAGS="-D warnings"
+[x] §7's three code comments corrected; compatibility.md NOT touched (RFC-106 owns it)
+[x] no version bump, tag, or publish
 ```
 
 ## 10. Non-goals
