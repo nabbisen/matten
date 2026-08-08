@@ -1,8 +1,9 @@
 # RFC-103: `0.44.0` — Dynamic Slicing Release
 
-**Status:** **Prepared** 2026-08-08 in commit *"Prepare 0.44.0 dynamic slicing release (RFC-103)"*,
-reviewed and approved with **no corrections**. **Not tagged, not published** — both remain separate
-owner authorizations. Accepted by the owner, who directed the cut directly ("Cut 0.44.0 now").
+**Status:** **Released** 2026-08-08 — prepared in commit *"Prepare 0.44.0 dynamic slicing release
+(RFC-103)"*, reviewed and approved with **no corrections**, then tagged `0.44.0` (signed, on the
+*Prepare* commit) and published to crates.io. All five crates verified live and unyanked against the
+sparse index; all 104 remote tags resolve to ancestors of `origin/main`. Accepted by the owner, who directed the cut directly ("Cut 0.44.0 now").
 **Target:** `0.44.0`, on the `0.x` line
 **Related:** RFC-030 (lock-step), RFC-094 (cadence), RFC-102 (the content)
 
