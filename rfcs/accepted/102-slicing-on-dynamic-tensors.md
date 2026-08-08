@@ -1,7 +1,8 @@
 # RFC-102: Slicing on Dynamic Tensors
 
-**Status:** **Accepted** 2026-08-08 by the owner. Not yet implemented. Handoff written to
-`.git-exclude/handoff/RFC-102/matten-rfc102-slicing-on-dynamic-tensors-developer-handoff-v0.1.md`.
+**Status:** **Accepted** 2026-08-08 by the owner. Implemented and reviewed; approved with one required
+correction (§8.1's retention documentation), pending. Handoff:
+`rfcs/handoffs/102-slicing-on-dynamic-tensors-handoff.md`.
 **Target:** core `matten`; behaviour change to an existing API, so a minor release when it ships
 **Theme:** Wire slicing to dynamic tensors — the machinery already exists and is unreachable
 **Related:** RFC-008, RFC-011, RFC-012, RFC-020, RFC-094
@@ -128,9 +129,34 @@ try_numeric, coercion, or anything that INTERPRETS an Element
 2. SHARED STORAGE IS INVISIBLE WHEN WRONG. A slice that copied instead of sharing would
    pass every value assertion. Assert Arc::strong_count, as lifecycle.rs already does.
 3. THE REJECTION MESSAGE IS A PUBLIC STRING. Removing it changes observable behaviour
-   for anyone matching on it — an intended consequence, but it belongs in the CHANGELOG
-   under Changed, not Added.
+   for anyone matching on it — an intended consequence. It lands as Changed rather
+   than Added; the release RFC writes the CHANGELOG entry, not this one.
 ```
+
+### 8.1 The risk this RFC missed — retention (added 2026-08-08, at review)
+
+**Shared storage has a cost this RFC never named, and the omission was mine.** Probed at review:
+
+```text
+100_000-element dynamic tensor -> 1-element slice -> drop the parent
+storage still holds 100_000 elements
+```
+
+A slice retains its source's **entire** allocation for as long as the slice lives, even after the
+source is dropped. That is inseparable from the cheap-chaining property §5 advertises — you cannot
+have one without the other — and it is the standard hazard of any shared-view design.
+
+It is sharper here because **the release valve is not public**: `DynamicTensor::materialize()` is
+`pub(crate)`. A user's only route to a detached copy is
+`Tensor::from_elements(slice.to_elements(), slice.shape())`.
+
+**This does not change the design**, which is correct and intended. What it changes is the
+documentation obligation: wherever this RFC's sharing is advertised, the retention consequence and
+the released form must ship in the same breath. `slicing.md` and `compatibility.md` both carry it.
+
+Recorded here rather than only in the review because the gap was the specification's. The RFC
+reasoned about what sharing *buys* and never about what it *holds* — and it reached a reader only
+because the implementation's docs made the promise specific enough to probe.
 
 ## 9. Acceptance criteria
 
@@ -142,6 +168,8 @@ try_numeric, coercion, or anything that INTERPRETS an Element
 [ ] Text, None and Bool elements survive a slice unchanged
 [ ] every numeric slice result is byte-identical — asserted, not assumed
 [ ] compatibility.md's "Slicing on dynamic tensors | Deferred" row is corrected
+[ ] §8.1's retention consequence is documented wherever sharing is advertised,
+    with the released form (from_elements(to_elements(), shape())) named
 [ ] all eight guards; check-doc-code.sh under RUSTFLAGS="-D warnings"
 [ ] no tag, no publish; the version bump is a separate decision under RFC-094
 ```
