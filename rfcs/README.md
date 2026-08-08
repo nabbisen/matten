@@ -120,6 +120,7 @@ The broader documentation ownership model is recorded in
 | 100 | [`Display` for `Tensor`](./done/100-display-for-tensor.md) | **Unreleased**; new public API, joining RFC-099 as RFC-094 minor-trigger content. Settles the formatting contract deferred since `0.1.0`. **Two of its own claims were wrong and are corrected inline**: it said two of three formatters would collapse to `Display` when only one does — the playground carries the same `{:.3}`-with-clamp constraint RFC-095 §4 gave it — and §5.5 contradicted §5.2, since `Element`'s `Display` made `Float(2.0)` and `Int(2)` both print `2` in the one view built for mixed types |
 | 101 | [`0.43.0` — Core Surface Release](./done/101-0430-core-surface-release.md) | 0.43.0 (released 2026-08-04). The first release whose RFC-094 trigger fired on its own terms — two themes landed, where `0.42.0` proceeded on an owner override. Added-only, and the API snapshot took a **content** update where the previous release required the number only. Approved with no corrections; the one deviation was correct and exposed a defect in this RFC's own §5 table, which counted a **historical narration** as a live version pin |
 | 102 | [Slicing on Dynamic Tensors](./done/102-slicing-on-dynamic-tensors.md) | **Unreleased**; lands as **Changed**, not Added, since it removes a public error. Wiring, not design: the view machinery (`slice_indices`) already existed, was tested, and had **no caller outside its own tests** — so the theme was materially smaller than §3.1 had claimed for three successive framings, all mine. Approved with one required correction that was **this RFC's gap, not the implementation's**: shared storage means a slice retains its source's entire allocation, with `materialize()` `pub(crate)` and no documented escape hatch (§8.1). The implementer also caught two handoff defects — a `CHANGELOG.md` requirement the RFC never listed, and a missing RFC-vs-handoff priority rule |
+| 103 | [`0.44.0` — Dynamic Slicing Release](./done/103-0440-dynamic-slicing-release.md) | **Prepared, not tagged or published.** The second **owner-directed** release, after `0.42.0` — RFC-094's cadence triggers had not fired (one theme, day 4 of 28), and this RFC says so plainly so the release table does not later read as though the policy produced it. Changed-only, the exact inverse of `0.43.0`'s Added-only shape four days earlier, which is where the risk sat. Separated **38 live pins from 21 historical narrations** and inspected all 38 rather than counting them — the check RFC-101's own §5 table failed. Approved with no corrections; the one correction was to **this RFC's own criterion**, which asserted a fixed count of `0.43` occurrences in `CHANGELOG.md` that correct work must violate, since the entry naming a bump has to cite the version it moves from |
 
 ## Accepted
 
@@ -129,7 +130,7 @@ sign-off and implementation — not that the state is unused.
 
 | ID | Title | Handoff |
 |---:|---|---|
-| 103 | [`0.44.0` — Dynamic Slicing Release](./accepted/103-0440-dynamic-slicing-release.md) | [`103-…-handoff.md`](./handoffs/103-0440-dynamic-slicing-release-handoff.md) |
+| — | *(none at present)* | — |
 
 ## Archive
 

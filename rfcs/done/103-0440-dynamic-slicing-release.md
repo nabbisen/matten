@@ -1,7 +1,8 @@
 # RFC-103: `0.44.0` — Dynamic Slicing Release
 
-**Status:** **Accepted** 2026-08-08 by the owner, who directed the cut directly ("Cut 0.44.0 now").
-Not yet implemented.
+**Status:** **Prepared** 2026-08-08 in commit *"Prepare 0.44.0 dynamic slicing release (RFC-103)"*,
+reviewed and approved with **no corrections**. **Not tagged, not published** — both remain separate
+owner authorizations. Accepted by the owner, who directed the cut directly ("Cut 0.44.0 now").
 **Target:** `0.44.0`, on the `0.x` line
 **Related:** RFC-030 (lock-step), RFC-094 (cadence), RFC-102 (the content)
 
@@ -156,16 +157,19 @@ review, per the `0.43.0` precedent.
 ## 8. Acceptance criteria
 
 ```text
-[ ] version 0.44.0 in Cargo.toml + Cargo.lock, all five crates (cargo metadata)
-[ ] 38 live pins retargeted; the 21 record occurrences UNCHANGED (assert both)
-[ ] no .rs change except crates/matten/src/lib.rs's install-pin doc comment
-[ ] CHANGELOG [0.44.0]: Changed + Version only, no empty Added heading
-[ ] introduction.md rewritten; "No existing behavior changed" GONE from it
-[ ] public-api-snapshot.md: one sentence, no new row, claim not moved
-[ ] ROADMAP.md and rfcs/** untouched
-[ ] eight guards; check-doc-code.sh under RUSTFLAGS="-D warnings"
-[ ] cargo test --workspace; both feature profiles build
-[ ] no tag, no publish, no maturity-label change
+[x] version 0.44.0 in Cargo.toml + Cargo.lock, all five crates (cargo metadata)
+[x] 38 live pins retargeted; the record files UNCHANGED. **Corrected at review:** this said
+    "the 21 record occurrences", but CHANGELOG.md correctly gains one — the entry naming the
+    bump must cite the old version, exactly as the 0.43.0 entry still cites 0.42.0. A fixed
+    count is the wrong invariant here; "no removed line" is the right one
+[x] no .rs change except crates/matten/src/lib.rs's install-pin doc comment
+[x] CHANGELOG [0.44.0]: Changed + Version only, no empty Added heading
+[x] introduction.md rewritten; "No existing behavior changed" GONE from it
+[x] public-api-snapshot.md: one sentence, no new row, claim not moved
+[x] ROADMAP.md and rfcs/** untouched
+[x] eight guards; check-doc-code.sh under RUSTFLAGS="-D warnings"
+[x] cargo test --workspace; both feature profiles build
+[x] no tag, no publish, no maturity-label change
 ```
 
 ## 9. Non-goals
