@@ -119,22 +119,56 @@ any change to get/get_flat, or to any operator
 CHANGELOG.md — the release RFC writes it
 ```
 
-## 6. Why dynamic mutation is excluded — a real question, raised not deferred
+## 6. CORRECTED — dynamic mutation is not blocked, and I invented the blocker
 
-The probe wrote `42.0` into an `Int` column and produced `[Int(0), Float(42.0), Int(2)]`, **silently
-turning a homogeneous tensor heterogeneous**. That is not a bug in the probe; it is the undecided
-question, and it is the first genuine semantic question found anywhere in this area:
+**This section previously claimed a coercion decision blocked dynamic mutation. That was wrong**, and
+the owner caught it by asking whether the question was a dynamic-API question at all.
+
+The probe wrote `42.0` into an `Int` column and produced `[Int(0), Float(42.0), Int(2)]`. I reported
+that as a semantic question — *allow, reject, or coerce?* It is neither:
 
 ```text
-writing a Float into an Int column ->  allow?  reject?  coerce?
+DynamicTensor = Arc<Vec<Element>> + shape + len + view
+  -> no per-column type, no schema, no declared homogeneity
+  -> schema_summary() is DERIVED on demand, not a stored invariant
+  -> Element is pub, re-exported at lib.rs:106, variants public
 ```
 
-This is RFC-011 §11's coercion question in a new place, and nothing has ever forced it. **It is a
-product decision and belongs to the owner, not to this RFC.** A dynamic setter cannot be specified
-until it is answered.
+There is no "Int column" to violate. A dynamic tensor holding all `Int`s was never homogeneous *by
+contract*. And with the right signature the library never chooses a variant at all:
 
-**Trigger to reopen:** an owner decision on the rule above. That is a named condition, not "deferred
-pending review."
+```text
+set_element(&mut self, coord: &[usize], value: Element)   <- caller names the variant
+```
+
+**My probe took `f64` and picked `Float` for it.** That was the probe's shortcut; I then reported its
+consequence as a design question. RFC-011 §11's coercion question is real — but it governs
+`try_numeric`, which *reads* and must interpret `Element -> f64`. Writing interprets nothing.
+
+**This is the fourth consecutive premise of mine to fail in this area**, after streaming, dynamic
+slicing, and this RFC's own §2. The first three were found by building the smallest real thing; this
+one was found by a question I should have asked myself. The pattern is now specific enough to name:
+**I reason forward from a probe's incidental output instead of asking what the type actually
+requires.**
+
+### 6.1 Open: does this RFC widen?
+
+The split recommended to the owner rested on dynamic being blocked. It is not. **This is now an open
+scope decision, not a settled one**, and it belongs to the owner because the earlier choice was made
+on a false premise:
+
+```text
+WIDEN   set/set_flat (numeric) + set_element (dynamic) in one RFC. Same theme, same
+        test shape, same compatibility.md row. Dynamic needs materialize(), already
+        PROVEN in §2's probe: shared_before=true -> shared_after=false, source intact.
+        Note: mutating a dynamic slice materializes it, which incidentally RELEASES
+        the parent allocation — the retention escape hatch of RFC-102 §8.1, arriving
+        as a side effect worth documenting.
+
+SPLIT   ship numeric now, dynamic as its own RFC. Smaller diff and review surface;
+        the CoW/retention interaction above gets its own attention rather than
+        riding along.
+```
 
 ## 7. Risks
 
