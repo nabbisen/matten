@@ -16,10 +16,14 @@ This book is organized by reader:
 - **Reference** — the rules that shape the public API.
 - **Contributors** — project layout, milestones, and process.
 
-> This documentation tracks the current 0.43 release family, an RFC-099 and
-> RFC-100 release adding two things to core `matten`'s public surface:
-> `try_dot`/`try_matmul` (Result forms for the last two panic-only operations;
-> the panicking `dot`/`matmul` are unchanged, including every message) and
-> `Display` for `Tensor` (an aligned grid for rank ≤ 2, the existing flat form
-> above it; `Debug` is unchanged). No existing behavior changed — see the
-> `[0.43.0]` CHANGELOG entry.
+> This documentation tracks the current 0.44 release family, an RFC-102 release
+> changing how `slice()` and `slice_str()` behave on dynamic tensors: they no
+> longer return `MattenError::Unsupported` and instead return a dynamic tensor
+> that shares storage with its source (`Arc::clone`, not a copy). The slice
+> grammar, rank rules, and error messages are unchanged, and every numeric
+> slicing result is unchanged. Sharing has a cost — a slice retains its
+> source's entire allocation for as long as the slice lives, even after the
+> source is dropped; see
+> [Slicing](./reference/slicing.md#slicing-dynamic-tensors-rfc-102-cfgfeature--dynamic).
+> No public item was added: an error was removed from methods that already
+> existed — see the `[0.44.0]` CHANGELOG entry.

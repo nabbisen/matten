@@ -26,6 +26,29 @@ crates are expressed by per-crate status labels, not by separate version numbers
 > trigger — unfired across eight consecutive releases before RFC-074 found
 > it — a mandatory per-entry check rather than a rule that only an RFC states.
 
+## [0.44.0] - 2026-08-08
+
+RFC-102 dynamic slicing release. `slice()` and `slice_str()` now support dynamic tensors.
+
+### Changed
+
+- core `matten`: `slice()` (via `SliceBuilder::build()`) and `slice_str()` previously accepted
+  only numeric tensors and returned `MattenError::Unsupported` for a dynamic one. Both now accept
+  dynamic tensors and return a dynamic tensor (`is_dynamic() == true`), sharing storage with its
+  source (`Arc::clone`, RFC-012's copy-on-write model) rather than copying elements. Slicing
+  selects positions, not values, so `Text`, `None`, and `Bool` survive a slice unchanged
+  alongside `Int`/`Float`. Sharing has a cost: a slice retains its source's **entire** allocation
+  for as long as the slice lives, even after the source is dropped — release it explicitly with
+  `Tensor::from_elements(slice.to_elements(), slice.shape())` if that matters. The slice grammar,
+  rank rules, and error messages are unchanged, and every numeric slicing result is unchanged —
+  the 35 pre-existing numeric slice tests pass unmodified. No public item was added; an error was
+  removed from two methods that already existed.
+
+### Version
+
+- Release bump `0.43.0` -> `0.44.0`. Lock-step family versioning applies to all five published
+  crates; only core `matten`'s dynamic-tensor slicing behavior changed.
+
 ## [0.43.0] - 2026-08-04
 
 Core surface release. Publishes RFC-099 and RFC-100, two additions to core `matten`'s public

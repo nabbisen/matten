@@ -1,6 +1,6 @@
 # Public API snapshot
 
-This page lists every public item in `matten` at the current v0.43 release
+This page lists every public item in `matten` at the current v0.44 release
 family. It serves as the baseline for tracking breaking changes toward v1.0.0
 and as the review gate required by RFC-015. Core `matten`'s public API most
 recently changed in RFC-099, which added `try_dot`/`try_matmul`, and RFC-100,
@@ -9,7 +9,10 @@ signature or message. Before those, RFC-087 added `repeat`, `repeat_axis`,
 `tile`, and `meshgrid` (see the shape composition section below). RFC-088
 followed with negative indices in `slice_str`, but changed no public item — a
 signature-level grammar extension behind an existing method, not a new row
-here. The RFC-082 streaming feature, RFC-083's functions before it, and
+here. RFC-102 is the same shape: `slice()` and `slice_str()` now accept
+dynamic tensors and return one instead of `MattenError::Unsupported` — a
+behavior change behind two existing methods, with no signature change and no
+new row. The RFC-082 streaming feature, RFC-083's functions before it, and
 RFC-090's `histogram` were companion-crate (`matten-data`/`matten-stats`)
 additions, and the RFC-080/084/085 maturity promotions were label changes;
 none of the three touched core `matten`'s root exports.
