@@ -1,8 +1,9 @@
 # RFC-102: Slicing on Dynamic Tensors
 
-**Status:** **Accepted** 2026-08-08 by the owner. Implemented and reviewed; approved with one required
-correction (§8.1's retention documentation), pending. Handoff:
-`rfcs/handoffs/102-slicing-on-dynamic-tensors-handoff.md`.
+**Status:** **Implemented** 2026-08-08 in commit *"Support slicing on dynamic tensors (RFC-102)"*,
+reviewed and approved after one required correction — **§8.1 below, a gap in this RFC rather than in
+the implementation**. Unreleased; the minor-vs-patch decision under RFC-094 remains with the owner.
+Handoff: `rfcs/handoffs/102-slicing-on-dynamic-tensors-handoff.md`.
 **Target:** core `matten`; behaviour change to an existing API, so a minor release when it ships
 **Theme:** Wire slicing to dynamic tensors — the machinery already exists and is unreachable
 **Related:** RFC-008, RFC-011, RFC-012, RFC-020, RFC-094
@@ -161,17 +162,17 @@ because the implementation's docs made the promise specific enough to probe.
 ## 9. Acceptance criteria
 
 ```text
-[ ] slice() and slice_str() work on dynamic tensors, returning is_dynamic() == true
-[ ] storage is SHARED — asserted via Arc::strong_count, not inferred from values
-[ ] slicing a slice composes correctly (Indexed of Indexed), asserted
-[ ] rank-0 collapse works
-[ ] Text, None and Bool elements survive a slice unchanged
-[ ] every numeric slice result is byte-identical — asserted, not assumed
-[ ] compatibility.md's "Slicing on dynamic tensors | Deferred" row is corrected
-[ ] §8.1's retention consequence is documented wherever sharing is advertised,
+[x] slice() and slice_str() work on dynamic tensors, returning is_dynamic() == true
+[x] storage is SHARED — asserted via Arc::strong_count, not inferred from values
+[x] slicing a slice composes correctly (Indexed of Indexed), asserted
+[x] rank-0 collapse works
+[x] Text, None and Bool elements survive a slice unchanged
+[x] every numeric slice result is byte-identical — asserted, not assumed
+[x] compatibility.md's "Slicing on dynamic tensors | Deferred" row is corrected
+[x] §8.1's retention consequence is documented wherever sharing is advertised,
     with the released form (from_elements(to_elements(), shape())) named
-[ ] all eight guards; check-doc-code.sh under RUSTFLAGS="-D warnings"
-[ ] no tag, no publish; the version bump is a separate decision under RFC-094
+[x] all eight guards; check-doc-code.sh under RUSTFLAGS="-D warnings"
+[x] no tag, no publish; the version bump is a separate decision under RFC-094
 ```
 
 ## 10. Non-goals
