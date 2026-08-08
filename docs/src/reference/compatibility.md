@@ -121,7 +121,7 @@ The following items were considered and explicitly deferred:
 | Item | Status | Reason |
 |---|---|---|
 | `Display` for `Tensor` | **Implemented** | RFC-100: rank ≤ 2 as a right-aligned grid, rank > 2 flat; see the Formatting contract section above. |
-| `is_empty()` | **Not planned** | The shape model rejects zero-sized dimensions in every form (`[0]`, `[0, 3]`, `[2, 0]` all error), and a scalar has `len() == 1`, so no `Tensor` can have length zero and `is_empty()` could only ever return `false`. A method with one possible answer carries no information; closed rather than left deferred. Reopen only if the shape model admits zero-sized dimensions. |
+| `is_empty()` | **Implemented** (RFC-108) | `len() == 0` is reachable today via slicing to a zero-sized shape (e.g. `t.slice().range(0..0).all().build()`), even though no constructor accepts a zero-sized shape directly — a fact this row's prior wording missed. `is_empty()` returns `self.len() == 0`; `false` for every scalar (`len() == 1`) and every ordinary tensor. |
 | `set_flat` | **Not planned under that name** | The shipped spelling is `get_flat_mut` — `*t.get_flat_mut(i)? = v` — mirroring `get_flat` rather than adding a `set_*` family; see the `Mutable element API` row below. |
 | `arange` max elements | `1<<20` (~1 M) | Lowered from `1<<28` in v0.12.0 for OOM safety. |
 | `get_flat` | **Implemented** | `Tensor::get_flat(index) -> Option<f64>` added in v0.11.0. |

@@ -704,6 +704,16 @@ fn mm_mul(a: &Tensor, b: &Tensor, op: &'static str) -> Result<Tensor, MattenErro
     let [nb, p] = shape2(b, op)?;
     dim_check(n, nb, "left columns", "right rows", op)?;
     let mut out = vec![0.0f64; m * p];
+    // `chunks_mut(0)` panics regardless of slice length, so p == 0 must be
+    // guarded before the loop; the result is simply the empty [m, p] matrix.
+    if p == 0 {
+        return Ok(Tensor {
+            data: out,
+            shape: vec![m, p],
+            #[cfg(feature = "dynamic")]
+            dynamic: None,
+        });
+    }
     for (i, row) in out.chunks_mut(p).enumerate() {
         for (j, slot) in row.iter_mut().enumerate() {
             let mut acc = 0.0f64;

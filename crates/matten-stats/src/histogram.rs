@@ -70,7 +70,7 @@ pub fn histogram(x: &Tensor, bins: usize) -> Result<Histogram, MattenStatsError>
     if bins == 0 {
         return Err(MattenStatsError::InvalidBinCount);
     }
-    if x.len() == 0 {
+    if x.is_empty() {
         return Err(MattenStatsError::Empty);
     }
 

@@ -101,3 +101,96 @@ fn star_is_still_element_wise_not_matmul() {
     assert_eq!((&a * &b).as_slice(), &[5.0, 12.0, 21.0, 32.0]); // element-wise
     assert_eq!(a.matmul(&b).as_slice(), &[19.0, 22.0, 43.0, 50.0]); // matrix product
 }
+
+// ── zero-column / zero-row matmul (RFC-106 SS2.10, RFC-108) ────────────────
+//
+// No constructor accepts a zero-sized shape, so every empty operand here is
+// reached via slice().range(0..0), exactly as RFC-105/RFC-106's fixtures do.
+
+fn zero_rows(cols: usize) -> Tensor {
+    // shape [0, cols]
+    Tensor::new(vec![0.0; cols], &[1, cols])
+        .slice()
+        .range(0..0)
+        .all()
+        .build()
+        .unwrap()
+}
+
+fn zero_cols(rows: usize) -> Tensor {
+    // shape [rows, 0]
+    Tensor::new(vec![0.0; rows], &[rows, 1])
+        .slice()
+        .all()
+        .range(0..0)
+        .build()
+        .unwrap()
+}
+
+#[test]
+fn matmul_zero_output_columns_before_fix_would_panic() {
+    // [2,3] x [3,0] -> [2,0]. Before RFC-108's fix, `mm_mul`'s
+    // `out.chunks_mut(p)` panicked with "chunk size must be non-zero" here --
+    // this exact fixture is what demonstrated the defect (RFC-106 SS2.10).
+    let a = Tensor::new(vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0], &[2, 3]);
+    let b = zero_cols(3);
+    assert_eq!(b.shape(), &[3, 0]);
+
+    let r = a.try_dot(&b).unwrap();
+    assert_eq!(r.shape(), &[2, 0]);
+    assert!(r.as_slice().is_empty());
+
+    assert_eq!(a.try_matmul(&b).unwrap().shape(), &[2, 0]);
+}
+
+#[test]
+fn matmul_zero_output_columns_panicking_forms_also_return() {
+    // T5: the panicking `dot`/`matmul` forms must not panic either.
+    let a = Tensor::new(vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0], &[2, 3]);
+    let b = zero_cols(3);
+    assert_eq!(a.dot(&b).shape(), &[2, 0]);
+    assert_eq!(a.matmul(&b).shape(), &[2, 0]);
+}
+
+#[test]
+fn matmul_zero_contraction_dim_unchanged() {
+    // T2: n == 0 already worked before this fix and must stay identical:
+    // [2,0] x [0,3] -> [2,3], all zero (sum over zero terms).
+    let a = zero_cols(2);
+    let b = zero_rows(3);
+    assert_eq!(a.shape(), &[2, 0]);
+    assert_eq!(b.shape(), &[0, 3]);
+
+    let r = a.try_dot(&b).unwrap();
+    assert_eq!(r.shape(), &[2, 3]);
+    assert_eq!(r.as_slice(), &[0.0; 6]);
+    assert_eq!(a.dot(&b), r);
+}
+
+#[test]
+fn matmul_zero_rows_unchanged() {
+    // T3: m == 0 already worked before this fix and must stay identical:
+    // [0,3] x [3,2] -> [0,2].
+    let a = zero_rows(3);
+    let b = Tensor::new(vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0], &[3, 2]);
+    assert_eq!(a.shape(), &[0, 3]);
+
+    let r = a.try_dot(&b).unwrap();
+    assert_eq!(r.shape(), &[0, 2]);
+    assert!(r.as_slice().is_empty());
+    assert_eq!(a.dot(&b), r);
+}
+
+#[test]
+fn matmul_both_dims_zero() {
+    // T4: [0,3] x [3,0] -> [0,0]. Both m and p zero at once.
+    let a = zero_rows(3);
+    let b = zero_cols(3);
+    assert_eq!(a.shape(), &[0, 3]);
+    assert_eq!(b.shape(), &[3, 0]);
+
+    let r = a.try_dot(&b).unwrap();
+    assert_eq!(r.shape(), &[0, 0]);
+    assert!(r.as_slice().is_empty());
+    assert_eq!(a.dot(&b), r);
+}

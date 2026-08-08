@@ -64,10 +64,6 @@ impl PartialEq for Tensor {
     }
 }
 
-// `is_empty` is absent while zero-sized dimensions are rejected: zero-sized dims are rejected and a scalar
-// has `len() == 1`, so it would always be false. Deferred to a future
-// zero-sized-tensor RFC.
-#[allow(clippy::len_without_is_empty)]
 impl Tensor {
     // ------------------------------------------------------------------ //
     // Core constructors (also implemented in M1; repeated here for clarity)
@@ -302,6 +298,16 @@ impl Tensor {
             return dyn_t.len;
         }
         self.data.len()
+    }
+
+    /// Returns `true` if `len() == 0`, i.e. the shape has a zero-sized dimension.
+    ///
+    /// A rank-0 scalar has `len() == 1` and is therefore never empty. A tensor
+    /// reaching a zero-sized shape (e.g. via [`slice`](Tensor::slice) with an
+    /// empty range) has `is_empty() == true`.
+    #[must_use]
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
     }
 
     /// Returns `true` for a rank-0 scalar tensor (shape `[]`).

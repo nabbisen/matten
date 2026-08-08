@@ -37,7 +37,7 @@ pub fn quantile(x: &Tensor, q: f64) -> Result<f64, MattenStatsError> {
     if x.is_dynamic() {
         return Err(MattenStatsError::DynamicTensor);
     }
-    if x.len() == 0 {
+    if x.is_empty() {
         return Err(MattenStatsError::Empty);
     }
     if !q.is_finite() || !(0.0..=1.0).contains(&q) {

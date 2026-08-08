@@ -32,6 +32,33 @@ fn shape_predicates() {
     assert!(!t3.is_matrix());
 }
 
+// RFC-108: is_empty() is reachable via slicing even though no constructor
+// accepts a zero-sized shape directly.
+#[test]
+fn is_empty_true_on_sliced_empty_tensor() {
+    let t = Tensor::new(vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0], &[2, 3])
+        .slice()
+        .range(0..0)
+        .all()
+        .build()
+        .unwrap();
+    assert_eq!(t.shape(), &[0, 3]);
+    assert_eq!(t.len(), 0);
+    assert!(t.is_empty());
+}
+
+#[test]
+fn is_empty_false_on_scalar() {
+    // A rank-0 scalar has len() == 1 and is therefore never empty (RFC §5 R3).
+    assert!(!Tensor::scalar(0.0).is_empty());
+}
+
+#[test]
+fn is_empty_false_on_ordinary_tensor() {
+    assert!(!Tensor::new(vec![1.0, 2.0], &[2]).is_empty());
+    assert!(!Tensor::new(vec![1.0, 2.0, 3.0, 4.0], &[2, 2]).is_empty());
+}
+
 // RFC-031: is_dynamic() is unconditionally available.
 // When the `dynamic` feature is off, it must always return false.
 // When it is on, numeric tensors return false and dynamic tensors return true

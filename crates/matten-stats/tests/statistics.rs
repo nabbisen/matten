@@ -20,6 +20,17 @@ fn vec_tensor(v: Vec<f64>) -> Tensor {
     Tensor::new(v, &[n])
 }
 
+// No constructor accepts a zero-sized shape; the reachable empty tensor is a
+// sliced-empty one (RFC-105/RFC-106/RFC-108's fixture), not a rejected
+// constructor call.
+fn sliced_empty() -> Tensor {
+    Tensor::new(vec![1.0, 2.0, 3.0], &[3])
+        .slice()
+        .range(0..0)
+        .build()
+        .unwrap()
+}
+
 // ── covariance ─────────────────────────────────────────────────────────────
 
 #[test]
@@ -339,6 +350,19 @@ fn quantile_invalid_q_is_an_error() {
 }
 
 #[test]
+fn quantile_on_sliced_empty_is_an_error() {
+    // RFC-108 rewrote this check from `x.len() == 0` to `x.is_empty()`
+    // (clippy::len_zero, triggered once Tensor::is_empty() existed); behaviour
+    // must be identical, asserted on the one reachable empty path.
+    let x = sliced_empty();
+    assert!(x.is_empty());
+    assert!(matches!(
+        quantile(&x, 0.5).unwrap_err(),
+        MattenStatsError::Empty
+    ));
+}
+
+#[test]
 fn quantile_non_finite_input_value_is_an_error() {
     let x = vec_tensor(vec![1.0, f64::NAN, 3.0]);
     assert!(matches!(
@@ -502,6 +526,17 @@ fn histogram_bins_zero_is_invalid_bin_count() {
     assert!(matches!(
         histogram(&x, 0).unwrap_err(),
         MattenStatsError::InvalidBinCount
+    ));
+}
+
+#[test]
+fn histogram_on_sliced_empty_is_an_error() {
+    // Same rewrite as quantile's sibling test above (RFC-108).
+    let x = sliced_empty();
+    assert!(x.is_empty());
+    assert!(matches!(
+        histogram(&x, 4).unwrap_err(),
+        MattenStatsError::Empty
     ));
 }
 
