@@ -1,6 +1,7 @@
 # RFC-108: Two Empty-Tensor Defects — Stage 1
 
-**Status:** Proposed
+**Status:** **Accepted** 2026-08-08 by the owner. Not yet implemented. Handoff:
+`rfcs/handoffs/108-empty-tensor-defects-stage-1-handoff.md`.
 **Target:** core `matten`; one bug fix plus one additive method — a minor release when it ships
 **Theme:** Fix what is wrong today, independent of the zero-sized policy decision
 **Related:** RFC-003 §7.4, RFC-099, RFC-102, RFC-105, RFC-106

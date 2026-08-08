@@ -1,6 +1,9 @@
 # RFC-107: Architecture Overview and Data-Model Lifecycle Pages
 
-**Status:** **Accepted** 2026-08-08 by the owner. Not yet implemented. Handoff:
+**Status:** **Implemented** 2026-08-08 in commit *"Add architecture overview and data-model/lifecycle
+docs pages (RFC-107)"*, reviewed and approved after two corrections — a pair of section references a
+reader could not follow, and a maturity label that contradicted the README. Docs only; no release
+trigger (RFC-094). Handoff:
 `rfcs/handoffs/107-architecture-and-data-model-docs-handoff.md`.
 **Target:** `docs/` only — no code, no API, no version change
 **Theme:** Two reader-facing pages the book does not have
@@ -168,19 +171,19 @@ CHANGELOG.md — the release RFC writes it, and docs never trigger a release (RF
 ## 9. Acceptance criteria
 
 ```text
-[ ] both pages exist and are reachable from SUMMARY.md in the reader's path
-[ ] the crate graph matches Cargo.toml, and cites it
-[ ] the star shape is stated: companions depend on core, never on each other
+[x] both pages exist and are reachable from SUMMARY.md in the reader's path
+[x] the crate graph matches Cargo.toml, and cites it
+[x] the star shape is stated: companions depend on core, never on each other
     (RFC-078 §6), and core never on a companion (guard, RFC-022 §10)
-[ ] "one type, two modes" stated plainly, with the cfg-gating named (risk 4)
-[ ] the four lifecycle stages, with try_numeric named as the single gate
-[ ] the storage state machine, with BOTH the retention cost and the
+[x] "one type, two modes" stated plainly, with the cfg-gating named (risk 4)
+[x] the four lifecycle stages, with try_numeric named as the single gate
+[x] the storage state machine, with BOTH the retention cost and the
     materialize-on-write release
-[ ] Table described as a companion type reaching core via to_tensor(), not a variant
-[ ] two mermaid blocks only (§6); everything else a table or text
-[ ] contributing/architecture.md's substance unchanged; no fact duplicated
-[ ] all eight guards; check-doc-code.sh under RUSTFLAGS="-D warnings"; mdbook build clean
-[ ] no .rs, no book.toml, no workflow, no version change
+[x] Table described as a companion type reaching core via to_tensor(), not a variant
+[x] two mermaid blocks only (§6); everything else a table or text
+[x] contributing/architecture.md's substance unchanged; no fact duplicated
+[x] all eight guards; check-doc-code.sh under RUSTFLAGS="-D warnings"; mdbook build clean
+[x] no .rs, no book.toml, no workflow, no version change
 ```
 
 ## 10. Non-goals

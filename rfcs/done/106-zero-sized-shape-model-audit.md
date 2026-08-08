@@ -1,7 +1,13 @@
 # RFC-106: Zero-Sized Dimensions — Audit Before Decision
 
-**Status:** **Accepted** 2026-08-08 by the owner — **this RFC scopes an audit; it does not decide the
-policy**. Sequenced AFTER RFC-105, so the audit runs against post-fix code. Handoff:
+**Status:** **Complete** 2026-08-08 — the audit was produced and reviewed; **accepted with one
+correction**. `git diff` was empty, as required. Its recommendation is a **staged accept**: Stage 1 is
+RFC-108; Stage 2 (axis reductions) is confirmed toward RFC-105's answer; Stage 3 (relaxing
+`checked_shape_len`) remains parked. **The audit found a severe defect neither this RFC nor RFC-105
+anticipated** — `try_dot` panics on a zero-column product — and it found it because the handoff
+required running operations rather than reading them. **The correction was to the audit's own loudest
+claim**: its `matten-mlprep` warning predicted NaN-filled output under a relaxed guard, and testing
+showed an empty tensor instead, since `out` has `rows * cols` slots. Handoff:
 `rfcs/handoffs/106-zero-sized-shape-model-audit-handoff.md`.
 **Target:** core `matten` and the companion crates; no code change in this RFC
 **Theme:** Establish what the shape model actually does before changing what it claims
@@ -163,13 +169,13 @@ a v1.0 decision (RFC-076 remains deferred)
 ## 9. Acceptance criteria
 
 ```text
-[ ] every operation in §5.1 classified; NO operation listed as "not checked"
-[ ] each row cites the command or file:line that established it
-[ ] every INCONSISTENT pair named explicitly (transpose vs reshape is one; find the rest)
-[ ] the SEMANTIC count stated plainly, with each such row's open question written out
-[ ] §6's A and B both resolved into recommendations
-[ ] a recommendation among accept / prevent / document, with the audit as its basis
-[ ] no code change; no version bump, tag, or publish
+[x] every operation in §5.1 classified; NO operation listed as "not checked"
+[x] each row cites the command or file:line that established it
+[x] every INCONSISTENT pair named explicitly (transpose vs reshape is one; find the rest)
+[x] the SEMANTIC count stated plainly, with each such row's open question written out
+[x] §6's A and B both resolved into recommendations
+[x] a recommendation among accept / prevent / document, with the audit as its basis
+[x] no code change; no version bump, tag, or publish
 ```
 
 ## 10. Non-goals
