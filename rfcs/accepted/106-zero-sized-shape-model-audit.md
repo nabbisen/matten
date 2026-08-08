@@ -1,6 +1,8 @@
 # RFC-106: Zero-Sized Dimensions — Audit Before Decision
 
-**Status:** Proposed — **this RFC scopes an audit; it does not decide the policy**
+**Status:** **Accepted** 2026-08-08 by the owner — **this RFC scopes an audit; it does not decide the
+policy**. Sequenced AFTER RFC-105, so the audit runs against post-fix code. Handoff:
+`rfcs/handoffs/106-zero-sized-shape-model-audit-handoff.md`.
 **Target:** core `matten` and the companion crates; no code change in this RFC
 **Theme:** Establish what the shape model actually does before changing what it claims
 **Related:** RFC-003 §7.4, RFC-030, RFC-087 §6, RFC-105

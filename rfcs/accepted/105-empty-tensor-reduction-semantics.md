@@ -1,6 +1,7 @@
 # RFC-105: Empty-Tensor Reduction Semantics
 
-**Status:** Proposed
+**Status:** **Accepted** 2026-08-08 by the owner. Not yet implemented. Handoff:
+`rfcs/handoffs/105-empty-tensor-reduction-semantics-handoff.md`.
 **Target:** core `matten`; behaviour change to existing APIs, so a minor release when it ships
 **Theme:** Make reductions correct on empty tensors, which are reachable today
 **Related:** RFC-003 §7.4, RFC-055, RFC-099, RFC-106

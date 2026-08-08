@@ -131,7 +131,8 @@ sign-off and implementation — not that the state is unused.
 
 | ID | Title | Handoff |
 |---:|---|---|
-| — | *(none at present)* | — |
+| 105 | [Empty-Tensor Reduction Semantics](./accepted/105-empty-tensor-reduction-semantics.md) | [`105-…-handoff.md`](./handoffs/105-empty-tensor-reduction-semantics-handoff.md) |
+| 106 | [Zero-Sized Dimensions — Audit Before Decision](./accepted/106-zero-sized-shape-model-audit.md) | [`106-…-handoff.md`](./handoffs/106-zero-sized-shape-model-audit-handoff.md) — **sequenced after 105** |
 
 ## Archive
 
