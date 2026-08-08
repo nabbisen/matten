@@ -84,6 +84,13 @@ This is the same boundary `var`/`std` already drew.
 `try_sum` returns **`-0.0`**, where Rust's `[].iter().sum::<f64>()` gives `0.0`. Observed, not
 explained. It is harmless (`-0.0 == 0.0` compares true) and it is **not** part of §4's fix.
 
+> **CORRECTED at review, 2026-08-08.** The baseline above is **wrong**: `[].iter().sum::<f64>()`
+> yields **`-0.0`**, not `0.0` (verified, `rustc 1.97.1`). Only a naive `fold(0.0, +)` yields `+0.0`,
+> and matten does not use one. `std` chooses `-0.0` because it is the true additive identity for
+> floats — `-0.0 + x == x` for every `x` including `-0.0`, whereas `0.0 + (-0.0) == 0.0` loses a
+> sign. `try_sum` was correctly left untouched; normalising it would have made matten diverge from
+> the language to match a baseline I invented.
+
 **Determine why before changing anything**, and if it is incidental, normalise to `0.0`. If it turns
 out to be load-bearing somewhere, leave it and say so. Do not "fix" it blind.
 

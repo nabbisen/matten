@@ -116,6 +116,11 @@ B. is_empty(). compatibility.md marks it Not planned, reasoning that "the shape 
    rejects zero-sized dimensions in every form". That premise is false. Whether
    is_empty() should exist is downstream of this audit and must be revisited here —
    NOT quietly, since it was declined on a claim that no longer holds.
+   SECOND SITE, found during RFC-105's implementation: tensor.rs:67 carries the
+   clippy::len_without_is_empty justification -- "zero-sized dims are rejected and a
+   scalar has len()==1, so it would always be false. Deferred to a future
+   zero-sized-tensor RFC." Same false premise, and THIS RFC is that future RFC.
+   Resolve both sites together; do not fix one and leave the other.
 ```
 
 ## 7. Ecosystem reference
