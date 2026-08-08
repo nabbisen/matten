@@ -2,15 +2,16 @@
 
 **Status:** Proposed
 **Target:** core `matten`; new public API, so a minor release when it ships
-**Theme:** In-place element mutation on numeric tensors — **numeric only**
+**Theme:** In-place element mutation — numeric settled; dynamic scope **open** (§6.1)
 **Related:** RFC-008, RFC-011, RFC-012, RFC-055, RFC-094, RFC-099, RFC-102
 
 ---
 
 ## 1. Summary
 
-Add in-place element mutation to numeric `Tensor`. Dynamic tensors are **out of scope** and stay
-unmutable, for a reason this RFC states rather than defers vaguely (§6).
+Add in-place element mutation to numeric `Tensor`. **Whether this RFC also covers dynamic mutation
+is an open decision for the owner (§6.1)** — an earlier version of this RFC excluded it on a blocker
+that does not exist, and §6 records that correction rather than hiding it.
 
 ## 2. The premise this was deferred on is wrong — and I proved it by building it
 
@@ -55,7 +56,7 @@ No global immutability stance exists to violate. The only nearby claim is `opera
 *"operands are never mutated"*, which is about **operators** and remains true — operators still
 return new owned tensors and never take `&mut`.
 
-## 4. API shape — and the one decision this RFC asks for
+## 4. API shape — DECIDED (owner, 2026-08-08: option B)
 
 The library already splits numeric and dynamic accessors by name and type, so a numeric setter
 constrains a future dynamic setter **not at all**:
@@ -86,7 +87,7 @@ C. panicking set + try_set   RFC-099's shape — but that pair exists to preserv
                              panic path that never had to exist.
 ```
 
-**Recommendation: B.** It is the reading of the owner's stated priority — *"clean and sophisticated
+**Decided: B**, approved by the owner on 2026-08-08. It is the reading of the owner's stated priority — *"clean and sophisticated
 API design and careful error handling"* — and it keeps the surface at two methods rather than four.
 
 `#[must_use]` is not needed on `Result`; the compiler already warns.
@@ -113,7 +114,7 @@ docs: compatibility.md's `set_flat` and `Mutable element API` rows, and a
 ### Out of scope — a diff touching these is a defect
 
 ```text
-dynamic mutation of any kind (§6)
+dynamic mutation — PENDING the §6.1 scope decision, not excluded on merit
 IndexMut, get_mut, iter_mut, as_mut_slice — a separate and larger surface
 any change to get/get_flat, or to any operator
 CHANGELOG.md — the release RFC writes it
