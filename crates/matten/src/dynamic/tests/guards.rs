@@ -45,6 +45,31 @@ mod accessor_guard_tests {
         assert!(std::panic::catch_unwind(|| dyn1().get_flat(0)).is_err());
     }
 
+    // T4 (RFC-104): get_mut / get_flat_mut panic on dynamic, the same guard
+    // get / get_flat use. The exact message is asserted separately in
+    // diagnostic_message_tests below.
+    #[test]
+    fn get_mut_panics_on_dynamic() {
+        assert!(
+            std::panic::catch_unwind(|| {
+                let mut t = dyn1();
+                let _ = t.get_mut(&[0]);
+            })
+            .is_err()
+        );
+    }
+
+    #[test]
+    fn get_flat_mut_panics_on_dynamic() {
+        assert!(
+            std::panic::catch_unwind(|| {
+                let mut t = dyn1();
+                let _ = t.get_flat_mut(0);
+            })
+            .is_err()
+        );
+    }
+
     #[test]
     fn from_ref_tensor_panics_on_dynamic() {
         assert!(
@@ -170,6 +195,51 @@ mod diagnostic_message_tests {
         assert!(
             msg.starts_with("matten unsupported error in as_slice:"),
             "expected 'matten unsupported error in as_slice:', got: {msg}"
+        );
+    }
+
+    /// T4 (RFC-104): get_mut's panic message on a dynamic tensor is asserted
+    /// against the exact shared guard text (E4), not just "it panics" --
+    /// `None` on a dynamic tensor would be indistinguishable from
+    /// out-of-range, so this must panic with the standard guard message.
+    #[test]
+    fn get_mut_message_format() {
+        let t = Tensor::from_elements(vec![Element::Int(1)], &[1]);
+        let result = std::panic::catch_unwind(|| {
+            let mut t = t;
+            let _ = t.get_mut(&[0]);
+        });
+        let msg = result
+            .unwrap_err()
+            .downcast::<String>()
+            .map(|s| s.to_string())
+            .or_else(|e| e.downcast::<&str>().map(|s| s.to_string()))
+            .unwrap_or_default();
+        assert_eq!(
+            msg,
+            "matten unsupported error in get_mut: this numeric API is not supported \
+             on dynamic tensors; use to_elements() or try_numeric() first"
+        );
+    }
+
+    /// T4 (RFC-104): get_flat_mut's panic message, same standard as get_mut's.
+    #[test]
+    fn get_flat_mut_message_format() {
+        let t = Tensor::from_elements(vec![Element::Int(1)], &[1]);
+        let result = std::panic::catch_unwind(|| {
+            let mut t = t;
+            let _ = t.get_flat_mut(0);
+        });
+        let msg = result
+            .unwrap_err()
+            .downcast::<String>()
+            .map(|s| s.to_string())
+            .or_else(|e| e.downcast::<&str>().map(|s| s.to_string()))
+            .unwrap_or_default();
+        assert_eq!(
+            msg,
+            "matten unsupported error in get_flat_mut: this numeric API is not supported \
+             on dynamic tensors; use to_elements() or try_numeric() first"
         );
     }
 

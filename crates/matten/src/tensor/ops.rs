@@ -243,6 +243,52 @@ impl Tensor {
         self.data.get(index).copied()
     }
 
+    /// Returns a mutable reference to the element at the multidimensional
+    /// `coord`, or `None` if the coordinate rank doesn't match or any
+    /// component is out of bounds.
+    ///
+    /// # Panics
+    ///
+    /// Panics on a dynamic tensor, the same guard [`get`](Tensor::get) uses —
+    /// use [`get_element_mut`](Tensor::get_element_mut) there instead.
+    ///
+    /// ```
+    /// use matten::Tensor;
+    /// let mut t = Tensor::new(vec![1.0, 2.0, 3.0, 4.0], &[2, 2]);
+    /// *t.get_mut(&[0, 1]).unwrap() += 1.0;
+    /// assert_eq!(t.get(&[0, 1]), Some(3.0));
+    /// assert_eq!(t.get_mut(&[5, 0]), None);
+    /// ```
+    pub fn get_mut(&mut self, coord: &[usize]) -> Option<&mut f64> {
+        #[cfg(feature = "dynamic")]
+        self.panic_if_dynamic("get_mut");
+        let flat = crate::shape::coord_to_flat(coord, &self.shape)?;
+        self.data.get_mut(flat)
+    }
+
+    /// Returns a mutable reference to the element at flat row-major `index`,
+    /// or `None` if out of bounds.
+    ///
+    /// The flat-index companion to [`get_mut`](Tensor::get_mut), following
+    /// the same row-major layout as [`as_slice`](Tensor::as_slice).
+    ///
+    /// # Panics
+    ///
+    /// Panics on a dynamic tensor, the same guard [`get_flat`](Tensor::get_flat) uses.
+    ///
+    /// ```
+    /// use matten::Tensor;
+    /// let mut t = Tensor::new(vec![1.0, 2.0, 3.0, 4.0], &[2, 2]);
+    /// *t.get_flat_mut(1).unwrap() += 1.0;
+    /// assert_eq!(t.get_flat(1), Some(3.0));
+    /// assert_eq!(t.get_flat_mut(10), None);
+    /// ```
+    pub fn get_flat_mut(&mut self, index: usize) -> Option<&mut f64> {
+        #[cfg(feature = "dynamic")]
+        self.panic_if_dynamic("get_flat_mut");
+        self.data.get_mut(index)
+    }
+
     // ---- Slicing (M4 / RFC-008) ---------------------------------------------
 
     /// Starts a slice builder for this tensor. The builder is the canonical

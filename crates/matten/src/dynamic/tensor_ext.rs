@@ -56,6 +56,42 @@ impl Tensor {
         self.dynamic.as_ref()?.get_flat(flat).cloned()
     }
 
+    /// Returns a mutable reference to the element at the multidimensional
+    /// coordinate, or `None` if out of bounds.
+    ///
+    /// If this tensor's storage is shared with another (e.g. it is a slice
+    /// produced by [`slice`](Tensor::slice)/[`slice_str`](Tensor::slice_str)),
+    /// the first write **materializes** it — copying into a fresh, uniquely
+    /// owned allocation and detaching from the source (RFC-012's
+    /// copy-on-write model), so the write can never reach a shared parent.
+    /// This is a no-op when the storage is already contiguous and unique.
+    /// One side effect worth knowing: materializing a slice releases the
+    /// source's allocation it was otherwise keeping alive (the escape hatch
+    /// for RFC-102's retention cost, arriving here incidentally).
+    ///
+    /// Only meaningful on dynamic tensors.
+    ///
+    /// ```
+    /// # #[cfg(feature = "dynamic")] {
+    /// use matten::{Element, Tensor};
+    /// let mut t = Tensor::from_elements(vec![Element::Int(1), Element::Int(2)], &[2]);
+    /// *t.get_element_mut(&[1]).unwrap() = Element::text("two");
+    /// assert_eq!(t.get_element(&[1]), Some(Element::text("two")));
+    /// assert_eq!(t.get_element_mut(&[9]), None);
+    /// # }
+    /// ```
+    pub fn get_element_mut(&mut self, coord: &[usize]) -> Option<&mut crate::dynamic::Element> {
+        let flat = crate::shape::coord_to_flat(coord, &self.shape)?;
+        let dyn_t = self.dynamic.as_mut()?;
+        if flat >= dyn_t.len {
+            return None;
+        }
+        dyn_t.materialize();
+        let storage = std::sync::Arc::get_mut(&mut dyn_t.storage)
+            .expect("materialize() guarantees storage is uniquely owned");
+        storage.get_mut(flat)
+    }
+
     /// Converts a dynamic tensor to a numeric Phase 1 tensor using an explicit
     /// [`NumericPolicy`](crate::NumericPolicy).
     ///

@@ -178,8 +178,36 @@ Tensor::scalar(99.0).get(&[]);  // Some(99.0)
 # assert_eq!(Tensor::scalar(99.0).get(&[]), Some(99.0));
 ```
 
-`get` returns `Option<f64>` and never panics. There is no mutable element
-setter.
+`get` returns `Option<f64>` and never panics.
+
+## Mutable element access (RFC-104)
+
+`get_mut` and `get_flat_mut` mirror `get` and `get_flat` exactly — same
+argument shape, same `Option` return, same panic-on-dynamic guard — but
+return a mutable reference instead of a copy, so read-modify-write is one
+expression instead of two lookups:
+
+```rust
+# use matten::Tensor;
+let mut t = Tensor::new(vec![1.0, 2.0, 3.0, 4.0], &[2, 2]);
+
+*t.get_mut(&[0, 1]).unwrap() += 1.0;
+assert_eq!(t.get(&[0, 1]), Some(3.0));
+
+assert_eq!(t.get_mut(&[5, 0]), None); // out of bounds -- tensor unchanged
+```
+
+There is no `set`/`set_flat`: `t.set(coord, v)` is one line over `get_mut`
+(`*t.get_mut(coord).unwrap() = v`), so it was left out rather than added as
+redundant sugar. `IndexMut` (`t[[i, j]] = v`), `iter_mut`, and
+`as_mut_slice` are deliberately not in this cut either — `get_mut` covers
+the read-modify-write case with an `Option` rather than a panic path; the
+others are cheap to add later on top of `get_mut` and not cheap to withdraw.
+
+On a dynamic tensor, use
+[`get_element_mut`](./dynamic.md#mutable-element-access-rfc-104) instead —
+`get_mut`/`get_flat_mut` panic on dynamic input, the same guard `get`/`get_flat`
+use.
 
 ## Numeric Tensor ownership note
 

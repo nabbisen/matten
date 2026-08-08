@@ -113,6 +113,39 @@ t.is_dynamic()          // true for dynamic tensors
 t.to_elements()         // Vec<Element> in row-major order
 ```
 
+## Mutable element access (RFC-104)
+
+`get_element_mut` mirrors `get_element`, returning `Option<&mut Element>`
+instead of a copy. The caller reads, changes, or replaces the variant —
+the library never chooses one, so writing a `42.0` into what was an `Int`
+column raises no coercion question; it simply becomes a `Float` because
+that is what was written.
+
+```rust
+# #[cfg(feature = "dynamic")] {
+use matten::{Element, Tensor};
+
+let mut t = Tensor::from_elements(vec![Element::Int(1), Element::Int(2)], &[2]);
+*t.get_element_mut(&[1]).unwrap() = Element::text("two");
+assert_eq!(t.get_element(&[1]), Some(Element::text("two")));
+assert_eq!(t.get_element_mut(&[9]), None); // out of bounds
+# }
+```
+
+**If this tensor's storage is shared** — for example it is a
+[slice](./slicing.md#slicing-dynamic-tensors-rfc-102-cfgfeature--dynamic) —
+the first write **materializes** it: a fresh, uniquely owned copy is made
+and the tensor detaches from whatever it was sharing with, so the write can
+never reach a shared parent. This is a no-op when the storage is already
+contiguous and unique — a second write on an already-detached tensor does
+not reallocate.
+
+**Worth knowing:** materializing a slice releases the source's allocation
+it was otherwise keeping alive for as long as the slice lived — the
+retention cost documented in [Slicing](./slicing.md) gets an incidental
+escape hatch here, as a side effect of an unrelated operation (mutation),
+not a feature built for that purpose.
+
 ## Missing-value utilities
 
 ```rust,ignore

@@ -252,6 +252,66 @@ fn get_flat_matches_as_slice_order() {
     }
 }
 
+// ---- get_mut / get_flat_mut (RFC-104) -----------------------------------
+
+// T1 + T2: write lands, and read-modify-write works in one expression.
+#[test]
+fn get_mut_writes_land_in_place() {
+    let mut t = Tensor::new(vec![1.0, 2.0, 3.0, 4.0], &[2, 2]);
+    *t.get_mut(&[0, 1]).unwrap() += 1.0;
+    assert_eq!(t.get(&[0, 1]), Some(3.0));
+    assert_eq!(t.as_slice(), &[1.0, 3.0, 3.0, 4.0]);
+}
+
+#[test]
+fn get_flat_mut_writes_land_in_place() {
+    let mut t = Tensor::new(vec![1.0, 2.0, 3.0, 4.0], &[2, 2]);
+    *t.get_flat_mut(1).unwrap() += 100.0;
+    assert_eq!(t.get_flat(1), Some(102.0));
+    assert_eq!(t.as_slice(), &[1.0, 102.0, 3.0, 4.0]);
+}
+
+// T3: out-of-range returns None and leaves the tensor unchanged.
+#[test]
+fn get_mut_out_of_range_is_none_and_leaves_tensor_unchanged() {
+    let mut t = Tensor::new(vec![1.0, 2.0, 3.0, 4.0], &[2, 2]);
+    assert_eq!(t.get_mut(&[5, 0]), None);
+    assert_eq!(t.get_mut(&[0]), None); // wrong rank
+    assert_eq!(t.as_slice(), &[1.0, 2.0, 3.0, 4.0]);
+}
+
+#[test]
+fn get_flat_mut_out_of_range_is_none_and_leaves_tensor_unchanged() {
+    let mut t = Tensor::new(vec![1.0, 2.0, 3.0, 4.0], &[2, 2]);
+    assert_eq!(t.get_flat_mut(99), None);
+    assert_eq!(t.as_slice(), &[1.0, 2.0, 3.0, 4.0]);
+}
+
+// T5: non-square tensor -- get_mut(&[r,c]) and get_flat_mut must agree on the
+// same element. A square tensor cannot distinguish a coord/flat transposition
+// bug from correct code, since rows and columns have the same stride.
+#[test]
+fn get_mut_and_get_flat_mut_agree_on_a_non_square_tensor() {
+    // [2, 3]: [[0,1,2],[3,4,5]] -- row-major flat index r*3+c
+    let mut t = Tensor::new((0..6).map(|x| x as f64).collect(), &[2, 3]);
+    *t.get_mut(&[1, 2]).unwrap() = 99.0; // flat index 1*3+2 = 5
+    assert_eq!(t.get_flat(5), Some(99.0));
+
+    *t.get_flat_mut(2).unwrap() = 77.0; // coord [0, 2]
+    assert_eq!(t.get(&[0, 2]), Some(77.0));
+}
+
+// T6 (risk 2): numeric slices are independent owned copies (RFC-008 Phase 1),
+// so mutating one must never reach the source. Proven, not assumed.
+#[test]
+fn mutating_a_numeric_slice_leaves_its_source_unchanged() {
+    let source = Tensor::new((0..6).map(|x| x as f64).collect(), &[2, 3]);
+    let mut slice = source.slice().index(0).all().build().unwrap();
+    *slice.get_mut(&[1]).unwrap() = 999.0;
+    assert_eq!(slice.as_slice(), &[0.0, 999.0, 2.0]);
+    assert_eq!(source.as_slice(), &[0.0, 1.0, 2.0, 3.0, 4.0, 5.0]);
+}
+
 // ---- RFC-018: resource safety limit tests --------------------------------
 
 mod limits_tests {

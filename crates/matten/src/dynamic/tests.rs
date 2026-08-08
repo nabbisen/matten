@@ -10,6 +10,8 @@ mod guards;
 #[cfg(feature = "dynamic")]
 mod lifecycle;
 #[cfg(feature = "dynamic")]
+mod mutation;
+#[cfg(feature = "dynamic")]
 mod policy;
 #[cfg(feature = "dynamic")]
 mod slicing;
