@@ -7,6 +7,7 @@
 - [Philosophy](./philosophy.md)
 - [Quick start](./quick-start.md)
 - [Playground](./playground.md)
+- [Architecture](./architecture.md)
 
 # Tutorial
 
@@ -26,6 +27,7 @@
 
 # Reference
 
+- [Data model and lifecycle](./reference/data-model.md)
 - [Error model](./reference/error-model.md)
   - [Panic vs Result (moved)](./panic-vs-result.md)
 - [Construction and conversion](./reference/construction.md)

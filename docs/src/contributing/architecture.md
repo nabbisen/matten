@@ -1,5 +1,10 @@
 # Architecture
 
+This is the contributor reference: source layout, re-exports, invariants, milestone
+history. For the reader-facing crate overview and the data-model/lifecycle picture,
+see [Architecture](../architecture.md) and
+[Data model and lifecycle](../reference/data-model.md).
+
 ## Source layout
 
 ```
