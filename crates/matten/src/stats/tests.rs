@@ -66,6 +66,47 @@ fn empty_tensor_is_not_constructible() {
     ));
 }
 
+// RFC-105: the guard above is reachable after all -- not via a constructor
+// (still correctly rejected, per the test above), but via slicing. try_var
+// and try_std were already correct on this path before RFC-105; this test
+// exists to prove that RFC-105's changes elsewhere left them byte-identical.
+#[test]
+fn var_and_std_are_unchanged_on_a_reachable_empty_tensor() {
+    let t = Tensor::new(vec![1., 2., 3., 4., 5., 6.], &[2, 3])
+        .slice()
+        .range(0..0)
+        .all()
+        .build()
+        .unwrap();
+    assert_eq!(t.len(), 0);
+
+    let err = t.try_var().unwrap_err();
+    assert!(matches!(
+        err,
+        MattenError::InvalidArgument {
+            operation: "var",
+            ..
+        }
+    ));
+    assert_eq!(
+        err.to_string(),
+        "matten invalid argument error in var: self: variance is undefined for an empty tensor"
+    );
+
+    let err = t.try_std().unwrap_err();
+    assert!(matches!(
+        err,
+        MattenError::InvalidArgument {
+            operation: "std",
+            ..
+        }
+    ));
+    assert_eq!(
+        err.to_string(),
+        "matten invalid argument error in std: self: standard deviation is undefined for an empty tensor"
+    );
+}
+
 // ----- axis reductions: drop the reduced axis -----
 
 #[test]

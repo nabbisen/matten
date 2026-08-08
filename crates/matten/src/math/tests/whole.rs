@@ -84,3 +84,107 @@ fn try_scalar_reductions_propagate_nan() {
     assert!(t.try_min().unwrap().is_nan());
     assert!(t.try_max().unwrap().is_nan());
 }
+
+// ── empty-tensor reduction semantics (RFC-105) ───────────────────────────
+//
+// An empty tensor cannot be built by any constructor (zero-sized dims are
+// rejected), but it IS reachable via slicing -- that reachability is the
+// entire point of this RFC, so every fixture below goes through
+// slice().range(0..0), never a direct constructor.
+
+use crate::MattenError;
+
+fn empty_2x3() -> Tensor {
+    Tensor::new(vec![1., 2., 3., 4., 5., 6.], &[2, 3])
+        .slice()
+        .range(0..0)
+        .all()
+        .build()
+        .unwrap()
+}
+
+#[test]
+fn empty_fixture_is_actually_empty() {
+    // Guards against risk R3 (RFC-105 handoff SS9): a fixture with len > 0
+    // would make every test below pass vacuously.
+    let t = empty_2x3();
+    assert_eq!(t.shape(), &[0, 3]);
+    assert_eq!(t.len(), 0);
+    assert!(t.as_slice().is_empty());
+}
+
+// T1 + T2: each try_ form returns Err on empty, naming the operation and
+// "undefined for an empty tensor".
+#[test]
+fn try_mean_min_max_are_err_on_empty() {
+    let t = empty_2x3();
+
+    let err = t.try_mean().unwrap_err();
+    assert!(matches!(
+        err,
+        MattenError::InvalidArgument {
+            operation: "mean",
+            ..
+        }
+    ));
+    assert_eq!(
+        err.to_string(),
+        "matten invalid argument error in mean: self: mean is undefined for an empty tensor"
+    );
+
+    let err = t.try_min().unwrap_err();
+    assert!(matches!(
+        err,
+        MattenError::InvalidArgument {
+            operation: "min",
+            ..
+        }
+    ));
+    assert_eq!(
+        err.to_string(),
+        "matten invalid argument error in min: self: minimum is undefined for an empty tensor"
+    );
+
+    let err = t.try_max().unwrap_err();
+    assert!(matches!(
+        err,
+        MattenError::InvalidArgument {
+            operation: "max",
+            ..
+        }
+    ));
+    assert_eq!(
+        err.to_string(),
+        "matten invalid argument error in max: self: maximum is undefined for an empty tensor"
+    );
+}
+
+// T3: the panicking forms panic with THAT SENTENCE, not a raw index panic.
+// The captured message is asserted, not merely that a panic occurred --
+// the entire defect was WHICH panic (RFC-105 handoff R2).
+#[test]
+#[should_panic(expected = "mean is undefined for an empty tensor")]
+fn mean_panics_with_the_sentence_on_empty() {
+    let _ = empty_2x3().mean();
+}
+
+#[test]
+#[should_panic(expected = "minimum is undefined for an empty tensor")]
+fn min_panics_with_the_sentence_on_empty() {
+    let _ = empty_2x3().min();
+}
+
+#[test]
+#[should_panic(expected = "maximum is undefined for an empty tensor")]
+fn max_panics_with_the_sentence_on_empty() {
+    let _ = empty_2x3().max();
+}
+
+// T5: try_sum still returns a zero on empty (sum of the empty set is the
+// additive identity -- explicitly NOT part of this RFC's fix, RFC-105 §4).
+#[test]
+fn try_sum_still_returns_a_zero_on_empty() {
+    let t = empty_2x3();
+    assert_eq!(t.try_sum().unwrap(), 0.0);
+    assert_eq!(t.sum(), 0.0);
+}

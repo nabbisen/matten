@@ -57,6 +57,68 @@ fn argmin_panics_on_nan() {
     let _ = Tensor::from_vec(vec![1.0, f64::NAN]).argmin();
 }
 
+// ── empty-tensor semantics (RFC-105) ─────────────────────────────────────
+//
+// Before this RFC, argmin/argmax on an empty tensor panicked with a raw
+// Rust slice index error ("index out of bounds: the len is 0 but the index
+// is 0"), not a matten error -- defeating the try_ form entirely. The
+// fixture MUST be reached via slicing; no constructor accepts a zero-sized
+// dimension.
+
+fn empty_2x3() -> Tensor {
+    Tensor::new(vec![1., 2., 3., 4., 5., 6.], &[2, 3])
+        .slice()
+        .range(0..0)
+        .all()
+        .build()
+        .unwrap()
+}
+
+#[test]
+fn try_argmin_argmax_are_err_on_empty() {
+    let t = empty_2x3();
+
+    let err = t.try_argmin().unwrap_err();
+    assert!(matches!(
+        err,
+        crate::MattenError::InvalidArgument {
+            operation: "argmin",
+            ..
+        }
+    ));
+    assert_eq!(
+        err.to_string(),
+        "matten invalid argument error in argmin: self: argmin is undefined for an empty tensor"
+    );
+
+    let err = t.try_argmax().unwrap_err();
+    assert!(matches!(
+        err,
+        crate::MattenError::InvalidArgument {
+            operation: "argmax",
+            ..
+        }
+    ));
+    assert_eq!(
+        err.to_string(),
+        "matten invalid argument error in argmax: self: argmax is undefined for an empty tensor"
+    );
+}
+
+// The captured message is asserted, not merely that a panic occurred --
+// the defect was WHICH panic: a raw index panic versus a diagnosis.
+#[test]
+#[should_panic(expected = "argmin is undefined for an empty tensor")]
+fn argmin_panics_with_the_sentence_on_empty_not_an_index_panic() {
+    let _ = empty_2x3().argmin();
+}
+
+#[test]
+#[should_panic(expected = "argmax is undefined for an empty tensor")]
+fn argmax_panics_with_the_sentence_on_empty_not_an_index_panic() {
+    let _ = empty_2x3().argmax();
+}
+
 // ── dynamic rejection ──────────────────────────────────────────────────────
 
 #[cfg(feature = "dynamic")]

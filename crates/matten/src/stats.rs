@@ -107,9 +107,11 @@ impl Tensor {
     /// Non-panicking [`Tensor::var`].
     ///
     /// # Errors
-    /// Returns [`MattenError::Unsupported`] on a dynamic tensor. The empty-tensor
-    /// guard returns [`MattenError::InvalidArgument`], but `matten` already forbids
-    /// zero-sized dimensions, so an empty tensor is not constructible in practice.
+    /// Returns [`MattenError::Unsupported`] on a dynamic tensor, or
+    /// [`MattenError::InvalidArgument`] if the tensor is empty. No
+    /// constructor accepts a zero-sized dimension, but slicing reaches one
+    /// (`t.slice().range(0..0).all().build()`), so this guard is live, not
+    /// theoretical (RFC-105).
     ///
     /// ```
     /// use matten::Tensor;

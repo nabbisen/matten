@@ -14,7 +14,11 @@ use crate::{MattenError, Tensor};
 /// Flat index of the extreme element, first occurrence on ties.
 ///
 /// Returns [`MattenError::InvalidArgument`] if any element is `NaN`. Callers
-/// guarantee `data` is non-empty (core rejects zero-sized dimensions).
+/// must check `data` is non-empty first (RFC-105) — this function indexes
+/// `data[0]` unconditionally and does not check itself. An empty tensor is
+/// not constructible directly, but slicing reaches one
+/// (`t.slice().range(0..0).all().build()`), so this is a real caller
+/// obligation, not a vacuous one.
 fn arg_extreme(
     data: &[f64],
     operation: &'static str,
@@ -43,8 +47,10 @@ impl Tensor {
     /// Flat (row-major) index of the smallest element; first occurrence on ties.
     ///
     /// # Panics
-    /// Panics if any element is `NaN` (the index would be ill-defined), or if called
-    /// on a dynamic tensor. Use [`Tensor::try_argmin`] for the non-panicking form.
+    /// Panics if any element is `NaN` (the index would be ill-defined), if
+    /// called on a dynamic tensor, or if the tensor is empty (RFC-105) —
+    /// there is no index to return. Use [`Tensor::try_argmin`] for the
+    /// non-panicking form.
     ///
     /// ```
     /// use matten::Tensor;
@@ -59,7 +65,8 @@ impl Tensor {
     /// Flat (row-major) index of the largest element; first occurrence on ties.
     ///
     /// # Panics
-    /// Panics if any element is `NaN`, or if called on a dynamic tensor. Use
+    /// Panics if any element is `NaN`, if called on a dynamic tensor, or if
+    /// the tensor is empty (RFC-105) — there is no index to return. Use
     /// [`Tensor::try_argmax`] for the non-panicking form.
     ///
     /// ```
@@ -74,8 +81,9 @@ impl Tensor {
 
     /// Non-panicking [`Tensor::argmin`].
     ///
-    /// Returns [`MattenError::InvalidArgument`] if any element is `NaN`, or
-    /// [`MattenError::Unsupported`] if called on a dynamic tensor.
+    /// Returns [`MattenError::InvalidArgument`] if any element is `NaN` or
+    /// the tensor is empty (RFC-105), or [`MattenError::Unsupported`] if
+    /// called on a dynamic tensor.
     ///
     /// ```
     /// use matten::Tensor;
@@ -91,13 +99,21 @@ impl Tensor {
                     .to_string(),
             });
         }
+        if self.data.is_empty() {
+            return Err(MattenError::InvalidArgument {
+                operation: "argmin",
+                argument: "self",
+                message: "argmin is undefined for an empty tensor".to_string(),
+            });
+        }
         arg_extreme(&self.data, "argmin", true)
     }
 
     /// Non-panicking [`Tensor::argmax`].
     ///
-    /// Returns [`MattenError::InvalidArgument`] if any element is `NaN`, or
-    /// [`MattenError::Unsupported`] if called on a dynamic tensor.
+    /// Returns [`MattenError::InvalidArgument`] if any element is `NaN` or
+    /// the tensor is empty (RFC-105), or [`MattenError::Unsupported`] if
+    /// called on a dynamic tensor.
     ///
     /// ```
     /// use matten::Tensor;
@@ -111,6 +127,13 @@ impl Tensor {
                 operation: "argmax",
                 message: "argmax is not supported on dynamic tensors; call try_numeric() first"
                     .to_string(),
+            });
+        }
+        if self.data.is_empty() {
+            return Err(MattenError::InvalidArgument {
+                operation: "argmax",
+                argument: "self",
+                message: "argmax is undefined for an empty tensor".to_string(),
             });
         }
         arg_extreme(&self.data, "argmax", false)

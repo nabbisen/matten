@@ -54,13 +54,14 @@ impl Tensor {
 
     /// Returns the arithmetic mean of all elements (`sum / len`).
     ///
-    /// `NaN` propagates. Behaviour on an empty tensor is unspecified
-    /// (zero-sized dims are rejected by constructors in Phase 1). For a
-    /// non-panicking form, see [`Tensor::try_mean`].
+    /// `NaN` propagates. For a non-panicking form, see [`Tensor::try_mean`].
     ///
     /// # Panics
-    /// Panics on a dynamic tensor. Use [`Tensor::try_mean`] for the
-    /// non-panicking form.
+    /// Panics on a dynamic tensor, or if the tensor is empty (RFC-105) — no
+    /// constructor accepts a zero-sized dimension, but slicing can still
+    /// produce one (e.g. `t.slice().range(0..0).all().build()`), and the
+    /// mean of an empty set is undefined, not `NaN`. Use [`Tensor::try_mean`]
+    /// for the non-panicking form.
     ///
     /// ```
     /// use matten::Tensor;
@@ -74,8 +75,10 @@ impl Tensor {
     /// Non-panicking [`Tensor::mean`].
     ///
     /// # Errors
-    /// Returns [`MattenError::Unsupported`] on a dynamic tensor. `NaN` is treated
-    /// as a value and propagates according to the underlying operation.
+    /// Returns [`MattenError::Unsupported`] on a dynamic tensor, or
+    /// [`MattenError::InvalidArgument`] if the tensor is empty (RFC-105).
+    /// `NaN` is treated as a value and propagates according to the
+    /// underlying operation.
     ///
     /// ```
     /// use matten::Tensor;
@@ -83,6 +86,13 @@ impl Tensor {
     /// ```
     pub fn try_mean(&self) -> Result<f64, MattenError> {
         reject_dynamic(self, "mean")?;
+        if self.data.is_empty() {
+            return Err(MattenError::InvalidArgument {
+                operation: "mean",
+                argument: "self",
+                message: "mean is undefined for an empty tensor".to_string(),
+            });
+        }
         Ok(self.data.iter().sum::<f64>() / self.data.len() as f64)
     }
 
@@ -93,8 +103,9 @@ impl Tensor {
     /// form, see [`Tensor::try_min`].
     ///
     /// # Panics
-    /// Panics on a dynamic tensor. Use [`Tensor::try_min`] for the
-    /// non-panicking form.
+    /// Panics on a dynamic tensor, or if the tensor is empty (RFC-105) — the
+    /// minimum of an empty set is undefined, not `f64::INFINITY`. Use
+    /// [`Tensor::try_min`] for the non-panicking form.
     ///
     /// ```
     /// use matten::Tensor;
@@ -109,8 +120,10 @@ impl Tensor {
     /// Non-panicking [`Tensor::min`].
     ///
     /// # Errors
-    /// Returns [`MattenError::Unsupported`] on a dynamic tensor. `NaN` is treated
-    /// as a value and propagates according to the underlying operation.
+    /// Returns [`MattenError::Unsupported`] on a dynamic tensor, or
+    /// [`MattenError::InvalidArgument`] if the tensor is empty (RFC-105).
+    /// `NaN` is treated as a value and propagates according to the
+    /// underlying operation.
     ///
     /// ```
     /// use matten::Tensor;
@@ -118,6 +131,13 @@ impl Tensor {
     /// ```
     pub fn try_min(&self) -> Result<f64, MattenError> {
         reject_dynamic(self, "min")?;
+        if self.data.is_empty() {
+            return Err(MattenError::InvalidArgument {
+                operation: "min",
+                argument: "self",
+                message: "minimum is undefined for an empty tensor".to_string(),
+            });
+        }
         Ok(nan_reduce(&self.data, f64::INFINITY, |acc, v| acc.min(v)))
     }
 
@@ -127,8 +147,9 @@ impl Tensor {
     /// [`Tensor::try_max`].
     ///
     /// # Panics
-    /// Panics on a dynamic tensor. Use [`Tensor::try_max`] for the
-    /// non-panicking form.
+    /// Panics on a dynamic tensor, or if the tensor is empty (RFC-105) — the
+    /// maximum of an empty set is undefined, not `f64::NEG_INFINITY`. Use
+    /// [`Tensor::try_max`] for the non-panicking form.
     ///
     /// ```
     /// use matten::Tensor;
@@ -143,8 +164,10 @@ impl Tensor {
     /// Non-panicking [`Tensor::max`].
     ///
     /// # Errors
-    /// Returns [`MattenError::Unsupported`] on a dynamic tensor. `NaN` is treated
-    /// as a value and propagates according to the underlying operation.
+    /// Returns [`MattenError::Unsupported`] on a dynamic tensor, or
+    /// [`MattenError::InvalidArgument`] if the tensor is empty (RFC-105).
+    /// `NaN` is treated as a value and propagates according to the
+    /// underlying operation.
     ///
     /// ```
     /// use matten::Tensor;
@@ -152,6 +175,13 @@ impl Tensor {
     /// ```
     pub fn try_max(&self) -> Result<f64, MattenError> {
         reject_dynamic(self, "max")?;
+        if self.data.is_empty() {
+            return Err(MattenError::InvalidArgument {
+                operation: "max",
+                argument: "self",
+                message: "maximum is undefined for an empty tensor".to_string(),
+            });
+        }
         Ok(nan_reduce(&self.data, f64::NEG_INFINITY, |acc, v| {
             acc.max(v)
         }))
