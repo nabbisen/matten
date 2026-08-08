@@ -1,7 +1,10 @@
 # RFC-104: Mutable Element Access
 
-**Status:** **Accepted** 2026-08-08 by the owner, with the §6.1 scope decision resolved to **WIDEN**:
-numeric and dynamic mutable access ship together. Not yet implemented.
+**Status:** **Implemented** 2026-08-08 in commit *"Add mutable element access: get_mut,
+get_flat_mut, get_element_mut (RFC-104)"*, reviewed and approved with **no corrections**. Unreleased;
+the release decision is open under RFC-094. Accepted with §6.1 resolved to **WIDEN** — numeric and
+dynamic shipped together. **This RFC was wrong twice before it was right; §4 and §6 record both
+corrections inline rather than presenting the third version as the first.**
 **Target:** core `matten`; new public API, so a minor release when it ships
 **Theme:** Mutable element access via `get_mut` — numeric **and** dynamic
 **Related:** RFC-008, RFC-011, RFC-012, RFC-055, RFC-094, RFC-099, RFC-102
@@ -221,19 +224,19 @@ which detaches its storage — so it *incidentally releases the parent allocatio
 ## 8. Acceptance criteria
 
 ```text
-[ ] get_mut / get_flat_mut return Some(&mut f64) and writes land in place
-[ ] out-of-range returns None; the tensor is UNCHANGED
-[ ] read-modify-write works in one expression: *t.get_mut(&[r,c])? += 1.0
-[ ] a dynamic tensor PANICS with the same message shape as get/get_flat — asserted
+[x] get_mut / get_flat_mut return Some(&mut f64) and writes land in place
+[x] out-of-range returns None; the tensor is UNCHANGED
+[x] read-modify-write works in one expression: *t.get_mut(&[r,c])? += 1.0
+[x] a dynamic tensor PANICS with the same message shape as get/get_flat — asserted
     against the captured message, not merely "it panics"
-[ ] mutating a numeric slice leaves its source unchanged — asserted (risk 2)
-[ ] non-square tensor: get_mut(&[r,c]) and get_flat_mut agree (risk 3)
-[ ] get_element_mut materializes; a slice's write does not reach its
+[x] mutating a numeric slice leaves its source unchanged — asserted (risk 2)
+[x] non-square tensor: get_mut(&[r,c]) and get_flat_mut agree (risk 3)
+[x] get_element_mut materializes; a slice's write does not reach its
     source; Arc identity breaks on first write — all asserted (risk 4)
-[ ] no change to get / get_flat / get_element, to any operator, or to any result
-[ ] both feature profiles build
-[ ] all eight guards; check-doc-code.sh under RUSTFLAGS="-D warnings"
-[ ] no version bump, tag, or publish
+[x] no change to get / get_flat / get_element, to any operator, or to any result
+[x] both feature profiles build
+[x] all eight guards; check-doc-code.sh under RUSTFLAGS="-D warnings"
+[x] no version bump, tag, or publish
 ```
 
 ## 9. Non-goals
