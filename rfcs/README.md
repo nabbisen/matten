@@ -129,7 +129,7 @@ sign-off and implementation — not that the state is unused.
 
 | ID | Title | Handoff |
 |---:|---|---|
-| — | *(none at present)* | — |
+| 103 | [`0.44.0` — Dynamic Slicing Release](./accepted/103-0440-dynamic-slicing-release.md) | [`103-…-handoff.md`](./handoffs/103-0440-dynamic-slicing-release-handoff.md) |
 
 ## Archive
 
