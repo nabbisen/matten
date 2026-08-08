@@ -258,18 +258,20 @@ mod lifecycle_tests {
     }
 
     #[test]
-    fn dynamic_slice_builder_is_unsupported() {
+    fn dynamic_slice_builder_is_supported() {
+        // RFC-102: slicing dynamic tensors is no longer rejected. Full
+        // coverage (shared storage, composition, rank-0 collapse, element
+        // survival, get_element on a slice) lives in dynamic::tests::slicing.
         let t = Tensor::from_elements(
             vec![Element::Int(1), Element::Int(2), Element::Int(3)],
             &[3],
         );
-        // slice().build() must either return Err or panic, not silently succeed
-        // with wrong data. We test via slice_str which calls execute_slice.
         let result = t.slice_str("0:2");
         assert!(
-            result.is_err(),
-            "slice_str on dynamic tensor must return Err"
+            result.is_ok(),
+            "slice_str on a dynamic tensor must succeed (RFC-102)"
         );
+        assert!(result.unwrap().is_dynamic());
     }
 
     #[test]

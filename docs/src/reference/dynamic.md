@@ -171,6 +171,28 @@ let t = Tensor::from_json_dynamic(r#"[[1, "active", true], [2, null, false]]"#)?
 let t = Tensor::from_csv_dynamic("1,active,true\n2,,false\n")?;
 ```
 
+## Slicing (RFC-102)
+
+`slice()` and `slice_str()` work on dynamic tensors, returning a dynamic
+tensor. Slicing selects *positions* — it does not interpret `Element`
+values, so heterogeneity is irrelevant and `Text`/`None`/`Bool` survive a
+slice unchanged alongside `Int`/`Float`. Storage is **shared**, not copied
+(`Arc::clone`), the same copy-on-write model `fill_none` and the other
+element-producing methods above already use internally:
+
+```rust
+# #[cfg(feature = "dynamic")] {
+use matten::{Element, Tensor};
+
+let t = Tensor::from_elements((0..6).map(Element::Int).collect(), &[2, 3]);
+let row = t.slice().index(0).all().build().unwrap();
+assert!(row.is_dynamic());
+assert_eq!(row.get_element(&[1]), Some(Element::Int(1)));
+# }
+```
+
+See [Slicing](./slicing.md#slicing-dynamic-tensors-rfc-102-cfgfeature--dynamic) for the full contract.
+
 ## Current limitations (guard model)
 
 In the current release, many numeric operations **reject** dynamic
@@ -179,15 +201,14 @@ to a numeric tensor first using `try_numeric()`.
 
 Guarded (will panic or return `Err`):
 - `reshape`, `flatten`, `transpose`, `swap_axes`
-- `slice()` builder and `slice_str()` → `MattenError::Unsupported`
 - all arithmetic operators and reductions
 - `dot` / `matmul`
 - `as_slice`, `to_vec`, `into_vec`, `get`, `get_flat`
 - `Serialize` / serde
 
 The underlying `Arc`-based CoW storage (`DynamicTensor`) is implemented
-internally and will back future public dynamic slicing and reshape in a later
-release.
+internally; slicing (above) is its first public use. `reshape` is not yet
+wired to it.
 
 ```rust,ignore
 // Correct pattern: ingest → clean → convert → arithmetic

@@ -115,10 +115,52 @@ documented in examples as canonical.
 
 ## Numeric Tensor ownership
 
-Every slice result is a **new contiguous owned tensor**. No borrowed view of
-the source tensor is returned. This means slicing always allocates, but the
-API is lifetime-free and safe to pass across function boundaries without
-lifetime annotation.
+Every slice of a **numeric** tensor is a **new contiguous owned tensor**. No
+borrowed view of the source tensor is returned. This means slicing always
+allocates and copies the selected `f64`s, but the API is lifetime-free and
+safe to pass across function boundaries without lifetime annotation.
+
+## Slicing dynamic tensors (RFC-102, `#[cfg(feature = "dynamic")]`)
+
+`slice()` and `slice_str()` also work on dynamic tensors, returning a dynamic
+tensor (`is_dynamic() == true`). The grammar, rank rules, and error messages
+are identical to the numeric case — slicing selects *positions*; it does not
+interpret `Element` values, so `Text`, `None`, and `Bool` survive a slice
+unchanged alongside `Int`/`Float`.
+
+**Ownership differs from the numeric case above:** a dynamic slice shares
+storage with its source (`Arc::clone`, RFC-012's copy-on-write model) rather
+than copying elements. Slicing a slice composes through the existing view
+instead of nesting, so an arbitrarily long chain of slices still shares one
+underlying allocation.
+
+**That sharing has a cost: a slice keeps its source's entire allocation
+alive for as long as the slice itself lives — even after the source tensor
+is dropped.** A one-element slice of a 100,000-element tensor retains all
+100,000 elements in memory, not just the one selected. If you need to
+release the rest, materialize the slice into its own storage explicitly:
+
+```rust
+# #[cfg(feature = "dynamic")] {
+use matten::{Element, Tensor};
+
+let t = Tensor::from_elements((0..6).map(Element::Int).collect(), &[2, 3]);
+let row = t.slice().index(0).all().build().unwrap();
+let released = Tensor::from_elements(row.to_elements(), row.shape());
+# let _ = released;
+# }
+```
+
+```rust
+# #[cfg(feature = "dynamic")] {
+use matten::{Element, Tensor};
+
+let t = Tensor::from_elements((0..6).map(Element::Int).collect(), &[2, 3]);
+let row = t.slice().index(0).all().build().unwrap();
+assert!(row.is_dynamic());
+assert_eq!(row.get_element(&[1]), Some(Element::Int(1)));
+# }
+```
 
 ## Error handling
 

@@ -135,22 +135,20 @@ fn resolve_spec(
     }
 }
 
-/// Shared slice executor used by both the builder and `slice_str`.
+/// Shared slice executor used by both the builder and `slice_str`. Spec
+/// resolution and coordinate arithmetic are shared unconditionally between
+/// numeric and dynamic tensors (RFC-102) — slicing selects *positions*, and
+/// that computation is type-agnostic. Only the terminal write differs: a
+/// numeric tensor copies `f64`s directly; a dynamic tensor instead collects
+/// source positions and hands them to
+/// [`DynamicTensor::slice_indices`](crate::dynamic::storage::DynamicTensor::slice_indices),
+/// which shares storage via `Arc::clone` rather than copying `Element`s
+/// (RFC-012's copy-on-write model).
 pub(crate) fn execute_slice(
     tensor: &Tensor,
     specs: &[SliceSpec],
     operation: &'static str,
 ) -> Result<Tensor, MattenError> {
-    #[cfg(feature = "dynamic")]
-    if tensor.is_dynamic() {
-        return Err(MattenError::Unsupported {
-            operation,
-            message: "dynamic tensors do not support the slice builder or slice_str; \
-                      use get_element(&[row, col]) for element access, or call \
-                      try_numeric() first"
-                .to_string(),
-        });
-    }
     let ndim = tensor.ndim();
     if specs.len() != ndim {
         return Err(MattenError::Slice {
@@ -178,7 +176,27 @@ pub(crate) fn execute_slice(
     } else {
         out_shape.iter().product()
     };
-    let mut out_data = vec![0.0f64; out_len];
+
+    // `is_dynamic()` is defined unconditionally (false without the `dynamic`
+    // feature), so this branch and the allocations below compile either way;
+    // without the feature it is always false and the compiler elides the
+    // dead branch below.
+    let is_dynamic = tensor.is_dynamic();
+    let mut out_data: Vec<f64> = if is_dynamic {
+        Vec::new()
+    } else {
+        vec![0.0f64; out_len]
+    };
+    // Source positions in OUTPUT order, indexed by dst_flat -- NOT push-built.
+    // A push-built vector would be correct only when the loop visits dst_flat
+    // in increasing order, which a rank-collapsing slice (out_shape shorter
+    // than the input rank) does not guarantee.
+    #[cfg(feature = "dynamic")]
+    let mut out_indices: Vec<usize> = if is_dynamic {
+        vec![0usize; out_len]
+    } else {
+        Vec::new()
+    };
 
     let counts: Vec<usize> = per_axis.iter().map(|(v, _)| v.len()).collect();
     let total: usize = counts.iter().product();
@@ -205,7 +223,27 @@ pub(crate) fn execute_slice(
         } else {
             coord_to_flat(&out_coord_kept, &out_shape).expect("kept coordinate is always valid")
         };
+
+        #[cfg(feature = "dynamic")]
+        if is_dynamic {
+            out_indices[dst_flat] = src_flat;
+            continue;
+        }
         out_data[dst_flat] = tensor.data[src_flat];
+    }
+
+    #[cfg(feature = "dynamic")]
+    if is_dynamic {
+        let dyn_t = tensor
+            .dynamic
+            .as_ref()
+            .expect("is_dynamic() true implies dynamic is Some");
+        let sliced = dyn_t.slice_indices(out_indices, out_shape.clone());
+        return Ok(Tensor {
+            data: Vec::new(),
+            shape: out_shape,
+            dynamic: Some(Box::new(sliced)),
+        });
     }
 
     Ok(Tensor {

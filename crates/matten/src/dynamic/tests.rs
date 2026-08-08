@@ -12,4 +12,6 @@ mod lifecycle;
 #[cfg(feature = "dynamic")]
 mod policy;
 #[cfg(feature = "dynamic")]
+mod slicing;
+#[cfg(feature = "dynamic")]
 mod tensor;
