@@ -129,7 +129,7 @@ The following items were considered and explicitly deferred:
 | Step slicing `::2` | Supported | `slice_str("0:10:2")` grammar works. |
 | Mutable element API | Deferred | **Numeric tensors have no shared storage to expose.** `Tensor` owns its `Vec<f64>` outright; the `Arc`-shared storage and copy-on-write exist only on the **dynamic** side (`DynamicTensor` holds `Arc<Vec<Element>>`). So a public mutation API is not a matter of exposing what is already there — for the numeric type it would mean changing the representation first, or designing mutation without CoW and reconciling the two halves. |
 | Slicing on dynamic tensors | Deferred | **Both** `slice().build()` and `slice_str()` are numeric-only — they share one `execute_slice` path, which returns `Unsupported` for a dynamic tensor. Use `get_element` column-by-column, or `try_numeric()` first. |
-| Batched matmul (rank > 2) | Deferred | RFC-010 scope: `[m,n]×[n,p]` maximum. |
+| Batched matmul (rank > 2) | **Not planned** | The boundary is deliberate, not a gap: **rank > 2 exists for shape manipulation** — `reshape`, `transpose`, `swap_axes`, `stack` all accept it — **and arithmetic is rank ≤ 2**. `matmul`/`dot` support `[n]×[n]`, `[m,n]×[n]`, `[n]×[n,p]` and `[m,n]×[n,p]`. A batched result would also be rank 3, which `Display` renders as a flat list by design (see the Formatting contract section), so the output would be less readable than looping over rank-2 multiplications. |
 | Axis reductions on dynamic | Not needed yet | Convert with `try_numeric()` first. |
 
 ## Phase status
