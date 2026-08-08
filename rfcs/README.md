@@ -132,7 +132,8 @@ sign-off and implementation — not that the state is unused.
 
 | ID | Title | Handoff |
 |---:|---|---|
-| 106 | [Zero-Sized Dimensions — Audit Before Decision](./accepted/106-zero-sized-shape-model-audit.md) | [`106-…-handoff.md`](./handoffs/106-zero-sized-shape-model-audit-handoff.md) — **sequenced after 105** |
+| 106 | [Zero-Sized Dimensions — Audit Before Decision](./accepted/106-zero-sized-shape-model-audit.md) | [`106-…-handoff.md`](./handoffs/106-zero-sized-shape-model-audit-handoff.md) — **in progress** |
+| 107 | [Architecture Overview and Data-Model Lifecycle Pages](./accepted/107-architecture-and-data-model-docs.md) | [`107-…-handoff.md`](./handoffs/107-architecture-and-data-model-docs-handoff.md) — docs only |
 
 ## Archive
 

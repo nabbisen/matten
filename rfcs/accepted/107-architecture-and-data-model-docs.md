@@ -1,6 +1,7 @@
 # RFC-107: Architecture Overview and Data-Model Lifecycle Pages
 
-**Status:** Proposed
+**Status:** **Accepted** 2026-08-08 by the owner. Not yet implemented. Handoff:
+`rfcs/handoffs/107-architecture-and-data-model-docs-handoff.md`.
 **Target:** `docs/` only — no code, no API, no version change
 **Theme:** Two reader-facing pages the book does not have
 **Related:** RFC-011, RFC-012, RFC-022 §10, RFC-078 §6, RFC-093 §6, RFC-102, RFC-104
