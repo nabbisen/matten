@@ -1,6 +1,9 @@
 # RFC-108: Two Empty-Tensor Defects — Stage 1
 
-**Status:** **Accepted** 2026-08-08 by the owner. Not yet implemented. Handoff:
+**Status:** **Implemented** 2026-08-08 in commit *"Fix mm_mul zero-column panic and add
+Tensor::is_empty() (RFC-108)"*, reviewed and approved **after corrections** — this RFC's own §4 scope
+was unsatisfiable and is amended inline below. Unreleased; the release decision is open under RFC-094,
+and the panic this fixes is live in published `0.44.0`. Handoff:
 `rfcs/handoffs/108-empty-tensor-defects-stage-1-handoff.md`.
 **Target:** core `matten`; one bug fix plus one additive method — a minor release when it ships
 **Theme:** Fix what is wrong today, independent of the zero-sized policy decision
@@ -139,17 +142,17 @@ R4  REMOVING THE ALLOW. Once is_empty() exists, clippy's len_without_is_empty is
 ## 6. Acceptance criteria
 
 ```text
-[ ] try_dot / try_matmul / dot on [m,n] x [n,0] return Ok with shape [m, 0], no panic
-[ ] n == 0 and m == 0 still behave exactly as today — asserted separately (R2)
-[ ] the panicking `dot` form also returns, rather than panicking
-[ ] is_empty() returns true for a sliced-empty tensor, false for a scalar (R3)
-[ ] the allow at tensor.rs:70 is removed and clippy passes without it (R4)
-[ ] tensor.rs:67's comment and compatibility.md's is_empty() row both corrected
-[ ] no change to checked_shape_len, the axis reductions, or any other operation
-[ ] both feature profiles; cargo test --workspace
-[ ] all eight guards; check-doc-code.sh under RUSTFLAGS="-D warnings"
-[ ] clippy clean under RUSTFLAGS="-D warnings"; cargo fmt --check
-[ ] no version bump, tag, or publish
+[x] try_dot / try_matmul / dot on [m,n] x [n,0] return Ok with shape [m, 0], no panic
+[x] n == 0 and m == 0 still behave exactly as today — asserted separately (R2)
+[x] the panicking `dot` form also returns, rather than panicking
+[x] is_empty() returns true for a sliced-empty tensor, false for a scalar (R3)
+[x] the allow at tensor.rs:70 is removed and clippy passes without it (R4)
+[x] tensor.rs:67's comment and compatibility.md's is_empty() row both corrected
+[x] no change to checked_shape_len, the axis reductions, or any other operation
+[x] both feature profiles; cargo test --workspace
+[x] all eight guards; check-doc-code.sh under RUSTFLAGS="-D warnings"
+[x] clippy clean under RUSTFLAGS="-D warnings"; cargo fmt --check
+[x] no version bump, tag, or publish
 ```
 
 ## 7. Release note
