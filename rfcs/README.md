@@ -138,6 +138,7 @@ sign-off and implementation — not that the state is unused.
 | ID | Title | Handoff |
 |---:|---|---|
 | 111 | [Zero-Sized Dimensions Accepted — Stage 3](./accepted/111-zero-sized-dimensions-accepted.md) | [`111-…-handoff.md`](./handoffs/111-zero-sized-dimensions-accepted-handoff.md) |
+| 112 | [`matten-mlprep` Panics on Zero Rows — an RFC-110 Regression](./accepted/112-mlprep-axis-panic-regression.md) | [`112-…-handoff.md`](./handoffs/112-mlprep-axis-panic-regression-handoff.md) — **release blocker for RFC-110** |
 
 ## Archive
 

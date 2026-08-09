@@ -1,6 +1,8 @@
 # RFC-112: `matten-mlprep` Panics on Zero Rows — an RFC-110 Regression
 
-**Status:** Proposed
+**Status:** **Accepted** 2026-08-09 by the owner. Not yet implemented. **Sequenced after RFC-111**,
+which is in flight; the two touch disjoint files. Handoff:
+`rfcs/handoffs/112-mlprep-axis-panic-regression-handoff.md`.
 **Target:** `matten-mlprep`; a defect fix — minor release when it ships
 **Theme:** Stop a published function panicking on a reachable input
 **Related:** RFC-099, RFC-105, RFC-108, RFC-110, RFC-111
