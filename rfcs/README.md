@@ -135,7 +135,7 @@ sign-off and implementation — not that the state is unused.
 
 | ID | Title | Handoff |
 |---:|---|---|
-| — | *(none at present)* | — |
+| 109 | [`0.45.0` — Mutation and Empty-Tensor Release](./accepted/109-0450-mutation-and-empty-tensor-release.md) | [`109-…-handoff.md`](./handoffs/109-0450-mutation-and-empty-tensor-release-handoff.md) |
 
 ## Archive
 
