@@ -28,6 +28,7 @@ bash scripts/check-streaming-scope.sh            # RFC-037 streaming / large-CSV
 bash scripts/check-release-docs.sh               # doc-truth + examples naming-band guards
 bash scripts/check-doc-code.sh                   # every non-ignored ```rust block in docs/src compiles
 bash scripts/check-report-demos.sh               # docs/src/reports/*.md match matten-report's current output
+bash scripts/check-tool-tests.sh                 # RFC-117: workspace-excluded tools' own shell test suites
 cargo clippy --all-targets --all-features -- -D warnings
 cargo clippy --all-targets --no-default-features -- -D warnings
 cargo clippy --all-targets --no-default-features --features dynamic -- -D warnings
@@ -243,6 +244,39 @@ Companion crates inherit core `matten` through `[workspace.dependencies]` as
 (RFC-064). Do not narrow this requirement during routine family releases. User
 docs and examples still show explicit matched release pins so downstreams see the
 supported family set.
+
+---
+
+## Push, confirm CI green, then publish
+
+**This section applies to every release, patch included** — not only minor ones. Pushing, confirming
+CI, tagging, and publishing happen regardless of release size, so this lives outside `## Additional
+gates for minor releases` on purpose: a patch release must not be able to read that heading and skip
+straight to tagging.
+
+### Push, confirm CI green, then tag
+
+The release sequence is **push → confirm CI green → tag → publish**, in that order, for a reason at
+each step:
+
+1. **Push `main`.** CI runs on push; it cannot report on a commit that has not been pushed yet.
+2. **Confirm CI is green on the commit just pushed** — not "CI was green recently," not the previous
+   run, the commit that is about to be tagged. **A red run on that commit stops the release.** Do not
+   tag or publish until it is green. Check with:
+
+   ```bash
+   gh run list --limit 5
+   ```
+
+   or the repository's Actions tab, and match the run against the commit SHA just pushed.
+3. **Tag**, only after step 1 has already landed on the remote. A tag pointing at a commit absent
+   from the remote is the orphaned-tag defect this project repaired once, for `0.38.0`/`0.39.0`.
+4. **Publish** — see below.
+
+`0.46.0` was tagged and published across four consecutive red CI runs because this step did not
+exist: every local gate passed, and the workflow result on the commit just pushed was never checked
+(RFC-117, RFC-118). This step does not automate that check — it only makes it impossible to miss by
+accident.
 
 ### Publishing: one workspace command, not five per-crate ones
 
