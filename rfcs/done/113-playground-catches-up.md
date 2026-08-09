@@ -1,6 +1,11 @@
 # RFC-113: The Playground Catches Up
 
-**Status:** **Accepted** 2026-08-09 by the owner. Not yet implemented. Handoff:
+**Status:** **Implemented** 2026-08-09 in commit *"Update playground to try_matmul and cover
+zero-sized shapes (RFC-113)"* (`086778f`), reviewed and approved with **no corrections**. Ships in no
+release — the playground is `publish = false`. **Implemented twice**: the reviewer destroyed the first
+implementation with a `git checkout` cleanup during a probe, which produced
+`.git-exclude/rules/003-never-checkout-a-dirty-file.md`. Change 3 (dynamic slicing) remains deferred
+pending a wasm size measurement. Handoff:
 `rfcs/handoffs/113-playground-catches-up-handoff.md`.
 **Target:** `tools/matten-playground` (workspace-excluded, `publish = false`) + the docs page
 **Theme:** Remove a duplicated rule, and cover inputs the library newly accepts
@@ -136,16 +141,16 @@ R4  Change 3's wasm size. Measure before deciding, not after.
 ## 8. Acceptance criteria
 
 ```text
-[ ] playground_matmul uses try_matmul; matmul_result_shape and its three sync
+[x] playground_matmul uses try_matmul; matmul_result_shape and its three sync
     tests are DELETED
-[ ] no panicking core form is called anywhere in the tool — grep, and state it
-[ ] all four operations have a zero-sized-input test
-[ ] any test asserting a changed error string is listed explicitly
-[ ] docs/src/playground.md mentions zero-sized shapes
-[ ] the wasm module still builds; the page still works
-[ ] cargo test for the tool; clippy under RUSTFLAGS="-D warnings"
-[ ] core matten and every published crate untouched
-[ ] no version bump, tag, or publish — this tool ships in no release
+[x] no panicking core form is called anywhere in the tool — grep, and state it
+[x] all four operations have a zero-sized-input test
+[x] any test asserting a changed error string is listed explicitly
+[x] docs/src/playground.md mentions zero-sized shapes
+[x] the wasm module still builds; the page still works
+[x] cargo test for the tool; clippy under RUSTFLAGS="-D warnings"
+[x] core matten and every published crate untouched
+[x] no version bump, tag, or publish — this tool ships in no release
 ```
 
 ## 9. Non-goals
