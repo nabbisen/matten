@@ -1,7 +1,9 @@
 # RFC-112: `matten-mlprep` Panics on Zero Rows — an RFC-110 Regression
 
-**Status:** **Accepted** 2026-08-09 by the owner. Not yet implemented. **Sequenced after RFC-111**,
-which is in flight; the two touch disjoint files. Handoff:
+**Status:** **Implemented** 2026-08-09 in commit *"Fix matten-mlprep panic on zero-row input, an
+RFC-110 regression (RFC-112)"* (`412427b`), reviewed and approved after one correction — a test that
+depended on RFC-111 because the reviewer's own evidence had been gathered on a tree already carrying
+it. **Unreleased, and a release blocker for RFC-110.** Handoff:
 `rfcs/handoffs/112-mlprep-axis-panic-regression-handoff.md`.
 **Target:** `matten-mlprep`; a defect fix — minor release when it ships
 **Theme:** Stop a published function panicking on a reachable input
@@ -115,16 +117,16 @@ R4  The ZeroVariance guard. With zero rows, `std` is NaN and `if std == 0.0` doe
 ## 7. Acceptance criteria
 
 ```text
-[ ] standardize_columns on a zero-row tensor returns Err, does NOT panic
-[ ] minmax_scale_columns likewise — both call sites converted
-[ ] the error carries core's message via MattenMlprepError::Matten
-[ ] non-empty behaviour byte-identical; the existing mlprep suite passes unmodified
-[ ] add_bias_column and train_test_split unchanged and re-asserted
-[ ] fixtures are SLICED-empty — the reachable path
-[ ] both feature profiles; cargo test --workspace
-[ ] all eight guards; check-doc-code.sh under RUSTFLAGS="-D warnings"
-[ ] RUSTFLAGS="-D warnings" cargo clippy --workspace --all-targets --all-features
-[ ] no version bump, tag, or publish
+[x] standardize_columns on a zero-row tensor returns Err, does NOT panic
+[x] minmax_scale_columns likewise — both call sites converted
+[x] the error carries core's message via MattenMlprepError::Matten
+[x] non-empty behaviour byte-identical; the existing mlprep suite passes unmodified
+[x] add_bias_column and train_test_split unchanged and re-asserted
+[x] fixtures are SLICED-empty — the reachable path
+[x] both feature profiles; cargo test --workspace
+[x] all eight guards; check-doc-code.sh under RUSTFLAGS="-D warnings"
+[x] RUSTFLAGS="-D warnings" cargo clippy --workspace --all-targets --all-features
+[x] no version bump, tag, or publish
 ```
 
 ## 8. Release note

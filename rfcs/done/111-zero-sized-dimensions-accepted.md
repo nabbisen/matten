@@ -1,6 +1,8 @@
 # RFC-111: Zero-Sized Dimensions Accepted — Stage 3
 
-**Status:** **Accepted** 2026-08-09 by the owner. Not yet implemented. Handoff:
+**Status:** **Implemented** 2026-08-09 in commit *"Accept zero-sized dimensions: core, ndarray bridge,
+Display (RFC-111)"* (`2ac99bb`), reviewed and approved after one correction, and after **two mid-work
+checkpoints** that each found something this RFC had asserted wrongly. Unreleased. Handoff:
 `rfcs/handoffs/111-zero-sized-dimensions-accepted-handoff.md`.
 **Target:** core `matten` + `matten-ndarray`; a shape-model change — minor release when it ships
 **Theme:** Close the model. Stop rejecting what the library already produces.
@@ -216,27 +218,27 @@ R5  REMOVING ZeroSizedAxis rather than deprecating it (§4).
 ## 9. Acceptance criteria
 
 ```text
-[ ] Tensor::try_new(vec![], &[0,3]) -> Ok, shape [0,3], len 0, is_empty() true
-[ ] rank-0 unchanged: scalar has len 1, is_empty() false — asserted (R1)
-[ ] the overflow guard still fires on a shape that overflows usize (R2)
-[ ] reshape, concatenate, stack, repeat, repeat_axis, tile, meshgrid, outer,
+[x] Tensor::try_new(vec![], &[0,3]) -> Ok, shape [0,3], len 0, is_empty() true
+[x] rank-0 unchanged: scalar has len 1, is_empty() false — asserted (R1)
+[x] the overflow guard still fires on a shape that overflows usize (R2)
+[x] reshape, concatenate, stack, repeat, repeat_axis, tile, meshgrid, outer,
     zeros/ones/full, linspace, eye all accept a zero-sized result
-[ ] try_linspace(_, _, 0) returns Ok with an empty result — NO panic (§3.3)
-[ ] repeat(t,0) / repeat_axis(t,0,ax) / tile(t,&[0,..]) return empty results,
+[x] try_linspace(_, _, 0) returns Ok with an empty result — NO panic (§3.3)
+[x] repeat(t,0) / repeat_axis(t,0,ax) / tile(t,&[0,..]) return empty results,
     and their three own-guards are deleted (§3.4)
-[ ] an EMPTY SOURCE tensor still flows correctly through all of the above —
+[x] an EMPTY SOURCE tensor still flows correctly through all of the above —
     asserted, not assumed
-[ ] serde round-trips a [0,3] tensor — serialize then deserialize, asserted
-[ ] from_arrayd accepts a zero-length axis; to_arrayd -> from_arrayd round-trips
-[ ] ZeroSizedAxis retained, deprecated, unreachable; its doc no longer claims
+[x] serde round-trips a [0,3] tensor — serialize then deserialize, asserted
+[x] from_arrayd accepts a zero-length axis; to_arrayd -> from_arrayd round-trips
+[x] ZeroSizedAxis retained, deprecated, unreachable; its doc no longer claims
     matten lacks support
-[ ] Display on an empty tensor shows its shape; Debug unchanged
-[ ] the §6 audit reported, with each site's finding
-[ ] every doc claim that zero-sized dims are rejected is corrected (R4)
-[ ] both feature profiles; cargo test --workspace
-[ ] all eight guards; check-doc-code.sh under RUSTFLAGS="-D warnings"
-[ ] RUSTFLAGS="-D warnings" cargo clippy --workspace --all-targets --all-features
-[ ] no version bump, tag, or publish
+[x] Display on an empty tensor shows its shape; Debug unchanged
+[x] the §6 audit reported, with each site's finding
+[x] every doc claim that zero-sized dims are rejected is corrected (R4)
+[x] both feature profiles; cargo test --workspace
+[x] all eight guards; check-doc-code.sh under RUSTFLAGS="-D warnings"
+[x] RUSTFLAGS="-D warnings" cargo clippy --workspace --all-targets --all-features
+[x] no version bump, tag, or publish
 ```
 
 ## 10. Non-goals
