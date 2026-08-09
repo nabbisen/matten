@@ -1,6 +1,6 @@
 # Public API snapshot
 
-This page lists every public item in `matten` at the current v0.45 release
+This page lists every public item in `matten` at the current v0.46 release
 family. It serves as the baseline for tracking breaking changes toward v1.0.0
 and as the review gate required by RFC-015. Core `matten`'s public API most
 recently changed in RFC-104, which added `get_mut`/`get_flat_mut` (numeric) and
@@ -19,10 +19,19 @@ methods, with no signature change and no new row. RFC-105 and RFC-108's
 `argmin`/`argmax` now return `Err`/panic-with-message on an empty tensor
 instead of panicking with a raw index error or returning `NaN`/`inf`/`-inf`,
 and `dot`/`matmul`/`try_dot`/`try_matmul` no longer panic on a zero-column
-product. The RFC-082 streaming feature, RFC-083's functions before it, and
-RFC-090's `histogram` were companion-crate (`matten-data`/`matten-stats`)
-additions, and the RFC-080/084/085 maturity promotions were label changes;
-none of the three touched core `matten`'s root exports.
+product. RFC-110 and RFC-111 are the same shape again: `mean_axis`/`min_axis`/
+`max_axis`/`var_axis`/`std_axis` now return `Err`/panic-with-message when the
+reduced axis has length 0, and every constructor, `reshape`, the
+shape-composition family, `linspace`/`eye`, and serde now accept a zero-sized
+shape instead of rejecting it — behavior changes behind existing signatures,
+no new row. `matten-ndarray`'s `ZeroSizedAxis` error variant (companion crate,
+not core) is deprecated by the same RFC and never constructed, kept rather
+than removed since the enum is `#[non_exhaustive]` but a removed variant still
+breaks a caller matching on it. The RFC-082 streaming feature, RFC-083's
+functions before it, and RFC-090's `histogram` were companion-crate
+(`matten-data`/`matten-stats`) additions, and the RFC-080/084/085 maturity
+promotions were label changes; none of the three touched core `matten`'s root
+exports.
 
 ## Root exports
 

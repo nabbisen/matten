@@ -26,6 +26,45 @@ crates are expressed by per-crate status labels, not by separate version numbers
 > trigger — unfired across eight consecutive releases before RFC-074 found
 > it — a mandatory per-entry check rather than a rule that only an RFC states.
 
+## [0.46.0] - 2026-08-09
+
+RFC-110, RFC-111, and RFC-112 release: empty-tensor axis-reduction semantics, zero-sized
+dimensions accepted throughout, and the `matten-mlprep` follow-on. No public item was
+added; every change below is a behavior change or a restriction removed.
+
+### Changed
+
+- core `matten`: `mean_axis`/`min_axis`/`max_axis`/`var_axis`/`std_axis` now return
+  `Err` (`MattenError::InvalidArgument`) — or, for the panicking forms, a panic
+  carrying that message — when the **reduced** axis has length 0, instead of leaking
+  `NaN`/`inf`/`-inf` per output slot (RFC-110). A zero-length **surviving** axis (the
+  axis not being reduced) is a different case and was, and remains, `Ok` with an empty
+  result. `sum`/`sum_axis` are unchanged: the additive identity they return was already
+  correct.
+- core `matten`: zero-sized dimensions are now accepted directly by every constructor
+  (`Tensor::try_new(vec![], &[0, 3])` succeeds), `reshape`, the shape-composition family
+  (`concatenate`/`stack`/`repeat`/`repeat_axis`/`tile`/`meshgrid`/`outer`), `linspace`/
+  `eye`, and `serde` (de)serialization — previously rejected everywhere except by
+  slicing an existing tensor down to a zero-sized shape (RFC-111). This removes a
+  restriction; no new method or type was added. `Display` on an empty tensor now shows
+  its shape (`shape=[0, 3] values=[]`) instead of an empty string; `Debug` is unchanged.
+- `matten-ndarray`: `from_arrayd` now accepts a zero-length axis instead of rejecting it
+  (RFC-111). Its `ZeroSizedAxis` error variant is **deprecated** (`#[deprecated]`) and is
+  never constructed by this crate anymore; it is kept, not removed, because the enum is
+  `#[non_exhaustive]` but removing a variant still breaks any caller matching on it.
+- `matten-mlprep`: `standardize_columns`/`minmax_scale_columns` return a different error
+  for a zero-row input than before — previously a shape-rejection error from tensor
+  construction (`Tensor::try_new` refusing the zero-sized output), now an axis-reduction
+  error from the underlying `mean_axis`/`min_axis`/`max_axis` call (RFC-112). Both are
+  `Err`; this was never a panic in any released version. RFC-112 exists because RFC-110's
+  change, landing in the same release, would otherwise have turned that internal call
+  into a live panic — the fix and the change that would have needed it ship together.
+
+### Version
+
+- Release bump `0.45.0` -> `0.46.0`. Lock-step family versioning applies to all five
+  published crates.
+
 ## [0.45.0] - 2026-08-09
 
 RFC-104, RFC-105, and RFC-108 release: mutable element access, empty-tensor reduction

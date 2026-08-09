@@ -14,8 +14,8 @@ below.
 
 ```toml
 [dependencies]
-matten = "0.45.0"
-matten-data = "0.45.0"
+matten = "0.46.0"
+matten-data = "0.46.0"
 ```
 
 Both crates share one lock-step family version (RFC-030); maturity is a per-crate
@@ -191,7 +191,7 @@ defers nine further items, including async and resumability).
 
 ```toml
 [dependencies]
-matten-data = { version = "0.45.0", features = ["streaming"] }
+matten-data = { version = "0.46.0", features = ["streaming"] }
 ```
 
 ```rust,no_run
@@ -209,6 +209,6 @@ while let Some(batch) = reader.next_batch()? {
 
 ## Status and maturity
 
-**Production-ready** (`0.45.x` family, RFC-085). The table-to-Tensor API is mostly stable but pre-1.0;
+**Production-ready** (`0.46.x` family, RFC-085). The table-to-Tensor API is mostly stable but pre-1.0;
 pin the release explicitly. The crate's scope is locked and enforced in CI (RFC-042), and
 core `matten` never depends on it (RFC-022).

@@ -11,7 +11,7 @@ assert_eq!(a.ndim(), 2);
 Install the lean core only:
 
 ```toml
-matten = { version = "0.45.0", default-features = false }
+matten = { version = "0.46.0", default-features = false }
 ```
 
 Want to try shape reasoning first, with nothing to install? See the [Playground](./playground.md).
