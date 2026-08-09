@@ -34,6 +34,12 @@ jobs:
       - name: Install mdBook
         run: cargo install mdbook --no-default-features --features search --vers "^0.5" --locked
 
+      # RFC-116: renders the two mermaid blocks in architecture.md and
+      # reference/data-model.md as diagrams instead of code blocks. Assets
+      # are vendored under docs/theme/ (committed), not fetched from a CDN.
+      - name: Install mdbook-mermaid
+        run: cargo install mdbook-mermaid --vers "^0.17" --locked
+
       # RFC-093: the shape playground's wasm module. Built before `mdbook
       # build` since mdBook copies docs/src/playground/*.js/.wasm verbatim
       # into the book output; this job runs with working-directory: docs, so

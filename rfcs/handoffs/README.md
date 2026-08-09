@@ -21,6 +21,14 @@ working documents for the implementation team and may be revised as work proceed
 | `040-implementation-handoff.md` | RFC-040 Small Statistics Boundary — Core vs Companion |
 | `041-implementation-handoff.md` | RFC-041 Linear Algebra Boundary — Core Lite vs External Crates |
 | `042-implementation-handoff.md` | RFC-042 Pandas-Inspired Scope Guard for `matten-data` |
+| `043-048-examples-implementation-handoff.md` | RFC-043 through RFC-048 examples-program implementation plan (program, docs, CI checks, QA review) |
+| `049-benchmarking-developer-handoff.md` | RFC-049 Benchmarking Program — harness, docs, ELOC tooling, reporting, optional peer/reference comparisons |
+| `049-phase-3-python-reference-comparison-handoff.md` | RFC-049 Phase 3 — optional NumPy/Pandas reference scripts, code-shape/dependency-footprint evidence, curated reference-comparison report; implemented and accepted |
+| `050-053-production-migration-implementation-handoff.md` | RFC-050–053 production migration and bridge-support documentation implementation; implemented, retained as the original planning record |
+| `050-053-acceptance-qa-checklist.md` | RFC-050–053 acceptance/QA checklist governing the documentation batch; RFC-054's tooling slices closed later under separate handoffs |
+| `050-053-release-guard-checklist.md` | RFC-050–054 release guard checklist — prevents overclaiming/scope drift in migration and local advisory tooling docs |
+| `050-054-review-request.md` | RFC-050–054 production migration program review request; RFC-050–053 implemented, RFC-054 documentation-only/deferred at the time |
+| `054-deferred-implementation-note.md` | RFC-054 `matten-migrate` deferred implementation note; superseded for the reviewed local advisory slices (inspect/report/suggest/explain-api/check-bridges), rewrite/apply remain deferred |
 | `063-phase-1-visual-docs-handoff.md` | RFC-063 Visual Understanding and Reporting — Phase 1 docs only |
 | `063-phase-2-example-reports-handoff.md` | RFC-063 Visual Understanding and Reporting — Phase 2 example reports |
 | `063-phase-3-local-report-tool-handoff.md` | RFC-063 Visual Understanding and Reporting — Phase 3 first local report tool slice |
