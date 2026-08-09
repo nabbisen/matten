@@ -1,6 +1,7 @@
 # RFC-111: Zero-Sized Dimensions Accepted — Stage 3
 
-**Status:** Proposed
+**Status:** **Accepted** 2026-08-09 by the owner. Not yet implemented. Handoff:
+`rfcs/handoffs/111-zero-sized-dimensions-accepted-handoff.md`.
 **Target:** core `matten` + `matten-ndarray`; a shape-model change — minor release when it ships
 **Theme:** Close the model. Stop rejecting what the library already produces.
 **Related:** RFC-003 §7.4, RFC-022 §10, RFC-030, RFC-087 §6, RFC-105, RFC-106, RFC-108, RFC-110

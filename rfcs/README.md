@@ -137,7 +137,7 @@ sign-off and implementation — not that the state is unused.
 
 | ID | Title | Handoff |
 |---:|---|---|
-| — | *(none at present)* | — |
+| 111 | [Zero-Sized Dimensions Accepted — Stage 3](./accepted/111-zero-sized-dimensions-accepted.md) | [`111-…-handoff.md`](./handoffs/111-zero-sized-dimensions-accepted-handoff.md) |
 
 ## Archive
 
