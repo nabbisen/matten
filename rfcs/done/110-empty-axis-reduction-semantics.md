@@ -1,6 +1,8 @@
 # RFC-110: Empty-Axis Reduction Semantics — Stage 2
 
-**Status:** **Accepted** 2026-08-09 by the owner. Not yet implemented. Handoff:
+**Status:** **Implemented** 2026-08-09 in commit *"Error on empty reduced axis in
+mean/min/max/var/std_axis (RFC-110)"* (`2b90592`), reviewed and approved with **no corrections**. Unreleased; **Changed**,
+not Added. This closes the last known-wrong behaviour in the empty-tensor family. Handoff:
 `rfcs/handoffs/110-empty-axis-reduction-semantics-handoff.md`.
 **Target:** core `matten`; behaviour change to existing APIs — a minor release when it ships
 **Theme:** Finish RFC-105's fix on the axis-wise siblings it deliberately excluded
@@ -120,17 +122,17 @@ CHANGELOG.md — the release RFC writes it
 ## 7. Acceptance criteria
 
 ```text
-[ ] the five try_*_axis forms return Err when the REDUCED axis has length 0
-[ ] each message mirrors RFC-105's wording for its whole-tensor sibling
-[ ] the panicking forms carry that message, asserted against the captured text
-[ ] [0,3].mean_axis(1) and [3,0].mean_axis(0) still return Ok with an empty result
+[x] the five try_*_axis forms return Err when the REDUCED axis has length 0
+[x] each message mirrors RFC-105's wording for its whole-tensor sibling
+[x] the panicking forms carry that message, asserted against the captured text
+[x] [0,3].mean_axis(1) and [3,0].mean_axis(0) still return Ok with an empty result
     — the surviving-axis case, both orientations (risks 1, 3)
-[ ] sum_axis unchanged on every case above — asserted, not assumed
-[ ] whole-tensor forms unchanged; existing suite passes unmodified
-[ ] both feature profiles; cargo test --workspace
-[ ] all eight guards; check-doc-code.sh under RUSTFLAGS="-D warnings"
-[ ] RUSTFLAGS="-D warnings" cargo clippy --workspace --all-targets --all-features
-[ ] no version bump, tag, or publish
+[x] sum_axis unchanged on every case above — asserted, not assumed
+[x] whole-tensor forms unchanged; existing suite passes unmodified
+[x] both feature profiles; cargo test --workspace
+[x] all eight guards; check-doc-code.sh under RUSTFLAGS="-D warnings"
+[x] RUSTFLAGS="-D warnings" cargo clippy --workspace --all-targets --all-features
+[x] no version bump, tag, or publish
 ```
 
 ## 8. Release note
