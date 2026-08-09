@@ -26,6 +26,8 @@ fn at(data: &[f64], i: usize, j: usize, cols: usize) -> f64 {
 /// - [`MattenMlprepError::ExpectedMatrix`] if `x` is not rank-2.
 /// - [`MattenMlprepError::ZeroVariance`] if any column is constant.
 /// - [`MattenMlprepError::DynamicTensor`] (with the `dynamic` feature) if `x` is dynamic.
+/// - [`MattenMlprepError::Matten`] if `x` has zero rows — the per-column mean is
+///   undefined over an empty column (RFC-112).
 ///
 /// ```
 /// use matten::Tensor;
@@ -41,7 +43,7 @@ pub fn standardize_columns(x: &Tensor) -> Result<Tensor, MattenMlprepError> {
     let data = x.as_slice();
 
     // Per-column means via core axis reduction (NaN propagates as in core).
-    let means = x.mean_axis(0);
+    let means = x.try_mean_axis(0).map_err(MattenMlprepError::Matten)?;
     let means = means.as_slice();
 
     let mut out = vec![0.0f64; rows * cols];
@@ -74,6 +76,8 @@ pub fn standardize_columns(x: &Tensor) -> Result<Tensor, MattenMlprepError> {
 /// - [`MattenMlprepError::ExpectedMatrix`] if `x` is not rank-2.
 /// - [`MattenMlprepError::ZeroVariance`] if any column is constant (zero range).
 /// - [`MattenMlprepError::DynamicTensor`] (with the `dynamic` feature) if `x` is dynamic.
+/// - [`MattenMlprepError::Matten`] if `x` has zero rows — the per-column min/max
+///   is undefined over an empty column (RFC-112).
 ///
 /// ```
 /// use matten::Tensor;
@@ -89,8 +93,8 @@ pub fn minmax_scale_columns(x: &Tensor) -> Result<Tensor, MattenMlprepError> {
     let data = x.as_slice();
 
     // Per-column min/max via core axis reductions (NaN propagates as in core).
-    let mins = x.min_axis(0);
-    let maxs = x.max_axis(0);
+    let mins = x.try_min_axis(0).map_err(MattenMlprepError::Matten)?;
+    let maxs = x.try_max_axis(0).map_err(MattenMlprepError::Matten)?;
     let mins = mins.as_slice();
     let maxs = maxs.as_slice();
 

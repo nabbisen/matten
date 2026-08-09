@@ -352,3 +352,92 @@ fn numeric_tensor_is_not_dynamic() {
     // Guard must pass and preprocessing must succeed.
     assert!(standardize_columns(&x).is_ok());
 }
+
+// ── RFC-112: zero rows must error, never panic ──────────────────────────────
+//
+// RFC-110 changed core's mean_axis/min_axis/max_axis to error on a zero-length
+// REDUCED axis instead of leaking NaN/inf. standardize_columns and
+// minmax_scale_columns called the panicking forms directly, so a zero-row
+// input (reachable from an ordinary header-only CSV via matten-data, no
+// slicing required by the caller) started panicking. Fixtures here are built
+// by slicing -- the reachable path -- matching every other empty-tensor test
+// in this project.
+
+fn empty_rows(cols: usize) -> Tensor {
+    // shape [0, cols]
+    Tensor::new(vec![0.0; cols], &[1, cols])
+        .slice()
+        .range(0..0)
+        .all()
+        .build()
+        .unwrap()
+}
+
+#[test]
+fn standardize_columns_on_zero_rows_errors_not_panics() {
+    // T1. Before this fix: panicked at "mean is undefined for a reduced axis
+    // of length 0 (axis 0)". Now: a clean Err via MattenMlprepError::Matten.
+    let x = empty_rows(2);
+    assert_eq!(x.shape(), &[0, 2]);
+    let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| standardize_columns(&x)));
+    let err = result.expect("must not panic").expect_err("must be Err");
+    assert!(matches!(err, MattenMlprepError::Matten(_)));
+    assert!(err.to_string().contains("mean"));
+}
+
+#[test]
+fn minmax_scale_columns_on_zero_rows_errors_not_panics() {
+    // T2. Both call sites matter (R1): min_axis(0) is converted first in
+    // source order, so a fixture alone cannot prove max_axis(0) was also
+    // converted -- min's Err short-circuits before max is ever reached. This
+    // is asserted at the source level too (see the review request); the
+    // no-panic assertion here is still required and is what actually shipped
+    // as the regression.
+    let x = empty_rows(2);
+    let result =
+        std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| minmax_scale_columns(&x)));
+    let err = result.expect("must not panic").expect_err("must be Err");
+    assert!(matches!(err, MattenMlprepError::Matten(_)));
+    // T3: the error carries core's message through MattenMlprepError::Matten.
+    assert!(err.to_string().contains("minimum"));
+}
+
+#[test]
+fn add_bias_column_on_zero_rows_is_unaffected() {
+    // T5: add_bias_column performs no axis reduction, so RFC-112 did not touch
+    // it. Made order-independent of RFC-111 (review correction): whether
+    // Tensor::try_new accepts a zero-sized shape depends on RFC-111's
+    // constructor change, which this RFC does not require and must not
+    // depend on as a release blocker. Assert what RFC-112 actually
+    // guarantees -- no panic, and if it errors, the error is not one of
+    // RFC-110's axis-reduction messages -- and accept either constructor
+    // policy for the shape/success question itself.
+    let x = empty_rows(3);
+    let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| add_bias_column(&x)));
+    match result.expect("must not panic") {
+        Ok(b) => {
+            assert_eq!(b.shape(), &[0, 4]);
+            assert!(b.is_empty());
+        }
+        Err(MattenMlprepError::Matten(e)) => {
+            let msg = e.to_string();
+            assert!(
+                !msg.contains("mean") && !msg.contains("minimum") && !msg.contains("maximum"),
+                "add_bias_column performs no axis reduction; got an axis-reduction \
+                 message instead of a constructor rejection: {msg}"
+            );
+        }
+        Err(other) => panic!("expected Ok or Matten(..), got {other:?}"),
+    }
+}
+
+#[test]
+fn train_test_split_on_zero_rows_is_unaffected() {
+    // T6: train_test_split rejects empty early and deliberately
+    // (EmptySplit), unrelated to this fix.
+    let x = empty_rows(2);
+    assert!(matches!(
+        train_test_split(&x, 0.5),
+        Err(MattenMlprepError::EmptySplit { .. })
+    ));
+}
