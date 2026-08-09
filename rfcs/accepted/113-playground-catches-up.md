@@ -1,6 +1,7 @@
 # RFC-113: The Playground Catches Up
 
-**Status:** Proposed
+**Status:** **Accepted** 2026-08-09 by the owner. Not yet implemented. Handoff:
+`rfcs/handoffs/113-playground-catches-up-handoff.md`.
 **Target:** `tools/matten-playground` (workspace-excluded, `publish = false`) + the docs page
 **Theme:** Remove a duplicated rule, and cover inputs the library newly accepts
 **Related:** RFC-093, RFC-095, RFC-099, RFC-102, RFC-108, RFC-110, RFC-111

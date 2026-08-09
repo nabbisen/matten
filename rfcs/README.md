@@ -139,7 +139,7 @@ sign-off and implementation — not that the state is unused.
 
 | ID | Title | Handoff |
 |---:|---|---|
-| — | *(none at present)* | — |
+| 113 | [The Playground Catches Up](./accepted/113-playground-catches-up.md) | [`113-…-handoff.md`](./handoffs/113-playground-catches-up-handoff.md) |
 
 ## Archive
 
