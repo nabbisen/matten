@@ -128,6 +128,7 @@ MARKDOWN_SHA256="b78cf8bdc12a74a33d6e0ad498e0be28405b3aed00f0cd098483addb26c5f5a
 JSON_SHA256="6491d3856293572e80f0388be6002703178336447f24afb330087c82ad680fac"
 INPUT_JSON_SHA256="84ec3f794c5ccf225bcf5fe88aa1f3d2043179492d776940fe5206c14cae7767"
 INPUT_ERROR_JSON_SHA256="f7c7125819e88635e21ab6c4a4769aee0f3a4ba3dc0e16dbfc20c1c82f267751"
+HEADER_ONLY_SHA256="49d11bf64c6c2f85a32e9698b36c50a8914a1290a6b28f0b83ea08572643b4c0"
 if [[ "$MUTATE_MARKDOWN_DIGEST" == true ]]; then
     MARKDOWN_SHA256="0000000000000000000000000000000000000000000000000000000000000000"
 fi
@@ -188,21 +189,29 @@ run_case header_only_absent \
     --input tools/matten-report/fixtures/header_only.csv \
     --kind data-readiness --select a,b \
     --format json --output "$HEADER_ONLY_OUTPUT"
-assert_process_error header_only_absent
-[[ ! -e "$HEADER_ONLY_OUTPUT" ]] ||
-    fail "header_only_absent: pre-write failure created an output artifact"
+assert_status header_only_absent 0
+assert_empty header_only_absent stdout "$CASE_STDOUT"
+assert_empty header_only_absent stderr "$CASE_STDERR"
+[[ -f "$HEADER_ONLY_OUTPUT" ]] || fail "header_only_absent: expected output file was not created"
+assert_fingerprint header_only_absent "$HEADER_ONLY_OUTPUT" 2416 "$HEADER_ONLY_SHA256"
 
-HEADER_ONLY_EXISTING_OUTPUT="$CASE_DIR/header-only-existing.json"
-HEADER_ONLY_SENTINEL="$CASE_DIR/header-only-sentinel.expected"
-printf 'preserve-existing-output\n' >"$HEADER_ONLY_SENTINEL"
-cp -- "$HEADER_ONLY_SENTINEL" "$HEADER_ONLY_EXISTING_OUTPUT"
-run_case header_only_existing \
-    --input tools/matten-report/fixtures/header_only.csv \
+# RFC-117: header_only.csv no longer produces a pre-write failure (RFC-111 made
+# a zero-row NumericTable's to_tensor() succeed with an empty tensor, see the
+# case above), so this case no longer has a fixture that exercises what it
+# actually tests: that a pre-write failure leaves an existing output file
+# untouched. Repointed at a nonexistent --input path, which still fails before
+# any write is attempted.
+MISSING_INPUT_EXISTING_OUTPUT="$CASE_DIR/missing-input-existing.json"
+MISSING_INPUT_SENTINEL="$CASE_DIR/missing-input-sentinel.expected"
+printf 'preserve-existing-output\n' >"$MISSING_INPUT_SENTINEL"
+cp -- "$MISSING_INPUT_SENTINEL" "$MISSING_INPUT_EXISTING_OUTPUT"
+run_case missing_input_existing_output \
+    --input tools/matten-report/fixtures/does_not_exist.csv \
     --kind data-readiness --select a,b \
-    --format json --output "$HEADER_ONLY_EXISTING_OUTPUT"
-assert_process_error header_only_existing
-cmp -s "$HEADER_ONLY_EXISTING_OUTPUT" "$HEADER_ONLY_SENTINEL" ||
-    fail "header_only_existing: pre-write failure changed existing output"
+    --format json --output "$MISSING_INPUT_EXISTING_OUTPUT"
+assert_process_error missing_input_existing_output
+cmp -s "$MISSING_INPUT_EXISTING_OUTPUT" "$MISSING_INPUT_SENTINEL" ||
+    fail "missing_input_existing_output: pre-write failure changed existing output"
 
 NON_FINITE_OUTPUT="$CASE_DIR/non-finite.json"
 run_case non_finite_absent \

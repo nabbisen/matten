@@ -52,6 +52,10 @@ added; every change below is a behavior change or a restriction removed.
   (RFC-111). Its `ZeroSizedAxis` error variant is **deprecated** (`#[deprecated]`) and is
   never constructed by this crate anymore; it is kept, not removed, because the enum is
   `#[non_exhaustive]` but removing a variant still breaks any caller matching on it.
+- `matten-data`: `NumericTable::to_tensor()` on a table with zero data rows returned
+  `Err` in `0.45.0` and now returns `Ok` with an empty tensor, following from core
+  accepting zero-sized dimensions (RFC-111). A header-only CSV is the ordinary way to
+  reach it.
 - `matten-mlprep`: `standardize_columns`/`minmax_scale_columns` return a different error
   for a zero-row input than before — previously a shape-rejection error from tensor
   construction (`Tensor::try_new` refusing the zero-sized output), now an axis-reduction
