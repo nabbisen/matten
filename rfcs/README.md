@@ -143,7 +143,7 @@ sign-off and implementation — not that the state is unused.
 
 | ID | Title | Handoff |
 |---:|---|---|
-| — | *(none at present)* | — |
+| 117 | [CI Has Been Red Since Before `0.46.0` Was Tagged](./accepted/117-red-ci-since-0460.md) | [`117-…-handoff.md`](./handoffs/117-red-ci-since-0460-handoff.md) |
 
 ## Archive
 

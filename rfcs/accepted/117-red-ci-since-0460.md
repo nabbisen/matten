@@ -1,6 +1,7 @@
 # RFC-117: CI Has Been Red Since Before `0.46.0` Was Tagged
 
-**Status:** Proposed
+**Status:** **Accepted** 2026-08-09 by the owner. Not yet implemented. Handoff:
+`rfcs/handoffs/117-red-ci-since-0460-handoff.md`.
 **Target:** `tools/matten-report/tests/`, `CHANGELOG.md`, `scripts/`
 **Theme:** Fix the break, document what actually shipped, and close the gap that hid both
 **Related:** RFC-111, RFC-114, rule 002 §8
