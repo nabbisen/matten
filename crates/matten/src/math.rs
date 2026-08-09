@@ -286,7 +286,11 @@ impl Tensor {
     ///
     /// # Panics
     ///
-    /// Panics if `axis >= self.ndim()`, or on a dynamic tensor.
+    /// Panics if `axis >= self.ndim()`, on a dynamic tensor, or if the
+    /// **reduced** axis has length 0 (RFC-110) — the mean of nothing is
+    /// undefined, not `NaN`. A zero-length axis that *survives* the reduction
+    /// (a different axis than `axis`) is unaffected and yields an empty
+    /// result, not a panic.
     ///
     /// ```
     /// use matten::Tensor;
@@ -304,8 +308,13 @@ impl Tensor {
     /// output shape, matching the panic form.
     ///
     /// # Errors
-    /// Returns [`MattenError::Shape`] if `axis >= rank`, or
-    /// [`MattenError::Unsupported`] on a dynamic tensor.
+    /// Returns [`MattenError::Shape`] if `axis >= rank`,
+    /// [`MattenError::Unsupported`] on a dynamic tensor, or
+    /// [`MattenError::InvalidArgument`] if the **reduced** axis has length 0
+    /// (RFC-110). No constructor accepts a zero-sized dimension, but slicing
+    /// reaches one (`t.slice().range(0..0).all().build()`), so this guard is
+    /// live, not theoretical. A zero-length axis that *survives* the
+    /// reduction still returns `Ok` with an empty result.
     ///
     /// ```
     /// use matten::Tensor;
@@ -316,6 +325,13 @@ impl Tensor {
         reject_dynamic(self, "mean_axis")?;
         check_axis(self, axis, "mean_axis")?;
         let n = self.shape()[axis] as f64;
+        if n == 0.0 {
+            return Err(MattenError::InvalidArgument {
+                operation: "mean_axis",
+                argument: "axis",
+                message: format!("mean is undefined for a reduced axis of length 0 (axis {axis})"),
+            });
+        }
         let sums = axis_reduce(self, axis, "mean_axis", |acc, v| acc + v, 0.0);
         Ok(&sums / n)
     }
@@ -331,7 +347,10 @@ impl Tensor {
     ///
     /// # Panics
     ///
-    /// Panics if `axis >= self.ndim()`, or on a dynamic tensor.
+    /// Panics if `axis >= self.ndim()`, on a dynamic tensor, or if the
+    /// **reduced** axis has length 0 (RFC-110) — the minimum of nothing is
+    /// undefined, not `f64::INFINITY`. A zero-length axis that *survives* the
+    /// reduction yields an empty result, not a panic.
     ///
     /// ```
     /// use matten::Tensor;
@@ -347,8 +366,11 @@ impl Tensor {
     /// output shape, matching the panic form.
     ///
     /// # Errors
-    /// Returns [`MattenError::Shape`] if `axis >= rank`, or
-    /// [`MattenError::Unsupported`] on a dynamic tensor.
+    /// Returns [`MattenError::Shape`] if `axis >= rank`,
+    /// [`MattenError::Unsupported`] on a dynamic tensor, or
+    /// [`MattenError::InvalidArgument`] if the **reduced** axis has length 0
+    /// (RFC-110). A zero-length axis that *survives* the reduction still
+    /// returns `Ok` with an empty result.
     ///
     /// ```
     /// use matten::Tensor;
@@ -359,6 +381,15 @@ impl Tensor {
     pub fn try_min_axis(&self, axis: usize) -> Result<Tensor, MattenError> {
         reject_dynamic(self, "min_axis")?;
         check_axis(self, axis, "min_axis")?;
+        if self.shape()[axis] == 0 {
+            return Err(MattenError::InvalidArgument {
+                operation: "min_axis",
+                argument: "axis",
+                message: format!(
+                    "minimum is undefined for a reduced axis of length 0 (axis {axis})"
+                ),
+            });
+        }
         Ok(nan_axis_reduce(
             self,
             axis,
@@ -375,7 +406,10 @@ impl Tensor {
     ///
     /// # Panics
     ///
-    /// Panics if `axis >= self.ndim()`, or on a dynamic tensor.
+    /// Panics if `axis >= self.ndim()`, on a dynamic tensor, or if the
+    /// **reduced** axis has length 0 (RFC-110) — the maximum of nothing is
+    /// undefined, not `f64::NEG_INFINITY`. A zero-length axis that *survives*
+    /// the reduction yields an empty result, not a panic.
     ///
     /// ```
     /// use matten::Tensor;
@@ -391,8 +425,11 @@ impl Tensor {
     /// output shape, matching the panic form.
     ///
     /// # Errors
-    /// Returns [`MattenError::Shape`] if `axis >= rank`, or
-    /// [`MattenError::Unsupported`] on a dynamic tensor.
+    /// Returns [`MattenError::Shape`] if `axis >= rank`,
+    /// [`MattenError::Unsupported`] on a dynamic tensor, or
+    /// [`MattenError::InvalidArgument`] if the **reduced** axis has length 0
+    /// (RFC-110). A zero-length axis that *survives* the reduction still
+    /// returns `Ok` with an empty result.
     ///
     /// ```
     /// use matten::Tensor;
@@ -402,6 +439,15 @@ impl Tensor {
     pub fn try_max_axis(&self, axis: usize) -> Result<Tensor, MattenError> {
         reject_dynamic(self, "max_axis")?;
         check_axis(self, axis, "max_axis")?;
+        if self.shape()[axis] == 0 {
+            return Err(MattenError::InvalidArgument {
+                operation: "max_axis",
+                argument: "axis",
+                message: format!(
+                    "maximum is undefined for a reduced axis of length 0 (axis {axis})"
+                ),
+            });
+        }
         Ok(nan_axis_reduce(
             self,
             axis,

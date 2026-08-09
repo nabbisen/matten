@@ -169,6 +169,186 @@ fn sum_axis_out_of_range_still_panics() {
     let _ = Tensor::ones(&[3]).sum_axis(5);
 }
 
+// ── empty reduced-axis semantics (RFC-110) ────────────────────────────────
+//
+// No constructor accepts a zero-sized shape; every fixture below is reached
+// via slice().range(0..0), never a direct constructor (handoff R4).
+
+fn empty_0x3() -> Tensor {
+    // shape [0, 3]
+    Tensor::new(vec![1., 2., 3., 4., 5., 6.], &[2, 3])
+        .slice()
+        .range(0..0)
+        .all()
+        .build()
+        .unwrap()
+}
+
+fn empty_3x0() -> Tensor {
+    // shape [3, 0]
+    Tensor::new(vec![1., 2., 3.], &[3, 1])
+        .slice()
+        .all()
+        .range(0..0)
+        .build()
+        .unwrap()
+}
+
+#[test]
+fn empty_axis_fixtures_are_actually_empty() {
+    // Guards against handoff R4: a fixture whose reduced axis is non-zero
+    // would make every test below pass vacuously.
+    let a = empty_0x3();
+    assert_eq!(a.shape(), &[0, 3]);
+    assert_eq!(a.len(), 0);
+    let b = empty_3x0();
+    assert_eq!(b.shape(), &[3, 0]);
+    assert_eq!(b.len(), 0);
+}
+
+#[test]
+fn mean_min_max_axis_error_on_zero_length_reduced_axis() {
+    // T1/T2: reducing axis 0 of [0,3] (length 0) and axis 1 of [3,0] (length 0).
+    let a = empty_0x3(); // reduce axis 0 -> length 0
+    let b = empty_3x0(); // reduce axis 1 -> length 0
+
+    let err = a.try_mean_axis(0).unwrap_err();
+    assert!(matches!(
+        err,
+        MattenError::InvalidArgument {
+            operation: "mean_axis",
+            ..
+        }
+    ));
+    assert_eq!(
+        err.to_string(),
+        "matten invalid argument error in mean_axis: axis: mean is undefined for a reduced axis of length 0 (axis 0)"
+    );
+
+    let err = b.try_mean_axis(1).unwrap_err();
+    assert!(matches!(
+        err,
+        MattenError::InvalidArgument {
+            operation: "mean_axis",
+            ..
+        }
+    ));
+    assert_eq!(
+        err.to_string(),
+        "matten invalid argument error in mean_axis: axis: mean is undefined for a reduced axis of length 0 (axis 1)"
+    );
+
+    let err = a.try_min_axis(0).unwrap_err();
+    assert!(matches!(
+        err,
+        MattenError::InvalidArgument {
+            operation: "min_axis",
+            ..
+        }
+    ));
+    assert_eq!(
+        err.to_string(),
+        "matten invalid argument error in min_axis: axis: minimum is undefined for a reduced axis of length 0 (axis 0)"
+    );
+
+    let err = a.try_max_axis(0).unwrap_err();
+    assert!(matches!(
+        err,
+        MattenError::InvalidArgument {
+            operation: "max_axis",
+            ..
+        }
+    ));
+    assert_eq!(
+        err.to_string(),
+        "matten invalid argument error in max_axis: axis: maximum is undefined for a reduced axis of length 0 (axis 0)"
+    );
+}
+
+#[test]
+#[should_panic(expected = "mean is undefined for a reduced axis of length 0 (axis 0)")]
+fn mean_axis_panicking_form_carries_the_message() {
+    // T3: the panicking form must carry the captured message, not merely panic.
+    let _ = empty_0x3().mean_axis(0);
+}
+
+#[test]
+#[should_panic(expected = "minimum is undefined for a reduced axis of length 0 (axis 0)")]
+fn min_axis_panicking_form_carries_the_message() {
+    let _ = empty_0x3().min_axis(0);
+}
+
+#[test]
+#[should_panic(expected = "maximum is undefined for a reduced axis of length 0 (axis 0)")]
+fn max_axis_panicking_form_carries_the_message() {
+    let _ = empty_0x3().max_axis(0);
+}
+
+#[test]
+fn mean_min_max_axis_surviving_empty_axis_is_still_ok_both_orientations() {
+    // T4: the SURVIVING axis is length 0 here, not the reduced one -- must stay Ok.
+    let a = empty_0x3(); // reduce axis 1 (length 3); axis 0 (length 0) survives
+    let r = a.try_mean_axis(1).unwrap();
+    assert_eq!(r.shape(), &[0]);
+    assert!(r.as_slice().is_empty());
+    assert!(a.try_min_axis(1).unwrap().as_slice().is_empty());
+    assert!(a.try_max_axis(1).unwrap().as_slice().is_empty());
+
+    let b = empty_3x0(); // reduce axis 0 (length 3); axis 1 (length 0) survives
+    let r = b.try_mean_axis(0).unwrap();
+    assert_eq!(r.shape(), &[0]);
+    assert!(r.as_slice().is_empty());
+    assert!(b.try_min_axis(0).unwrap().as_slice().is_empty());
+    assert!(b.try_max_axis(0).unwrap().as_slice().is_empty());
+}
+
+#[test]
+fn sum_axis_unchanged_on_every_empty_axis_case() {
+    // T5: sum_axis must be untouched by this RFC on every case above --
+    // the zero-length reduced axis returns the additive identity per slot,
+    // and the surviving-empty-axis case returns an empty result, exactly as
+    // before RFC-110.
+    let a = empty_0x3();
+    let b = empty_3x0();
+
+    // reduced axis length 0 -> identity 0.0 per output slot (RFC-105 territory,
+    // deliberately unchanged by RFC-110).
+    assert_eq!(a.try_sum_axis(0).unwrap().as_slice(), &[0.0, 0.0, 0.0]);
+    assert_eq!(b.try_sum_axis(1).unwrap().as_slice(), &[0.0, 0.0, 0.0]);
+
+    // surviving axis length 0 -> empty result, no computation.
+    assert!(a.try_sum_axis(1).unwrap().as_slice().is_empty());
+    assert!(b.try_sum_axis(0).unwrap().as_slice().is_empty());
+}
+
+#[test]
+fn axis_out_of_range_keeps_existing_message_not_an_index_panic() {
+    // T7: the length-zero guard must not turn an out-of-range axis into a raw
+    // index panic; the existing Shape error must survive.
+    let a = empty_0x3();
+    assert!(matches!(
+        a.try_mean_axis(5).unwrap_err(),
+        MattenError::Shape {
+            operation: "mean_axis",
+            ..
+        }
+    ));
+    assert!(matches!(
+        a.try_min_axis(5).unwrap_err(),
+        MattenError::Shape {
+            operation: "min_axis",
+            ..
+        }
+    ));
+    assert!(matches!(
+        a.try_max_axis(5).unwrap_err(),
+        MattenError::Shape {
+            operation: "max_axis",
+            ..
+        }
+    ));
+}
+
 // ── rank-1 axis reductions collapse to a scalar (RFC-056, deep-review P3) ──
 
 #[test]

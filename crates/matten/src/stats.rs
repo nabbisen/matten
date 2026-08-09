@@ -176,8 +176,11 @@ impl Tensor {
     /// `keepdims` (e.g. `[2, 3]` axis 0 → `[3]`, axis 1 → `[2]`).
     ///
     /// # Panics
-    /// Panics if `axis >= rank`, or on a dynamic tensor. Use
-    /// [`Tensor::try_var_axis`] for the non-panicking form.
+    /// Panics if `axis >= rank`, on a dynamic tensor, or if the **reduced**
+    /// axis has length 0 (RFC-110) — the variance of nothing is undefined,
+    /// not `NaN`. A zero-length axis that *survives* the reduction yields an
+    /// empty result, not a panic. Use [`Tensor::try_var_axis`] for the
+    /// non-panicking form.
     ///
     /// ```
     /// use matten::Tensor;
@@ -192,8 +195,11 @@ impl Tensor {
     /// Non-panicking [`Tensor::var_axis`].
     ///
     /// # Errors
-    /// Returns [`MattenError::Shape`] if `axis >= rank`, or
-    /// [`MattenError::Unsupported`] on a dynamic tensor.
+    /// Returns [`MattenError::Shape`] if `axis >= rank`,
+    /// [`MattenError::Unsupported`] on a dynamic tensor, or
+    /// [`MattenError::InvalidArgument`] if the **reduced** axis has length 0
+    /// (RFC-110). A zero-length axis that *survives* the reduction still
+    /// returns `Ok` with an empty result.
     ///
     /// ```
     /// use matten::Tensor;
@@ -201,6 +207,16 @@ impl Tensor {
     /// assert!(m.try_var_axis(2).is_err()); // axis out of range
     /// ```
     pub fn try_var_axis(&self, axis: usize) -> Result<Tensor, MattenError> {
+        crate::math::reject_dynamic(self, "var_axis")?;
+        if self.shape().get(axis) == Some(&0) {
+            return Err(MattenError::InvalidArgument {
+                operation: "var_axis",
+                argument: "axis",
+                message: format!(
+                    "variance is undefined for a reduced axis of length 0 (axis {axis})"
+                ),
+            });
+        }
         variance_axis_impl(self, axis, "var_axis")
     }
 
@@ -209,7 +225,10 @@ impl Tensor {
     /// Population (`ddof = 0`). `NaN` propagates within each reduced slice.
     ///
     /// # Panics
-    /// Panics if `axis >= rank`, or on a dynamic tensor. Use
+    /// Panics if `axis >= rank`, on a dynamic tensor, or if the **reduced**
+    /// axis has length 0 (RFC-110) — the standard deviation of nothing is
+    /// undefined, not `NaN`. A zero-length axis that *survives* the
+    /// reduction yields an empty result, not a panic. Use
     /// [`Tensor::try_std_axis`] for the non-panicking form.
     ///
     /// ```
@@ -226,8 +245,11 @@ impl Tensor {
     /// Non-panicking [`Tensor::std_axis`].
     ///
     /// # Errors
-    /// Returns [`MattenError::Shape`] if `axis >= rank`, or
-    /// [`MattenError::Unsupported`] on a dynamic tensor.
+    /// Returns [`MattenError::Shape`] if `axis >= rank`,
+    /// [`MattenError::Unsupported`] on a dynamic tensor, or
+    /// [`MattenError::InvalidArgument`] if the **reduced** axis has length 0
+    /// (RFC-110). A zero-length axis that *survives* the reduction still
+    /// returns `Ok` with an empty result.
     ///
     /// ```
     /// use matten::Tensor;
@@ -235,6 +257,16 @@ impl Tensor {
     /// assert!(m.try_std_axis(5).is_err());
     /// ```
     pub fn try_std_axis(&self, axis: usize) -> Result<Tensor, MattenError> {
+        crate::math::reject_dynamic(self, "std_axis")?;
+        if self.shape().get(axis) == Some(&0) {
+            return Err(MattenError::InvalidArgument {
+                operation: "std_axis",
+                argument: "axis",
+                message: format!(
+                    "standard deviation is undefined for a reduced axis of length 0 (axis {axis})"
+                ),
+            });
+        }
         let mut v = variance_axis_impl(self, axis, "std_axis")?;
         for x in &mut v.data {
             *x = x.sqrt();

@@ -88,6 +88,14 @@ var_axis(1): collapse columns, keep rows
 The `try_*` forms return `MattenError::Shape` if `axis >= rank`, or
 `MattenError::Unsupported` on a dynamic tensor.
 
+**Empty reduced axis (RFC-110):** `var_axis`/`try_var_axis` and
+`std_axis`/`try_std_axis` additionally return `MattenError::InvalidArgument`
+(or, for the panicking forms, a panic carrying that message) when the
+**reduced** axis has length 0 — variance and standard deviation of nothing
+are undefined, not `NaN`. A zero-length axis that *survives* the reduction
+(a different axis than the one being reduced) is unaffected and still returns
+`Ok` with an empty result.
+
 ## Out of scope for core
 
 ```text

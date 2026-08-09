@@ -90,6 +90,16 @@ only axis gives a scalar-shaped tensor.
 
 Both panic with an actionable message if `axis >= ndim`.
 
+**Empty reduced axis (RFC-110):** `mean_axis`/`try_mean_axis` error
+(`MattenError::InvalidArgument`, or a panic carrying that message) when the
+**reduced** axis has length 0 — the mean of nothing is undefined. `sum_axis` is
+unaffected and returns the additive identity `0.0` per output slot, the same
+boundary RFC-105 drew for whole-tensor `sum`. A zero-length axis that
+*survives* the reduction (the axis you did **not** reduce) is a different case
+entirely and still returns `Ok` with an empty result — no constructor accepts
+a zero-sized shape, but slicing reaches one
+(`t.slice().range(0..0).all().build()`).
+
 Read an axis reduction as "collapse that axis and keep the others":
 
 ```text
@@ -204,6 +214,13 @@ m.max_axis(1);  // row maximums   -> shape [2] -> [4.0, 9.0]
 
 NaN propagation: if any element along the reduced axis is `NaN`, the output
 for that position is `NaN`.
+
+**Empty reduced axis (RFC-110):** `min_axis`/`try_min_axis` and
+`max_axis`/`try_max_axis` error (`MattenError::InvalidArgument`, or a panic
+carrying that message) when the **reduced** axis has length 0, rather than
+returning `f64::INFINITY`/`f64::NEG_INFINITY` — those are fold identities, not
+answers. A zero-length axis that *survives* the reduction still returns `Ok`
+with an empty result.
 
 ## `*` is always element-wise
 

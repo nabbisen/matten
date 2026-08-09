@@ -167,6 +167,123 @@ fn var_axis_nan_propagates_within_slice() {
     assert!(v.as_slice()[2].is_finite());
 }
 
+// ----- empty reduced-axis semantics (RFC-110) -----
+//
+// No constructor accepts a zero-sized shape; every fixture below is reached
+// via slice().range(0..0), never a direct constructor.
+
+fn empty_0x3() -> Tensor {
+    Tensor::new(vec![1., 2., 3., 4., 5., 6.], &[2, 3])
+        .slice()
+        .range(0..0)
+        .all()
+        .build()
+        .unwrap()
+}
+
+fn empty_3x0() -> Tensor {
+    Tensor::new(vec![1., 2., 3.], &[3, 1])
+        .slice()
+        .all()
+        .range(0..0)
+        .build()
+        .unwrap()
+}
+
+#[test]
+fn var_std_axis_error_on_zero_length_reduced_axis() {
+    let a = empty_0x3();
+    let err = a.try_var_axis(0).unwrap_err();
+    assert!(matches!(
+        err,
+        MattenError::InvalidArgument {
+            operation: "var_axis",
+            ..
+        }
+    ));
+    assert_eq!(
+        err.to_string(),
+        "matten invalid argument error in var_axis: axis: variance is undefined for a reduced axis of length 0 (axis 0)"
+    );
+
+    let err = a.try_std_axis(0).unwrap_err();
+    assert!(matches!(
+        err,
+        MattenError::InvalidArgument {
+            operation: "std_axis",
+            ..
+        }
+    ));
+    assert_eq!(
+        err.to_string(),
+        "matten invalid argument error in std_axis: axis: standard deviation is undefined for a reduced axis of length 0 (axis 0)"
+    );
+
+    let b = empty_3x0();
+    assert!(matches!(
+        b.try_var_axis(1).unwrap_err(),
+        MattenError::InvalidArgument {
+            operation: "var_axis",
+            ..
+        }
+    ));
+    assert!(matches!(
+        b.try_std_axis(1).unwrap_err(),
+        MattenError::InvalidArgument {
+            operation: "std_axis",
+            ..
+        }
+    ));
+}
+
+#[test]
+#[should_panic(expected = "variance is undefined for a reduced axis of length 0 (axis 0)")]
+fn var_axis_panicking_form_carries_the_message() {
+    let _ = empty_0x3().var_axis(0);
+}
+
+#[test]
+#[should_panic(
+    expected = "standard deviation is undefined for a reduced axis of length 0 (axis 0)"
+)]
+fn std_axis_panicking_form_carries_the_message() {
+    let _ = empty_0x3().std_axis(0);
+}
+
+#[test]
+fn var_std_axis_surviving_empty_axis_is_still_ok_both_orientations() {
+    let a = empty_0x3(); // reduce axis 1 (length 3); axis 0 (length 0) survives
+    let r = a.try_var_axis(1).unwrap();
+    assert_eq!(r.shape(), &[0]);
+    assert!(r.as_slice().is_empty());
+    assert!(a.try_std_axis(1).unwrap().as_slice().is_empty());
+
+    let b = empty_3x0(); // reduce axis 0 (length 3); axis 1 (length 0) survives
+    let r = b.try_var_axis(0).unwrap();
+    assert_eq!(r.shape(), &[0]);
+    assert!(r.as_slice().is_empty());
+    assert!(b.try_std_axis(0).unwrap().as_slice().is_empty());
+}
+
+#[test]
+fn var_axis_out_of_range_still_shape_not_index_panic() {
+    let a = empty_0x3();
+    assert!(matches!(
+        a.try_var_axis(5).unwrap_err(),
+        MattenError::Shape {
+            operation: "var_axis",
+            ..
+        }
+    ));
+    assert!(matches!(
+        a.try_std_axis(5).unwrap_err(),
+        MattenError::Shape {
+            operation: "std_axis",
+            ..
+        }
+    ));
+}
+
 // ----- invalid axis -> Shape -----
 
 #[test]
