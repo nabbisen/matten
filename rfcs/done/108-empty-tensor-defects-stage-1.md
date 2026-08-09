@@ -1,6 +1,6 @@
 # RFC-108: Two Empty-Tensor Defects — Stage 1
 
-**Status:** **Implemented** 2026-08-08 in commit *"Fix mm_mul zero-column panic and add
+**Status:** **Implemented** 2026-08-09 in commit *"Fix mm_mul zero-column panic and add
 Tensor::is_empty() (RFC-108)"*, reviewed and approved **after corrections** — this RFC's own §4 scope
 was unsatisfiable and is amended inline below. Unreleased; the release decision is open under RFC-094,
 and the panic this fixes is live in published `0.44.0`. Handoff:
@@ -111,7 +111,7 @@ Display on an empty tensor (RFC-106 §2.14)
 the serde round-trip (RFC-106 Finding A — resolves under Stage 3, not here)
 matten-ndarray's ZeroSizedAxis boundary (Stage 3)
 
-AMENDED 2026-08-08 at review: this list previously forbade "any companion-crate
+AMENDED 2026-08-09 at review: this list previously forbade "any companion-crate
 change". That was UNSATISFIABLE. Adding Tensor::is_empty() makes clippy::len_zero
 fire on every `tensor.len() == 0` in the workspace, and matten-stats has two
 (histogram.rs:73, quantile.rs:40) — so the CI gate

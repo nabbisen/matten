@@ -1,6 +1,6 @@
 # RFC-107: Architecture Overview and Data-Model Lifecycle Pages
 
-**Status:** **Implemented** 2026-08-08 in commit *"Add architecture overview and data-model/lifecycle
+**Status:** **Implemented** 2026-08-09 in commit *"Add architecture overview and data-model/lifecycle
 docs pages (RFC-107)"*, reviewed and approved after two corrections — a pair of section references a
 reader could not follow, and a maturity label that contradicted the README. Docs only; no release
 trigger (RFC-094). Handoff:

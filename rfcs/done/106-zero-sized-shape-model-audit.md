@@ -1,6 +1,6 @@
 # RFC-106: Zero-Sized Dimensions — Audit Before Decision
 
-**Status:** **Complete** 2026-08-08 — the audit was produced and reviewed; **accepted with one
+**Status:** **Complete** 2026-08-09 — the audit was produced and reviewed; **accepted with one
 correction**. `git diff` was empty, as required. Its recommendation is a **staged accept**: Stage 1 is
 RFC-108; Stage 2 (axis reductions) is confirmed toward RFC-105's answer; Stage 3 (relaxing
 `checked_shape_len`) remains parked. **The audit found a severe defect neither this RFC nor RFC-105

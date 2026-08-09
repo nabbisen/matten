@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-109: `0.45.0` Mutation and Empty-Tensor Release
 
-**From:** High-capability model. **Date:** 2026-08-08.
+**From:** High-capability model. **Date:** 2026-08-09.
 **Design authority:** `rfcs/accepted/109-0450-mutation-and-empty-tensor-release.md`
 **Base:** `main` @ `1c6c208`, clean tree, family at `0.44.0`.
 

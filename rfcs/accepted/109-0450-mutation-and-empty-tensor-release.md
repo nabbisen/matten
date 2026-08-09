@@ -1,6 +1,6 @@
 # RFC-109: `0.45.0` — Mutation and Empty-Tensor Release
 
-**Status:** **Accepted** 2026-08-08 by the owner, who directed the cut ("Cut it"). Not yet
+**Status:** **Accepted** 2026-08-09 by the owner, who directed the cut ("Cut it"). Not yet
 implemented. Handoff: `rfcs/handoffs/109-0450-mutation-and-empty-tensor-release-handoff.md`.
 **Target:** `0.45.0`, on the `0.x` line
 **Related:** RFC-030 (lock-step), RFC-094 (cadence), RFC-104, RFC-105, RFC-108
@@ -18,7 +18,7 @@ RFC-094's triggers:
 
 ```text
 two themes accumulated  -> YES. Three: RFC-104, RFC-105, RFC-108.
-28 days since the last  -> no. 0.44.0 shipped 2026-08-08, the same day.
+28 days since the last  -> no. 0.44.0 shipped 2026-08-09, the same day.
 the owner asks          -> YES, and the owner directed the cut.
 ```
 

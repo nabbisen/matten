@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-107: Architecture Overview and Data-Model Lifecycle Pages
 
-**From:** High-capability model. **Date:** 2026-08-08.
+**From:** High-capability model. **Date:** 2026-08-09.
 **Design authority:** `rfcs/accepted/107-architecture-and-data-model-docs.md`
 **Base:** `main` @ `0df4c06`, family at `0.44.0`.
 **Sequencing:** independent of RFC-106. Either order; they touch different files.

@@ -1,6 +1,6 @@
 # Developer Handoff — RFC-108: Two Empty-Tensor Defects, Stage 1
 
-**From:** High-capability model. **Date:** 2026-08-08.
+**From:** High-capability model. **Date:** 2026-08-09.
 **Design authority:** `rfcs/accepted/108-empty-tensor-defects-stage-1.md`
 **Base:** `main` @ `07af3c1`, clean tree, family at `0.44.0`.
 
