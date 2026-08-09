@@ -1,7 +1,10 @@
 # RFC-109: `0.45.0` — Mutation and Empty-Tensor Release
 
-**Status:** **Accepted** 2026-08-09 by the owner, who directed the cut ("Cut it"). Not yet
-implemented. Handoff: `rfcs/handoffs/109-0450-mutation-and-empty-tensor-release-handoff.md`.
+**Status:** **Prepared** 2026-08-09 in commit *"Prepare 0.45.0: mutation and empty-tensor release
+(RFC-109)"*, reviewed and approved with **no corrections**. **Not tagged, not published** — both remain
+separate owner authorizations. Accepted by the owner, who directed the cut ("Cut it"), though unlike
+`0.42.0` and `0.44.0` this release is **not an override**: RFC-094's two-theme trigger had already
+fired, with three themes. Handoff: `rfcs/handoffs/109-0450-mutation-and-empty-tensor-release-handoff.md`.
 **Target:** `0.45.0`, on the `0.x` line
 **Related:** RFC-030 (lock-step), RFC-094 (cadence), RFC-104, RFC-105, RFC-108
 
@@ -149,18 +152,18 @@ commit absent from the remote — the orphaned-tag defect this project repaired 
 ## 8. Acceptance criteria
 
 ```text
-[ ] cargo metadata shows 0.45.0 for all five crates
-[ ] 38 live pins retargeted; the 41 record occurrences UNCHANGED — assert both
-[ ] no .rs diff except crates/matten/src/lib.rs's doc comment
-[ ] CHANGELOG [0.45.0]: Added + Changed + Version, none of them empty
-[ ] introduction.md rewritten; no text describing 0.44.0 as current survives
-[ ] public-api-snapshot.md: the four new items added, the "most recently changed"
+[x] cargo metadata shows 0.45.0 for all five crates
+[x] 38 live pins retargeted; the 41 record occurrences UNCHANGED — assert both
+[x] no .rs diff except crates/matten/src/lib.rs's doc comment
+[x] CHANGELOG [0.45.0]: Added + Changed + Version, none of them empty
+[x] introduction.md rewritten; no text describing 0.44.0 as current survives
+[x] public-api-snapshot.md: the four new items added, the "most recently changed"
     claim moved to RFC-104/RFC-108
-[ ] ROADMAP.md and rfcs/** untouched
-[ ] eight guards; check-doc-code.sh under RUSTFLAGS="-D warnings"
-[ ] cargo clippy --workspace --all-targets --all-features -- -D warnings (the CI form)
-[ ] cargo test --workspace; both feature profiles build
-[ ] no tag, no publish, no maturity-label change
+[x] ROADMAP.md and rfcs/** untouched
+[x] eight guards; check-doc-code.sh under RUSTFLAGS="-D warnings"
+[x] cargo clippy --workspace --all-targets --all-features -- -D warnings (the CI form)
+[x] cargo test --workspace; both feature profiles build
+[x] no tag, no publish, no maturity-label change
 ```
 
 ## 9. Non-goals
