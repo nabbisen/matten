@@ -84,6 +84,49 @@ verified rather than assumed — if any site needs special handling, that is a d
 - from_json_dynamic's "empty arrays are not supported" — likewise
 ```
 
+### 3.3 `try_linspace` — a defect CREATED by §3, found at the cascade check
+
+**Added at review, 2026-08-09.** `creation.rs:44-55` computes `(end - start) / (len - 1)`. With the
+guard relaxed, `count = 0` reaches it and `0usize - 1` underflows:
+
+```text
+Tensor::try_linspace(0.0, 1.0, 0)  ->  PANIC "attempt to subtract with overflow"
+```
+
+Reproduced against the partially-implemented tree. **This is not a scope question — it is a new panic
+in a `try_` form**, the exact defect class RFC-108 fixed for `mm_mul`. Shipping §3 without this would
+trade one panicking `try_` API for another.
+
+Fix: a third arm for `len == 0`, mirroring the existing `len == 1` arm — an empty `Vec`, no step
+computed. One unambiguous answer; an empty `linspace` has no points to space.
+
+### 3.4 `repeat` / `repeat_axis` / `tile` — three guards that bypass §3 entirely
+
+**Added at review, 2026-08-09.** Each has its **own** zero check, running *before* `check_shape` is
+ever reached, so §3 does not touch them:
+
+```text
+composition.rs:316  try_repeat       "repeat requires n > 0; n = 0 would produce a zero-sized
+                                      dimension, which the current matten shape model does
+                                      not support"
+composition.rs:410  try_repeat_axis  same shape, same claim
+composition.rs:524  try_tile         "tile reps must all be nonzero"
+```
+
+The first two messages assert precisely what this RFC makes false. **§9's acceptance criterion
+already names all three** — *"repeat, repeat_axis, tile … all accept a zero-sized result"* — so the
+RFC required this behaviour while §7's file list omitted the file. **That scope list was mine and it
+was unsatisfiable**, the second such in this sequence after RFC-108's.
+
+Fix: delete the three checks, nothing else. Verified safe at review — an empty *source* tensor already
+flows correctly through every one of these:
+
+```text
+[0,3].tile(&[2,2]) -> [0,6]     [3,0].tile(&[2,2]) -> [6,0]
+[0,3].repeat(2)    -> [0]       [0,3].repeat_axis(2,0) -> [0,3]
+reshape/concatenate/stack/transpose on empty sources: all Ok, no panic
+```
+
 ## 4. Change 2 — `matten-ndarray::from_arrayd`
 
 `convert.rs:60` rejects a zero-length axis with `ZeroSizedAxis`. Once core accepts, that rejection is
@@ -134,6 +177,9 @@ The audit is still owed, narrower than it looked:
 
 ```text
 crates/matten/src/shape.rs         the zero check (§3)
+crates/matten/src/creation.rs      try_linspace's len == 0 arm (§3.3, ADDED at review)
+crates/matten/src/composition.rs   the three own-guards in repeat / repeat_axis /
+                                   tile (§3.4, ADDED at review)
 crates/matten/src/tensor/display.rs the empty rendering (§5)
 crates/matten-ndarray             from_arrayd + the deprecated variant (§4)
 tests per §9
@@ -175,6 +221,11 @@ R5  REMOVING ZeroSizedAxis rather than deprecating it (§4).
 [ ] the overflow guard still fires on a shape that overflows usize (R2)
 [ ] reshape, concatenate, stack, repeat, repeat_axis, tile, meshgrid, outer,
     zeros/ones/full, linspace, eye all accept a zero-sized result
+[ ] try_linspace(_, _, 0) returns Ok with an empty result — NO panic (§3.3)
+[ ] repeat(t,0) / repeat_axis(t,0,ax) / tile(t,&[0,..]) return empty results,
+    and their three own-guards are deleted (§3.4)
+[ ] an EMPTY SOURCE tensor still flows correctly through all of the above —
+    asserted, not assumed
 [ ] serde round-trips a [0,3] tensor — serialize then deserialize, asserted
 [ ] from_arrayd accepts a zero-length axis; to_arrayd -> from_arrayd round-trips
 [ ] ZeroSizedAxis retained, deprecated, unreachable; its doc no longer claims
