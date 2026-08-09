@@ -1,6 +1,7 @@
 # RFC-118: Confirm CI Green Before Tagging
 
-**Status:** Proposed
+**Status:** **Accepted** 2026-08-09 by the owner. Not yet implemented. Handoff:
+`rfcs/handoffs/118-confirm-ci-before-tagging-handoff.md`.
 **Target:** `docs/src/contributing/release-checklist.md`
 **Theme:** Add the missing step between *push* and *tag*
 **Related:** RFC-094, RFC-117, rule 002 §8

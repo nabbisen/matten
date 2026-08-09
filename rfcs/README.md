@@ -144,7 +144,7 @@ sign-off and implementation — not that the state is unused.
 
 | ID | Title | Handoff |
 |---:|---|---|
-| — | *(none at present)* | — |
+| 118 | [Confirm CI Green Before Tagging](./accepted/118-confirm-ci-before-tagging.md) | [`118-…-handoff.md`](./handoffs/118-confirm-ci-before-tagging-handoff.md) |
 
 ## Archive
 
