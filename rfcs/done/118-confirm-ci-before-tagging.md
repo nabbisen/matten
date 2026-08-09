@@ -1,6 +1,9 @@
 # RFC-118: Confirm CI Green Before Tagging
 
-**Status:** **Accepted** 2026-08-09 by the owner. Not yet implemented. Handoff:
+**Status:** **Implemented** 2026-08-09 in commit *"Confirm CI green before tagging, and count the
+ninth guard (RFC-118)"* (`3e298df`), reviewed and approved after one correction — the step was first
+placed under *Additional gates for minor releases*, where a patch release would have been entitled to
+skip it. No release; documentation only. Handoff:
 `rfcs/handoffs/118-confirm-ci-before-tagging-handoff.md`.
 **Target:** `docs/src/contributing/release-checklist.md`
 **Theme:** Add the missing step between *push* and *tag*
@@ -107,14 +110,14 @@ R4  Turning this into a workflow-automation change. Out of scope.
 ## 8. Acceptance criteria
 
 ```text
-[ ] the release sequence documents push -> confirm CI green -> tag -> publish
-[ ] the CI step names the PUSHED COMMIT and says a red run STOPS the release
-[ ] the ordering reason for push-before-tag is stated (orphaned tags)
-[ ] an executable way to check is given
-[ ] section 1's guard list matches `ls scripts/*.sh`, derived not copied
-[ ] no crate, no .rs, no script touched — assert via git diff --stat
-[ ] nine guards; check-doc-code.sh under RUSTFLAGS="-D warnings"; mdbook build clean
-[ ] no version bump, tag, or publish
+[x] the release sequence documents push -> confirm CI green -> tag -> publish
+[x] the CI step names the PUSHED COMMIT and says a red run STOPS the release
+[x] the ordering reason for push-before-tag is stated (orphaned tags)
+[x] an executable way to check is given
+[x] section 1's guard list matches `ls scripts/*.sh`, derived not copied
+[x] no crate, no .rs, no script touched — assert via git diff --stat
+[x] nine guards; check-doc-code.sh under RUSTFLAGS="-D warnings"; mdbook build clean
+[x] no version bump, tag, or publish
 ```
 
 ## 9. What this does not claim
