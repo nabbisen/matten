@@ -1,6 +1,8 @@
 # RFC-114: `0.46.0` — The Empty-Tensor Release
 
-**Status:** **Accepted** 2026-08-09 by the owner. Not yet implemented. Handoff:
+**Status:** **Prepared** 2026-08-09 in commit *"Prepare 0.46.0: the empty-tensor release (RFC-114)"*
+(`0a62a0a`), reviewed and approved with **no corrections**. **Not tagged, not published** — both remain
+separate owner authorizations. Handoff:
 `rfcs/handoffs/114-0460-empty-tensor-release-handoff.md`.
 **Target:** `0.46.0`, on the `0.x` line
 **Related:** RFC-030 (lock-step), RFC-094 (cadence), RFC-110, RFC-111, RFC-112
@@ -154,18 +156,18 @@ None is authorized by this RFC. Each comes to the owner as its own ask.
 ## 9. Acceptance criteria
 
 ```text
-[ ] cargo metadata shows 0.46.0 for all five crates
-[ ] 38 live pins retargeted; the 32 record occurrences UNCHANGED — assert both
-[ ] no .rs diff except crates/matten/src/lib.rs's doc comment
-[ ] CHANGELOG [0.46.0]: Changed + Version, no Added, no Deprecated section
-[ ] no falsehood from §7.1 — especially §4's
-[ ] introduction.md rewritten; no text describing 0.45.0 as current survives
-[ ] public-api-snapshot.md: a sentence, NO new row, claim not moved
-[ ] ROADMAP.md and rfcs/** untouched
-[ ] eight guards; check-doc-code.sh under RUSTFLAGS="-D warnings"
-[ ] RUSTFLAGS="-D warnings" cargo clippy --workspace --all-targets --all-features
-[ ] cargo test --workspace; both feature profiles
-[ ] no tag, no publish, no maturity-label change
+[x] cargo metadata shows 0.46.0 for all five crates
+[x] 38 live pins retargeted; the 32 record occurrences UNCHANGED — assert both
+[x] no .rs diff except crates/matten/src/lib.rs's doc comment
+[x] CHANGELOG [0.46.0]: Changed + Version, no Added, no Deprecated section
+[x] no falsehood from §7.1 — especially §4's
+[x] introduction.md rewritten; no text describing 0.45.0 as current survives
+[x] public-api-snapshot.md: a sentence, NO new row, claim not moved
+[x] ROADMAP.md and rfcs/** untouched
+[x] eight guards; check-doc-code.sh under RUSTFLAGS="-D warnings"
+[x] RUSTFLAGS="-D warnings" cargo clippy --workspace --all-targets --all-features
+[x] cargo test --workspace; both feature profiles
+[x] no tag, no publish, no maturity-label change
 ```
 
 ## 10. Non-goals
