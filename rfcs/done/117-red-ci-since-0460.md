@@ -1,6 +1,8 @@
 # RFC-117: CI Has Been Red Since Before `0.46.0` Was Tagged
 
-**Status:** **Accepted** 2026-08-09 by the owner. Not yet implemented. Handoff:
+**Status:** **Implemented** 2026-08-09 in commit *"Fix red CI: invert two stale header_only
+assertions, add missing CHANGELOG bullet, and a ninth guard (RFC-117)"* (`942caff`), reviewed and
+approved with **no corrections**, and pushed. No release — no `crates/` change. Handoff:
 `rfcs/handoffs/117-red-ci-since-0460-handoff.md`.
 **Target:** `tools/matten-report/tests/`, `CHANGELOG.md`, `scripts/`
 **Theme:** Fix the break, document what actually shipped, and close the gap that hid both
@@ -132,15 +134,15 @@ R4  Only fixing header_only_absent. There are TWO cases; the script stops at the
 ## 9. Acceptance criteria
 
 ```text
-[ ] process-boundary.sh passes; BOTH header_only cases inverted (R4)
-[ ] module-boundaries.sh and its --self-test still pass, unmodified
-[ ] matten-report's source unchanged — assert via git diff --stat
-[ ] the [0.46.0] entry gains a matten-data bullet; nothing else in CHANGELOG changes
-[ ] scripts/check-tool-tests.sh exists, runs the same set as test.yaml, and is
+[x] process-boundary.sh passes; BOTH header_only cases inverted (R4)
+[x] module-boundaries.sh and its --self-test still pass, unmodified
+[x] matten-report's source unchanged — assert via git diff --stat
+[x] the [0.46.0] entry gains a matten-data bullet; nothing else in CHANGELOG changes
+[x] scripts/check-tool-tests.sh exists, runs the same set as test.yaml, and is
     PROVEN to fail on a reverted assertion
-[ ] all nine guards pass
-[ ] no crate, no .rs file touched
-[ ] no version bump, tag, or publish
+[x] all nine guards pass
+[x] no crate, no .rs file touched
+[x] no version bump, tag, or publish
 ```
 
 ## 10. What this does not fix
