@@ -12,7 +12,7 @@ crates.io is not a release at all. The last is testable rather than editorial â€
 
 ## Before every release
 
-Release tags use bare SemVer with no `v` prefix, for example `0.44.0`.
+Release tags use bare SemVer with no `v` prefix, for example `0.45.0`.
 
 ### 1. Source verification
 

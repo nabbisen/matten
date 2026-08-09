@@ -26,6 +26,52 @@ crates are expressed by per-crate status labels, not by separate version numbers
 > trigger — unfired across eight consecutive releases before RFC-074 found
 > it — a mandatory per-entry check rather than a rule that only an RFC states.
 
+## [0.45.0] - 2026-08-09
+
+RFC-104, RFC-105, and RFC-108 release: mutable element access, empty-tensor reduction
+fixes, and a fix for a live panic in matrix multiplication. Two behaviour changes ship
+alongside the additions, not only fixes.
+
+### Added
+
+- core `matten`: `get_mut(coord)` / `get_flat_mut(index)` on numeric tensors, and
+  `get_element_mut(coord)` on dynamic tensors (RFC-104), each mirroring its existing
+  getter (`get` / `get_flat` / `get_element`). On a dynamic tensor whose storage is
+  shared (for example a slice), the first write through `get_element_mut` **materializes**
+  a fresh, uniquely owned copy and **releases the parent's allocation** as a side effect —
+  the retention cost documented for slicing gets an incidental escape hatch here, arriving
+  from an unrelated operation rather than a feature built for that purpose.
+- core `matten`: `Tensor::is_empty()` (RFC-108), returning `self.len() == 0`. The state it
+  reports was always reachable — via slicing to a zero-sized shape, never via a
+  constructor, which still rejects zero-sized dimensions unconditionally and continues to
+  do so — what was missing was the method, not the behaviour it reports.
+
+### Changed
+
+- core `matten`: `mean`/`min`/`max` and `argmin`/`argmax` now return `Err`
+  (`MattenError::InvalidArgument`) — or, for the panicking forms, a panic carrying that
+  message — when called on an empty tensor, instead of panicking with a raw Rust
+  slice-index error (`argmin`/`argmax`) or silently returning `NaN`/`inf`/`-inf`
+  (`mean`/`min`/`max`) (RFC-105). `sum` is unchanged and still returns a zero, its identity
+  under addition. Code relying on the old sentinel values, or catching the old raw panic
+  message, will now see different behaviour.
+- core `matten`: `dot`/`matmul`/`try_dot`/`try_matmul` no longer panic on a matrix product
+  with zero output columns (for example `[m,n] × [n,0]`); they return the correctly shaped
+  empty `[m, 0]` result instead (RFC-108). This removes a panic from an operation that
+  already existed — including inside `try_dot`, the very `Result` form RFC-099 added so a
+  caller could handle a failure instead of only catching a panic — not a new capability.
+  `n == 0` (zero contraction dimension) and `m == 0` (zero rows) already behaved correctly
+  and are unchanged.
+- `matten-stats`: `histogram`/`quantile`'s internal empty-input check was rewritten from
+  `x.len() == 0` to `x.is_empty()`, a `clippy::len_zero` fix made possible by core's new
+  method; the check's observable behaviour (`MattenStatsError::Empty`) is unchanged.
+
+### Version
+
+- Release bump `0.44.0` -> `0.45.0`. Lock-step family versioning applies to all five
+  published crates; the behaviour changes are in core `matten`, with a one-line internal
+  follow-on in `matten-stats`.
+
 ## [0.44.0] - 2026-08-08
 
 RFC-102 dynamic slicing release. `slice()` and `slice_str()` now support dynamic tensors.

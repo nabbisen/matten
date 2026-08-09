@@ -61,7 +61,7 @@ the lean core. Enabling `dynamic` does not rename or remove any numeric Tensor A
 
 The published crates are released as one lock-step family (RFC-030): matching
 crate versions are the supported, documented set. Downstream examples therefore
-show explicit matched pins such as `matten = "0.44.0"` plus a companion at the
+show explicit matched pins such as `matten = "0.45.0"` plus a companion at the
 same release.
 
 Inside the workspace, companion crates inherit the core dependency from

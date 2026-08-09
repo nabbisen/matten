@@ -1,18 +1,25 @@
 # Public API snapshot
 
-This page lists every public item in `matten` at the current v0.44 release
+This page lists every public item in `matten` at the current v0.45 release
 family. It serves as the baseline for tracking breaking changes toward v1.0.0
 and as the review gate required by RFC-015. Core `matten`'s public API most
-recently changed in RFC-099, which added `try_dot`/`try_matmul`, and RFC-100,
-which added `Display for Tensor` — both additive, neither changing an existing
-signature or message. Before those, RFC-087 added `repeat`, `repeat_axis`,
-`tile`, and `meshgrid` (see the shape composition section below). RFC-088
-followed with negative indices in `slice_str`, but changed no public item — a
-signature-level grammar extension behind an existing method, not a new row
-here. RFC-102 is the same shape: `slice()` and `slice_str()` now accept
-dynamic tensors and return one instead of `MattenError::Unsupported` — a
-behavior change behind two existing methods, with no signature change and no
-new row. The RFC-082 streaming feature, RFC-083's functions before it, and
+recently changed in RFC-104, which added `get_mut`/`get_flat_mut` (numeric) and
+`get_element_mut` (dynamic) — all three mirroring their existing getters — and
+RFC-108, which added `is_empty()`; all four are additive, none changing an
+existing signature or message. Before those, RFC-099 added `try_dot`/
+`try_matmul`, and RFC-100 added `Display for Tensor` — both additive as well.
+Earlier still, RFC-087 added `repeat`, `repeat_axis`, `tile`, and `meshgrid`
+(see the shape composition section below). RFC-088 followed with negative
+indices in `slice_str`, but changed no public item — a signature-level grammar
+extension behind an existing method, not a new row here. RFC-102 is the same
+shape: `slice()` and `slice_str()` now accept dynamic tensors and return one
+instead of `MattenError::Unsupported` — a behavior change behind two existing
+methods, with no signature change and no new row. RFC-105 and RFC-108's
+`mm_mul` fix are likewise behavior changes with no new row: `mean`/`min`/`max`/
+`argmin`/`argmax` now return `Err`/panic-with-message on an empty tensor
+instead of panicking with a raw index error or returning `NaN`/`inf`/`-inf`,
+and `dot`/`matmul`/`try_dot`/`try_matmul` no longer panic on a zero-column
+product. The RFC-082 streaming feature, RFC-083's functions before it, and
 RFC-090's `histogram` were companion-crate (`matten-data`/`matten-stats`)
 additions, and the RFC-080/084/085 maturity promotions were label changes;
 none of the three touched core `matten`'s root exports.
@@ -103,6 +110,7 @@ See [Display / formatting](./math.md#display--formatting-rfc-100) for the full c
 | `is_scalar()` | `bool` | ndim == 0 |
 | `is_vector()` | `bool` | ndim == 1 |
 | `is_matrix()` | `bool` | ndim == 2 |
+| `is_empty()` | `bool` | RFC-108; `len() == 0`; reachable via slicing, never via a constructor |
 
 ## `Tensor` — data access (numeric Tensor)
 
@@ -113,6 +121,8 @@ See [Display / formatting](./math.md#display--formatting-rfc-100) for the full c
 | `into_vec(self)` | `Vec<f64>` | consuming; panics on dynamic |
 | `get(coord)` | `Option<f64>` | panics on dynamic |
 | `get_flat(index)` | `Option<f64>` | panics on dynamic |
+| `get_mut(coord)` | `Option<&mut f64>` | RFC-104; mirrors `get`; panics on dynamic |
+| `get_flat_mut(index)` | `Option<&mut f64>` | RFC-104; mirrors `get_flat`; panics on dynamic |
 
 ## `Tensor` — shape operations (numeric Tensor)
 
@@ -256,6 +266,7 @@ percentile, histogram, covariance, correlation, and z-score are out of core scop
 | `from_elements(data, shape)` | `Tensor` | |
 | `try_from_elements(data, shape)` | `Result<Tensor, MattenError>` | |
 | `get_element(coord)` | `Option<Element>` | |
+| `get_element_mut(coord)` | `Option<&mut Element>` | RFC-104; mirrors `get_element`; materializes shared storage on first write, releasing the parent's allocation |
 | `is_dynamic()` | `bool` | |
 | `from_json_dynamic(input)` | `Result<Tensor, MattenError>` | needs `json` |
 | `from_csv_dynamic(input)` | `Result<Tensor, MattenError>` | needs `csv` |
