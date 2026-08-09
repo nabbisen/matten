@@ -1,6 +1,7 @@
 # RFC-114: `0.46.0` — The Empty-Tensor Release
 
-**Status:** Proposed
+**Status:** **Accepted** 2026-08-09 by the owner. Not yet implemented. Handoff:
+`rfcs/handoffs/114-0460-empty-tensor-release-handoff.md`.
 **Target:** `0.46.0`, on the `0.x` line
 **Related:** RFC-030 (lock-step), RFC-094 (cadence), RFC-110, RFC-111, RFC-112
 
