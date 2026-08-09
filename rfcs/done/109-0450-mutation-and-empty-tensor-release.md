@@ -1,8 +1,9 @@
 # RFC-109: `0.45.0` — Mutation and Empty-Tensor Release
 
-**Status:** **Prepared** 2026-08-09 in commit *"Prepare 0.45.0: mutation and empty-tensor release
-(RFC-109)"*, reviewed and approved with **no corrections**. **Not tagged, not published** — both remain
-separate owner authorizations. Accepted by the owner, who directed the cut ("Cut it"), though unlike
+**Status:** **Released** 2026-08-09 — prepared in commit *"Prepare 0.45.0: mutation and empty-tensor
+release (RFC-109)"*, reviewed and approved with **no corrections**, then tagged `0.45.0` (signed, on
+the *Prepare* commit) and published to crates.io. All five crates verified live and unyanked against
+the sparse index; all **105** remote tags resolve to ancestors of `origin/main`. Accepted by the owner, who directed the cut ("Cut it"), though unlike
 `0.42.0` and `0.44.0` this release is **not an override**: RFC-094's two-theme trigger had already
 fired, with three themes. Handoff: `rfcs/handoffs/109-0450-mutation-and-empty-tensor-release-handoff.md`.
 **Target:** `0.45.0`, on the `0.x` line
