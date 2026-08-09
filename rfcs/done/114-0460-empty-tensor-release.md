@@ -1,8 +1,9 @@
 # RFC-114: `0.46.0` — The Empty-Tensor Release
 
-**Status:** **Prepared** 2026-08-09 in commit *"Prepare 0.46.0: the empty-tensor release (RFC-114)"*
-(`0a62a0a`), reviewed and approved with **no corrections**. **Not tagged, not published** — both remain
-separate owner authorizations. Handoff:
+**Status:** **Released** 2026-08-09 — prepared in commit *"Prepare 0.46.0: the empty-tensor release
+(RFC-114)"* (`0a62a0a`), reviewed and approved with **no corrections**, then tagged `0.46.0` (signed,
+on the *Prepare* commit) and published to crates.io. All five crates verified live and unyanked
+against the sparse index; all **106** remote tags resolve to ancestors of `origin/main`. Handoff:
 `rfcs/handoffs/114-0460-empty-tensor-release-handoff.md`.
 **Target:** `0.46.0`, on the `0.x` line
 **Related:** RFC-030 (lock-step), RFC-094 (cadence), RFC-110, RFC-111, RFC-112
