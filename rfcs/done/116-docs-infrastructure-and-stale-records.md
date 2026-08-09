@@ -1,6 +1,11 @@
 # RFC-116: Render the Diagrams, and Repair Two Unmaintained Records
 
-**Status:** **Accepted** 2026-08-09 by the owner. Not yet implemented. Handoff:
+**Status:** **Implemented** 2026-08-09 in commit *"Render RFC-107's diagrams and backfill two stale
+records (RFC-116)"* (`8da081d`), reviewed and approved after the owner chose **ACCEPT** on the asset
+cost, plus one required addition. Ships in no release. **§2.2 asked for the wrong number** — repository
+size, when the consequential figure was that every page loads the 2.6 MiB bundle — and **E7's count and
+its era characterisation were both wrong**: 8 missing, not 18, and RFC-043–054, not RFC-033–042.
+Handoff:
 `rfcs/handoffs/116-docs-infrastructure-and-stale-records-handoff.md`.
 **Target:** `docs/` + one build dependency + one CI step; `ROADMAP.md`, `rfcs/handoffs/README.md`
 **Theme:** Make the diagrams diagrams, and stop two indexes lying by omission
@@ -117,17 +122,17 @@ R5  Scope creep into adding diagrams elsewhere.
 ## 7. Acceptance criteria
 
 ```text
-[ ] both mermaid blocks render as DIAGRAMS in the built HTML — verified by
+[x] both mermaid blocks render as DIAGRAMS in the built HTML — verified by
     inspecting docs/book/, not by the build exiting 0
-[ ] assets are vendored under docs/theme/, not fetched from a CDN
-[ ] the added repository size is stated
-[ ] mdbook-mermaid pinned with --locked, matching the mdBook step
-[ ] the docs workflow succeeds
-[ ] Part B: five rows added, or the table retired with a dated note
-[ ] Part C: the index completed, or retired with a dated note
-[ ] no crate, no .rs file touched — assert via git diff --stat
-[ ] eight guards; check-doc-code.sh under RUSTFLAGS="-D warnings"
-[ ] no version bump, tag, or publish
+[x] assets are vendored under docs/theme/, not fetched from a CDN
+[x] the added repository size is stated
+[x] mdbook-mermaid pinned with --locked, matching the mdBook step
+[x] the docs workflow succeeds
+[x] Part B: five rows added, or the table retired with a dated note
+[x] Part C: the index completed, or retired with a dated note
+[x] no crate, no .rs file touched — assert via git diff --stat
+[x] eight guards; check-doc-code.sh under RUSTFLAGS="-D warnings"
+[x] no version bump, tag, or publish
 ```
 
 ## 8. This produces no release

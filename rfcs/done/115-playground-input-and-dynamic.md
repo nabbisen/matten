@@ -1,6 +1,9 @@
 # RFC-115: Playground Input Ergonomics, and a Dynamic Path
 
-**Status:** **Accepted** 2026-08-09 by the owner. Not yet implemented. Handoff:
+**Status:** **Implemented** 2026-08-09 in commit *"Fix playground input parsing and add a try_numeric
+demo (RFC-115)"* (`301a600`), reviewed and approved with **no corrections**. Ships in no release.
+**§3's wasm figure was corrected at review** — the +1.7% it cited measured the bare feature flag, not
+the change; the real delta is ~+18%. The decision was unaffected. Handoff:
 `rfcs/handoffs/115-playground-input-and-dynamic-handoff.md`.
 **Target:** `tools/matten-playground` (workspace-excluded, `publish = false`) + the docs page
 **Theme:** Make the page easier to *use*, then let it accept data it currently cannot
@@ -125,17 +128,17 @@ R5  Scope creep into RFC-095's output format.
 ## 6. Acceptance criteria
 
 ```text
-[ ] a grid pasted across newlines parses, for every operation
-[ ] an INTERIOR blank cell is reported, naming its position — not dropped
-[ ] a TRAILING separator still works ("1,2,3," is fine)
-[ ] no computed result changes for any currently-valid input — asserted
-[ ] Part B: a try_numeric demo, showing the dynamic tensor and then either the
+[x] a grid pasted across newlines parses, for every operation
+[x] an INTERIOR blank cell is reported, naming its position — not dropped
+[x] a TRAILING separator still works ("1,2,3," is fine)
+[x] no computed result changes for any currently-valid input — asserted
+[x] Part B: a try_numeric demo, showing the dynamic tensor and then either the
     numeric result or the real error naming the offending cell
-[ ] no panicking core form called anywhere in the tool — grep, and state it
-[ ] the wasm module builds; the page works
-[ ] cargo test for the tool; clippy under RUSTFLAGS="-D warnings"
-[ ] core matten and every published crate untouched — assert via git diff --stat
-[ ] no version bump, tag, or publish
+[x] no panicking core form called anywhere in the tool — grep, and state it
+[x] the wasm module builds; the page works
+[x] cargo test for the tool; clippy under RUSTFLAGS="-D warnings"
+[x] core matten and every published crate untouched — assert via git diff --stat
+[x] no version bump, tag, or publish
 ```
 
 ## 7. This produces no release
