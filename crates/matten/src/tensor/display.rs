@@ -54,6 +54,13 @@ impl fmt::Display for Tensor {
 }
 
 fn fmt_numeric(data: &[f64], shape: &[usize], f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    // A zero-sized dimension (RFC-111) renders its shape, matching the rank > 2
+    // fallback below, instead of an empty string that gives no sign the value
+    // is even a tensor. A rank-0 scalar's data always has exactly one element
+    // (the empty shape product is 1), so it can never reach this branch.
+    if data.is_empty() {
+        return write!(f, "shape={shape:?} values={data:?}");
+    }
     match shape {
         [] => write!(f, "{:?}", data[0]),
         [n] => f.write_str(&row(*n, f.alternate(), |i| format!("{:?}", data[i]))),
@@ -77,6 +84,11 @@ fn dynamic_cell_text(e: &Element) -> String {
 #[cfg(feature = "dynamic")]
 fn fmt_dynamic(dyn_t: &DynamicTensor, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     let shape = dyn_t.shape.as_slice();
+    // Same zero-sized-dimension case as fmt_numeric (RFC-111); a rank-0 scalar
+    // always has len 1, so it can never reach this branch.
+    if dyn_t.len == 0 {
+        return write!(f, "shape={shape:?} values=[]");
+    }
     let cell = |i: usize| dyn_t.get_flat(i).map(dynamic_cell_text).unwrap_or_default();
     match shape {
         [] => f.write_str(&cell(0)),

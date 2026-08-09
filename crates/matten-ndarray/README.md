@@ -53,8 +53,8 @@ let back = from_arrayd(arr)?;     // ArrayD<f64> -> Tensor
 - **Logical order is preserved.** `from_arrayd` converts a non-standard-layout
   `ArrayD` (transposed / sliced) by its *logical* element order, never the raw
   backing buffer.
-- **Zero-sized axes are rejected.** Core `matten` does not support zero-length
-  dimensions, so `from_arrayd` returns an error for them.
+- **Zero-sized axes are accepted.** Core `matten` accepts zero-length dimensions
+  (RFC-111), and `from_arrayd` converts them like any other shape.
 - **Dynamic tensors are rejected, not panicked.** Passing a dynamic (`Element`)
   tensor returns `MattenNdarrayError::DynamicTensor` regardless of whether the
   companion `dynamic` feature is enabled (RFC-031); convert it with
@@ -88,7 +88,7 @@ template. The full contract:
 | Source / target | `matten::Tensor` ↔ `ndarray::ArrayD<f64>` |
 | Direction | Bidirectional: `to_arrayd(&Tensor)`, `from_arrayd(ArrayD<f64>)` |
 | Copy / view | Copies both directions; no zero-copy |
-| Shape / rank | Shape preserved; rank bounded by core `matten` (over-rank → `Matten` error); a zero-length axis is rejected (→ `ZeroSizedAxis`) |
+| Shape / rank | Shape preserved; rank bounded by core `matten` (over-rank → `Matten` error); a zero-length axis is accepted (RFC-111) |
 | Memory order | Row-major logical order both ways; `from_arrayd` honors non-standard layouts |
 | Dynamic tensors | Rejected → `DynamicTensor` (unconditional; not a panic) |
 | NaN | Passed through as ordinary `f64` |

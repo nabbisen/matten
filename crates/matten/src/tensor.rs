@@ -197,9 +197,7 @@ impl Tensor {
 
     /// Creates a 1-D tensor from a flat vector; shape is `[data.len()]`.
     ///
-    /// # Panics
-    ///
-    /// Panics if `data` is empty (zero-sized dimension).
+    /// An empty `data` produces an empty tensor, shape `[0]` (RFC-111).
     ///
     /// ```
     /// use matten::Tensor;

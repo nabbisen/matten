@@ -119,9 +119,9 @@ Tensor::try_repeat_axis(&self, n: usize, axis: usize) -> Result<Tensor, MattenEr
 ```
 
 A rank-0 scalar `.repeat(n)` produces a rank-1 tensor of length `n`; `repeat_axis`
-on a rank-0 scalar is a `Shape` error (there is no axis to repeat along). `n = 0` is
-also a `Shape` error — the shape model has no representation for a zero-sized
-dimension, so this is explicit rather than an empty tensor.
+on a rank-0 scalar is a `Shape` error (there is no axis to repeat along). `n = 0`
+returns an empty tensor (RFC-111): `repeat` gives shape `[0]`, `repeat_axis` gives
+a zero-length result on `axis`.
 
 **`repeat` is explicit allocation, unlike broadcasting**, which is implicit and
 materializes nothing: `[1, 2, 3] * 2` and `[1, 2, 3].repeat(2)` differ for exactly
@@ -156,7 +156,8 @@ If `reps` is **shorter** than the input's rank, it is padded with leading `1`s
 instead, which `matten` treats as the surprising direction, not the safe one: the
 result would have more dimensions than the input, with no obvious place for a
 caller to look. This is a deliberate, one-directional divergence from NumPy (see
-below). `reps` must be non-empty and every entry nonzero.
+below). `reps` must be non-empty; a `0` entry returns a zero-length result on
+that axis (RFC-111), rather than an error.
 
 ## `meshgrid`
 
@@ -217,7 +218,7 @@ standing preference for explicit over silent behaviour.
 | any dynamic input | `Unsupported` (convert with `try_numeric()` first) |
 | rank / dimension / shape mismatch | `Shape` |
 | axis out of range (`0..rank` for `concatenate`, `0..=rank` for `stack`/`repeat_axis`) | `Shape` |
-| `n = 0` (`repeat`/`repeat_axis`), empty or zero-containing `reps` (`tile`) | `Shape` |
+| empty `reps` (`tile`) | `Shape` |
 | `reps` longer than rank (`tile`), non-rank-1 input (`meshgrid`) | `Shape` |
 | `repeat_axis` on a rank-0 scalar | `Shape` |
 | result exceeds the allocation limit | `Allocation` |

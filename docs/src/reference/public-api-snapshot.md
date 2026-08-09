@@ -244,9 +244,9 @@ percentile, histogram, covariance, correlation, and z-score are out of core scop
 | Method | Returns | Notes |
 |---|---|---|
 | `var()` / `std()` | `f64` | population (`ddof = 0`); NaN propagates; singleton → `0.0`; panics on dynamic |
-| `try_var()` / `try_std()` | `Result<f64, MattenError>` | `Unsupported` on dynamic; `InvalidArgument` on empty (not constructible) |
-| `var_axis(axis)` / `std_axis(axis)` | `Tensor` | reduces and drops the axis; panics if `axis >= rank` or dynamic |
-| `try_var_axis(axis)` / `try_std_axis(axis)` | `Result<Tensor, MattenError>` | `Shape` if `axis >= rank`; `Unsupported` on dynamic |
+| `try_var()` / `try_std()` | `Result<f64, MattenError>` | `Unsupported` on dynamic; `InvalidArgument` on empty (RFC-105) |
+| `var_axis(axis)` / `std_axis(axis)` | `Tensor` | reduces and drops the axis; panics if `axis >= rank`, dynamic, or the reduced axis has length 0 (RFC-110) |
+| `try_var_axis(axis)` / `try_std_axis(axis)` | `Result<Tensor, MattenError>` | `Shape` if `axis >= rank`; `Unsupported` on dynamic; `InvalidArgument` if the reduced axis has length 0 (RFC-110) |
 
 ## `Tensor` — boundary / serde
 

@@ -118,6 +118,55 @@ fn rank3_falls_back_to_the_flat_form() {
     );
 }
 
+// ── empty tensor: shows its shape, not nothing (RFC-111 Change 3, T7) ──────
+//
+// No constructor accepts a zero-sized shape directly (a scalar's shape [] has
+// len 1, so it can never be empty), but slicing reaches one -- the reachable
+// fixture used throughout RFC-105/106/108/110/111.
+
+#[test]
+fn rank1_empty_shows_its_shape_not_an_empty_string() {
+    let t = Tensor::new(vec![1.0, 2.0, 3.0], &[3])
+        .slice()
+        .range(0..0)
+        .build()
+        .unwrap();
+    assert_eq!(t.shape(), &[0]);
+    assert_eq!(t.to_string(), "shape=[0] values=[]");
+}
+
+#[test]
+fn rank2_empty_shows_its_shape_both_orientations() {
+    let a = Tensor::new(vec![1., 2., 3., 4., 5., 6.], &[2, 3])
+        .slice()
+        .range(0..0)
+        .all()
+        .build()
+        .unwrap();
+    assert_eq!(a.shape(), &[0, 3]);
+    assert_eq!(a.to_string(), "shape=[0, 3] values=[]");
+
+    let b = Tensor::new(vec![1., 2., 3.], &[3, 1])
+        .slice()
+        .all()
+        .range(0..0)
+        .build()
+        .unwrap();
+    assert_eq!(b.shape(), &[3, 0]);
+    assert_eq!(b.to_string(), "shape=[3, 0] values=[]");
+}
+
+#[test]
+fn empty_tensor_debug_is_unaffected() {
+    // Only Display changed (§9); Debug already showed the shape.
+    let t = Tensor::new(vec![1.0, 2.0, 3.0], &[3])
+        .slice()
+        .range(0..0)
+        .build()
+        .unwrap();
+    assert_eq!(format!("{t:?}"), "Tensor(shape=[0], data=[])");
+}
+
 // ── Debug is unchanged (§9, RFC-020 owns it) ────────────────────────────────
 
 #[test]
@@ -214,5 +263,16 @@ mod dynamic_tests {
         let t = Tensor::from_elements(values, &[13]);
         assert!(t.to_string().contains("... 1 more values"));
         assert!(!format!("{t:#}").contains("more values"));
+    }
+
+    #[test]
+    fn dynamic_empty_shows_its_shape_not_an_empty_string() {
+        let t = Tensor::from_elements(vec![Element::Int(1), Element::Int(2)], &[2])
+            .slice()
+            .range(0..0)
+            .build()
+            .unwrap();
+        assert_eq!(t.shape(), &[0]);
+        assert_eq!(t.to_string(), "shape=[0] values=[]");
     }
 }

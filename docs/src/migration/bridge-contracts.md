@@ -45,7 +45,7 @@ conversions **return `Result` and never panic** on rejected input, and a bridge 
 | NaN policy | Passed through as ordinary `f64` values; no special handling. |
 | Missing-value policy | Not reachable: only numeric tensors convert, and dynamic tensors (which can carry missing values) are rejected first. |
 | Integer / text / bool policy | Not reachable: `matten`'s numeric `Tensor` is `f64` only; non-numeric element kinds live in the rejected dynamic model. |
-| Error behavior | Returns `Result<_, MattenNdarrayError>`; never panics. Variants: `DynamicTensor`, `ZeroSizedAxis(shape)` (core has no zero-length axes), `NdarrayShape(..)` (ndarray shape mismatch), `Matten(MattenError)` (wraps a core validation error). |
+| Error behavior | Returns `Result<_, MattenNdarrayError>`; never panics. Variants: `DynamicTensor`, `NdarrayShape(..)` (ndarray shape mismatch), `Matten(MattenError)` (wraps a core validation error). `ZeroSizedAxis(shape)` is `#[deprecated]` and never constructed — core `matten` accepts zero-length axes since RFC-111, and `from_arrayd` no longer rejects one; the variant is kept, not removed, because removing it would break anyone matching on it. |
 | Performance caveat | Both directions allocate and copy. Convert **once** at the boundary, not inside a hot loop. |
 | Examples | See below. |
 
@@ -76,6 +76,6 @@ A dynamic tensor is rejected rather than guessed:
 
 The generic error categories sketched in RFC-051 (`UnsupportedTensorKind`, `UnsupportedRank`,
 …) are **illustrative for future bridges, not a required enum schema**. `matten-ndarray`'s
-existing variants (`DynamicTensor` / `ZeroSizedAxis` / `NdarrayShape` / `Matten`) document its
-contract clearly and are compliant as-is; a bridge need not rename or expand its error enum
-to match the sketch.
+existing variants (`DynamicTensor` / `NdarrayShape` / `Matten`, plus the deprecated,
+never-constructed `ZeroSizedAxis`) document its contract clearly and are compliant as-is; a
+bridge need not rename or expand its error enum to match the sketch.

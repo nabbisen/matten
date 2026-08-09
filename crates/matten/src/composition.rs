@@ -280,10 +280,11 @@ impl Tensor {
     /// A rank-0 scalar repeats to a rank-1 tensor of length `n`. Repetition is
     /// explicit allocation, unlike broadcasting, which is implicit and materializes
     /// nothing — `[1,2,3] * 2` and `[1,2,3].repeat(2)` differ for exactly that reason.
+    /// `n == 0` returns an empty tensor (RFC-111).
     ///
     /// # Panics
-    /// Panics if `n == 0` or any input is a dynamic tensor, or the result exceeds
-    /// the allocation limit. Use [`Tensor::try_repeat`] for the non-panicking form.
+    /// Panics if the input is a dynamic tensor, or the result exceeds the
+    /// allocation limit. Use [`Tensor::try_repeat`] for the non-panicking form.
     ///
     /// ```
     /// use matten::Tensor;
@@ -300,27 +301,17 @@ impl Tensor {
     /// Non-panicking [`Tensor::repeat`].
     ///
     /// # Errors
-    /// - [`MattenError::Shape`] if `n == 0` — the shape model has no representation
-    ///   for a zero-sized dimension, so this is an explicit error, not an empty
-    ///   tensor.
     /// - [`MattenError::Unsupported`] if the input is a dynamic tensor.
     /// - [`MattenError::Allocation`] if the result exceeds the allocation limit.
     ///
     /// ```
     /// use matten::Tensor;
     /// let a = Tensor::from_vec(vec![1.0, 2.0]);
-    /// assert!(Tensor::try_repeat(&a, 0).is_err()); // n = 0
+    /// let r = Tensor::try_repeat(&a, 0).unwrap(); // n = 0 -> empty, not an error
+    /// assert!(r.is_empty());
     /// ```
     pub fn try_repeat(&self, n: usize) -> Result<Tensor, MattenError> {
         reject_dynamic(&[self], "repeat")?;
-        if n == 0 {
-            return Err(MattenError::Shape {
-                operation: "repeat",
-                message: "repeat requires n > 0; n = 0 would produce a zero-sized dimension, \
-                          which the current matten shape model does not support"
-                    .to_string(),
-            });
-        }
 
         let in_len = self.data.len();
         let out_len = in_len
@@ -358,8 +349,10 @@ impl Tensor {
     ///
     /// See [`Tensor::repeat`] for the repeat-vs-[`Tensor::tile`] contrast.
     ///
+    /// `n == 0` returns a zero-length result on `axis` (RFC-111).
+    ///
     /// # Panics
-    /// Panics if `n == 0`, the input is a rank-0 scalar (there is no axis to repeat
+    /// Panics if the input is a rank-0 scalar (there is no axis to repeat
     /// along), `axis` is out of range, or the input is a dynamic tensor, or the
     /// result exceeds the allocation limit. Use [`Tensor::try_repeat_axis`] for the
     /// non-panicking form.
@@ -380,8 +373,8 @@ impl Tensor {
     /// Non-panicking [`Tensor::repeat_axis`].
     ///
     /// # Errors
-    /// - [`MattenError::Shape`] if the input is a rank-0 scalar, `axis` is out of
-    ///   range (`0..rank`), or `n == 0`.
+    /// - [`MattenError::Shape`] if the input is a rank-0 scalar, or `axis` is out
+    ///   of range (`0..rank`).
     /// - [`MattenError::Unsupported`] if the input is a dynamic tensor.
     /// - [`MattenError::Allocation`] if the result exceeds the allocation limit.
     ///
@@ -405,14 +398,6 @@ impl Tensor {
             return Err(MattenError::Shape {
                 operation: "repeat_axis",
                 message: format!("axis {axis} is out of range for a rank-{rank} tensor"),
-            });
-        }
-        if n == 0 {
-            return Err(MattenError::Shape {
-                operation: "repeat_axis",
-                message: "repeat_axis requires n > 0; n = 0 would produce a zero-sized \
-                          dimension, which the current matten shape model does not support"
-                    .to_string(),
             });
         }
 
@@ -469,10 +454,12 @@ impl Tensor {
     /// (the result would have more dimensions than the input, with no obvious place
     /// for a caller to look) — an explicit [`MattenError::Shape`] is preferred.
     ///
+    /// A `0` entry in `reps` produces a zero-length result on that axis (RFC-111).
+    ///
     /// # Panics
-    /// Panics if `reps` is empty, any entry of `reps` is `0`, `reps` is longer than
-    /// the input's rank, the input is a dynamic tensor, or the result exceeds the
-    /// allocation limit. Use [`Tensor::try_tile`] for the non-panicking form.
+    /// Panics if `reps` is empty, `reps` is longer than the input's rank, the
+    /// input is a dynamic tensor, or the result exceeds the allocation limit.
+    /// Use [`Tensor::try_tile`] for the non-panicking form.
     ///
     /// ```
     /// use matten::Tensor;
@@ -489,8 +476,8 @@ impl Tensor {
     /// Non-panicking [`Tensor::tile`].
     ///
     /// # Errors
-    /// - [`MattenError::Shape`] if `reps` is empty, any entry is `0`, or `reps` is
-    ///   longer than the input's rank (rank promotion is rejected, not performed).
+    /// - [`MattenError::Shape`] if `reps` is empty, or `reps` is longer than the
+    ///   input's rank (rank promotion is rejected, not performed).
     /// - [`MattenError::Unsupported`] if the input is a dynamic tensor.
     /// - [`MattenError::Allocation`] if the result exceeds the allocation limit.
     ///
@@ -519,12 +506,6 @@ impl Tensor {
                      input's shape)",
                     reps.len()
                 ),
-            });
-        }
-        if reps.contains(&0) {
-            return Err(MattenError::Shape {
-                operation: "tile",
-                message: format!("tile reps must all be nonzero, got {reps:?}"),
             });
         }
 

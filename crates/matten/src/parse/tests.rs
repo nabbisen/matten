@@ -25,6 +25,29 @@ fn serde_canonical_scalar() {
 
 #[cfg(feature = "json")]
 #[test]
+fn serde_roundtrips_a_zero_sized_tensor() {
+    // T5 / RFC-111: this was the one-way round trip RFC-106 Finding A named --
+    // serialize succeeded, deserialize rejected it (checked_shape_len). Both
+    // directions now agree.
+    let t = Tensor::new(vec![1., 2., 3., 4., 5., 6.], &[2, 3])
+        .slice()
+        .range(0..0)
+        .all()
+        .build()
+        .unwrap();
+    assert_eq!(t.shape(), &[0, 3]);
+
+    let json = serde_json::to_string(&t).unwrap();
+    assert_eq!(json, r#"{"shape":[0,3],"data":[]}"#);
+
+    let t2: Tensor = serde_json::from_str(&json).unwrap();
+    assert_eq!(t2.shape(), &[0, 3]);
+    assert!(t2.is_empty());
+    assert_eq!(t, t2);
+}
+
+#[cfg(feature = "json")]
+#[test]
 fn serde_deserialize_rejects_shape_mismatch() {
     let bad = r#"{"shape":[2,2],"data":[1.0,2.0,3.0]}"#;
     let err: Result<Tensor, _> = serde_json::from_str(bad);

@@ -108,10 +108,9 @@ impl Tensor {
     ///
     /// # Errors
     /// Returns [`MattenError::Unsupported`] on a dynamic tensor, or
-    /// [`MattenError::InvalidArgument`] if the tensor is empty. No
-    /// constructor accepts a zero-sized dimension, but slicing reaches one
-    /// (`t.slice().range(0..0).all().build()`), so this guard is live, not
-    /// theoretical (RFC-105).
+    /// [`MattenError::InvalidArgument`] if the tensor is empty (RFC-105) —
+    /// reachable via slicing (`t.slice().range(0..0).all().build()`) and,
+    /// since RFC-111, directly via any constructor as well.
     ///
     /// ```
     /// use matten::Tensor;

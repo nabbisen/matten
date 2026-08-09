@@ -64,9 +64,10 @@ let i = Tensor::try_eye(n)?;
 ```
 
 `linspace` includes both endpoints when `count >= 2`, returns `[start]` when
-`count == 1`, and rejects `count == 0`. `eye` produces shape `[n, n]` and rejects
-`n == 0`. Both are budget-checked like the fill constructors (oversized results
-yield `MattenError::Allocation`).
+`count == 1`, and returns an empty tensor when `count == 0` (RFC-111) — no step
+is ever computed. `eye` produces shape `[n, n]` and returns an empty `[0, 0]`
+tensor when `n == 0`. Both are budget-checked like the fill constructors
+(oversized results yield `MattenError::Allocation`).
 
 ## Shape model
 
@@ -82,7 +83,9 @@ shape arithmetic.
 
 Rules enforced on every constructor:
 
-- Zero-sized dimensions are rejected (deferred to a future RFC).
+- Zero-sized dimensions are accepted (RFC-111): a shape containing a `0`
+  yields an empty tensor, `len() == 0`. The empty product (rank 0, a scalar)
+  is `1`, not `0` — a scalar is never empty.
 - Rank may not exceed 8.
 - Shape product is computed with checked arithmetic; overflow returns
   `MattenError::Allocation`.

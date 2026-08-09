@@ -170,3 +170,22 @@ fn get_scalar() {
     let s = Tensor::scalar(99.0);
     assert_eq!(s.get(&[]), Some(99.0));
 }
+
+#[test]
+fn reshape_accepts_a_zero_sized_result() {
+    // RFC-111 T4: reshape now agrees with transpose (which already accepted
+    // this) instead of the pre-RFC-111 inconsistency RFC-111 SS2 named:
+    // transpose([0,3]) -> [3,0] Ok, but reshape([0,3], &[3,0]) -> rejected.
+    let t = Tensor::new(vec![1., 2., 3., 4., 5., 6.], &[2, 3])
+        .slice()
+        .range(0..0)
+        .all()
+        .build()
+        .unwrap();
+    assert_eq!(t.shape(), &[0, 3]);
+    let r = t.try_reshape(&[3, 0]).unwrap();
+    assert_eq!(r.shape(), &[3, 0]);
+    assert!(r.is_empty());
+    // Agrees with transpose on the identical source and target shape.
+    assert_eq!(r.shape(), t.transpose().shape());
+}

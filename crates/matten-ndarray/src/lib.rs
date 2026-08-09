@@ -26,8 +26,8 @@
 //! - Both conversions **copy**; no zero-copy is claimed.
 //! - [`from_arrayd`] preserves *logical* element order even for non-standard
 //!   (transposed / sliced) `ArrayD` inputs.
-//! - [`from_arrayd`] rejects shapes with a zero-length axis ([`matten`] forbids
-//!   zero-sized dimensions).
+//! - [`from_arrayd`] accepts shapes with a zero-length axis ([`matten`] accepts
+//!   zero-sized dimensions, RFC-111).
 //! - A dynamic tensor passed to [`to_arrayd`] always returns
 //!   [`MattenNdarrayError::DynamicTensor`] — this guard is unconditional and
 //!   does not depend on the companion `dynamic` feature (RFC-031).

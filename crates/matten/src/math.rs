@@ -57,11 +57,11 @@ impl Tensor {
     /// `NaN` propagates. For a non-panicking form, see [`Tensor::try_mean`].
     ///
     /// # Panics
-    /// Panics on a dynamic tensor, or if the tensor is empty (RFC-105) — no
-    /// constructor accepts a zero-sized dimension, but slicing can still
-    /// produce one (e.g. `t.slice().range(0..0).all().build()`), and the
-    /// mean of an empty set is undefined, not `NaN`. Use [`Tensor::try_mean`]
-    /// for the non-panicking form.
+    /// Panics on a dynamic tensor, or if the tensor is empty (RFC-105) —
+    /// reachable via slicing (`t.slice().range(0..0).all().build()`) and,
+    /// since RFC-111, directly via any constructor as well. The mean of an
+    /// empty set is undefined, not `NaN`. Use [`Tensor::try_mean`] for the
+    /// non-panicking form.
     ///
     /// ```
     /// use matten::Tensor;
@@ -311,10 +311,10 @@ impl Tensor {
     /// Returns [`MattenError::Shape`] if `axis >= rank`,
     /// [`MattenError::Unsupported`] on a dynamic tensor, or
     /// [`MattenError::InvalidArgument`] if the **reduced** axis has length 0
-    /// (RFC-110). No constructor accepts a zero-sized dimension, but slicing
-    /// reaches one (`t.slice().range(0..0).all().build()`), so this guard is
-    /// live, not theoretical. A zero-length axis that *survives* the
-    /// reduction still returns `Ok` with an empty result.
+    /// (RFC-110) — reachable via slicing (`t.slice().range(0..0).all().build()`)
+    /// and, since RFC-111, directly via any constructor as well. A zero-length
+    /// axis that *survives* the reduction still returns `Ok` with an empty
+    /// result.
     ///
     /// ```
     /// use matten::Tensor;

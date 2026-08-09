@@ -32,15 +32,12 @@ fn linspace_count_one_returns_start() {
 }
 
 #[test]
-fn linspace_rejects_zero_count() {
-    let err = Tensor::try_linspace(0.0, 1.0, 0).unwrap_err();
-    assert!(matches!(
-        err,
-        MattenError::Shape {
-            operation: "try_linspace",
-            ..
-        }
-    ));
+fn linspace_count_zero_is_empty_not_an_error() {
+    // RFC-111 (T8): count == 0 used to be rejected by checked_shape_len; it now
+    // returns an empty tensor, with no step ever computed.
+    let t = Tensor::try_linspace(0.0, 1.0, 0).unwrap();
+    assert_eq!(t.shape(), &[0]);
+    assert!(t.is_empty());
 }
 
 #[test]
@@ -66,15 +63,12 @@ fn eye_one() {
 }
 
 #[test]
-fn eye_rejects_zero() {
-    let err = Tensor::try_eye(0).unwrap_err();
-    assert!(matches!(
-        err,
-        MattenError::Shape {
-            operation: "try_eye",
-            ..
-        }
-    ));
+fn eye_zero_is_empty_not_an_error() {
+    // RFC-111 (T8): n == 0 used to be rejected by checked_shape_len via
+    // MattenLimits::check_shape; it now returns an empty [0, 0] tensor.
+    let i = Tensor::try_eye(0).unwrap();
+    assert_eq!(i.shape(), &[0, 0]);
+    assert!(i.is_empty());
 }
 
 #[test]

@@ -113,21 +113,25 @@ fn try_new_rejects_shape_overflow() {
 }
 
 #[test]
-fn rejects_zero_dim() {
-    assert!(matches!(
-        Tensor::try_new(vec![], &[0]),
-        Err(MattenError::Shape { .. })
-    ));
-    assert!(matches!(
-        Tensor::try_new(vec![], &[2, 0]),
-        Err(MattenError::Shape { .. })
-    ));
+fn accepts_zero_dim() {
+    // RFC-111 (T8): checked_shape_len no longer rejects a zero-sized dimension.
+    let a = Tensor::try_new(vec![], &[0]).unwrap();
+    assert_eq!(a.shape(), &[0]);
+    assert_eq!(a.len(), 0);
+    assert!(a.is_empty());
+
+    let b = Tensor::try_new(vec![], &[2, 0]).unwrap();
+    assert_eq!(b.shape(), &[2, 0]);
+    assert_eq!(b.len(), 0);
+    assert!(b.is_empty());
 }
 
 #[test]
-#[should_panic(expected = "zero-sized dimensions")]
-fn new_panics_on_zero_dim() {
-    let _ = Tensor::new(vec![], &[0]);
+fn new_accepts_zero_dim() {
+    // RFC-111 (T8): the panicking form no longer panics on a zero-sized shape.
+    let t = Tensor::new(vec![], &[0]);
+    assert_eq!(t.shape(), &[0]);
+    assert!(t.is_empty());
 }
 
 #[test]
@@ -365,9 +369,24 @@ mod limits_tests {
     }
 
     #[test]
-    fn try_zeros_shape_error() {
-        let err = Tensor::try_zeros(&[2, 0]).unwrap_err();
-        assert!(matches!(err, MattenError::Shape { .. }));
+    fn try_zeros_accepts_zero_dim() {
+        // RFC-111 (T8): a zero-sized dimension used to be a Shape error via
+        // checked_shape_len; it now succeeds, empty.
+        let t = Tensor::try_zeros(&[2, 0]).unwrap();
+        assert_eq!(t.shape(), &[2, 0]);
+        assert!(t.is_empty());
+    }
+
+    #[test]
+    fn try_ones_and_try_full_accept_zero_dim() {
+        // RFC-111 T4: zeros/ones/full all accept a zero-sized result.
+        let ones = Tensor::try_ones(&[0, 3]).unwrap();
+        assert_eq!(ones.shape(), &[0, 3]);
+        assert!(ones.is_empty());
+
+        let full = Tensor::try_full(&[3, 0], 7.0).unwrap();
+        assert_eq!(full.shape(), &[3, 0]);
+        assert!(full.is_empty());
     }
 
     #[test]

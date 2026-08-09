@@ -285,15 +285,16 @@ fn single_column_is_column_vector() {
 }
 
 #[test]
-fn zero_row_table_cannot_become_tensor() {
+fn zero_row_table_becomes_an_empty_tensor() {
+    // RFC-111 (T8): core matten used to reject a zero-length dimension,
+    // surfaced here as a wrapped MattenDataError::Matten. checked_shape_len no
+    // longer rejects it, so to_tensor() now succeeds with an empty tensor.
     let t = Table::from_csv_str("a,b").unwrap();
     let numeric = t.try_numeric().unwrap();
     assert_eq!(numeric.row_count(), 0);
-    // Core matten rejects zero-length dimensions; surfaced as a wrapped error.
-    assert!(matches!(
-        numeric.to_tensor(),
-        Err(MattenDataError::Matten(_))
-    ));
+    let tensor = numeric.to_tensor().unwrap();
+    assert_eq!(tensor.shape(), &[0, 2]);
+    assert!(tensor.is_empty());
 }
 
 #[test]

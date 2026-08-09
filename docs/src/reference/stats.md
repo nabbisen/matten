@@ -44,9 +44,9 @@ Tensor::try_std(&self) -> Result<f64, MattenError>
 ```
 
 The `try_*` forms return `MattenError::Unsupported` on a dynamic tensor. They also
-guard the empty-tensor case with `MattenError::InvalidArgument`, but `matten`
-forbids zero-sized dimensions, so an empty tensor is not constructible and that
-branch is unreachable through normal construction.
+guard the empty-tensor case with `MattenError::InvalidArgument` (RFC-105) — reachable
+via slicing to a zero-sized shape and, since RFC-111, directly from any constructor
+as well.
 
 ## var_axis / std_axis
 

@@ -35,22 +35,18 @@ pub(crate) fn validate_shape(
     checked_shape_len(shape, operation)
 }
 
-/// Computes the logical element count of a shape with checked arithmetic,
-/// rejecting zero-sized dimensions. Does not enforce the rank limit.
+/// Computes the logical element count of a shape with checked arithmetic.
+/// Does not enforce the rank limit.
+///
+/// Zero-sized dimensions are accepted (RFC-111): a shape containing a `0`
+/// yields a length of `0`, arithmetically what it means. The empty product
+/// (rank 0, a scalar) is `1`, not `0` — a scalar is never empty.
 pub(crate) fn checked_shape_len(
     shape: &[usize],
     operation: &'static str,
 ) -> Result<usize, MattenError> {
     let mut len: usize = 1;
     for &dim in shape {
-        if dim == 0 {
-            return Err(MattenError::Shape {
-                operation,
-                message: format!(
-                    "zero-sized dimensions are not supported in the current matten shape model (shape {shape:?})"
-                ),
-            });
-        }
         len = len.checked_mul(dim).ok_or_else(|| MattenError::Allocation {
             requested_elements: usize::MAX,
             message: format!("shape {shape:?} overflows usize when computing the element count in {operation}"),

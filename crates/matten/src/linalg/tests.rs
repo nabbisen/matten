@@ -216,3 +216,24 @@ fn try_norm_rejects_dynamic() {
         }
     ));
 }
+
+#[test]
+fn try_outer_accepts_a_zero_length_operand() {
+    // RFC-111 T4: outer's own MECHANICAL rejection (RFC-106 SS2.11) is gone;
+    // an empty operand now produces the unambiguously correct empty matrix.
+    let empty = Tensor::new(vec![1.0, 2.0, 3.0], &[3])
+        .slice()
+        .range(0..0)
+        .build()
+        .unwrap();
+    assert_eq!(empty.shape(), &[0]);
+    let nonempty = Tensor::from_vec(vec![1.0, 2.0]);
+
+    let r = empty.try_outer(&nonempty).unwrap();
+    assert_eq!(r.shape(), &[0, 2]);
+    assert!(r.is_empty());
+
+    let r = nonempty.try_outer(&empty).unwrap();
+    assert_eq!(r.shape(), &[2, 0]);
+    assert!(r.is_empty());
+}

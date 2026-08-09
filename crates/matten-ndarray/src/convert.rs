@@ -40,8 +40,9 @@ pub fn to_arrayd(tensor: &Tensor) -> Result<ArrayD<f64>, MattenNdarrayError> {
 /// Conversion preserves **logical** element order: an `ArrayD` may be in
 /// non-standard (transposed / sliced / non-standard-stride) layout, so the raw
 /// backing buffer is not read directly — that would silently transpose the
-/// data. A shape with any zero-length axis is rejected, because core `matten`
-/// does not support zero-sized dimensions.
+/// data. A shape with a zero-length axis is accepted (RFC-111): core `matten`
+/// accepts zero-sized dimensions, and this bridge no longer imposes a
+/// narrower rule than the type it converts to.
 ///
 /// ```
 /// use matten_ndarray::from_arrayd;
@@ -52,13 +53,15 @@ pub fn to_arrayd(tensor: &Tensor) -> Result<ArrayD<f64>, MattenNdarrayError> {
 /// let t = from_arrayd(a.t().to_owned()).unwrap(); // logical shape [3, 2]
 /// assert_eq!(t.shape(), &[3, 2]);
 /// assert_eq!(t.as_slice(), &[1.0, 4.0, 2.0, 5.0, 3.0, 6.0]);
+///
+/// // A zero-length axis round-trips.
+/// let empty = ArrayD::from_shape_vec(IxDyn(&[0, 3]), vec![]).unwrap();
+/// let t = from_arrayd(empty).unwrap();
+/// assert_eq!(t.shape(), &[0, 3]);
+/// assert!(t.is_empty());
 /// ```
 pub fn from_arrayd(array: ArrayD<f64>) -> Result<Tensor, MattenNdarrayError> {
     let shape: Vec<usize> = array.shape().to_vec();
-
-    if shape.contains(&0) {
-        return Err(MattenNdarrayError::ZeroSizedAxis(shape));
-    }
 
     // `as_standard_layout` yields a row-major view (cloning only if the input
     // was non-standard layout); iterating it gives logical order.

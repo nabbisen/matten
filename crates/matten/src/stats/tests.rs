@@ -2,8 +2,8 @@
 //!
 //! Validates the design spec: population variance (`ddof = 0`, divide by `n`),
 //! two-pass; `std = sqrt(var)`; singleton variance `0.0`; NaN propagation; the
-//! empty-tensor policy (zero-sized dims are not constructible); axis reductions that
-//! drop the reduced axis; invalid-axis and dynamic error policy.
+//! empty-tensor policy (`var`/`std` error rather than compute over zero elements);
+//! axis reductions that drop the reduced axis; invalid-axis and dynamic error policy.
 
 use crate::{MattenError, Tensor};
 
@@ -57,17 +57,18 @@ fn var_and_std_nan_propagates() {
 // ----- empty-tensor policy -----
 
 #[test]
-fn empty_tensor_is_not_constructible() {
-    // The empty-variance guard exists for completeness, but `matten` forbids
-    // zero-sized dimensions, so an empty tensor cannot be built to reach it.
-    assert!(matches!(
-        Tensor::try_new(vec![], &[0]).unwrap_err(),
-        MattenError::Shape { .. }
-    ));
+fn empty_tensor_is_directly_constructible() {
+    // RFC-111 (T8): `matten` used to forbid zero-sized dimensions outright, so
+    // an empty tensor could only be reached via slicing (see the test below).
+    // checked_shape_len no longer rejects them; try_new(vec![], &[0]) now
+    // succeeds directly.
+    let t = Tensor::try_new(vec![], &[0]).unwrap();
+    assert_eq!(t.shape(), &[0]);
+    assert!(t.is_empty());
 }
 
-// RFC-105: the guard above is reachable after all -- not via a constructor
-// (still correctly rejected, per the test above), but via slicing. try_var
+// RFC-105: the empty-variance guard is reachable via slicing, independent of
+// whether direct construction is also allowed (RFC-111 made it so). try_var
 // and try_std were already correct on this path before RFC-105; this test
 // exists to prove that RFC-105's changes elsewhere left them byte-identical.
 #[test]

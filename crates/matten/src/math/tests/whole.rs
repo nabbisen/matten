@@ -87,10 +87,10 @@ fn try_scalar_reductions_propagate_nan() {
 
 // ── empty-tensor reduction semantics (RFC-105) ───────────────────────────
 //
-// An empty tensor cannot be built by any constructor (zero-sized dims are
-// rejected), but it IS reachable via slicing -- that reachability is the
-// entire point of this RFC, so every fixture below goes through
-// slice().range(0..0), never a direct constructor.
+// An empty tensor is reachable via slicing -- that reachability was the
+// point RFC-105 needed, so every fixture below goes through
+// slice().range(0..0). A constructor reaches one too since RFC-111, but
+// that is not what these particular tests are exercising.
 
 use crate::MattenError;
 

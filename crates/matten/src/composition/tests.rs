@@ -400,31 +400,25 @@ fn tile_reps_longer_than_rank_is_shape_error_naming_both_lengths() {
 }
 
 // ----- repeat / repeat_axis / tile: n = 0, empty reps, rep = 0 -----
+//
+// RFC-111 (T8): n == 0 / rep == 0 used to be rejected by each function's own
+// dedicated guard, independent of checked_shape_len. That guard is gone; these
+// three now assert the inverse -- an empty, not-an-error result.
 
 #[test]
-fn repeat_n_zero_is_shape_error() {
+fn repeat_n_zero_is_empty_not_an_error() {
     let a = Tensor::from_vec(vec![1.0, 2.0]);
-    let err = Tensor::try_repeat(&a, 0).unwrap_err();
-    assert!(matches!(
-        err,
-        MattenError::Shape {
-            operation: "repeat",
-            ..
-        }
-    ));
+    let r = Tensor::try_repeat(&a, 0).unwrap();
+    assert_eq!(r.shape(), &[0]);
+    assert!(r.is_empty());
 }
 
 #[test]
-fn repeat_axis_n_zero_is_shape_error() {
+fn repeat_axis_n_zero_is_empty_not_an_error() {
     let a = Tensor::new(vec![1.0, 2.0, 3.0, 4.0], &[2, 2]);
-    let err = Tensor::try_repeat_axis(&a, 0, 0).unwrap_err();
-    assert!(matches!(
-        err,
-        MattenError::Shape {
-            operation: "repeat_axis",
-            ..
-        }
-    ));
+    let r = Tensor::try_repeat_axis(&a, 0, 0).unwrap();
+    assert_eq!(r.shape(), &[0, 2]);
+    assert!(r.is_empty());
 }
 
 #[test]
@@ -454,16 +448,68 @@ fn tile_empty_reps_is_shape_error() {
 }
 
 #[test]
-fn tile_rep_zero_is_shape_error() {
+fn tile_rep_zero_is_empty_not_an_error() {
+    // RFC-111 (T8): tile's own `reps.contains(&0)` guard is gone.
     let a = Tensor::from_vec(vec![1.0, 2.0]);
-    let err = Tensor::try_tile(&a, &[0]).unwrap_err();
-    assert!(matches!(
-        err,
-        MattenError::Shape {
-            operation: "tile",
-            ..
-        }
-    ));
+    let r = Tensor::try_tile(&a, &[0]).unwrap();
+    assert_eq!(r.shape(), &[0]);
+    assert!(r.is_empty());
+}
+
+// ----- repeat / repeat_axis / tile with an EMPTY SOURCE tensor (RFC-111 SS3) -----
+//
+// The risk named at review: these three now can also receive an already-empty
+// source (not just an empty n/reps parameter). tile's coordinate loop divides
+// by each input dimension (`c % dim`); a zero dim must never be reached by
+// that division. Both non-empty fixtures are checked (both orientations).
+
+fn empty_0x3() -> Tensor {
+    Tensor::new(vec![1., 2., 3., 4., 5., 6.], &[2, 3])
+        .slice()
+        .range(0..0)
+        .all()
+        .build()
+        .unwrap()
+}
+
+fn empty_3x0() -> Tensor {
+    Tensor::new(vec![1., 2., 3.], &[3, 1])
+        .slice()
+        .all()
+        .range(0..0)
+        .build()
+        .unwrap()
+}
+
+#[test]
+fn repeat_on_empty_source() {
+    let a = empty_0x3();
+    let r = a.try_repeat(2).unwrap();
+    assert_eq!(r.shape(), &[0]);
+    assert!(r.is_empty());
+}
+
+#[test]
+fn repeat_axis_on_empty_source() {
+    let a = empty_0x3();
+    let r = a.try_repeat_axis(2, 0).unwrap();
+    assert_eq!(r.shape(), &[0, 3]);
+    assert!(r.is_empty());
+}
+
+#[test]
+fn tile_on_empty_source_both_orientations() {
+    // No panic from `c % dim`: the coordinate loop only runs when the output
+    // total is non-zero, and it never is here.
+    let a = empty_0x3();
+    let r = a.try_tile(&[2, 2]).unwrap();
+    assert_eq!(r.shape(), &[0, 6]);
+    assert!(r.is_empty());
+
+    let b = empty_3x0();
+    let r = b.try_tile(&[2, 2]).unwrap();
+    assert_eq!(r.shape(), &[6, 0]);
+    assert!(r.is_empty());
 }
 
 // ----- meshgrid -----
@@ -592,4 +638,40 @@ fn repeat_tile_meshgrid_reject_dynamic() {
             ..
         }
     ));
+}
+
+// ----- concatenate / stack / meshgrid accept a zero-sized result (RFC-111 T4) -----
+
+#[test]
+fn concatenate_accepts_a_zero_sized_result() {
+    let a = empty_0x3();
+    let b = empty_0x3();
+    let r = Tensor::try_concatenate(&[&a, &b], 0).unwrap();
+    assert_eq!(r.shape(), &[0, 3]);
+    assert!(r.is_empty());
+}
+
+#[test]
+fn stack_accepts_a_zero_sized_result() {
+    let a = empty_0x3();
+    let b = empty_0x3();
+    let r = Tensor::try_stack(&[&a, &b], 0).unwrap();
+    assert_eq!(r.shape(), &[2, 0, 3]);
+    assert!(r.is_empty());
+}
+
+#[test]
+fn meshgrid_accepts_a_zero_length_input() {
+    let x = Tensor::new(vec![1.0, 2.0, 3.0], &[3])
+        .slice()
+        .range(0..0)
+        .build()
+        .unwrap();
+    assert_eq!(x.shape(), &[0]);
+    let y = Tensor::from_vec(vec![1.0, 2.0]);
+    let (gx, gy) = Tensor::try_meshgrid(&x, &y).unwrap();
+    assert_eq!(gx.shape(), &[2, 0]);
+    assert_eq!(gy.shape(), &[2, 0]);
+    assert!(gx.is_empty());
+    assert!(gy.is_empty());
 }

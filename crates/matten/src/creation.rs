@@ -2,10 +2,10 @@
 //!
 //! `linspace` and `eye` are small, familiar builders. Like the other
 //! limit-enforcing constructors they validate through [`MattenLimits`]: a
-//! zero-sized result (`count == 0`, `n == 0`) is rejected with
-//! [`MattenError::Shape`], and an oversized result with
-//! [`MattenError::Allocation`]. The convenience forms panic on those errors; the
-//! `try_*` forms return them.
+//! zero-sized result (`count == 0`, `n == 0`) is accepted, producing an empty
+//! tensor (RFC-111), and an oversized result is rejected with
+//! [`MattenError::Allocation`]. The convenience forms panic on that error; the
+//! `try_*` forms return it.
 
 use crate::limits::MattenLimits;
 use crate::{MattenError, Tensor};
@@ -14,12 +14,13 @@ impl Tensor {
     /// Creates a 1-D tensor of `count` evenly spaced values from `start` to `end`
     /// (inclusive of both endpoints when `count >= 2`).
     ///
-    /// `count == 1` returns `[start]`. Element values follow ordinary `f64`
-    /// behavior, so non-finite bounds propagate.
+    /// `count == 1` returns `[start]`. `count == 0` returns an empty tensor
+    /// (RFC-111) — no points, no step computed. Element values follow ordinary
+    /// `f64` behavior, so non-finite bounds propagate.
     ///
     /// # Panics
-    /// Panics if `count == 0` (a zero-sized dimension) or the result exceeds the
-    /// allocation limit. Use [`Tensor::try_linspace`] for the non-panicking form.
+    /// Panics if the result exceeds the allocation limit. Use
+    /// [`Tensor::try_linspace`] for the non-panicking form.
     ///
     /// ```
     /// use matten::Tensor;
@@ -34,17 +35,19 @@ impl Tensor {
     /// Non-panicking [`Tensor::linspace`].
     ///
     /// # Errors
-    /// Returns [`MattenError::Shape`] if `count == 0`, or
-    /// [`MattenError::Allocation`] if the result exceeds the element limit.
+    /// Returns [`MattenError::Allocation`] if the result exceeds the element limit.
     ///
     /// ```
     /// use matten::Tensor;
-    /// assert!(Tensor::try_linspace(0.0, 1.0, 0).is_err());
+    /// let t = Tensor::try_linspace(0.0, 1.0, 0).unwrap();
+    /// assert_eq!(t.shape(), &[0]);
+    /// assert!(t.is_empty());
     /// ```
     pub fn try_linspace(start: f64, end: f64, count: usize) -> Result<Tensor, MattenError> {
-        // Rejects count == 0 (zero-sized dim) and enforces the element limit.
         let len = MattenLimits::default().check_shape(&[count], "try_linspace")?;
-        let data: Vec<f64> = if len == 1 {
+        let data: Vec<f64> = if len == 0 {
+            vec![]
+        } else if len == 1 {
             vec![start]
         } else {
             let step = (end - start) / (len - 1) as f64;
@@ -63,9 +66,11 @@ impl Tensor {
 
     /// Creates an `n × n` identity matrix (1.0 on the diagonal, 0.0 elsewhere).
     ///
+    /// `n == 0` returns an empty `[0, 0]` tensor (RFC-111).
+    ///
     /// # Panics
-    /// Panics if `n == 0` (a zero-sized dimension) or the result exceeds the
-    /// allocation limit. Use [`Tensor::try_eye`] for the non-panicking form.
+    /// Panics if the result exceeds the allocation limit. Use
+    /// [`Tensor::try_eye`] for the non-panicking form.
     ///
     /// ```
     /// use matten::Tensor;
@@ -81,15 +86,15 @@ impl Tensor {
     /// Non-panicking [`Tensor::eye`].
     ///
     /// # Errors
-    /// Returns [`MattenError::Shape`] if `n == 0`, or [`MattenError::Allocation`]
-    /// if the result exceeds the element limit.
+    /// Returns [`MattenError::Allocation`] if the result exceeds the element limit.
     ///
     /// ```
     /// use matten::Tensor;
-    /// assert!(Tensor::try_eye(0).is_err());
+    /// let i = Tensor::try_eye(0).unwrap();
+    /// assert_eq!(i.shape(), &[0, 0]);
+    /// assert!(i.is_empty());
     /// ```
     pub fn try_eye(n: usize) -> Result<Tensor, MattenError> {
-        // Rejects n == 0 (zero-sized dim) and enforces the element limit on n*n.
         let len = MattenLimits::default().check_shape(&[n, n], "try_eye")?;
         let mut data = vec![0.0f64; len];
         for i in 0..n {

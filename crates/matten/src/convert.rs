@@ -119,14 +119,16 @@ pub(crate) fn flatten_rectangular(
     if row_count == 0 {
         return Err(MattenError::Shape {
             operation,
-            message: "cannot create a tensor from an empty row list (zero-sized dimensions are not supported in the current matten shape model)".into(),
+            message: "cannot create a tensor from an empty row list: the column count \
+                      cannot be inferred from zero rows"
+                .into(),
         });
     }
     let col_count = rows[0].len();
     if col_count == 0 {
         return Err(MattenError::Shape {
             operation,
-            message: "rows must have at least one column (zero-sized dimensions are not supported in the current matten shape model)".into(),
+            message: "rows must have at least one column".into(),
         });
     }
     let capacity =

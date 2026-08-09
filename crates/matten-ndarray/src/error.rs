@@ -15,8 +15,15 @@ pub enum MattenNdarrayError {
     /// A dynamic (`Element`) tensor was passed to a conversion. Convert it to a
     /// numeric tensor first with `Tensor::try_numeric()`.
     DynamicTensor,
-    /// The input `ndarray` shape contained a zero-length axis, which core
-    /// `matten` does not support.
+    /// Formerly returned when the input `ndarray` shape contained a
+    /// zero-length axis. Core `matten` now accepts zero-sized dimensions
+    /// (RFC-111), so `from_arrayd` no longer rejects one — this variant is
+    /// never constructed. Kept, rather than removed, because the enum is
+    /// `#[non_exhaustive]` but a *removed* variant still breaks anyone
+    /// matching on it.
+    #[deprecated(
+        note = "from_arrayd accepts a zero-length axis since RFC-111; this variant is never constructed"
+    )]
     ZeroSizedAxis(Vec<usize>),
     /// `ndarray` could not construct the target array (e.g. a shape/length
     /// mismatch).
@@ -33,10 +40,11 @@ impl fmt::Display for MattenNdarrayError {
                 "matten-ndarray error: dynamic tensors cannot be converted; call \
                  try_numeric() to convert to a numeric tensor first"
             ),
+            #[allow(deprecated)]
             MattenNdarrayError::ZeroSizedAxis(shape) => write!(
                 f,
                 "matten-ndarray error: ndarray shape {shape:?} contains a zero-length \
-                 axis, which matten does not support"
+                 axis (unreachable: from_arrayd has accepted these since RFC-111)"
             ),
             MattenNdarrayError::NdarrayShape(e) => {
                 write!(

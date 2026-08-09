@@ -67,11 +67,32 @@ fn from_arrayd_sliced_noncontiguous_preserves_logical_order() {
 }
 
 #[test]
-fn from_arrayd_zero_axis_is_rejected() {
+fn from_arrayd_zero_axis_is_accepted_not_rejected() {
+    // RFC-111 (T8): core matten now accepts zero-sized dimensions, so this
+    // bridge no longer imposes ZeroSizedAxis (deprecated, never constructed).
     let a = ArrayD::<f64>::zeros(IxDyn(&[2, 0, 3]));
-    let err = from_arrayd(a).unwrap_err();
-    assert!(matches!(err, MattenNdarrayError::ZeroSizedAxis(_)));
-    assert!(err.to_string().contains("zero-length axis"));
+    let t = from_arrayd(a).unwrap();
+    assert_eq!(t.shape(), &[2, 0, 3]);
+    assert!(t.is_empty());
+}
+
+#[test]
+fn to_arrayd_from_arrayd_roundtrips_a_zero_sized_tensor() {
+    // T6: the round trip that used to be one-way is now complete both ways.
+    let t = Tensor::new(vec![1., 2., 3., 4., 5., 6.], &[2, 3])
+        .slice()
+        .range(0..0)
+        .all()
+        .build()
+        .unwrap();
+    assert_eq!(t.shape(), &[0, 3]);
+
+    let arr = to_arrayd(&t).unwrap();
+    assert_eq!(arr.shape(), &[0, 3]);
+
+    let back = from_arrayd(arr).unwrap();
+    assert_eq!(back.shape(), &[0, 3]);
+    assert!(back.is_empty());
 }
 
 #[test]

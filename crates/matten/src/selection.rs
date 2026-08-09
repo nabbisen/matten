@@ -16,9 +16,9 @@ use crate::{MattenError, Tensor};
 /// Returns [`MattenError::InvalidArgument`] if any element is `NaN`. Callers
 /// must check `data` is non-empty first (RFC-105) — this function indexes
 /// `data[0]` unconditionally and does not check itself. An empty tensor is
-/// not constructible directly, but slicing reaches one
-/// (`t.slice().range(0..0).all().build()`), so this is a real caller
-/// obligation, not a vacuous one.
+/// constructible directly since RFC-111 (`Tensor::try_new(vec![], &[0])`) and
+/// reachable by slicing (`t.slice().range(0..0).all().build()`), so this is a
+/// real caller obligation, not a vacuous one.
 fn arg_extreme(
     data: &[f64],
     operation: &'static str,
