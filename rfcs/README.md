@@ -141,7 +141,8 @@ sign-off and implementation — not that the state is unused.
 
 | ID | Title | Handoff |
 |---:|---|---|
-| — | *(none at present)* | — |
+| 115 | [Playground Input Ergonomics, and a Dynamic Path](./accepted/115-playground-input-and-dynamic.md) | [`115-…-handoff.md`](./handoffs/115-playground-input-and-dynamic-handoff.md) |
+| 116 | [Render the Diagrams, and Repair Two Unmaintained Records](./accepted/116-docs-infrastructure-and-stale-records.md) | [`116-…-handoff.md`](./handoffs/116-docs-infrastructure-and-stale-records-handoff.md) |
 
 ## Archive
 

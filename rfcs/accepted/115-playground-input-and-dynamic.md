@@ -1,6 +1,7 @@
 # RFC-115: Playground Input Ergonomics, and a Dynamic Path
 
-**Status:** Proposed
+**Status:** **Accepted** 2026-08-09 by the owner. Not yet implemented. Handoff:
+`rfcs/handoffs/115-playground-input-and-dynamic-handoff.md`.
 **Target:** `tools/matten-playground` (workspace-excluded, `publish = false`) + the docs page
 **Theme:** Make the page easier to *use*, then let it accept data it currently cannot
 **Related:** RFC-093, RFC-095, RFC-102, RFC-111, RFC-113

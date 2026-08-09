@@ -1,6 +1,7 @@
 # RFC-116: Render the Diagrams, and Repair Two Unmaintained Records
 
-**Status:** Proposed
+**Status:** **Accepted** 2026-08-09 by the owner. Not yet implemented. Handoff:
+`rfcs/handoffs/116-docs-infrastructure-and-stale-records-handoff.md`.
 **Target:** `docs/` + one build dependency + one CI step; `ROADMAP.md`, `rfcs/handoffs/README.md`
 **Theme:** Make the diagrams diagrams, and stop two indexes lying by omission
 **Related:** RFC-093, RFC-094, RFC-107
