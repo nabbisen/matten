@@ -1,6 +1,7 @@
 # RFC-110: Empty-Axis Reduction Semantics — Stage 2
 
-**Status:** Proposed
+**Status:** **Accepted** 2026-08-09 by the owner. Not yet implemented. Handoff:
+`rfcs/handoffs/110-empty-axis-reduction-semantics-handoff.md`.
 **Target:** core `matten`; behaviour change to existing APIs — a minor release when it ships
 **Theme:** Finish RFC-105's fix on the axis-wise siblings it deliberately excluded
 **Related:** RFC-105, RFC-106 (Stage 2), RFC-108

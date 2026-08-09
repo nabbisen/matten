@@ -136,7 +136,7 @@ sign-off and implementation — not that the state is unused.
 
 | ID | Title | Handoff |
 |---:|---|---|
-| — | *(none at present)* | — |
+| 110 | [Empty-Axis Reduction Semantics — Stage 2](./accepted/110-empty-axis-reduction-semantics.md) | [`110-…-handoff.md`](./handoffs/110-empty-axis-reduction-semantics-handoff.md) |
 
 ## Archive
 
