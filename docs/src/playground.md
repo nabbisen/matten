@@ -4,6 +4,11 @@ Try `matten`'s shape reasoning below — broadcasting, reshape, axis reductions,
 multiplication, computed by a real build of core `matten` and shown exactly as it happens,
 including rejections.
 
+A zero-sized dimension — a shape like `3,0` — is a valid input here. It looks like it should
+fail, but `matten` accepts zero-sized dimensions (RFC-111): try it in any of the four forms
+below and the result computes normally, including a matrix product where one side has a
+zero dimension.
+
 <div id="shape-playground">
 
 <p id="pg-status"></p>

@@ -251,68 +251,8 @@ pub fn playground_axis_reduce(shape: &str, values: &str, axis: &str, op: &str) -
 
 // ---- matmul -------------------------------------------------------------------
 
-/// Mirrors `Tensor::matmul`'s internal rank dispatch and its exact panic text
-/// (`crates/matten/src/math.rs`), returning the result shape or that text.
-///
-/// `matmul`/`dot` have no `Result`-returning form and panic on a shape
-/// mismatch; there is no `MattenError` this crate can obtain for that case.
-/// The `wasm32-unknown-unknown` target cannot recover a panic's message
-/// either — verified directly: a panic inside `std::panic::catch_unwind`,
-/// compiled for this target, reaches the JS caller as a bare
-/// `RuntimeError: unreachable` trap with no payload, not a caught `Err`.
-/// Reproducing `matten`'s own panic text here, and never calling `matmul`
-/// on shapes this check has not already approved, is the closest available
-/// approximation to "the real message" that does not risk trapping the page.
-fn matmul_result_shape(left: &[usize], right: &[usize]) -> Result<Vec<usize>, String> {
-    const OP: &str = "dot"; // matmul() delegates to dot(), which hardcodes op = "dot".
-
-    fn dim_mismatch(left_name: &str, left: usize, right_name: &str, right: usize) -> String {
-        format!(
-            "matten shape error in {OP}: {left_name} ({left}) must equal {right_name} ({right})"
-        )
-    }
-
-    match (left.len(), right.len()) {
-        (1, 1) => {
-            if left[0] != right[0] {
-                return Err(format!(
-                    "matten shape error in {OP}: vector lengths must match (left {}, right {})",
-                    left[0], right[0]
-                ));
-            }
-            Ok(vec![])
-        }
-        (2, 1) => {
-            let [m, n] = [left[0], left[1]];
-            if n != right[0] {
-                return Err(dim_mismatch("left columns", n, "right length", right[0]));
-            }
-            Ok(vec![m])
-        }
-        (1, 2) => {
-            let [n, p] = [right[0], right[1]];
-            if left[0] != n {
-                return Err(dim_mismatch("left length", left[0], "right rows", n));
-            }
-            Ok(vec![p])
-        }
-        (2, 2) => {
-            let [m, n] = [left[0], left[1]];
-            let [nb, p] = [right[0], right[1]];
-            if n != nb {
-                return Err(dim_mismatch("left columns", n, "right rows", nb));
-            }
-            Ok(vec![m, p])
-        }
-        (lr, rr) => Err(format!(
-            "matten shape error in {OP}: unsupported rank combination (left rank {lr}, right rank {rr}); \
-             supported: [n]\u{d7}[n], [m,n]\u{d7}[n], [n]\u{d7}[n,p], [m,n]\u{d7}[n,p]"
-        )),
-    }
-}
-
-/// Two shapes and values -> the matrix product, or the real matmul rejection
-/// text (RFC-093 §5).
+/// Two shapes and values -> the matrix product, or the real
+/// [`MattenError`] text from [`Tensor::try_matmul`] (RFC-093 §5, RFC-113).
 #[wasm_bindgen]
 pub fn playground_matmul(
     left_shape: &str,
@@ -329,24 +269,18 @@ pub fn playground_matmul(
         Err(e) => return error_block(&e),
     };
 
-    let result_shape = match matmul_result_shape(a.shape(), b.shape()) {
-        Ok(s) => s,
-        Err(e) => return error_block(&e),
-    };
-
-    // Guaranteed not to panic: the same rank/dimension rules were just checked.
-    let product = a.matmul(&b);
-    debug_assert_eq!(product.shape(), result_shape.as_slice());
-
-    format!(
-        "{}\n{}\n{}\nmeaning          {:?} x {:?} -> {:?}",
-        format_tensor_block("left", &a),
-        format_tensor_block("right", &b),
-        format_tensor_block("left.matmul", &product),
-        a.shape(),
-        b.shape(),
-        product.shape()
-    )
+    match a.try_matmul(&b) {
+        Ok(product) => format!(
+            "{}\n{}\n{}\nmeaning          {:?} x {:?} -> {:?}",
+            format_tensor_block("left", &a),
+            format_tensor_block("right", &b),
+            format_tensor_block("left.matmul", &product),
+            a.shape(),
+            b.shape(),
+            product.shape()
+        ),
+        Err(e) => error_block(&format_matten_error(&e)),
+    }
 }
 
 // ---- shared error formatting ------------------------------------------------
@@ -361,18 +295,28 @@ mod tests {
 
     // ---- live fidelity to the real panic text (review C1) -------------------
     //
-    // The four `*_matches_the_real_panic_text_exactly` tests below assert
-    // against a string this crate hand-transcribed from a one-time
-    // `catch_unwind` run (see the review request). A hand-transcription does
-    // not notice if core `matten` ever rewords the panic it mirrors — the
-    // test keeps passing while the page quietly starts lying about what
-    // matten says. These tests close that gap: they trigger the REAL panic,
-    // live, every run, and assert the playground's output against whatever
-    // core actually produced this time, not a frozen guess. Native-only:
-    // `catch_unwind` does not recover a panic's message on
-    // `wasm32-unknown-unknown` (verified separately, see the review
-    // request) — this target is where the crate actually ships, so these
-    // tests exist to protect that build without needing to run on it.
+    // RFC-113 deleted matmul's copy of this pattern along with
+    // matmul_result_shape: playground_matmul calls try_matmul now, so there is
+    // no panic text left to keep honest for matmul, and its three sync tests
+    // (which called `real_panic_message` around a live `.matmul()` call) are
+    // gone with it.
+    //
+    // The one remaining case is broadcast's `+`, which has no `try_add` to
+    // call instead (RFC-113 §2 — unavoidable, not this RFC's to fix). Its
+    // hand-transcribed `broadcast_incompatible_shapes_matches_the_real_panic_
+    // text_exactly` test, below, asserts against a string this crate
+    // hand-transcribed from a one-time `catch_unwind` run (see the review
+    // request). A hand-transcription does not notice if core `matten` ever
+    // rewords the panic it mirrors — the test keeps passing while the page
+    // quietly starts lying about what matten says.
+    // `broadcast_mismatch_matches_the_live_real_panic_payload` closes that
+    // gap: it triggers the REAL panic, live, every run, and asserts the
+    // playground's output against whatever core actually produced this time,
+    // not a frozen guess. Native-only: `catch_unwind` does not recover a
+    // panic's message on `wasm32-unknown-unknown` (verified separately, see
+    // the review request) — this target is where the crate actually ships,
+    // so this test exists to protect that build without needing to run on
+    // it.
 
     #[cfg(not(target_arch = "wasm32"))]
     fn real_panic_message(f: impl FnOnce() + std::panic::UnwindSafe) -> String {
@@ -399,47 +343,6 @@ mod tests {
             let _ = &a + &b;
         });
         let out = playground_broadcast("2,3", "1,1,1,1,1,1", "4", "1,1,1,1");
-        assert_eq!(out, format!("Error: {real}"));
-    }
-
-    #[cfg(not(target_arch = "wasm32"))]
-    #[test]
-    fn matmul_dim_mismatch_matches_the_live_real_panic_payload() {
-        let l = Tensor::new(vec![1.0; 6], &[2, 3]);
-        let r = Tensor::new(vec![1.0; 4], &[2, 2]);
-        let real = real_panic_message(|| {
-            let _ = l.matmul(&r);
-        });
-        let out = playground_matmul("2,3", "1,1,1,1,1,1", "2,2", "1,1,1,1");
-        assert_eq!(out, format!("Error: {real}"));
-    }
-
-    #[cfg(not(target_arch = "wasm32"))]
-    #[test]
-    fn matmul_vector_length_mismatch_matches_the_live_real_panic_payload() {
-        let v1 = Tensor::new(vec![1.0, 2.0, 3.0], &[3]);
-        let v2 = Tensor::new(vec![1.0, 2.0], &[2]);
-        let real = real_panic_message(|| {
-            let _ = v1.matmul(&v2);
-        });
-        let out = playground_matmul("3", "1,2,3", "2", "1,2");
-        assert_eq!(out, format!("Error: {real}"));
-    }
-
-    #[cfg(not(target_arch = "wasm32"))]
-    #[test]
-    fn matmul_rank_mismatch_matches_the_live_real_panic_payload() {
-        let l3 = Tensor::new((1..=24).map(|x| x as f64).collect(), &[2, 3, 4]);
-        let r2 = Tensor::new(vec![1.0; 4], &[2, 2]);
-        let real = real_panic_message(|| {
-            let _ = l3.matmul(&r2);
-        });
-        let out = playground_matmul(
-            "2,3,4",
-            "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24",
-            "2,2",
-            "1,1,1,1",
-        );
         assert_eq!(out, format!("Error: {real}"));
     }
 
@@ -494,6 +397,19 @@ mod tests {
         );
     }
 
+    #[test]
+    fn broadcast_zero_sized_input_is_incompatible_not_a_panic() {
+        // RFC-113 Change 2: [0,3] and [2,3] are typeable into the form since
+        // RFC-111 made zero-sized shapes constructible. Axis 0 sizes 0 vs 2
+        // are genuinely incompatible -- this is a real Shape error, not a
+        // consequence of the zero-sized dimension itself.
+        let out = playground_broadcast("0,3", "", "2,3", "1,2,3,4,5,6");
+        assert_eq!(
+            out,
+            "Error: matten broadcast error in add: shapes [0, 3] and [2, 3] are not compatible"
+        );
+    }
+
     // ---- reshape --------------------------------------------------------------
 
     #[test]
@@ -518,6 +434,18 @@ mod tests {
         assert_eq!(
             out,
             "Error: matten shape error in reshape: cannot reshape tensor with 6 elements into shape [4, 2] requiring 8 elements"
+        );
+    }
+
+    #[test]
+    fn reshape_to_a_zero_sized_target_is_an_element_count_mismatch() {
+        // RFC-113 Change 2: [0,6] is typeable since RFC-111, but a 6-element
+        // source cannot reshape into a 0-element target -- the same
+        // element-count check that already governs every other reshape.
+        let out = playground_reshape("2,3", "1,2,3,4,5,6", "0,6");
+        assert_eq!(
+            out,
+            "Error: matten shape error in reshape: cannot reshape tensor with 6 elements into shape [0, 6] requiring 0 elements"
         );
     }
 
@@ -586,6 +514,18 @@ mod tests {
         );
     }
 
+    #[test]
+    fn axis_reduce_zero_length_reduced_axis_shows_rfc110s_message() {
+        // RFC-113 Change 2: [0,3] is typeable since RFC-111. Reducing axis 0
+        // (length 0) is RFC-110's territory -- InvalidArgument, not a panic
+        // and not a NaN/inf leak.
+        let out = playground_axis_reduce("0,3", "", "0", "mean");
+        assert_eq!(
+            out,
+            "Error: matten invalid argument error in mean_axis: axis: mean is undefined for a reduced axis of length 0 (axis 0)"
+        );
+    }
+
     // ---- matmul -----------------------------------------------------------------
 
     #[test]
@@ -650,7 +590,10 @@ mod tests {
     }
 
     #[test]
-    fn matmul_dimension_mismatch_matches_the_real_panic_text_exactly() {
+    fn matmul_dimension_mismatch_shows_the_real_try_matmul_error() {
+        // RFC-113: was matmul_dimension_mismatch_matches_the_real_panic_text_exactly,
+        // asserting a hand-rolled mirror of matmul()'s panic text. Now a real
+        // try_matmul Err; text confirmed unchanged (SS3 of the review request).
         let out = playground_matmul("2,3", "1,2,3,4,5,6", "2,2", "1,2,3,4");
         assert_eq!(
             out,
@@ -659,7 +602,8 @@ mod tests {
     }
 
     #[test]
-    fn matmul_vector_length_mismatch_matches_the_real_panic_text_exactly() {
+    fn matmul_vector_length_mismatch_shows_the_real_try_matmul_error() {
+        // RFC-113: was matmul_vector_length_mismatch_matches_the_real_panic_text_exactly.
         let out = playground_matmul("3", "1,2,3", "2", "1,2");
         assert_eq!(
             out,
@@ -668,7 +612,8 @@ mod tests {
     }
 
     #[test]
-    fn matmul_unsupported_rank_combination_matches_the_real_panic_text_exactly() {
+    fn matmul_unsupported_rank_combination_shows_the_real_try_matmul_error() {
+        // RFC-113: was matmul_unsupported_rank_combination_matches_the_real_panic_text_exactly.
         let out = playground_matmul(
             "2,3,4",
             "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24",
@@ -679,6 +624,47 @@ mod tests {
             out,
             "Error: matten shape error in dot: unsupported rank combination (left rank 3, right rank 2); \
              supported: [n]\u{d7}[n], [m,n]\u{d7}[n], [n]\u{d7}[n,p], [m,n]\u{d7}[n,p]"
+        );
+    }
+
+    #[test]
+    fn matmul_zero_length_contraction_dimension_computes_the_zero_matrix() {
+        // RFC-113 Change 2: [3,0] x [0,2] -- n = 0. Sum over zero terms is
+        // correctly all-zero, not an error (matches matten's own behaviour;
+        // this case never depended on RFC-108). A zero-row or zero-column
+        // grid renders as blank lines (render_matrix's join of empty rows),
+        // not an empty string -- the shape header is still shown, so no
+        // information is lost; captured from the real output, not
+        // hand-computed.
+        let out = playground_matmul("3,0", "", "0,2", "");
+        assert_eq!(
+            out,
+            "left             shape=[3, 0]\n\n\n\n\
+             right            shape=[0, 2]\n\n\
+             left.matmul      shape=[3, 2]\n\
+             0.000 0.000\n\
+             0.000 0.000\n\
+             0.000 0.000\n\
+             meaning          [3, 0] x [0, 2] -> [3, 2]"
+        );
+    }
+
+    #[test]
+    fn matmul_zero_output_columns_does_not_panic() {
+        // RFC-113 Change 2: [2,3] x [3,0] -- p = 0, the exact shape RFC-108
+        // fixed a live panic for. Confirms the playground inherits that fix
+        // through try_matmul rather than re-triggering it through the now-
+        // deleted hand-rolled guard. Blank lines are the empty-grid rendering
+        // (see the sibling test above), captured from the real output.
+        let out = playground_matmul("2,3", "1,2,3,4,5,6", "3,0", "");
+        assert_eq!(
+            out,
+            "left             shape=[2, 3]\n\
+             1.000 2.000 3.000\n\
+             4.000 5.000 6.000\n\
+             right            shape=[3, 0]\n\n\n\n\
+             left.matmul      shape=[2, 0]\n\n\n\
+             meaning          [2, 3] x [3, 0] -> [2, 0]"
         );
     }
 
