@@ -101,6 +101,16 @@
             )
           );
         });
+
+        wireButton("pg-numeric-run", function () {
+          showResult(
+            "pg-numeric-output",
+            mod.playground_try_numeric(
+              val("pg-numeric-shape"),
+              val("pg-numeric-values")
+            )
+          );
+        });
       });
     })
     .catch(function (err) {

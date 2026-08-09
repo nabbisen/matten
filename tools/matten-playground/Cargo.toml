@@ -15,7 +15,7 @@ crate-type = ["cdylib"]
 # This tool is workspace-excluded and publish = false. Path-only local
 # dependency so prerelease family-version bumps do not require tool manifest
 # churn; API drift is caught by cargo build/clippy via --manifest-path.
-matten                      = { path = "../../crates/matten", default-features = false }
+matten                      = { path = "../../crates/matten", default-features = false, features = ["dynamic"] }
 
 # Pinned exactly: the wasm-bindgen crate and the wasm-bindgen-cli
 # post-processing tool must be the SAME version, or the build fails outright.

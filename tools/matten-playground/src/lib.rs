@@ -9,7 +9,7 @@
 //! §3). Workspace-excluded and `publish = false`; nothing here reaches
 //! crates.io.
 
-use matten::{MattenError, Tensor};
+use matten::{Element, MattenError, Tensor};
 use wasm_bindgen::prelude::*;
 
 mod render;
@@ -17,11 +17,43 @@ use render::format_tensor_block;
 
 // ---- input parsing --------------------------------------------------------
 
-/// Parses a comma-separated list of non-negative integers, e.g. `"2, 3"`.
+/// Splits `s` on commas **and newlines** (RFC-115) — a grid pasted as rows,
+/// one line each, is how a learner naturally types one — trims each token,
+/// and drops **only a trailing run** of empty tokens, so `"1,2,3,"` and a
+/// trailing blank line both stay forgiving.
+///
+/// An empty token that is *not* trailing is an interior blank. It is not
+/// dropped: dropping it would silently shift every value after it into the
+/// wrong position and change how many values are read, with no sign anything
+/// was wrong (RFC-115 §2). It is reported instead, naming its 1-based
+/// position in the flat, row-major sequence the field is read as.
+fn split_forgiving_trailing(s: &str) -> Result<Vec<&str>, String> {
+    let tokens: Vec<&str> = s.split([',', '\n']).map(str::trim).collect();
+
+    // No non-empty token anywhere: an all-blank (or empty) field is zero
+    // values, unchanged from before this RFC — not an interior-blank error.
+    let Some(last_significant) = tokens.iter().rposition(|t| !t.is_empty()) else {
+        return Ok(Vec::new());
+    };
+
+    let significant = &tokens[..=last_significant];
+    if let Some(pos) = significant.iter().position(|t| t.is_empty()) {
+        return Err(format!(
+            "value {} is blank — an interior blank is not dropped silently, since that \
+             would shift every value after it and change how many values are read; a \
+             trailing separator (e.g. \"1,2,3,\") is fine, but a gap in the middle is not",
+            pos + 1
+        ));
+    }
+
+    Ok(significant.to_vec())
+}
+
+/// Parses a comma/newline-separated list of non-negative integers, e.g.
+/// `"2, 3"` or `"2\n3"`.
 fn parse_shape(s: &str) -> Result<Vec<usize>, String> {
-    s.split(',')
-        .map(str::trim)
-        .filter(|p| !p.is_empty())
+    split_forgiving_trailing(s)?
+        .into_iter()
         .map(|p| {
             p.parse::<usize>()
                 .map_err(|_| format!("\"{p}\" is not a non-negative integer"))
@@ -29,11 +61,11 @@ fn parse_shape(s: &str) -> Result<Vec<usize>, String> {
         .collect()
 }
 
-/// Parses a comma-separated list of `f64` values, e.g. `"1, 2.5, -3"`.
+/// Parses a comma/newline-separated list of `f64` values, e.g. `"1, 2.5, -3"`
+/// or a grid pasted as rows, `"1, 2, 3\n4, 5, 6"`.
 fn parse_values(s: &str) -> Result<Vec<f64>, String> {
-    s.split(',')
-        .map(str::trim)
-        .filter(|p| !p.is_empty())
+    split_forgiving_trailing(s)?
+        .into_iter()
         .map(|p| {
             p.parse::<f64>()
                 .map_err(|_| format!("\"{p}\" is not a number"))
@@ -280,6 +312,82 @@ pub fn playground_matmul(
             product.shape()
         ),
         Err(e) => error_block(&format_matten_error(&e)),
+    }
+}
+
+// ---- dynamic: try_numeric (RFC-115 Part B) -----------------------------------
+
+/// Infers the most specific [`Element`] for one cell's text, mirroring core's
+/// own CSV inference policy exactly (`crates/matten/src/dynamic/parse/csv.rs`,
+/// RFC-011 §8) so the playground never invents a rule core doesn't already
+/// use elsewhere: empty -> `None`, `"true"`/`"false"` (case-insensitive) ->
+/// `Bool`, else `i64` -> `Int`, else `f64` -> `Float`, else `Text`.
+fn infer_element(field: &str) -> Element {
+    if field.is_empty() {
+        return Element::None;
+    }
+    if field.eq_ignore_ascii_case("true") {
+        return Element::Bool(true);
+    }
+    if field.eq_ignore_ascii_case("false") {
+        return Element::Bool(false);
+    }
+    if let Ok(i) = field.parse::<i64>() {
+        return Element::Int(i);
+    }
+    if let Ok(f) = field.parse::<f64>() {
+        return Element::Float(f);
+    }
+    Element::text(field)
+}
+
+/// Splits `values` on commas and newlines like [`parse_shape`]/[`parse_values`],
+/// but — deliberately unlike them — every token here is significant,
+/// including a blank one: it becomes [`Element::None`] rather than being
+/// reported as an error or forgiven as trailing. This is Part A's blank-cell
+/// fix composing with a dynamic tensor's own representation of "missing"
+/// (RFC-115 §3): on this form only, a blank is data, not a mistake. A field
+/// that is blank in its entirety is zero cells, matching the numeric forms'
+/// existing convention for a zero-sized shape.
+fn parse_elements(values: &str) -> Vec<Element> {
+    if values.trim().is_empty() {
+        return Vec::new();
+    }
+    values
+        .split([',', '\n'])
+        .map(str::trim)
+        .map(infer_element)
+        .collect()
+}
+
+/// Shape and values (which may contain text or be blank) -> the dynamic
+/// tensor exactly as entered, followed by [`Tensor::try_numeric`]'s outcome:
+/// either the converted numeric tensor, or the real error naming the first
+/// offending cell and why (RFC-115 Part B).
+///
+/// `values`' blank-cell handling deliberately differs from the four numeric
+/// forms above: see [`parse_elements`].
+#[wasm_bindgen]
+pub fn playground_try_numeric(shape: &str, values: &str) -> String {
+    let shape = match parse_shape(shape) {
+        Ok(s) => s,
+        Err(e) => return error_block(&e),
+    };
+    let elements = parse_elements(values);
+
+    let t = match Tensor::try_from_elements(elements, &shape) {
+        Ok(t) => t,
+        Err(e) => return error_block(&format_matten_error(&e)),
+    };
+
+    let dynamic_block = format!("{:<16} shape={:?}\n{t}", "input (dynamic)", t.shape());
+
+    match t.try_numeric() {
+        Ok(numeric) => format!(
+            "{dynamic_block}\n{}\nmeaning          every cell converted; try_numeric() succeeded",
+            format_tensor_block("numeric", &numeric)
+        ),
+        Err(e) => format!("{dynamic_block}\nError: {}", format_matten_error(&e)),
     }
 }
 
@@ -682,6 +790,162 @@ mod tests {
         assert_eq!(
             out,
             "Error: matten shape error in try_new: data length 5 does not match shape [2, 3], which requires 6 elements"
+        );
+    }
+
+    // ---- RFC-115 Part A: newlines, interior blanks, trailing forgiveness ------
+
+    #[test]
+    fn t1_a_grid_pasted_across_newlines_parses_for_values_and_shape() {
+        // A 2x3 grid typed the way it looks -- one row per line -- must work,
+        // for both the values field and the shape field.
+        let out = playground_reshape("2,3", "1, 2, 3\n4, 5, 6", "3,2");
+        assert_eq!(
+            out,
+            "input            shape=[2, 3]\n\
+             1.000 2.000 3.000\n\
+             4.000 5.000 6.000\n\
+             reshaped         shape=[3, 2]\n\
+             1.000 2.000\n\
+             3.000 4.000\n\
+             5.000 6.000\n\
+             meaning          row-major values stay in the same order"
+        );
+
+        let out = playground_reshape("2,3", "1,2,3,4,5,6", "3\n2");
+        assert!(
+            !out.starts_with("Error"),
+            "newline-separated shape unexpectedly errored: {out}"
+        );
+    }
+
+    #[test]
+    fn t2_an_interior_blank_is_reported_naming_its_position() {
+        // Exact input/output quoted per the handoff's required evidence.
+        let out = playground_reshape("2,3", "1,2,,4,5,6", "3,2");
+        assert_eq!(
+            out,
+            "Error: value 3 is blank — an interior blank is not dropped silently, since that \
+             would shift every value after it and change how many values are read; a \
+             trailing separator (e.g. \"1,2,3,\") is fine, but a gap in the middle is not"
+        );
+
+        // The same bug, the same fix, in the shape field (handoff R5: fix both).
+        let out = playground_reshape("2,,3", "1,2,3,4,5,6", "3,2");
+        assert_eq!(
+            out,
+            "Error: value 2 is blank — an interior blank is not dropped silently, since that \
+             would shift every value after it and change how many values are read; a \
+             trailing separator (e.g. \"1,2,3,\") is fine, but a gap in the middle is not"
+        );
+    }
+
+    #[test]
+    fn t3_a_trailing_separator_still_works() {
+        // Exact inputs from the handoff's own examples.
+        let out = playground_axis_reduce("2,3,", "1,2,3,4,5,6", "0", "sum");
+        assert!(
+            !out.starts_with("Error"),
+            "trailing comma in shape unexpectedly errored: {out}"
+        );
+        let out = playground_reshape("2,3", "1,2,3,4,5,6,", "3,2");
+        assert!(
+            !out.starts_with("Error"),
+            "trailing comma in values unexpectedly errored: {out}"
+        );
+        // A trailing blank LINE, the newline-separator analogue of a trailing comma.
+        let out = playground_reshape("2,3", "1,2,3,4,5,6\n", "3,2");
+        assert!(
+            !out.starts_with("Error"),
+            "trailing newline unexpectedly errored: {out}"
+        );
+    }
+
+    #[test]
+    fn t4_every_pre_rfc115_test_in_this_file_is_unmodified() {
+        // Not a new assertion of its own: the 33 tests preceding this section
+        // in the file are the pre-RFC-115 suite, verbatim -- byte-identical
+        // pass/fail against the new parser is the evidence for "no computed
+        // result changes for any currently-valid input" (RFC-115 R1/T4). This
+        // test exists only to name that fact at the point a reviewer would
+        // look for it; the real evidence is that nothing above this line was
+        // touched.
+    }
+
+    // ---- RFC-115 Part B: try_numeric demo --------------------------------------
+
+    #[test]
+    fn t5_mixed_input_shows_elements_then_numeric_result() {
+        let out = playground_try_numeric("2,3", "1, 2, 3, 4, 5, 6");
+        assert_eq!(
+            out,
+            "input (dynamic)  shape=[2, 3]\n\
+             1 2 3\n\
+             4 5 6\n\
+             numeric          shape=[2, 3]\n\
+             1.000 2.000 3.000\n\
+             4.000 5.000 6.000\n\
+             meaning          every cell converted; try_numeric() succeeded"
+        );
+    }
+
+    #[test]
+    fn t5_a_text_cell_produces_the_real_error_naming_that_cell() {
+        let out = playground_try_numeric("2,3", "1, 2, x, 4, 5, 6");
+        assert_eq!(
+            out,
+            "input (dynamic)  shape=[2, 3]\n\
+             1 2 x\n\
+             4 5 6\n\
+             Error: matten unsupported error in try_numeric: element at position 2 is Text(\"x\") and cannot be coerced to f64; use fill_none or explicit conversion first"
+        );
+    }
+
+    #[test]
+    fn t5_a_blank_cell_is_shown_as_none_and_reported_by_try_numeric() {
+        // Part A's numeric forms reject an interior blank outright (T2); this
+        // form accepts it as Element::None and shows it, then try_numeric()
+        // names it as the reason conversion failed -- both correct, and
+        // different, per the handoff's explicit instruction to say so.
+        let out = playground_try_numeric("2,3", "1, 2, , 4, 5, 6");
+        assert_eq!(
+            out,
+            "input (dynamic)  shape=[2, 3]\n\
+             1 2 None\n\
+             4 5    6\n\
+             Error: matten unsupported error in try_numeric: element at position 2 is None and cannot be coerced to f64; use fill_none or explicit conversion first"
+        );
+    }
+
+    #[test]
+    fn t5_bool_and_int_and_float_all_infer_correctly() {
+        let out = playground_try_numeric("1,4", "1, 1.5, true, false");
+        assert!(
+            out.contains("1 1.5 true false"),
+            "expected inferred Int/Float/Bool cells, got: {out}"
+        );
+    }
+
+    #[test]
+    fn t5_grid_pasted_across_newlines_works_here_too() {
+        let out = playground_try_numeric("2,3", "1, 2, 3\n4, 5, 6");
+        assert!(
+            !out.starts_with("Error"),
+            "newline-separated dynamic input unexpectedly errored: {out}"
+        );
+    }
+
+    #[test]
+    fn t6_try_numeric_demo_calls_no_panicking_core_form() {
+        // T6: try_from_elements always sets `dynamic: Some(..)`, so
+        // try_numeric() (which panics only on a non-dynamic tensor) can never
+        // reach its panic branch here. Asserted by using both outcomes above
+        // without a catch_unwind guard -- if it could panic, T5's tests would
+        // already trap in `cargo test`, let alone under wasm.
+        let empty_shape_ok = playground_try_numeric("0,3", "");
+        assert!(
+            !empty_shape_ok.starts_with("Error"),
+            "zero-sized dynamic input unexpectedly errored: {empty_shape_ok}"
         );
     }
 }

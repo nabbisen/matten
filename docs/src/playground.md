@@ -1,8 +1,8 @@
 # Playground
 
-Try `matten`'s shape reasoning below — broadcasting, reshape, axis reductions, and matrix
-multiplication, computed by a real build of core `matten` and shown exactly as it happens,
-including rejections.
+Try `matten`'s shape reasoning below — broadcasting, reshape, axis reductions, matrix
+multiplication, and converting mixed data to numeric — computed by a real build of core
+`matten` and shown exactly as it happens, including rejections.
 
 A zero-sized dimension — a shape like `3,0` — is a valid input here. It looks like it should
 fail, but `matten` accepts zero-sized dimensions (RFC-111): try it in any of the four forms
@@ -105,6 +105,32 @@ not only the two-matrix case.
 
 <pre id="pg-matmul-output"></pre>
 
+## Converting mixed data
+
+A shape and a grid of values that may include text or blank cells. Every cell is shown as
+`matten` reads it — a number, `true`/`false`, text, or a blank as `None` — and then
+[`try_numeric()`](./reference/dynamic.md) is run on it: the single point in `matten` where
+mixed data either becomes a plain numeric tensor, or is rejected with the exact cell that
+stopped it.
+
+A blank cell is accepted here and shown as `None`, unlike the four forms above: those build
+a numeric tensor directly, where a blank has nothing to become, so it is reported as a
+mistake (see [Input notes](#input-notes) below). On this form a blank is data, not an error —
+it is `try_numeric()`, not the parser, that decides whether `None` can go further.
+
+<div class="pg-row">
+  <label for="pg-numeric-shape">Shape</label>
+  <input id="pg-numeric-shape" type="text" value="2,3">
+</div>
+<div class="pg-row">
+  <label for="pg-numeric-values">values (comma or newline separated; blanks and text allowed)</label>
+  <textarea id="pg-numeric-values" rows="3" cols="40">1, 2, x, , 5, 6</textarea>
+</div>
+
+<button id="pg-numeric-run">Run</button>
+
+<pre id="pg-numeric-output"></pre>
+
 </div>
 
 ## Rejections are shown, not hidden
@@ -112,6 +138,19 @@ not only the two-matrix case.
 Try an incompatible pair — shapes `2,3` and `4` for broadcasting, or `2,3` and `2,2` for
 `matmul` — and the page shows the same error `matten` itself produces for that mistake, not a
 generic "invalid input". A rejected operation teaches as much as an accepted one.
+
+## Input notes
+
+A shape or values field accepts either commas or newlines as separators — paste a grid the
+way it looks, one row per line, and it parses (`1, 2, 3` on one line and `1, 2, 3\n4, 5, 6`
+across two both work). A trailing separator is always fine (`1,2,3,` is the same as `1,2,3`).
+
+A **blank cell in the middle** of a shape or values field — `1,2,,4` — is never silently
+dropped. On the four numeric forms above it is reported by position, since a numeric tensor
+has no way to represent "missing" and dropping it would silently shift every value after it.
+On the **Converting mixed data** form it is accepted and shown as `None` instead — a dynamic
+tensor can represent a missing cell, so there it is data to convert or reject explicitly, not
+a parsing mistake.
 
 ## Notes for contributors
 
