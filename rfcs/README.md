@@ -146,7 +146,7 @@ sign-off and implementation — not that the state is unused.
 
 | ID | Title | Handoff |
 |---:|---|---|
-| — | *(none at present)* | — |
+| 120 | [Patch Releases Cover Published Documentation](./accepted/120-patches-cover-published-documentation.md) | — *(governance editing; none)* |
 
 ## Archive
 
