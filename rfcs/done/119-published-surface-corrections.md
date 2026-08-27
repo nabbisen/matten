@@ -1,8 +1,11 @@
 # RFC-119: Corrections to the Published Surface
 
-**Status:** **Accepted** 2026-08-28 by the owner. Not yet implemented. Handoff:
-`rfcs/handoffs/119-published-surface-corrections-handoff.md`. The §9 RFC-094 amendment is **not**
-part of this acceptance and remains open for RFC-120; this RFC does not depend on it.
+**Status:** **Implemented** 2026-08-28 in commit *"Fix a panicking example and four false published
+statements, close the CI execution gap that hid it (RFC-119)"* (`a7a3790`), reviewed and approved
+after **one required correction and three minor items**, all applied. **Unreleased** — this is the
+first `crates/` change since `0.46.0`, so it warrants a release; RFC-121 owns it. The §9 RFC-094
+amendment is RFC-120's, and remains proposed. Handoff:
+`rfcs/handoffs/119-published-surface-corrections-handoff.md`.
 **Target:** `crates/matten/examples/`, `crates/matten/src/lib.rs`, `crates/matten/src/stats.rs`,
 `crates/matten-stats/README.md`, `README.md`, `.github/workflows/test.yaml`
 **Theme:** Fix four false statements and one panic that are already on crates.io, and close the gap
