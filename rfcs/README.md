@@ -145,7 +145,7 @@ sign-off and implementation — not that the state is unused.
 
 | ID | Title | Handoff |
 |---:|---|---|
-| — | *(none at present)* | — |
+| 119 | [Corrections to the Published Surface](./accepted/119-published-surface-corrections.md) | [`119-…-handoff.md`](./handoffs/119-published-surface-corrections-handoff.md) |
 
 ## Archive
 
