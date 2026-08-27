@@ -81,6 +81,25 @@ excluded: any new public API, any behaviour change that is not a bug fix
 A user hitting a wrong answer should not wait for an unrelated feature to be ready. This is the only
 release type with no batching rule, deliberately.
 
+> **Amended by RFC-120 (2026-08-28).** The original `contents:` line read *"correctness fixes to
+> already-published crate code, and nothing else"*. It is replaced by:
+>
+> ```text
+> contents: correctness fixes to already-published crate content — code,
+>           rustdoc, or a packaged README — and nothing else
+> ```
+>
+> `excluded:` is unchanged. **This does not admit documentation generally.** §4.3's exclusion of
+> documentation that does not reach crates.io stands untouched, and the boundary is the same
+> `cargo package --list` test that declined `0.42.1` — the root `README.md` is in zero of the five
+> packages, `crates/matten-stats/README.md` is in one. What changes is that §4.1 now *matches* that
+> test instead of contradicting it.
+>
+> **Why:** a false statement in published rustdoc or a packaged README was neither "code" under §4.1
+> nor excluded by §4.3, so it fell through both and was caught only by §4.2(b)'s 28-day floor —
+> routing a one-line correction into a *minor* release a month later. RFC-119 supplied four such
+> statements at once, one of them a panicking example shipped in 83 releases.
+
 ### 4.2 Minor — `0.4x.0`
 
 **Trigger: any one of the following.**
@@ -95,6 +114,18 @@ release type with no batching rule, deliberately.
 indefinitely — the *"releasing nothing of what was built"* failure org §6.4 names. (c) is recorded
 because it is what actually happened at `0.42.0`; an owner override is legitimate and should be a
 named path rather than a departure from policy.
+
+> **Amended by RFC-120 (2026-08-28).** §4.2 defined **triggers only** — unlike §4.1 it carried no
+> `contents:` clause at all. That asymmetry let (b) route a documentation-only backlog into a minor.
+> Added:
+>
+> ```text
+> The triggers determine WHEN a release happens, not WHAT KIND. If everything
+> unreleased when a trigger fires is a correction under §4.1, the release is a
+> patch.
+> ```
+>
+> The three triggers themselves and the 28-day figure are **unchanged**.
 
 **The 28 days is a judgement, not a derivation.** There is no user data to derive it from, and ROADMAP
 §1.1 states adoption is not a success measure, so no external cadence pressure exists. It is set to be

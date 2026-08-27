@@ -1,8 +1,9 @@
 # RFC-120: Patch Releases Cover Published Documentation
 
-**Status:** **Accepted** 2026-08-28 by the owner. Not yet implemented. **Governance editing, so no
-Developer Handoff** (see `accepted/README.md`) — the high-capability model performs it. No version,
-no release.
+**Status:** **Implemented** 2026-08-28. RFC-094 §4.1 and §4.2 each carry an *Amended by RFC-120*
+blockquote quoting the original wording verbatim; the diff is **31 insertions, 0 removals**, so no
+prior text was rewritten. §4.3, the three triggers and the 28-day figure are untouched. Governance
+editing, so no Developer Handoff (see `accepted/README.md`). No version, no release.
 **Target:** `rfcs/done/094-release-cadence-policy.md` §4.1 and §4.2
 **Amends:** RFC-094 §4.1 (patch contents) and §4.2 (adds the timing-versus-form rule it never had)
 **Theme:** Close the gap that routes a published-documentation correction into a minor release a
