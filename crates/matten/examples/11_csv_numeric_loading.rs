@@ -1,6 +1,11 @@
 //! Loading numeric CSV data into a tensor.
 //!
-//! Run: cargo run --example 11_csv_numeric_loading
+//! Run: cd crates/matten && cargo run --example 11_csv_numeric_loading
+//!
+//! Reads `examples/data/numeric_2x3.csv` relative to the current working
+//! directory, so this must be run from `crates/matten/`, not from the
+//! repository root — this is why it is excluded from the CI smoke job's
+//! example runs (RFC-119).
 //!
 //! Core numeric Tensor APIs accept rectangular numeric-only CSV. Shape is inferred as
 //! [rows, cols]. Each field must be a valid f64.

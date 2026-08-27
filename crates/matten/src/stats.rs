@@ -3,10 +3,11 @@
 //! [`Tensor::var`] / [`Tensor::std`] compute the **population** variance and
 //! standard deviation over all elements; [`Tensor::var_axis`] / [`Tensor::std_axis`]
 //! do the same along one axis (removing it from the output shape). These are the
-//! only statistics in core — quantile, percentile, histogram, covariance,
-//! correlation, and z-score are deferred to a possible future `matten-stats`
-//! companion (RFC-040 §6/§8), and there is no sample-variance (`ddof = 1`) variant
-//! in the first cut.
+//! only statistics in core — quantile, histogram, covariance, and correlation
+//! live in the `matten-stats` companion (RFC-040 §6/§8); percentile is not yet
+//! implemented anywhere in the family, and z-score lives in `matten-mlprep`
+//! (`standardize_columns`) rather than `matten-stats`. There is no
+//! sample-variance (`ddof = 1`) variant in the first cut.
 //!
 //! **Variance is population variance, not sample variance:**
 //! `var = sum((x_i - mean)^2) / n` and `std = sqrt(var)`. A two-pass algorithm is

@@ -173,6 +173,24 @@ jobs:
       - run: cargo run -p matten --example dynamic_08_json_ingestion --features dynamic,json
       - run: cargo check -p matten --example dynamic_09_visual_readiness_summary
       - run: cargo run -p matten --example dynamic_09_visual_readiness_summary --features dynamic
+      # core matten — previously compiled but never executed (RFC-119 E.1); 10_json_roundtrip
+      # and 11_csv_numeric_loading are excluded — see their file headers for why
+      - run: cargo run -p matten --example 01_create_tensor
+      - run: cargo run -p matten --example 02_shape_and_size
+      - run: cargo run -p matten --example 03_reshape_flatten
+      - run: cargo run -p matten --example 04_elementwise_ops
+      - run: cargo run -p matten --example 05_scalar_ops
+      - run: cargo run -p matten --example 07_transpose_swap_axes
+      - run: cargo run -p matten --example 09_slice_str
+      - run: cargo run -p matten --example 20_dot_product
+      - run: cargo run -p matten --example 21_matrix_vector_product
+      - run: cargo run -p matten --example 22_matrix_multiplication
+      - run: cargo run -p matten --example 23_sum_mean
+      - run: cargo run -p matten --example 24_min_max
+      - run: cargo run -p matten --example dynamic_01_mixed_elements --features dynamic
+      - run: cargo run -p matten --example dynamic_02_missing_values --features dynamic,csv
+      - run: cargo run -p matten --example dynamic_03_fill_none --features dynamic
+      - run: cargo run -p matten --example dynamic_04_numeric_coercion --features dynamic
       # matten-ndarray
       - run: cargo run -p matten-ndarray --example to_arrayd
       - run: cargo run -p matten-ndarray --example from_arrayd
@@ -182,6 +200,7 @@ jobs:
       - run: cargo run -p matten-mlprep --example mlprep_add_bias_column
       - run: cargo run -p matten-mlprep --example mlprep_train_test_split
       - run: cargo run -p matten-mlprep --example mlprep_visual_standardize_summary
+      - run: cargo run -p matten-mlprep --example mlprep_train_test_split_seeded  # RFC-119 E.1
       # matten-data
       - run: cargo run -p matten-data --example csv_to_tensor
       - run: cargo run -p matten-data --example data_00_quickstart
@@ -191,12 +210,17 @@ jobs:
       - run: cargo run -p matten-data --example data_04_to_tensor
       - run: cargo run -p matten-data --example data_05_errors
       - run: cargo run -p matten-data --example data_06_visual_readiness_summary
+      - run: cargo run -p matten-data --example data_csv_batches --features streaming  # RFC-119 E.1
       # matten-stats
       - run: cargo run -p matten-stats --example stats_covariance
       - run: cargo run -p matten-stats --example stats_correlation
       - run: cargo run -p matten-stats --example stats_quantile
       - run: cargo run -p matten-stats --example stats_expansion
       - run: cargo run -p matten-stats --example stats_histogram
+      # tools/matten-playground (RFC-119 E.3) — the only tool with neither a test nor a
+      # clippy CI step before this; docs.yaml only builds its wasm module
+      - run: cargo test --manifest-path tools/matten-playground/Cargo.toml
+      - run: cargo clippy --manifest-path tools/matten-playground/Cargo.toml --all-targets -- -D warnings
       # local tools
       - run: cargo check --manifest-path tools/matten-report/Cargo.toml
       - run: cargo test --manifest-path tools/matten-report/Cargo.toml

@@ -142,11 +142,12 @@ pub enum MattenStatsError {
   purely additive follow-up if ever wanted (RFC-083 §4.1).
 - **Scalar pair APIs only.** No matrix-wide covariance/correlation over many
   columns, and no axis-wise variants.
-- **`Empty` on an input with fewer than 2 elements**, not on a literally
-  zero-length tensor — `matten::Tensor` cannot represent zero elements at all
-  (every dimension must be non-zero), so the only reachable "too few
-  elements" case for `covariance`/`correlation`/`skewness`/`kurtosis` is
-  exactly 1 element per side (`covariance_population` alone accepts that).
+- **`Empty` on an input with fewer than 2 elements.** A zero-length `matten::Tensor`
+  is constructible since RFC-111, but these four functions still return `Empty`
+  before reaching a zero-element input — the check is on element count, not on
+  whether the tensor happens to be reachable, so a zero-length or a one-element
+  input both take this path (`covariance_population` alone accepts exactly 1
+  element per side).
 - **Not for large/streaming data.** These are eager, in-memory computations.
 
 ## Compatibility

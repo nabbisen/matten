@@ -15,8 +15,8 @@
 //!
 //! The `dynamic` feature (`features = ["dynamic"]`) supports heterogeneous
 //! ingestion and missing-value cleanup before conversion to numeric tensors via
-//! [`Tensor::try_numeric`]. Dynamic reshape/slicing/arithmetic are intentionally
-//! guarded until a future CoW-view milestone.
+//! [`Tensor::try_numeric`]. Dynamic slicing is available; dynamic reshape and
+//! arithmetic remain intentionally guarded.
 //!
 //! # Quick start
 //!

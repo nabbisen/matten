@@ -1,6 +1,11 @@
 //! JSON serialisation and deserialisation round-trip.
 //!
-//! Run: cargo run --example 10_json_roundtrip
+//! Run: cd crates/matten && cargo run --example 10_json_roundtrip
+//!
+//! Reads `examples/data/tensor_2x2.json` relative to the current working
+//! directory, so this must be run from `crates/matten/`, not from the
+//! repository root — this is why it is excluded from the CI smoke job's
+//! example runs (RFC-119).
 //!
 //! Two accepted forms:
 //!   • canonical object  {"shape":[…],"data":[…]}  (preferred)

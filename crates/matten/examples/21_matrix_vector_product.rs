@@ -21,8 +21,11 @@ fn main() {
 
     // Vector × matrix: [n] × [n, p] -> [p]
     let w = Tensor::from_vec(vec![1.0, 2.0]);
-    let r2 = w.matmul(&m.transpose());
-    println!("w·mᵀ = {r2:?}");
+    let r2 = w.matmul(&m);
+    println!("w·m  = {r2:?}");
+
+    assert_eq!(r2.shape(), &[3]);
+    assert_eq!(r2.as_slice(), &[9.0, 12.0, 15.0]);
 
     println!("Shapes and values verified: OK");
 }

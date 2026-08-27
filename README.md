@@ -195,8 +195,10 @@ More examples are [here](crates/matten-mlprep/examples/).
 - **Logical order is preserved.** `from_arrayd` converts a non-standard-layout
   `ArrayD` (transposed / sliced) by its *logical* element order, never the raw
   backing buffer.
-- **Zero-sized axes are rejected.** Core `matten` does not support zero-length
-  dimensions, so `from_arrayd` returns an error for them.
+- **Zero-sized axes are accepted.** Core `matten` accepts zero-length dimensions
+  since RFC-111, and `from_arrayd` no longer rejects one; the deprecated
+  `ZeroSizedAxis` error variant is kept, not removed, because removing it
+  would break anyone matching on it.
 - **Dynamic tensors are rejected, not panicked.** With the `dynamic` feature,
   passing a dynamic (`Element`) tensor returns `MattenNdarrayError::DynamicTensor`;
   convert it with `Tensor::try_numeric()` first.
