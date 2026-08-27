@@ -1,6 +1,8 @@
 # RFC-121: `0.46.1` — The Published-Surface Patch
 
-**Status:** Proposed
+**Status:** **Accepted** 2026-08-28 by the owner. Not yet implemented. Handoff:
+`rfcs/handoffs/121-0461-published-surface-patch-handoff.md`. **The tag and the publish are NOT
+authorized by this acceptance** — each is a separate owner authorization at the time (RFC-094 §5).
 **Target:** `Cargo.toml`, live version pins, `CHANGELOG.md`
 **Theme:** Publish RFC-119's corrections — the only way they reach a reader
 **Related:** RFC-094 §4.1 (as amended by RFC-120), RFC-030, RFC-118, RFC-119, RFC-103

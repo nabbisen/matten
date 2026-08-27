@@ -147,7 +147,7 @@ sign-off and implementation — not that the state is unused.
 
 | ID | Title | Handoff |
 |---:|---|---|
-| — | *(none at present)* | — |
+| 121 | [`0.46.1` — The Published-Surface Patch](./accepted/121-0461-published-surface-patch.md) | [`121-…-handoff.md`](./handoffs/121-0461-published-surface-patch-handoff.md) |
 
 ## Archive
 
