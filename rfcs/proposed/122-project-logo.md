@@ -164,15 +164,32 @@ a brand/style guide                  — one mark, four surfaces, no system
 
 ## 10. Open questions — both the owner's, both blocking
 
-**These must be answered before implementation starts.** They are not implementer decisions.
+**Q1 is answered. Q2 remains open** and must be settled before implementation starts. Neither is an
+implementer decision.
+
+**Q1 — ANSWERED by the owner, 2026-08-28. Drop the tagline.**
 
 ```text
-Q1  The candidate sheet prints "Math • Tensor • Rust" beneath the wordmark,
-    which reads as a definition of the name. The repository has NEVER stated
-    where "matten" comes from (E11), and mat(rix)+ten(sor) fits at least as
-    well. Is this the actual origin?
-    -> If not, the tagline is a claim the documentation has never made, on the
-       one artefact hardest to correct later. Change it or drop it.
+The name comes from a Japanese dialect phrase meaning "I waited for", chosen
+because it sounds pleasant. "Math • Tensor • Rust" is a coincidence the owner
+enjoys but does not wish to assert:
+
+    "I enjoy the misleading but it is not necessary to intentionally show."
+
+DECISION: remove "Math • Tensor • Rust" from every asset — the wordmark
+lockup and the social preview (§8).
+
+The coincidence still works. It simply stops being CLAIMED, which is the
+whole difference: a reader who notices mat(rix)+ten(sor) is delighted; a
+reader told that is what it means has been told something untrue. E11 stands
+— the repository has never stated the origin, and this RFC does not add one.
+
+If a descriptor is wanted under the wordmark, it must describe the LIBRARY,
+not the name. The coloured-dot device carries any three words equally well.
+Recommended: nothing at all, or the crate's own description.
+```
+
+```text
 
 Q2  The mark is a 3×3 cube with coloured facelets, used as a source identifier.
     The pastel palette and absent black frame reduce the Rubik's Cube
@@ -181,7 +198,7 @@ Q2  The mark is a 3×3 cube with coloured facelets, used as a source identifier.
        expensive once the mark is established.
 ```
 
-Q1 also determines Change D: the social preview carries the tagline.
+Q1's resolution reaches Change D directly: the social preview must not carry the tagline either.
 
 ## 11. Risks
 
