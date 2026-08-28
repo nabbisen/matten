@@ -164,8 +164,9 @@ a brand/style guide                  — one mark, four surfaces, no system
 
 ## 10. Open questions — both the owner's, both blocking
 
-**Q1 is answered. Q2 remains open** and must be settled before implementation starts. Neither is an
-implementer decision.
+**Both questions are answered** (2026-08-28) and implementation may proceed on them. They are recorded
+with their reasoning because neither was an implementer decision and neither should be re-opened
+without new information.
 
 **Q1 — ANSWERED by the owner, 2026-08-28. Drop the tagline.**
 
@@ -189,13 +190,34 @@ not the name. The coloured-dot device carries any three words equally well.
 Recommended: nothing at all, or the crate's own description.
 ```
 
-```text
+```te**Q2 — ANSWERED 2026-08-28. Keep the 3×3 cube. The concern does not survive scrutiny.**
 
-Q2  The mark is a 3×3 cube with coloured facelets, used as a source identifier.
-    The pastel palette and absent black frame reduce the Rubik's Cube
-    resemblance materially; they do not remove the reference.
-    -> Not a legal opinion and not mine to decide. Cheap to consider now,
-       expensive once the mark is established.
+```text
+Raised at review, then withdrawn on the owner's challenge. Recorded here with
+its reasoning so it is not re-raised from scratch by the next reader.
+
+WHY IT IS NOT A PROBLEM
+  - a 3x3x3 cube is the canonical picture of a RANK-3 TENSOR. That is what
+    this library holds. The puzzle occupies the same geometry; the mark is
+    not borrowing it.
+  - trademark is class-specific and confusion-based. A Rust numerical library
+    is not a puzzle toy, and nobody installs `matten` expecting one.
+  - the EU 3-D shape mark was invalidated on FUNCTIONALITY grounds — the
+    rotating mechanism. Name marks persist; the shape is not the asset.
+  - the palette is pastel yellow/green/purple, not the classic six, with no
+    black frame and softened facelets.
+  - the semantic worry ("a puzzle means difficulty, matten claims ease") is
+    answered by the artwork itself: the cube is SOLVED — three faces, three
+    uniform colours — and it is HELD IN A PALM. Scrambled says problem;
+    solved and held says order and manageable.
+
+AND THE 2x2 ALTERNATIVE IS WITHDRAWN TOO. It was offered partly on
+legibility grounds, and E6 does not support that: the cube-only crop reads
+clearly at 32px and 48px as 3x3. Only 16px is marginal, and the SVG (§5) can
+be tuned for that one case. 2x2 would have bought almost nothing and cost the
+correct tensor picture.
+
+DECISION: 3x3, unchanged, in both the full mark and the small mark.
 ```
 
 Q1's resolution reaches Change D directly: the social preview must not carry the tagline either.
@@ -214,7 +236,7 @@ R6  Scaling the full mark down for the favicon instead of using the small
     mark. It is unidentifiable at 16px (E5) and no export setting fixes it.
 R7  Adding html_logo_url "while we are here". It is a release, and not one
     0.46.1 can carry (§9).
-R8  Starting before Q1 and Q2 are answered (§10).
+R8  Re-raising §10's questions from scratch. Both are settled, with reasons.
 ```
 
 ## 12. Acceptance criteria
@@ -230,7 +252,7 @@ R8  Starting before Q1 and Q2 are answered (§10).
 [ ] the built book serves the new favicons — verified by grepping built HTML
     and confirming the emitted hashed filenames changed
 [ ] book.toml unchanged
-[ ] Q1 and Q2 answered by the owner before implementation
+[ ] the tagline is absent from every asset (§10 Q1); the cube stays 3×3 (Q2)
 [ ] nine guards; check-doc-code.sh under RUSTFLAGS="-D warnings"; mdbook build clean
 [ ] no version bump, no tag, no publish, no crates/** change
 ```
