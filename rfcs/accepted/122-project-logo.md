@@ -1,6 +1,9 @@
 # RFC-122: Project Logo — Assets and the Unpublished Surfaces
 
-**Status:** Proposed
+**Status:** **Accepted** 2026-08-28 by the owner, with a **split execution**: Changes A and A.1 (the
+assets and the small mark) are performed by the high-capability model; Changes B, C and D are handed
+over with the assets already in place. Handoff: `rfcs/handoffs/122-project-logo-handoff.md`.
+Both §10 questions are answered. No version, no tag, no publish.
 **Target:** `assets/` (new, workspace root), `README.md`, `docs/theme/`, `docs/book.toml`
 **Theme:** Give the project a face on the surfaces that need no release, and keep it out of the
 published packages
@@ -63,11 +66,30 @@ measured by me — this project's record says that is reason enough to check.
 
 ```text
 assets/                              NEW, at the workspace root
-  matten-logo.png                    512px, RGBA, 128 colours, no dither  (~70 KB)
-  matten-logo-dark.png               the dark variant from the candidate sheet
+  matten-logo.png                    512px, RGBA, 128 colours, no dither
   matten-mark.svg                    the small mark — see §5
   matten-social.png                  1280×640 wide lockup (§8)
 ```
+
+> **Implemented 2026-08-28 (Changes A and A.1). One design change, found by measuring.**
+>
+> **No dark variant is needed, and E1's premise was wrong in a useful way.** Removing the white
+> surround also lifts the cream plate — the two are close enough in value that one flood-fill takes
+> both. The result is the mark on transparency, and it was composited against GitHub light
+> (`#ffffff`) and GitHub dark (`#0d1117`) and inspected: **the single file works on both.** On dark,
+> the facelet gaps become dark and the mark reads *better* than on light. Checked for halo against
+> magenta — none.
+>
+> ```text
+> assets/matten-logo.png    512×512 RGBA    26,580 bytes   (was 1,153,513 — 43× smaller)
+> assets/matten-mark.svg    hand-authored    2,504 bytes
+> assets/matten-social.png  1280×640       124,043 bytes
+>                                          -------------
+>                                          153,127 bytes total
+> ```
+>
+> This **simplifies Change B**: one `<img>`, no `<picture>`, no dark asset to keep in sync. §6 is
+> amended accordingly.
 
 ```text
 DO NOT place any of these under crates/*/. Anything inside a package directory
@@ -104,11 +126,11 @@ lockup and still reads as a cube. Verify by rendering at 16px and looking — do
 
 Above the existing badge block. Light and dark, via the element GitHub supports:
 
+**Amended after implementation (§4): one image, not a `<picture>` pair.** The asset is transparent
+and verified on both themes, so a dark variant would be a second file to keep in sync for no gain.
+
 ```text
-<picture>
-  <source media="(prefers-color-scheme: dark)"  srcset="<absolute URL to dark>">
-  <img alt="matten" src="<absolute URL to light>" width="200">
-</picture>
+<img alt="matten" src="<absolute raw.githubusercontent URL>" width="200">
 ```
 
 ```text
@@ -244,10 +266,10 @@ R8  Re-raising §10's questions from scratch. Both are settled, with reasons.
 ```text
 [ ] assets/ exists at the WORKSPACE ROOT; git diff touches no crates/** path
 [ ] cargo package --list for all five crates is UNCHANGED — asserted, not assumed
-[ ] logo PNGs are 512px, RGBA, 128 colours, no dither; each under ~100 KB
-[ ] assets/matten-mark.svg exists, renders as a cube at 16px, and is verified
-    by looking at it rendered — not by assuming
-[ ] README hero present, <picture> with a dark variant, ABSOLUTE URLs, alt text
+[ ] assets/ carries matten-logo.png, matten-mark.svg, matten-social.png (A, A.1 — done)
+[ ] assets/matten-mark.svg renders as a cube at 16px — DONE and verified by
+    rendering at 16/32/48/64 and looking; 3×3 holds at 16px
+[ ] README hero present, ABSOLUTE URL, alt text (one image — see §4's note)
 [ ] docs/theme/favicon.png AND favicon.svg both overridden
 [ ] the built book serves the new favicons — verified by grepping built HTML
     and confirming the emitted hashed filenames changed

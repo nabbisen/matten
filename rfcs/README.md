@@ -148,6 +148,7 @@ sign-off and implementation — not that the state is unused.
 | ID | Title | Handoff |
 |---:|---|---|
 | 121 | [`0.46.1` — The Published-Surface Patch](./accepted/121-0461-published-surface-patch.md) | [`121-…-handoff.md`](./handoffs/121-0461-published-surface-patch-handoff.md) |
+| 122 | [Project Logo — Assets and the Unpublished Surfaces](./accepted/122-project-logo.md) | [`122-…-handoff.md`](./handoffs/122-project-logo-handoff.md) |
 
 ## Archive
 
