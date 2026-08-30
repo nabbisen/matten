@@ -1,8 +1,9 @@
 # RFC-124: A Simpler, Softer Mark
 
-**Status:** **Accepted** 2026-08-28 by the owner. Performed by the high-capability model — asset
-production and mechanical regeneration, **no Developer Handoff** (see `accepted/README.md`).
-No version, no tag, no publish.
+**Status:** **Implemented** 2026-08-31. Five asset files replaced, **every filename unchanged**, so
+no markup edit was needed — `README.md` and `docs/book.toml` have empty diffs. mdBook's emitted
+favicon hashes changed (`72702a55`/`e1714371` → `905a5a24`/`c7cc3629`), verified against the built
+HTML. Asset production, so no Developer Handoff. No version, no tag, no publish.
 **Target:** `assets/`, `docs/theme/`
 **Theme:** Replace the mark with one that matches the positioning it is meant to carry
 **Related:** RFC-122 (the mark being replaced), RFC-094 §4.3 (no release), RFC-121 / RFC-123
