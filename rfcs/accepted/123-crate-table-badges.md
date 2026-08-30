@@ -1,6 +1,9 @@
 # RFC-123: Move the Per-Crate Badges into the Crate Table
 
-**Status:** Proposed
+**Status:** **Accepted** 2026-08-28 by the owner. **BLOCKED — do not start.** Implementation waits
+until `0.46.1` is tagged and published: RFC-121 asserts the five `0.46.x` references in `README.md`
+are unchanged, and those five are exactly the Version cells Change C deletes (§7). Handoff:
+`rfcs/handoffs/123-crate-table-badges-handoff.md`. No version, no tag, no publish.
 **Target:** `README.md`, `scripts/check-release-docs.sh`
 **Theme:** Make an incomplete crate list structurally visible instead of merely unlikely
 **Related:** RFC-030 (lock-step versioning), RFC-117 (guards that cannot pass vacuously), RFC-121
