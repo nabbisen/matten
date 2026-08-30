@@ -1,5 +1,7 @@
 # matten
 
+<img alt="matten" src="https://raw.githubusercontent.com/nabbisen/matten/main/assets/matten-logo.png" width="200">
+
 [![license](https://img.shields.io/crates/l/matten.svg)](./LICENSE)
 [![matten docs.rs](https://img.shields.io/docsrs/matten?label=matten%20docs)](https://docs.rs/matten)
 [![matten-ndarray docs.rs](https://img.shields.io/docsrs/matten-ndarray?label=ndarray%20docs)](https://docs.rs/matten-ndarray)
