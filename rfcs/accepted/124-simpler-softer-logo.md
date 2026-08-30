@@ -1,6 +1,8 @@
 # RFC-124: A Simpler, Softer Mark
 
-**Status:** Proposed
+**Status:** **Accepted** 2026-08-28 by the owner. Performed by the high-capability model — asset
+production and mechanical regeneration, **no Developer Handoff** (see `accepted/README.md`).
+No version, no tag, no publish.
 **Target:** `assets/`, `docs/theme/`
 **Theme:** Replace the mark with one that matches the positioning it is meant to carry
 **Related:** RFC-122 (the mark being replaced), RFC-094 §4.3 (no release), RFC-121 / RFC-123
