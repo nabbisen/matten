@@ -1,9 +1,11 @@
 # RFC-122: Project Logo — Assets and the Unpublished Surfaces
 
-**Status:** **Accepted** 2026-08-28 by the owner, with a **split execution**: Changes A and A.1 (the
-assets and the small mark) are performed by the high-capability model; Changes B, C and D are handed
-over with the assets already in place. Handoff: `rfcs/handoffs/122-project-logo-handoff.md`.
-Both §10 questions are answered. No version, no tag, no publish.
+**Status:** **Implemented** 2026-08-31. Changes A and A.1 in *"Add logo assets and accept RFC-122
+with handoff for the remaining surfaces"* (`f499d0a`); Changes B and C in *"Put the logo on the
+README hero and the mdBook favicon (RFC-122)"* (`ae588fd`), reviewed and approved after **one minor
+correction** (alt text), applied. Change D is an owner action outside any diff: set
+`assets/matten-social.png` as the repository social preview. No `crates/` change, so no release;
+docs.rs waits for `0.47.0` (§9). Handoff: `rfcs/handoffs/122-project-logo-handoff.md`.
 **Target:** `assets/` (new, workspace root), `README.md`, `docs/theme/`, `docs/book.toml`
 **Theme:** Give the project a face on the surfaces that need no release, and keep it out of the
 published packages
