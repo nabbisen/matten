@@ -1,7 +1,10 @@
 # RFC-126: The Favicon Should Be the Mark
 
-**Status:** **Accepted** 2026-08-31 by the owner. Performed by the high-capability model — asset
-production, **no Developer Handoff** (see `accepted/README.md`). No version, no tag, no publish.
+**Status:** **Implemented** 2026-08-31. `docs/theme/favicon.svg` now carries the artwork embedded at
+a 128px source (6,726 bytes); `favicon.png` is 32×32 downscaled from `assets/matten-logo.png`;
+`assets/matten-mark.svg` is deleted after re-deriving that nothing consumes it. The emitted favicon
+rendered at 32px was compared against `assets/matten-logo.png` at 32px and **matches**. Hashes moved
+`d896f3e4`/`5baa6546` → `cb2a668f`/`0458a13a`. No version, no tag, no publish.
 **Target:** `docs/theme/`, `assets/`
 **Theme:** Serve the actual artwork in the browser tab, and delete the file that displaced it
 **Related:** RFC-125 §6 (the decision being reversed), RFC-122 §C, RFC-094 §4.3 (no release)
