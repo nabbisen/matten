@@ -1,8 +1,10 @@
 # RFC-121: `0.46.1` — The Published-Surface Patch
 
-**Status:** **Accepted** 2026-08-28 by the owner. Not yet implemented. Handoff:
-`rfcs/handoffs/121-0461-published-surface-patch-handoff.md`. **The tag and the publish are NOT
-authorized by this acceptance** — each is a separate owner authorization at the time (RFC-094 §5).
+**Status:** **Implemented** 2026-08-31 in commit *"Prepare 0.46.1: retarget 21 live pins, add the
+Fixed changelog entry (RFC-119)"* (`89e3e91`), reviewed and approved after **one required
+correction** — the CHANGELOG dated `matten-stats`' first release to `0.38.0`; it shipped at
+`0.39.0`, and the wrong date came from this RFC's own §6. Applied. **Prepared, not yet tagged** at
+the time of closing. Handoff: `rfcs/handoffs/121-0461-published-surface-patch-handoff.md`.
 **Target:** `Cargo.toml`, live version pins, `CHANGELOG.md`
 **Theme:** Publish RFC-119's corrections — the only way they reach a reader
 **Related:** RFC-094 §4.1 (as amended by RFC-120), RFC-030, RFC-118, RFC-119, RFC-103
