@@ -110,7 +110,7 @@ pub enum MattenMlprepError {
 ## Compatibility
 
 - **SemVer:** pre-1.0 (`0.x`). A `0.x` minor bump may break and carries migration
-  notes; patch releases are additive only. Pin the release explicitly (`matten-mlprep = "0.46.0"`).
+  notes; patch releases are additive only. Pin the release explicitly (`matten-mlprep = "0.46.1"`).
 - **MSRV:** Rust 1.85 (edition 2024).
 - **`matten`:** released with the `0.46.x` family version (RFC-030). The published
   manifest uses the workspace's broad pre-1.0 core requirement for maintenance

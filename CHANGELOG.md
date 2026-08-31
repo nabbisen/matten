@@ -26,6 +26,27 @@ crates are expressed by per-crate status labels, not by separate version numbers
 > trigger — unfired across eight consecutive releases before RFC-074 found
 > it — a mandatory per-entry check rather than a rule that only an RFC states.
 
+## [0.46.1] - 2026-08-31
+
+RFC-119 release: a panicking example and four false statements, corrected. No public API changed
+and no behavior changed — the corrections are to a demonstration and to prose.
+
+### Fixed
+
+- `21_matrix_vector_product` panicked when run — it multiplied a `[2]` vector by a `[3,2]`
+  transpose, violating the shape rule its own comment stated. Shipped in every release since
+  `0.17.0`. (RFC-119)
+- The crate-root documentation described dynamic slicing as guarded; it has been available since
+  `0.44.0`. (RFC-102, corrected by RFC-119)
+- Two READMEs stated that zero-sized dimensions are rejected; they have been accepted since
+  `0.46.0`. (RFC-111, corrected by RFC-119)
+- The core statistics module described `matten-stats` as a possible future companion; it has
+  shipped since `0.39.0`. (RFC-119)
+
+### Version
+
+- Release bump `0.46.0` -> `0.46.1`, lock-step.
+
 ## [0.46.0] - 2026-08-09
 
 RFC-110, RFC-111, and RFC-112 release: empty-tensor axis-reduction semantics, zero-sized

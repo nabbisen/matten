@@ -65,7 +65,7 @@ including async and resumability).
 
 ```toml
 [dependencies]
-matten-data = { version = "0.46.0", features = ["streaming"] }
+matten-data = { version = "0.46.1", features = ["streaming"] }
 ```
 
 ```rust
