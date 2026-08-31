@@ -1,6 +1,8 @@
 # RFC-127: The Unbounded Dimension
 
-**Status:** Proposed
+**Status:** **Accepted** 2026-09-01 by the owner. Not yet implemented. Handoff:
+`rfcs/handoffs/127-the-unbounded-dimension-handoff.md`. Ships as `0.46.2`, prepared by a separate
+release RFC. No version bump, tag, or publish in this RFC.
 **Target:** `crates/matten/src/shape.rs`, `math.rs`, `slice.rs`, `stats.rs`, `tensor.rs`,
 `parse/csv.rs`, `Cargo.toml`
 **Theme:** Close every process abort in the external audit, and the silent wrong answer beside it
