@@ -4,7 +4,8 @@
 **Design authority:** `rfcs/proposed/129-result-zone-arithmetic.md`
 **Base:** after RFC-127 ships. Rides `0.47.0`, not a patch. See §2.
 
-> **PENDING ACCEPTANCE.** RFC-129 is in `proposed/`. **Do not start** until the owner accepts it.
+> **ACCEPTED 2026-09-01 and PRIORITIZED.** The owner authorized `0.47.0` early under RFC-094 §4.2(c)
+> specifically to move this forward. **You may start.** It runs in parallel with RFC-127 — see §2.1.
 
 > **Priority rule.** The RFC is the design authority; this handoff never overrides it. Where the two
 > disagree, **raise it before proceeding**. A pure addition in the handoff you can simply omit may be
@@ -28,6 +29,18 @@ no hostile input needed.
 
 **Practical consequence for you:** your diff will include `public-api-snapshot.md` rows, which
 RFC-121's release explicitly forbade. Do not carry that instruction forward — see §5.
+
+### 2.1 Parallel with RFC-127, and one trap
+
+RFC-127 and this may run at the same time; their files are disjoint. But:
+
+```text
+crates/matten/src/ops/tensor_ops.rs    <- the operators. YOURS.
+crates/matten/src/tensor/ops.rs        <- an RFC-127 allocation site. NOT yours.
+```
+
+**Two different files, near-identical paths.** The audit's own text uses both spellings. Confirm the
+path before editing, and if you find yourself in `tensor/ops.rs`, stop.
 
 ## 3. The gap
 

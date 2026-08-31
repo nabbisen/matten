@@ -1,6 +1,9 @@
 # RFC-129: Result-Zone Arithmetic
 
-**Status:** Proposed
+**Status:** **Accepted** 2026-09-01 by the owner, and **prioritized** — the owner exercised RFC-094
+§4.2(c) to authorize `0.47.0` sooner, which is the only lever that moves this ahead of a patch.
+Handoff: `rfcs/handoffs/129-result-zone-arithmetic-handoff.md`. Runs in parallel with RFC-127; the
+two touch disjoint files (§7.1). No version bump, tag, or publish in this RFC.
 **Target:** `crates/matten/src/ops/`, `docs/src/reference/`, `docs/src/reference/compatibility.md`
 **Theme:** Give the four operators most likely to exceed the budget a recoverable twin
 **Related:** RFC-094 §4.1 (why this cannot ride a patch), RFC-127, RFC-018, RFC-001 §10
@@ -107,6 +110,13 @@ judgement about risk.
 
 **The lever that changes it is authorizing `0.47.0` sooner** — RFC-094 §4.2(c), the owner asks. This
 RFC does not assume that authorization.
+
+### 6.1 Running in parallel with RFC-127
+
+The two may proceed together — their targets are disjoint. **One trap:** the operators live in
+`crates/matten/src/ops/tensor_ops.rs`, while one of RFC-127's unguarded allocation sites is
+`crates/matten/src/tensor/ops.rs`. **Two different files with near-identical paths.** Confirm which
+you are editing before you edit it; the audit's own text uses both spellings.
 
 ## 7. Scope
 
