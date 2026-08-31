@@ -1,7 +1,9 @@
 # RFC-125: The Owner's Simplified Mark
 
-**Status:** **Accepted** 2026-08-31 by the owner. Performed by the high-capability model — asset
-production, **no Developer Handoff** (see `accepted/README.md`). No version, no tag, no publish.
+**Status:** **Implemented** 2026-08-31. Five asset files replaced, every filename unchanged, so
+`README.md` and `docs/book.toml` have empty diffs. mdBook's emitted favicon hashes changed
+(`905a5a24`/`c7cc3629` → `d896f3e4`/`5baa6546`), verified against the built HTML. **Two deviations
+from §7, both recorded in §12.1.** No version, no tag, no publish.
 **Target:** `assets/`, `docs/theme/`
 **Theme:** Adopt the owner's regenerated artwork — the original composition, cube simplified
 **Related:** RFC-122 (first mark), RFC-124 (second, superseded), RFC-094 §4.3 (no release)
@@ -178,3 +180,33 @@ R7  Treating this as a release. No crate content changes.
 **RFC-124 is superseded three days after it closed.** That is the cost of having read a narrow
 measurement as a broad mandate, and it is cheap only because every logo change so far has stayed
 outside the published packages.
+
+---
+
+## 12.1 Deviations found during implementation
+
+**§7's prescribed fix did not work, and could not have.** It asked for a wider flood-fill fuzz until
+the plate's bottom edge artifact disappeared. Measured:
+
+```text
+plate cream   #FCF3E7
+white surround #FDFEFE      -> they differ by ~2%
+```
+
+No fuzz value separates them: below ~6% the artifact survives; above it, the flood-fill reaches
+*through* the plate and starts eating the tan sweeps. Rendered at 8%, 14% and 20% against `#0d1117`
+to confirm — 14% already showed notches bitten out of the sweeps.
+
+**What was done instead:** the plate boundary was located *geometrically* rather than by colour. Its
+bounding box was measured by scanning for the cream signature (`r - b >= 12`) along a row and a
+column — `x = 18..1233`, `y = 17..1237`, i.e. **the plate nearly fills the frame and the white sits
+only in the corners**, which is why colour-trim could not find it. The mark is now that crop with a
+rounded-rectangle alpha mask at radius 118. No colour matching, so no erosion, and the artifact is
+gone — verified by looking at `#0d1117`, not by assuming.
+
+**Consequence, and a visible design difference worth stating:** this **retains the cream plate**,
+where RFC-122 and RFC-124 removed it and let the mark float. Removal is not available for this
+artwork — plate and surround cannot be told apart by colour — and the artwork is drawn as an app
+icon, so it is kept as one: a rounded tile with transparent corners. It reads correctly on both
+`#ffffff` and `#0d1117`.
+

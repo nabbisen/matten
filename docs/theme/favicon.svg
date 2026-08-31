@@ -1,25 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="matten">
   <title>matten</title>
-  <!-- RFC-124: a 2x2x2 cube — the smallest non-trivial rank-3 tensor — in a cradle.
-       Replaces RFC-122 A.1's 3x3x3 mark, which read as complicated against the
-       project's family positioning and failed below 64px at 27 facelets. -->
-  <path d="M 122 378 Q 256 492 390 378" fill="none" stroke="#9FBFA6" stroke-width="42" stroke-linecap="round"/>
-  <g fill="#F7CE93" stroke="#F7CE93" stroke-width="8" stroke-linejoin="round">
-    <polygon points="256.0,86.7 318.2,122.0 256.0,157.3 193.8,122.0"/>
-    <polygon points="182.0,128.7 244.2,164.0 182.0,199.3 119.8,164.0"/>
-    <polygon points="330.0,128.7 392.2,164.0 330.0,199.3 267.8,164.0"/>
-    <polygon points="256.0,170.7 318.2,206.0 256.0,241.3 193.8,206.0"/>
-  </g>
-  <g fill="#AECBB4" stroke="#AECBB4" stroke-width="8" stroke-linejoin="round">
-    <polygon points="113.9,174.2 176.1,209.5 176.1,281.8 113.9,246.5"/>
-    <polygon points="113.9,260.2 176.1,295.5 176.1,367.8 113.9,332.5"/>
-    <polygon points="187.9,216.2 250.1,251.5 250.1,323.8 187.9,288.5"/>
-    <polygon points="187.9,302.2 250.1,337.5 250.1,409.8 187.9,374.5"/>
-  </g>
-  <g fill="#CFBCE2" stroke="#CFBCE2" stroke-width="8" stroke-linejoin="round">
-    <polygon points="398.1,174.2 335.9,209.5 335.9,281.8 398.1,246.5"/>
-    <polygon points="398.1,260.2 335.9,295.5 335.9,367.8 398.1,332.5"/>
-    <polygon points="324.1,216.2 261.9,251.5 261.9,323.8 324.1,288.5"/>
-    <polygon points="324.1,302.2 261.9,337.5 261.9,409.8 324.1,374.5"/>
-  </g>
+  <!-- RFC-125 favicon lockup: the 2x2x2 cube alone, in the mark's own face colours.
+       Deliberately simpler than assets/matten-logo.png — at 16-32px the plate, sun
+       and palm do not resolve as forms, so the cube gets all the pixels. -->
+  <polygon points="256.0,102.0 333.4,146.0 256.0,190.0 178.6,146.0" fill="#FAA366" stroke="#FAA366" stroke-width="10" stroke-linejoin="round"/>
+  <polygon points="168.0,152.0 245.4,196.0 168.0,240.0 90.6,196.0" fill="#FCC769" stroke="#FCC769" stroke-width="10" stroke-linejoin="round"/>
+  <polygon points="344.0,152.0 421.4,196.0 344.0,240.0 266.6,196.0" fill="#FAA366" stroke="#FAA366" stroke-width="10" stroke-linejoin="round"/>
+  <polygon points="256.0,202.0 333.4,246.0 256.0,290.0 178.6,246.0" fill="#FCC769" stroke="#FCC769" stroke-width="10" stroke-linejoin="round"/>
+  <polygon points="85.3,205.0 162.7,249.0 162.7,337.0 85.3,293.0" fill="#7A9F95" stroke="#7A9F95" stroke-width="10" stroke-linejoin="round"/>
+  <polygon points="85.3,305.0 162.7,349.0 162.7,437.0 85.3,393.0" fill="#7A9F95" stroke="#7A9F95" stroke-width="10" stroke-linejoin="round"/>
+  <polygon points="173.3,255.0 250.7,299.0 250.7,387.0 173.3,343.0" fill="#7A9F95" stroke="#7A9F95" stroke-width="10" stroke-linejoin="round"/>
+  <polygon points="173.3,355.0 250.7,399.0 250.7,487.0 173.3,443.0" fill="#7A9F95" stroke="#7A9F95" stroke-width="10" stroke-linejoin="round"/>
+  <polygon points="426.7,205.0 349.3,249.0 349.3,337.0 426.7,293.0" fill="#AAA0C4" stroke="#AAA0C4" stroke-width="10" stroke-linejoin="round"/>
+  <polygon points="426.7,305.0 349.3,349.0 349.3,437.0 426.7,393.0" fill="#AAA0C4" stroke="#AAA0C4" stroke-width="10" stroke-linejoin="round"/>
+  <polygon points="338.7,255.0 261.3,299.0 261.3,387.0 338.7,343.0" fill="#AAA0C4" stroke="#AAA0C4" stroke-width="10" stroke-linejoin="round"/>
+  <polygon points="338.7,355.0 261.3,399.0 261.3,487.0 338.7,443.0" fill="#AAA0C4" stroke="#AAA0C4" stroke-width="10" stroke-linejoin="round"/>
 </svg>
