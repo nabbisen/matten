@@ -1,6 +1,7 @@
 # RFC-126: The Favicon Should Be the Mark
 
-**Status:** Proposed
+**Status:** **Accepted** 2026-08-31 by the owner. Performed by the high-capability model — asset
+production, **no Developer Handoff** (see `accepted/README.md`). No version, no tag, no publish.
 **Target:** `docs/theme/`, `assets/`
 **Theme:** Serve the actual artwork in the browser tab, and delete the file that displaced it
 **Related:** RFC-125 §6 (the decision being reversed), RFC-122 §C, RFC-094 §4.3 (no release)
