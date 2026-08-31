@@ -1,6 +1,7 @@
 # RFC-125: The Owner's Simplified Mark
 
-**Status:** Proposed
+**Status:** **Accepted** 2026-08-31 by the owner. Performed by the high-capability model — asset
+production, **no Developer Handoff** (see `accepted/README.md`). No version, no tag, no publish.
 **Target:** `assets/`, `docs/theme/`
 **Theme:** Adopt the owner's regenerated artwork — the original composition, cube simplified
 **Related:** RFC-122 (first mark), RFC-124 (second, superseded), RFC-094 §4.3 (no release)

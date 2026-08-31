@@ -151,6 +151,7 @@ sign-off and implementation — not that the state is unused.
 |---:|---|---|
 | 121 | [`0.46.1` — The Published-Surface Patch](./accepted/121-0461-published-surface-patch.md) | [`121-…-handoff.md`](./handoffs/121-0461-published-surface-patch-handoff.md) |
 | 123 | [Move the Per-Crate Badges into the Crate Table](./accepted/123-crate-table-badges.md) | [`123-…-handoff.md`](./handoffs/123-crate-table-badges-handoff.md) — **blocked until `0.46.1` ships** |
+| 125 | [The Owner's Simplified Mark](./accepted/125-the-owners-simplified-mark.md) | — *(asset production; none)* |
 
 ## Archive
 
