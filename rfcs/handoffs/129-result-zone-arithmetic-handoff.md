@@ -42,6 +42,27 @@ crates/matten/src/tensor/ops.rs        <- an RFC-127 allocation site. NOT yours.
 **Two different files, near-identical paths.** The audit's own text uses both spellings. Confirm the
 path before editing, and if you find yourself in `tensor/ops.rs`, stop.
 
+## 2.2 AMENDED 2026-09-01 — RFC-132 changed one of your expectations
+
+The owner has since decided RFC-132 **Option A**: limits bound allocations sized by caller-supplied
+values, **not** allocations sized by data already in memory. Arithmetic is the second kind.
+
+```text
+WAS  T2: a [2000,1000] pair returns Err rather than panicking
+NOW  a [2000,1000] pair returns Ok — there is no budget check on arithmetic
+```
+
+**`try_add` is still worth adding.** Its durable jobs are **broadcast incompatibility** and **dynamic
+tensors** (T3, T4), which do not change. Only the budget justification goes.
+
+```text
+THIS RFC NOW LANDS TOGETHER WITH RFC-132 Stage 2, in 0.47.0.
+Landing it alone would ship a test asserting behaviour RFC-132 then removes.
+```
+
+Replace T2 with: **a large in-memory pair returns `Ok`** — the positive assertion that the budget no
+longer applies here.
+
 ## 3. The gap
 
 ```text
@@ -125,7 +146,7 @@ R6  Shipping in a patch (§2).
 ```text
 T1  try_add/sub/mul/div return Ok with the same result the operator produces,
     for ordinary shapes
-T2  a [2000,1000] pair returns Err rather than panicking
+T2  SEE THE BANNER BELOW — this expectation changed on 2026-09-01
 T3  broadcast-incompatible shapes return Err, not a panic
 T4  a dynamic tensor returns Unsupported, not a panic
 T5  the operators still panic, with byte-identical messages

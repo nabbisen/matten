@@ -1,6 +1,9 @@
 # RFC-132: The Limit Policy, Made Coherent
 
-**Status:** Proposed — **this RFC asks for a decision before it asks for an implementation.**
+**Status:** **Stage 1 DECIDED 2026-09-01 — Option A, boundary-only**, authorized by the owner:
+*"Simple design and proactive protection are good."* Stage 2 (applying it) is **Accepted** and
+handed off: `rfcs/handoffs/132-the-limit-policy-made-coherent-handoff.md`. Rides `0.47.0` **with**
+RFC-129 — they interact (§12). No version bump, tag, or publish in this RFC.
 **Target:** `crates/matten/src/limits.rs` and every allocating operation; `RFC-018`'s policy
 **Theme:** Decide once what `MattenLimits` *is*, so no future operation has to re-derive it
 **Related:** RFC-018 (the policy this reopens), RFC-001 (the threat model that motivates it),
@@ -292,3 +295,92 @@ R5  Treating the audit's "8 of ~13" as authoritative. E7 — the denominator was
 **And it does not make the limit policy correct — it makes it decidable.** Today a maintainer adding
 an allocating operation has no rule to follow and must guess, which is how 8 of ~13 happened. The
 value of this RFC is that afterwards there is an answer, and it is the same answer every time.
+
+---
+
+## 12. Stage 2 — the decision, and the rule it produces
+
+**Option A is chosen.** The owner's reason, recorded: *"Simple design and proactive protection are
+good."*
+
+### 12.1 The rule, stated so a future operation can apply it unaided
+
+> **Limits bound allocations sized by a value the CALLER SUPPLIED as data — a shape, a count, a
+> parsed document. They do not bound allocations sized by data already in memory and already
+> validated.**
+
+That phrasing matters more than "boundary-only", because it is decidable without argument:
+
+```text
+LIMITS APPLY                              because the size comes from outside
+  try_new / try_zeros / try_ones / try_full / try_reshape   a caller-supplied shape
+  from_json / load_json / serde Deserialize                 a parsed document
+  from_csv / load_csv / from_csv_path / Table / CsvBatchReader
+  from_json_dynamic / from_csv_dynamic
+  slice_str                                                 a caller-supplied string
+  repeat / repeat_axis / tile / meshgrid                     a caller-supplied COUNT
+  max_parse_bytes at every file/string entry point           REQUIRED, see 12.3
+
+LIMITS DO NOT APPLY                       because the size comes from existing data
+  arithmetic (+ - * /) and their try_ twins
+  reductions, axis reductions, statistics
+  matmul / dot / outer / trace / norm
+  slicing an existing tensor
+  concatenate / stack        (output <= the sum of inputs already in memory)
+```
+
+**`repeat`/`tile` stay guarded** even though they operate on an existing tensor, because the
+multiplier is a caller-supplied number — the size does not come from the data.
+
+### 12.2 What changes for a user
+
+```text
+&big + &big        panics today  ->  works. This is a BEHAVIOUR CHANGE and a
+                                     `Changed` CHANGELOG entry.
+try_new(hostile)   accepted today -> rejected (RFC-127 already does this)
+load_json(10 GB)   unbounded today -> refused (12.3)
+```
+
+### 12.3 `max_parse_bytes` becomes required, not optional
+
+Under Option A it is no longer an anomaly — it is **the** boundary control, and the one place the
+model most obviously demands enforcement. Enforce it in `load_json`, `load_csv`, `from_csv_path` and
+the string parsers, then **delete the "do not yet enforce" note** from its rustdoc.
+
+### 12.4 The three `_with_limits` constructors
+
+`try_zeros_with_limits`, `try_ones_with_limits`, `try_full_with_limits` **keep working and keep their
+meaning** — they take a caller-supplied shape, which is exactly the case limits govern. No
+deprecation. Option A does not shrink their purpose; it explains it.
+
+### 12.5 Two sentences that must change
+
+```text
+limits.rs   "the single source of truth for all allocation budgets" is FALSE and
+            becomes false in a new way under A. Rewrite it to state the rule in
+            12.1.
+the broadcast panic message   currently advises "increase the limit", a remedy
+            that does not exist. Under A that check is REMOVED, so the message
+            goes with it. Verify no other message makes the same offer.
+```
+
+## 13. Interaction with RFC-129 — both must land together
+
+**RFC-129 was accepted before this decision and its handoff contradicts it.**
+
+```text
+RFC-129 handoff T2:  "a [2000,1000] pair returns Err rather than panicking"
+under Option A:      that pair returns Ok
+```
+
+RFC-129 remains worth doing — `try_add` is still the Result-zone twin for **broadcast
+incompatibility** and **dynamic tensors**, which are its durable jobs. Only its budget-related
+justification evaporates.
+
+```text
+SEQUENCE:  RFC-127 -> 0.46.2
+           RFC-132 Stage 2 AND RFC-129 together -> 0.47.0
+```
+
+Landing RFC-129 first would ship a test asserting behaviour this RFC then removes. **RFC-129's handoff
+has been amended accordingly.**

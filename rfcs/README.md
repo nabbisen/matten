@@ -158,6 +158,7 @@ sign-off and implementation — not that the state is unused.
 | 128 | [Property Testing](./accepted/128-property-testing.md) | [`128-…-handoff.md`](./handoffs/128-property-testing-handoff.md) — after RFC-127 |
 | 130 | [Repository Governance Files](./accepted/130-repository-governance-files.md) | [`130-…-handoff.md`](./handoffs/130-repository-governance-files-handoff.md) — **blocked**: private reporting is off |
 | 131 | [Documentation Corrections, Batched](./accepted/131-documentation-corrections-batch.md) | [`131-…-handoff.md`](./handoffs/131-documentation-corrections-batch-handoff.md) — after RFC-127 |
+| 132 | [The Limit Policy, Made Coherent](./accepted/132-the-limit-policy-made-coherent.md) | [`132-…-handoff.md`](./handoffs/132-the-limit-policy-made-coherent-handoff.md) — **Option A decided**; lands with RFC-129 |
 
 ## Archive
 
