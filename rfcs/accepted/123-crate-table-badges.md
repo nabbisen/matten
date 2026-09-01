@@ -11,6 +11,34 @@ are unchanged, and those five are exactly the Version cells Change C deletes (§
 
 ---
 
+> **AMENDED 2026-09-01 — Changes A, B and C were performed by the owner directly**, in commit *"Clean
+> up the README top and move the per-crate badges into the crate table"*. **Only Change D remains.**
+>
+> ```text
+> A  badges moved into the crate table                 DONE
+> B  matten-stats' two badges added                    DONE — the eight-release gap is closed
+> C  the Version column's hand-maintained strings gone DONE, differently: the column
+>    was KEPT and its content replaced with badges, rather than the column being
+>    removed. The effect this RFC wanted is achieved — the five `0.46.x family`
+>    strings no longer exist, so they no longer need retargeting every minor.
+> D  the guard                                          NOT DONE — and now provably
+>    vacuous: `grep -cE '^\| \[.*\]\(.*\) \| [0-9]+\.[0-9]+\.[0-9]+ ' README.md`
+>    returns **0**. It can never match again.
+> ```
+>
+> **What the implementer must do is now Change D and nothing else.** Do not move badges, do not touch
+> the table — that work is finished and re-doing it would revert the owner's layout.
+>
+> **Two measured consequences, verified 2026-09-01:**
+>
+> ```text
+> all five crates carry BOTH badges          verified per crate
+> the table still renders                    4 cells per row
+> the family-version paragraph survived      byte-identical, as §5 required
+> live `0.46.x` references: 13 -> 8          README's five are gone; future release
+>                                            RFCs must re-derive, which they already require
+> ```
+
 ## 1. Summary
 
 ```text

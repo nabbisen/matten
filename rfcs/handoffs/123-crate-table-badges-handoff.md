@@ -10,9 +10,23 @@
 
 ---
 
+> **AMENDED 2026-09-01 — most of this task is already done.** The owner performed Changes A, B and C
+> directly. **Your task is now Change D only: replace the guard.**
+>
+> ```text
+> DO NOT move badges. DO NOT edit the crate table. DO NOT remove the Version
+> column. All of that is finished, and redoing it would revert the owner's layout.
+> ```
+>
+> The guard is now **provably** vacuous — its pattern matches **0** rows in `README.md` and can never
+> match again, which is precisely the condition §6 was written to prevent. Read §6 and §6.1; ignore
+> §4 and §5.
+>
+> **The blocker below is also lifted** — `0.46.1` shipped on 2026-08-31.
+
 ## 1. DO NOT START THIS YET
 
-**This task is blocked, and starting it early breaks work already in flight.**
+~~**This task is blocked, and starting it early breaks work already in flight.**~~ **LIFTED — `0.46.1` shipped 2026-08-31.** The original reasoning is kept below as the record of why it was held.
 
 ```text
 RFC-121 (0.46.1) is accepted and in progress. Its acceptance criteria include:
