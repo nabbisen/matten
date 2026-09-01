@@ -1,6 +1,10 @@
 # RFC-127: The Unbounded Dimension
 
-**Status:** **Accepted** 2026-09-01 by the owner. Not yet implemented. Handoff:
+**Status:** **Accepted** 2026-09-01 by the owner. Implemented and reviewed — **approved with one
+small required correction** (`.git-exclude/reviewed/matten-rfc127-the-unbounded-dimension-review-v0.1.md`).
+**This RFC was itself corrected at review**: §6's cast list was missing the site E5 exercises, §8's
+site count was an estimate presented as fact, and E4's evidence was release-only. All three are
+marked in place. Handoff:
 `rfcs/handoffs/127-the-unbounded-dimension-handoff.md`. Ships as `0.46.2`, prepared by a separate
 release RFC. No version bump, tag, or publish in this RFC.
 **Target:** `crates/matten/src/shape.rs`, `math.rs`, `slice.rs`, `stats.rs`, `tensor.rs`,
@@ -71,7 +75,7 @@ dimension is ever bounded.** Before RFC-111, a zero dimension was rejected outri
 | E1 | `checked_shape_len` bounds the product only | `crates/matten/src/shape.rs:44-56`, direct read |
 | E2 | A degenerate shape validates through `from_json` **and** `try_new` | probe, both returned `Ok` |
 | E3 | An ordinary operation on it aborts, uncatchably | probe: allocation failure, `catch_unwind` did not recover |
-| E4 | `try_matmul` returns a structurally corrupt `Tensor` | probe: `shape.product() = 3.4e38`, `data.len() = 1` |
+| E4 | `try_matmul` returns a structurally corrupt `Tensor` **in release**; in **debug** it *panics* (`attempt to multiply with overflow`) — a `Result`-zone function panicking, which is a third and separate defect. **Corrected 2026-09-01:** the original probe ran release-only and reported one manifestation as the whole. | probe, both profiles: release `shape.product() = 3.4e38`, `data.len() = 1`; debug panics at `mm_mul`'s `m * p` |
 | E5 | `t.slice().index(usize::MAX)` returns **the last row**; `index(9)` correctly errors | probe on a `[2,3]` tensor → `Ok([3], [4,5,6])` |
 | E6 | No `try_add`/`try_sub`/`try_mul`/`try_div` exists | `grep` across `crates/matten/src` → nothing |
 | E7 | `Tensor::new` has no rustdoc; a `pub(crate)` helper absorbed its doc block | `RUSTFLAGS="-W missing_docs"` → warning at `tensor.rs:95` |
@@ -121,13 +125,42 @@ RFC-117 warned about.
 
 ## 6. Change C — the sign flip
 
-`slice.rs:301,302,311,320,335,336` cast `usize` to `isize`. Any value ≥ 2^63 becomes negative, and
-negative means "from the end" (RFC-088).
+`slice.rs` casts `usize` to `isize`. Any value ≥ 2^63 becomes negative, and negative means "from the
+end" (RFC-088).
+
+> **CORRECTED 2026-09-01, at implementation review. This RFC's original list was wrong in two ways,
+> and one of them would have left the defect alive.**
+>
+> ```text
+> WAS  "slice.rs:301,302,311,320,335,336 ... replace the six `as isize`"
+> ```
+>
+> ```text
+> the casts actually present :  301, 302, 310, 320, 335, 336, 389   -- SEVEN
+> 311                        :  does not exist; the line is 310
+> 389                        :  ABSENT from the original list entirely
+> ```
+>
+> **Line 389 is `SliceBuilder::index`'s `SliceSpec::Index(index as isize)`, and it is the only cast
+> `.index(usize::MAX)` reaches — which is E5, this RFC's own flagship reproduction.** The six listed
+> are the `IntoSliceRange` impls, reached only by `.range(…)`.
+>
+> Applying the original list literally would have fixed all six cited casts, satisfied every
+> acceptance criterion as written, and **left E5 returning the last row.** The implementer caught it
+> only because the handoff required deriving the list rather than trusting it.
+>
+> **The requirement is all seven**, and the fix shipped is a shared
+> `usize_to_isize_saturating` helper rather than per-site `isize::try_from` — accepted at review,
+> because saturating to `isize::MAX` reuses the existing bounds-check error path instead of adding a
+> new one, and keeps the builder methods infallible like every other method in that API.
 
 ```text
-replace the six `as isize` with isize::try_from, erroring on failure
-delete the comment at slice.rs:332-333, which tells the next reader this hazard
-    is already handled — it is not, and a false reassurance is worse than silence
+replace ALL SEVEN `as isize` casts so an out-of-range usize cannot become a
+    negative index
+the comment at slice.rs:332-333 told the next reader this hazard was already
+    handled — it was not. Replaced at review with an ACCURATE comment describing
+    the saturating mechanism, rather than deleted: the objection was to the false
+    claim, and the fix makes a true one worth having.
 ```
 
 **This is the most damaging finding for the project's positioning**, whatever its severity rating: a
@@ -150,7 +183,7 @@ one.
 ## 8. Change E — the invariant, asserted
 
 `shape.iter().product() == data.len()` is the crate's one global invariant. E4 shows it can be broken
-through a public `Result` API, and ~31 `Tensor { .. }` construction sites assert it only by
+through a public `Result` API, and **47** `Tensor { .. }` construction sites assert it only by
 convention.
 
 Add a **debug-only** assertion and call it from those sites. Under `cfg(debug_assertions)` it costs

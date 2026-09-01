@@ -94,8 +94,20 @@ approximation. A discrepancy is worth more than the edit.
 
 ## 6. Change C — the sign flip (`slice.rs`)
 
-Six `as isize` casts at `301, 302, 311, 320, 335, 336`. `usize::MAX as isize` is `-1`, and `-1` means
-"from the end" under RFC-088's negative indexing.
+**CORRECTED 2026-09-01 at review — this list was wrong and incomplete.**
+
+```text
+WAS  "Six `as isize` casts at 301, 302, 311, 320, 335, 336"
+ARE  SEVEN, at 301, 302, 310, 320, 335, 336, 389
+       311 does not exist (it is 310)
+       389 is SliceBuilder::index's cast — the ONLY one .index(usize::MAX)
+           reaches, which is E5, this task's flagship reproduction
+```
+
+Fixing only the six listed would have left E5 returning the last row while every acceptance criterion
+passed. It was caught because §5's instruction to derive rather than trust was followed here too.
+
+`usize::MAX as isize` is `-1`, and `-1` means "from the end" under RFC-088's negative indexing.
 
 ```text
 replace each with isize::try_from, returning the existing out-of-range Slice error
@@ -125,7 +137,7 @@ This is a correctness patch. A widening diff is how a patch stops being one.
 ## 8. Change E — the invariant, asserted in debug only
 
 `shape.iter().product() == data.len()` is the crate's one global invariant, and E4 shows a public
-`Result` API can break it. ~31 `Tensor { .. }` sites assert it by convention only.
+`Result` API can break it. **47** `Tensor { .. }` sites assert it by convention only. *(Corrected 2026-09-01 — the original figure "~31" was an estimate presented as fact.)*
 
 ```text
 add a debug-only assertion; call it from those construction sites
