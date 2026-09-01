@@ -8,6 +8,59 @@ RFC-127, RFC-129, external audit F-3/F-7/I-2/D-11
 
 ---
 
+## 0. The decision, in plain terms
+
+**The question is: when should `matten` refuse to allocate memory?**
+
+Right now it has three different answers depending on which function you call, and the error message
+it prints recommends something that does not work. This RFC asks you to pick one answer.
+
+### What a user experiences under each option
+
+Take a caller with a 2000×1000 tensor — 2 million numbers, about 16 MB. Ordinary data.
+
+| | **A. Boundary-only** *(recommended)* | **B. Per-tensor** | **C. Per-call** | **D. Leave it** |
+|---|---|---|---|---|
+| `big + big` | **works** | works if `big` was made with a raised budget | works if you pass a budget: `big.try_add_with(&b, &limits)` | **panics, and you cannot fix it** |
+| a hostile 36-byte JSON | **rejected** | rejected | rejected | rejected |
+| `matten` reads a 10 GB file | **refused** | refused | refused | *currently not refused at all* |
+| new operation added next year | **rule already decided** | rule already decided | rule already decided | maintainer guesses again |
+
+### What each option *means*
+
+```text
+A  Limits guard the DOOR, not the room.
+   matten checks sizes when data arrives from outside — a file, JSON, CSV, a
+   shape you were handed. Once it is in memory and valid, it is your data and
+   matten does not second-guess you.
+
+B  Each tensor carries its own budget, set when it is created, and every
+   operation on it respects that budget.
+
+C  You pass a budget to each operation that needs one, the way you already pass
+   a NumericPolicy to try_numeric_with.
+
+D  Keep today's behaviour. Delete the sentence claiming MattenLimits is "the
+   single source of truth", because it is not.
+```
+
+### Why I recommend A
+
+Not because of this bug — because of the next operation someone adds. **A gives one test that answers
+the question forever: does this read untrusted input?** B and C make every new operation decide
+again, which is exactly how the current situation arose.
+
+A also happens to fix three separate audit findings at once, and it is the only option under which
+`max_parse_bytes` — public, documented, and enforced nowhere — stops being an anomaly and becomes
+obviously required.
+
+**The cost of A, stated honestly:** a caller who asks for something genuinely enormous with their own
+in-memory data can exhaust their own memory, and `matten` will not stop them. NumPy and `ndarray`
+both work this way. It is a real change from today's intent, and it is the thing to disagree with if
+you are going to disagree.
+
+---
+
 ## 1. Summary
 
 ```text
