@@ -26,6 +26,32 @@ crates are expressed by per-crate status labels, not by separate version numbers
 > trigger — unfired across eight consecutive releases before RFC-074 found
 > it — a mandatory per-entry check rather than a rule that only an RFC states.
 
+## [0.46.2] - 2026-09-01
+
+RFC-127 release: an uncatchable process abort reachable from untrusted input, fixed. Three
+further defects found by the same audit are fixed alongside it.
+
+### Security
+
+- A malformed shape — reachable from untrusted JSON, or from any caller-supplied shape passed to
+  `try_new`/`try_reshape` — could make an ordinary operation abort the process. The abort was an
+  allocator failure, so it could **not** be caught with `catch_unwind`. Any application accepting
+  user-supplied JSON, or reshaping a tensor to a caller-supplied shape, inherited an uncatchable
+  denial of service. **CSV is not affected**: every CSV path derives its shape from the number of
+  rows and columns actually parsed, never from a declared shape. Fixed by bounding each individual
+  dimension, not only the shape product. (RFC-127)
+
+### Fixed
+
+- `slice().index(n)` with `n >= 2^63` silently returned a row counted from the end instead of
+  erroring — a wrong answer, not a failure. (RFC-127)
+- `try_matmul` could return a `Tensor` whose shape and data disagreed. (RFC-127)
+- `Tensor::new` had no rustdoc: a private helper had absorbed its doc block. (RFC-127)
+
+### Version
+
+- Release bump `0.46.1` -> `0.46.2`, lock-step.
+
 ## [0.46.1] - 2026-08-31
 
 RFC-119 release: a panicking example and four false statements, corrected. No public API changed
