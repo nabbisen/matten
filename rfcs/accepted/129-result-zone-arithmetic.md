@@ -10,6 +10,22 @@ two touch disjoint files (§7.1). No version bump, tag, or publish in this RFC.
 
 ---
 
+> **AMENDED by RFC-132's Stage-1 decision, 2026-09-01.** The owner chose the **boundary-only** limit
+> model: limits bound allocations sized by a caller-supplied value, **not** allocations sized by data
+> already in memory. **Arithmetic is the second kind, so the budget no longer applies to it.**
+>
+> ```text
+> WAS  "a [2000,1000] + [2000,1000] case returns Err rather than panicking"
+> NOW  that case returns Ok — there is no budget check on arithmetic
+> ```
+>
+> **This RFC still stands.** `try_add`'s durable jobs are **broadcast incompatibility** and **dynamic
+> tensors**; only its budget justification is superseded. §2's motivating example, E3, §9's fourth
+> criterion and §10 are corrected below and marked.
+>
+> **It now lands together with RFC-132 Stage 2 in `0.47.0`.** Landing it alone would ship a test
+> asserting behaviour RFC-132 then removes.
+
 ## 1. Summary
 
 ```text
@@ -36,6 +52,11 @@ a [2000,1000] tensor:
     try_concatenate correctly returns Err
     &big + &big   ->  PANIC, and there is no try_add anywhere in the API
 ```
+
+> **Superseded in part by RFC-132.** Under the boundary-only model this panic is *removed* rather than
+> converted to an `Err` — `&big + &big` simply works. What survives as this RFC's justification is the
+> rest of the Result-zone gap: **broadcast incompatibility and dynamic tensors still need a
+> recoverable twin**, and today they have none.
 
 **The external audit rates this the highest-likelihood finding in its report** — above the Critical —
 because it needs no hostile input at all. An ordinary user with ordinary data reaches it.
@@ -156,7 +177,8 @@ R6  Shipping this in a patch (§6).
     in the Err's Display where applicable
 [ ] the operators delegate to them; every pre-existing arithmetic test passes
     UNMODIFIED
-[ ] a [2000,1000] + [2000,1000] case returns Err rather than panicking
+[ ] a [2000,1000] + [2000,1000] case returns Ok  (AMENDED by RFC-132 — was
+    "returns Err rather than panicking"; the budget no longer applies here)
 [ ] dynamic tensors return Unsupported, not a panic
 [ ] no new MattenError variant
 [ ] compatibility.md and the arithmetic reference updated
@@ -170,9 +192,9 @@ R6  Shipping this in a patch (§6).
 ## 10. What this does not fix
 
 ```text
-- the budget itself. A caller still cannot raise max_elements for arithmetic;
-  MattenLimits is not threaded through these paths. That is the audit's
-  long-term item and a real design question, deferred deliberately.
+- (RESOLVED elsewhere) the budget question. RFC-132 answered it: the budget no
+  longer applies to arithmetic at all, so there is nothing to raise. This bullet
+  is kept, struck, as the record of what was open when this RFC was written.
 - the other Result-zone gaps, if any. This RFC closes the four the audit named;
   if you find a fifth convenience API without a twin, REPORT it rather than
   adding it here.

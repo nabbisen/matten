@@ -72,6 +72,9 @@ a [2000,1000] tensor:  constructs, .abs() works, .sum_axis(0) works,
                        &big + &big   ->  PANIC, with no try_add anywhere
 ```
 
+**Read §2.2 first.** Under RFC-132 that panic is *removed*, not converted to an `Err`. What survives
+as your justification is the rest of the gap — broadcast incompatibility and dynamic tensors.
+
 `Add`/`Sub`/`Mul`/`Div` are `std::ops` traits and **cannot** return `Result`. The operator panicking
 is not the defect. **The defect is that no recoverable alternative exists** — in the library whose
 stated proposition is legible, recoverable failure, and where nearly every other convenience API has a
@@ -146,7 +149,8 @@ R6  Shipping in a patch (§2).
 ```text
 T1  try_add/sub/mul/div return Ok with the same result the operator produces,
     for ordinary shapes
-T2  SEE THE BANNER BELOW — this expectation changed on 2026-09-01
+T2  a large in-memory pair returns Ok  (AMENDED by RFC-132 — see §2.2 ABOVE;
+    this was "returns Err" before the boundary-only model was decided)
 T3  broadcast-incompatible shapes return Err, not a panic
 T4  a dynamic tensor returns Unsupported, not a panic
 T5  the operators still panic, with byte-identical messages

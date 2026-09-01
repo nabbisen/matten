@@ -382,5 +382,7 @@ SEQUENCE:  RFC-127 -> 0.46.2
            RFC-132 Stage 2 AND RFC-129 together -> 0.47.0
 ```
 
-Landing RFC-129 first would ship a test asserting behaviour this RFC then removes. **RFC-129's handoff
-has been amended accordingly.**
+Landing RFC-129 first would ship a test asserting behaviour this RFC then removes. **RFC-129 has been amended accordingly — both its body and its handoff.**
+The body mattered more: its acceptance criteria still required the old behaviour, and the handoff's own
+priority rule makes the RFC authoritative, so correcting only the handoff would have left an
+implementer following the rules correctly into the wrong test.
