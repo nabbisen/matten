@@ -2,17 +2,10 @@
 
 <img alt="matten" src="https://raw.githubusercontent.com/nabbisen/matten/main/assets/matten-logo.png" width="200">
 
+[![documentation](https://img.shields.io/badge/docs-github_pages-brightgreen)](https://nabbisen.github.io/matten/)
 [![license](https://img.shields.io/crates/l/matten.svg)](./LICENSE)
-[![matten docs.rs](https://img.shields.io/docsrs/matten?label=matten%20docs)](https://docs.rs/matten)
-[![matten-ndarray docs.rs](https://img.shields.io/docsrs/matten-ndarray?label=ndarray%20docs)](https://docs.rs/matten-ndarray)
-[![matten-mlprep docs.rs](https://img.shields.io/docsrs/matten-mlprep?label=mlprep%20docs)](https://docs.rs/matten-mlprep)
-[![matten-data docs.rs](https://img.shields.io/docsrs/matten-data?label=data%20docs)](https://docs.rs/matten-data)
 [![CI Test](https://github.com/nabbisen/matten/actions/workflows/test.yaml/badge.svg)](https://github.com/nabbisen/matten/actions/workflows/test.yaml)
 [![CI Docs](https://github.com/nabbisen/matten/actions/workflows/docs.yaml/badge.svg)](https://github.com/nabbisen/matten/actions/workflows/docs.yaml)
-[![matten crates.io](https://img.shields.io/crates/v/matten.svg?label=matten)](https://crates.io/crates/matten)
-[![matten-ndarray crates.io](https://img.shields.io/crates/v/matten-ndarray.svg?label=ndarray)](https://crates.io/crates/matten-ndarray)
-[![matten-mlprep crates.io](https://img.shields.io/crates/v/matten-mlprep.svg?label=mlprep)](https://crates.io/crates/matten-mlprep)
-[![matten-data crates.io](https://img.shields.io/crates/v/matten-data.svg?label=data)](https://crates.io/crates/matten-data)
 
 **A family-car multidimensional array (tensor) library for Rust** —
 for learning, teaching, small workflows, and early prototypes, with a small,
@@ -26,11 +19,11 @@ This repository is a Cargo workspace, where core `matten` stays small and depend
 
 | Crate | Version | Status | What it is |
 |---|---|---|---|
-| [`matten`](./crates/matten) | 0.46.x family | stable (v0.x) | The core `f64` tensor library: construction, shape ops, broadcasting, slicing, reductions, matmul, JSON/CSV boundary APIs, and an optional `dynamic` ingestion on-ramp. |
-| [`matten-ndarray`](./crates/matten-ndarray) | 0.46.x family | production-ready | Conversion bridge between `matten::Tensor` and `ndarray::ArrayD<f64>`. |
-| [`matten-mlprep`](./crates/matten-mlprep) | 0.46.x family | production-ready | Transparent, deterministic preprocessing helpers (standardize, min-max scale, bias column, train/test split). |
-| [`matten-data`](./crates/matten-data) | 0.46.x family | production-ready | Small, honest CSV→tensor ingestion (`Table` with explicit missing-value handling and strict numeric conversion). Deliberately not a dataframe library. |
-| [`matten-stats`](./crates/matten-stats) | 0.46.x family | production-ready candidate | Small, explicit scalar statistics (`covariance`, `covariance_population`, `correlation`, `quantile`, `skewness`, `kurtosis`) over `matten::Tensor`. Estimator conventions differ per function, matching each function's own ecosystem default. |
+| [`matten`](./crates/matten) | [![matten crates.io](https://img.shields.io/crates/v/matten.svg?label=matten)](https://crates.io/crates/matten) [![matten docs.rs](https://img.shields.io/docsrs/matten?label=matten%20docs)](https://docs.rs/matten) | stable (v0.x) | The core `f64` tensor library: construction, shape ops, broadcasting, slicing, reductions, matmul, JSON/CSV boundary APIs, and an optional `dynamic` ingestion on-ramp. |
+| [`matten-ndarray`](./crates/matten-ndarray) | [![matten-ndarray crates.io](https://img.shields.io/crates/v/matten-ndarray.svg?label=ndarray)](https://crates.io/crates/matten-ndarray) [![matten-ndarray docs.rs](https://img.shields.io/docsrs/matten-ndarray?label=ndarray%20docs)](https://docs.rs/matten-ndarray) | production-ready | Conversion bridge between `matten::Tensor` and `ndarray::ArrayD<f64>`. |
+| [`matten-mlprep`](./crates/matten-mlprep) | [![matten-mlprep crates.io](https://img.shields.io/crates/v/matten-mlprep.svg?label=mlprep)](https://crates.io/crates/matten-mlprep) [![matten-mlprep docs.rs](https://img.shields.io/docsrs/matten-mlprep?label=mlprep%20docs)](https://docs.rs/matten-mlprep) | production-ready | Transparent, deterministic preprocessing helpers (standardize, min-max scale, bias column, train/test split). |
+| [`matten-data`](./crates/matten-data) | [![matten-data crates.io](https://img.shields.io/crates/v/matten-data.svg?label=data)](https://crates.io/crates/matten-data) [![matten-data docs.rs](https://img.shields.io/docsrs/matten-data?label=data%20docs)](https://docs.rs/matten-data) | production-ready | Small, honest CSV→tensor ingestion (`Table` with explicit missing-value handling and strict numeric conversion). Deliberately not a dataframe library. |
+| [`matten-stats`](./crates/matten-stats) | [![matten-stats crates.io](https://img.shields.io/crates/v/matten-stats.svg?label=stats)](https://crates.io/crates/matten-stats) [![matten-stats docs.rs](https://img.shields.io/docsrs/matten-stats?label=stats%20docs)](https://docs.rs/matten-stats) | production-ready candidate | Small, explicit scalar statistics (`covariance`, `covariance_population`, `correlation`, `quantile`, `skewness`, `kurtosis`) over `matten::Tensor`. Estimator conventions differ per function, matching each function's own ecosystem default. |
 
 All crates share one **family version** (RFC-030): matching numbers mean a
 matched, compatible set. A crate's **maturity is the Status column**, not its
