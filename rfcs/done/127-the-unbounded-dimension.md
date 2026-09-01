@@ -1,12 +1,6 @@
 # RFC-127: The Unbounded Dimension
 
-**Status:** **Accepted** 2026-09-01 by the owner. Implemented and reviewed — **approved with one
-small required correction** (`.git-exclude/reviewed/matten-rfc127-the-unbounded-dimension-review-v0.1.md`).
-**This RFC was itself corrected at review**: §6's cast list was missing the site E5 exercises, §8's
-site count was an estimate presented as fact, and E4's evidence was release-only. All three are
-marked in place. Handoff:
-`rfcs/handoffs/127-the-unbounded-dimension-handoff.md`. Ships as `0.46.2`, prepared by a separate
-release RFC. No version bump, tag, or publish in this RFC.
+**Status:** **Implemented** 2026-09-01 in commit *"Close the unbounded-dimension audit findings: per-dimension bound, two allocation guards, seven slice casts fixed, docs and debug invariant (RFC-127)"* (`0646fd3`), reviewed and approved after **one required correction** — the saturating cast rested on an unstated invariant, now made true by construction via `MAX_REPRESENTABLE_DIMENSION = isize::MAX / 8`. **Unreleased** — ships as `0.46.2`. **This RFC was itself corrected at review**: §6's cast list omitted the site E5 exercises, §8's site count was an estimate, and E4's evidence was release-only. All three are marked in place. Handoff: `rfcs/handoffs/127-the-unbounded-dimension-handoff.md`.
 **Target:** `crates/matten/src/shape.rs`, `math.rs`, `slice.rs`, `stats.rs`, `tensor.rs`,
 `parse/csv.rs`, `Cargo.toml`
 **Theme:** Close every process abort in the external audit, and the silent wrong answer beside it
