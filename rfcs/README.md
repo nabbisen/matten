@@ -155,6 +155,9 @@ sign-off and implementation — not that the state is unused.
 | 123 | [Move the Per-Crate Badges into the Crate Table](./accepted/123-crate-table-badges.md) | [`123-…-handoff.md`](./handoffs/123-crate-table-badges-handoff.md) — **blocked until `0.46.1` ships** |
 | 127 | [The Unbounded Dimension](./accepted/127-the-unbounded-dimension.md) | [`127-…-handoff.md`](./handoffs/127-the-unbounded-dimension-handoff.md) — **urgent** |
 | 129 | [Result-Zone Arithmetic](./accepted/129-result-zone-arithmetic.md) | [`129-…-handoff.md`](./handoffs/129-result-zone-arithmetic-handoff.md) — **prioritized**, rides `0.47.0` |
+| 128 | [Property Testing](./accepted/128-property-testing.md) | [`128-…-handoff.md`](./handoffs/128-property-testing-handoff.md) — after RFC-127 |
+| 130 | [Repository Governance Files](./accepted/130-repository-governance-files.md) | [`130-…-handoff.md`](./handoffs/130-repository-governance-files-handoff.md) — **blocked**: private reporting is off |
+| 131 | [Documentation Corrections, Batched](./accepted/131-documentation-corrections-batch.md) | [`131-…-handoff.md`](./handoffs/131-documentation-corrections-batch-handoff.md) — after RFC-127 |
 
 ## Archive
 

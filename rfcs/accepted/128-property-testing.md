@@ -1,6 +1,8 @@
 # RFC-128: Property Testing
 
-**Status:** Proposed
+**Status:** **Accepted** 2026-09-01 by the owner. Not yet implemented. Handoff:
+`rfcs/handoffs/128-property-testing-handoff.md`. Starts after RFC-127 lands (both touch test modules).
+No version bump, tag, or publish.
 **Target:** `crates/matten/Cargo.toml` (`[dev-dependencies]`), `crates/matten/src/**/tests.rs`,
 `.github/workflows/test.yaml`
 **Theme:** Write the invariants down as properties, so the next RFC-111 cannot remove one silently

@@ -4,7 +4,15 @@
 **Design authority:** `rfcs/proposed/130-repository-governance-files.md`
 **Base:** **after RFC-127 ships.** See §2 — the sequencing is not incidental.
 
-> **PENDING ACCEPTANCE.** RFC-130 is in `proposed/`. **Do not start** until the owner accepts it.
+> **ACCEPTED 2026-09-01 — but BLOCKED.** Private vulnerability reporting is **disabled** on the
+> repository, measured 2026-09-01:
+>
+> ```text
+> gh api repos/nabbisen/matten/private-vulnerability-reporting  ->  {"enabled": false}
+> ```
+>
+> **The owner's URL does not accept reports until that is switched on.** Do not write `SECURITY.md`
+> until it is. Change B (`CONTRIBUTING.md`) is unaffected and may proceed.
 
 > **Priority rule.** The RFC is the design authority; this handoff never overrides it. Where the two
 > disagree, **raise it before proceeding**. A pure addition in the handoff you can simply omit may be

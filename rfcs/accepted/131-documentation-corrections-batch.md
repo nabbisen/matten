@@ -1,6 +1,9 @@
 # RFC-131: Documentation Corrections, Batched
 
-**Status:** Proposed
+**Status:** **Accepted** 2026-09-01 by the owner. Not yet implemented. Handoff:
+`rfcs/handoffs/131-documentation-corrections-batch-handoff.md`. Starts after RFC-127 lands — two of
+its findings are resolved by RFC-127 and are verification tasks, not edits. No version bump, tag, or
+publish.
 **Target:** `docs/src/**`, and rustdoc in `crates/matten/src/**`
 **Theme:** The audit's nineteen documentation findings, sorted by what a release can carry
 **Related:** RFC-119 (the template for this), RFC-120 (which decides the split), RFC-127, RFC-094
