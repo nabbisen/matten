@@ -1,8 +1,11 @@
 # RFC-134: `0.46.2` — The Unbounded-Dimension Patch
 
-**Status:** **Accepted** 2026-09-01 by the owner. Not yet implemented. Handoff:
-`rfcs/handoffs/134-0462-the-unbounded-dimension-patch-handoff.md`. **The tag and the publish are NOT
-authorized by this acceptance** — each is a separate owner authorization at the time (RFC-094 §5).
+**Status:** **Implemented** 2026-09-01 in commit *"Prepare 0.46.2: retarget 21 live pins, add the
+Security/Fixed changelog entry (RFC-134)"* (`5f41660`), reviewed and approved after **one required
+correction** — the `Security` bullet claimed the defect was reachable from CSV; it is not, since every
+CSV path derives its shape from counts of parsed data. Corrected, and improved on the request by
+stating **"CSV is not affected"** explicitly with the reason. **Prepared, not yet tagged** at the time
+of closing. Handoff: `rfcs/handoffs/134-0462-the-unbounded-dimension-patch-handoff.md`.
 **Target:** `Cargo.toml`, live version pins, `CHANGELOG.md`
 **Theme:** Ship the Critical. It is fixed in git and still live on crates.io.
 **Related:** RFC-127 (what ships), RFC-094 §4.1 (patch contents), RFC-118 (the CI gate), RFC-121 (the
