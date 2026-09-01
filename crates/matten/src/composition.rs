@@ -161,12 +161,7 @@ impl Tensor {
             }
         }
 
-        Ok(Tensor {
-            data,
-            shape: out_shape,
-            #[cfg(feature = "dynamic")]
-            dynamic: None,
-        })
+        Ok(Tensor::from_parts_checked(data, out_shape))
     }
 
     /// Joins identically shaped tensors along a **new** `axis` (the analogue of
@@ -258,12 +253,7 @@ impl Tensor {
             }
         }
 
-        Ok(Tensor {
-            data,
-            shape: out_shape,
-            #[cfg(feature = "dynamic")]
-            dynamic: None,
-        })
+        Ok(Tensor::from_parts_checked(data, out_shape))
     }
 
     /// Repeats each **element** `n` times, flattening the result to rank 1
@@ -332,12 +322,7 @@ impl Tensor {
             }
         }
 
-        Ok(Tensor {
-            data,
-            shape: out_shape,
-            #[cfg(feature = "dynamic")]
-            dynamic: None,
-        })
+        Ok(Tensor::from_parts_checked(data, out_shape))
     }
 
     /// Repeats each element `n` times along `axis`, preserving rank (the analogue
@@ -429,12 +414,7 @@ impl Tensor {
             }
         }
 
-        Ok(Tensor {
-            data,
-            shape: out_shape,
-            #[cfg(feature = "dynamic")]
-            dynamic: None,
-        })
+        Ok(Tensor::from_parts_checked(data, out_shape))
     }
 
     /// Repeats the **whole tensor** according to `reps`, one repetition factor per
@@ -541,12 +521,7 @@ impl Tensor {
             data.push(self.data[in_flat]);
         }
 
-        Ok(Tensor {
-            data,
-            shape: out_shape,
-            #[cfg(feature = "dynamic")]
-            dynamic: None,
-        })
+        Ok(Tensor::from_parts_checked(data, out_shape))
     }
 
     /// Builds the two coordinate grids for evaluating a function of two variables
@@ -625,18 +600,8 @@ impl Tensor {
         }
 
         Ok((
-            Tensor {
-                data: out_x,
-                shape: out_shape.clone(),
-                #[cfg(feature = "dynamic")]
-                dynamic: None,
-            },
-            Tensor {
-                data: out_y,
-                shape: out_shape,
-                #[cfg(feature = "dynamic")]
-                dynamic: None,
-            },
+            Tensor::from_parts_checked(out_x, out_shape.clone()),
+            Tensor::from_parts_checked(out_y, out_shape),
         ))
     }
 }

@@ -56,12 +56,7 @@ impl Tensor {
             );
         }
         let len = self.data.len();
-        Tensor {
-            data: self.data.clone(),
-            shape: vec![len],
-            #[cfg(feature = "dynamic")]
-            dynamic: None,
-        }
+        Tensor::from_parts_checked(self.data.clone(), vec![len])
     }
 
     /// Transposes the tensor by reversing the axis order.
@@ -140,12 +135,7 @@ impl Tensor {
             );
         }
         let shape: Vec<usize> = self.shape.iter().copied().filter(|&d| d != 1).collect();
-        Tensor {
-            data: self.data.clone(),
-            shape,
-            #[cfg(feature = "dynamic")]
-            dynamic: None,
-        }
+        Tensor::from_parts_checked(self.data.clone(), shape)
     }
 
     /// Inserts a new axis of length `1` at `axis`, returning a new owned tensor.
@@ -202,12 +192,7 @@ impl Tensor {
         }
         let mut shape = self.shape.clone();
         shape.insert(axis, 1);
-        Ok(Tensor {
-            data: self.data.clone(),
-            shape,
-            #[cfg(feature = "dynamic")]
-            dynamic: None,
-        })
+        Ok(Tensor::from_parts_checked(self.data.clone(), shape))
     }
 
     /// Returns the element at the multidimensional `coord`, or `None` if the

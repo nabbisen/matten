@@ -78,19 +78,15 @@ impl Tensor {
     ///
     /// Panics if the shape is invalid or `data.len()` does not equal the shape
     /// product.
-    /// Panics with a clear `matten unsupported error` message if this tensor
-    /// uses dynamic (`Element`) storage. Used to guard all Phase 1 numeric
-    /// accessors and conversions.
-    #[cfg(feature = "dynamic")]
-    #[inline(always)]
-    pub(crate) fn panic_if_dynamic(&self, operation: &'static str) {
-        if self.is_dynamic() {
-            panic!(
-                "matten unsupported error in {operation}: this numeric API is not supported on dynamic tensors; use to_elements() or try_numeric() first"
-            );
-        }
-    }
-
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use matten::Tensor;
+    ///
+    /// let t = Tensor::new(vec![1.0, 2.0, 3.0, 4.0], &[2, 2]);
+    /// assert_eq!(t.shape(), &[2, 2]);
+    /// ```
     #[must_use]
     pub fn new(data: Vec<f64>, shape: &[usize]) -> Tensor {
         Self::try_new(data, shape).unwrap_or_else(|e| panic!("{e}"))
@@ -114,12 +110,65 @@ impl Tensor {
                 ),
             });
         }
-        Ok(Tensor {
+        Ok(Tensor::from_parts_checked(data, shape.to_vec()))
+    }
+
+    /// Builds a numeric-mode `Tensor` from already-shape-validated `data` and
+    /// `shape` (RFC-127 Change E). In debug builds only, asserts the crate's
+    /// one global invariant — `shape.iter().product() == data.len()` — which
+    /// otherwise held only by construction-site convention (E4 showed a
+    /// `Result`-zone API can break it: a corrupt `Tensor` whose `shape` and
+    /// `data` disagree). Costs nothing in release builds. Not meaningful for
+    /// dynamic-mode tensors, whose elements live in `dynamic` instead and
+    /// whose `data` is always empty — construct those with a bare struct
+    /// literal, not this helper.
+    #[cfg(debug_assertions)]
+    #[inline]
+    pub(crate) fn from_parts_checked(data: Vec<f64>, shape: Vec<usize>) -> Tensor {
+        let expected: usize = if shape.is_empty() {
+            1
+        } else {
+            shape.iter().product()
+        };
+        debug_assert_eq!(
+            expected,
+            data.len(),
+            "matten internal invariant violated: shape {shape:?} implies {expected} \
+             elements but data has {}",
+            data.len()
+        );
+        Tensor {
             data,
-            shape: shape.to_vec(),
+            shape,
             #[cfg(feature = "dynamic")]
             dynamic: None,
-        })
+        }
+    }
+
+    /// Release-mode counterpart of the debug-only [`Tensor::from_parts_checked`]
+    /// above — same construction, no assertion.
+    #[cfg(not(debug_assertions))]
+    #[inline(always)]
+    pub(crate) fn from_parts_checked(data: Vec<f64>, shape: Vec<usize>) -> Tensor {
+        Tensor {
+            data,
+            shape,
+            #[cfg(feature = "dynamic")]
+            dynamic: None,
+        }
+    }
+
+    /// Panics with a clear `matten unsupported error` message if this tensor
+    /// uses dynamic (`Element`) storage. Used to guard all Phase 1 numeric
+    /// accessors and conversions.
+    #[cfg(feature = "dynamic")]
+    #[inline(always)]
+    pub(crate) fn panic_if_dynamic(&self, operation: &'static str) {
+        if self.is_dynamic() {
+            panic!(
+                "matten unsupported error in {operation}: this numeric API is not supported on dynamic tensors; use to_elements() or try_numeric() first"
+            );
+        }
     }
 
     /// Creates a rank-0 scalar tensor (shape `[]`, length `1`).
@@ -133,12 +182,7 @@ impl Tensor {
     #[must_use]
     pub fn scalar(value: f64) -> Tensor {
         // Shape `[]` is always valid: rank 0, no dims, product 1.
-        Tensor {
-            data: vec![value],
-            shape: Vec::new(),
-            #[cfg(feature = "dynamic")]
-            dynamic: None,
-        }
+        Tensor::from_parts_checked(vec![value], Vec::new())
     }
 
     // ------------------------------------------------------------------ //
@@ -264,12 +308,7 @@ impl Tensor {
     /// row, or ragged rows.
     pub fn try_from_rows(rows: Vec<Vec<f64>>) -> Result<Tensor, MattenError> {
         let (data, shape) = flatten_rectangular(rows, "try_from_rows")?;
-        Ok(Tensor {
-            data,
-            shape,
-            #[cfg(feature = "dynamic")]
-            dynamic: None,
-        })
+        Ok(Tensor::from_parts_checked(data, shape))
     }
 
     // ------------------------------------------------------------------ //
@@ -489,12 +528,7 @@ fn arange_impl(
         });
     }
 
-    Ok(Tensor {
-        data,
-        shape: vec![len],
-        #[cfg(feature = "dynamic")]
-        dynamic: None,
-    })
+    Ok(Tensor::from_parts_checked(data, vec![len]))
 }
 
 // Shape operations, slicing, and boundary integration (split per 300-ELOC rule).

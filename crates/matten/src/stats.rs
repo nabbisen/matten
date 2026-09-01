@@ -76,12 +76,7 @@ fn variance_axis_impl(
         .copied()
         .collect();
 
-    Ok(Tensor {
-        data,
-        shape: out_shape,
-        #[cfg(feature = "dynamic")]
-        dynamic: None,
-    })
+    Ok(Tensor::from_parts_checked(data, out_shape))
 }
 
 impl Tensor {

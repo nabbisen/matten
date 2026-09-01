@@ -68,6 +68,7 @@
 //! ```
 
 #![forbid(unsafe_code)]
+#![deny(missing_docs)]
 
 // Public modules. The public surface is intentionally centered on `Tensor`,
 // `MattenError`, and `DataFormat`; storage, layout, and (future) `ops` modules

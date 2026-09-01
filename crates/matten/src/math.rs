@@ -13,6 +13,7 @@
 
 use crate::MattenError;
 use crate::Tensor;
+use crate::limits::MattenLimits;
 use crate::shape::{coord_to_flat, flat_to_coord};
 
 // ── Whole-tensor reductions ───────────────────────────────────────────────
@@ -277,7 +278,7 @@ impl Tensor {
     pub fn try_sum_axis(&self, axis: usize) -> Result<Tensor, MattenError> {
         reject_dynamic(self, "sum_axis")?;
         check_axis(self, axis, "sum_axis")?;
-        Ok(axis_reduce(self, axis, "sum_axis", |acc, v| acc + v, 0.0))
+        axis_reduce(self, axis, "sum_axis", |acc, v| acc + v, 0.0)
     }
 
     /// Reduces along `axis` by computing the arithmetic mean.
@@ -332,7 +333,7 @@ impl Tensor {
                 message: format!("mean is undefined for a reduced axis of length 0 (axis {axis})"),
             });
         }
-        let sums = axis_reduce(self, axis, "mean_axis", |acc, v| acc + v, 0.0);
+        let sums = axis_reduce(self, axis, "mean_axis", |acc, v| acc + v, 0.0)?;
         Ok(&sums / n)
     }
 }
@@ -512,12 +513,7 @@ fn nan_axis_reduce(
             out_data[i] = f64::NAN;
         }
     }
-    Tensor {
-        data: out_data,
-        shape: out_shape,
-        #[cfg(feature = "dynamic")]
-        dynamic: None,
-    }
+    Tensor::from_parts_checked(out_data, out_shape)
 }
 
 /// Generic axis reduction.
@@ -527,7 +523,7 @@ fn axis_reduce(
     operation: &'static str,
     f: impl Fn(f64, f64) -> f64,
     identity: f64,
-) -> Tensor {
+) -> Result<Tensor, MattenError> {
     if axis >= t.ndim() {
         panic!(
             "matten shape error in {operation}: axis {axis} is out of range for rank-{} tensor",
@@ -542,11 +538,13 @@ fn axis_reduce(
         .filter(|&(i, _)| i != axis)
         .map(|(_, &d)| d)
         .collect();
-    let out_len: usize = if out_shape.is_empty() {
-        1
-    } else {
-        out_shape.iter().product()
-    };
+    // RFC-127 Change B: sum_axis is the one caller that legitimately reaches
+    // here with a zero-length REDUCED axis (RFC-110 left sum/sum_axis
+    // unchanged — the additive identity is correct for them). The SURVIVING
+    // axes are not otherwise bounded by that zero, so their product can still
+    // be unreasonably large; validate the output shape before allocating,
+    // the same as every other shape-derived allocation in this crate.
+    let out_len = MattenLimits::default().check_shape(&out_shape, operation)?;
     let mut out_data = vec![identity; out_len];
 
     for (src_flat, &val) in t.data.iter().enumerate() {
@@ -566,12 +564,7 @@ fn axis_reduce(
         out_data[dst_flat] = f(out_data[dst_flat], val);
     }
 
-    Tensor {
-        data: out_data,
-        shape: out_shape,
-        #[cfg(feature = "dynamic")]
-        dynamic: None,
-    }
+    Ok(Tensor::from_parts_checked(out_data, out_shape))
 }
 
 // ── dot and matmul ────────────────────────────────────────────────────────
@@ -718,12 +711,7 @@ fn mv_mul(a: &Tensor, b: &Tensor, op: &'static str) -> Result<Tensor, MattenErro
             *o += a.data[i * n + k] * b.data[k];
         }
     }
-    Ok(Tensor {
-        data: out,
-        shape: vec![m],
-        #[cfg(feature = "dynamic")]
-        dynamic: None,
-    })
+    Ok(Tensor::from_parts_checked(out, vec![m]))
 }
 
 /// `[n] × [n, p] -> [p]`.
@@ -736,12 +724,7 @@ fn vm_mul(a: &Tensor, b: &Tensor, op: &'static str) -> Result<Tensor, MattenErro
             *slot += a.data[k] * b.data[k * p + j];
         }
     }
-    Ok(Tensor {
-        data: out,
-        shape: vec![p],
-        #[cfg(feature = "dynamic")]
-        dynamic: None,
-    })
+    Ok(Tensor::from_parts_checked(out, vec![p]))
 }
 
 /// `[m, n] × [n, p] -> [m, p]`.
@@ -749,16 +732,16 @@ fn mm_mul(a: &Tensor, b: &Tensor, op: &'static str) -> Result<Tensor, MattenErro
     let [m, n] = shape2(a, op)?;
     let [nb, p] = shape2(b, op)?;
     dim_check(n, nb, "left columns", "right rows", op)?;
-    let mut out = vec![0.0f64; m * p];
+    // RFC-127 Change B: `m` and `p` each come from a DIFFERENT already-valid
+    // tensor, so their product is a new quantity neither operand's own
+    // validation bounded — two individually reasonable operands (e.g. each
+    // [1_048_576, 1]) can still multiply out to a many-terabyte output.
+    let total = MattenLimits::default().check_shape(&[m, p], op)?;
+    let mut out = vec![0.0f64; total];
     // `chunks_mut(0)` panics regardless of slice length, so p == 0 must be
     // guarded before the loop; the result is simply the empty [m, p] matrix.
     if p == 0 {
-        return Ok(Tensor {
-            data: out,
-            shape: vec![m, p],
-            #[cfg(feature = "dynamic")]
-            dynamic: None,
-        });
+        return Ok(Tensor::from_parts_checked(out, vec![m, p]));
     }
     for (i, row) in out.chunks_mut(p).enumerate() {
         for (j, slot) in row.iter_mut().enumerate() {
@@ -769,12 +752,7 @@ fn mm_mul(a: &Tensor, b: &Tensor, op: &'static str) -> Result<Tensor, MattenErro
             *slot = acc;
         }
     }
-    Ok(Tensor {
-        data: out,
-        shape: vec![m, p],
-        #[cfg(feature = "dynamic")]
-        dynamic: None,
-    })
+    Ok(Tensor::from_parts_checked(out, vec![m, p]))
 }
 
 /// Extracts shape `[d0, d1]` from a rank-2 tensor; errors on wrong rank.

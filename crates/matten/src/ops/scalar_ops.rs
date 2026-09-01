@@ -33,12 +33,10 @@ impl Add<f64> for &Tensor {
     fn add(self, rhs: f64) -> Tensor {
         #[cfg(feature = "dynamic")]
         require_numeric(self, "add");
-        Tensor {
-            data: self.data.iter().map(|&v| v + rhs).collect(),
-            shape: self.shape.clone(),
-            #[cfg(feature = "dynamic")]
-            dynamic: None,
-        }
+        Tensor::from_parts_checked(
+            self.data.iter().map(|&v| v + rhs).collect(),
+            self.shape.clone(),
+        )
     }
 }
 
@@ -55,12 +53,10 @@ impl Sub<f64> for &Tensor {
     fn sub(self, rhs: f64) -> Tensor {
         #[cfg(feature = "dynamic")]
         require_numeric(self, "sub");
-        Tensor {
-            data: self.data.iter().map(|&v| v - rhs).collect(),
-            shape: self.shape.clone(),
-            #[cfg(feature = "dynamic")]
-            dynamic: None,
-        }
+        Tensor::from_parts_checked(
+            self.data.iter().map(|&v| v - rhs).collect(),
+            self.shape.clone(),
+        )
     }
 }
 
@@ -77,12 +73,10 @@ impl Mul<f64> for &Tensor {
     fn mul(self, rhs: f64) -> Tensor {
         #[cfg(feature = "dynamic")]
         require_numeric(self, "mul");
-        Tensor {
-            data: self.data.iter().map(|&v| v * rhs).collect(),
-            shape: self.shape.clone(),
-            #[cfg(feature = "dynamic")]
-            dynamic: None,
-        }
+        Tensor::from_parts_checked(
+            self.data.iter().map(|&v| v * rhs).collect(),
+            self.shape.clone(),
+        )
     }
 }
 
@@ -99,12 +93,10 @@ impl Div<f64> for &Tensor {
     fn div(self, rhs: f64) -> Tensor {
         #[cfg(feature = "dynamic")]
         require_numeric(self, "div");
-        Tensor {
-            data: self.data.iter().map(|&v| v / rhs).collect(),
-            shape: self.shape.clone(),
-            #[cfg(feature = "dynamic")]
-            dynamic: None,
-        }
+        Tensor::from_parts_checked(
+            self.data.iter().map(|&v| v / rhs).collect(),
+            self.shape.clone(),
+        )
     }
 }
 
@@ -123,12 +115,10 @@ impl Add<&Tensor> for f64 {
     fn add(self, rhs: &Tensor) -> Tensor {
         #[cfg(feature = "dynamic")]
         require_numeric(rhs, "add (scalar-left)");
-        Tensor {
-            data: rhs.data.iter().map(|&v| self + v).collect(),
-            shape: rhs.shape.clone(),
-            #[cfg(feature = "dynamic")]
-            dynamic: None,
-        }
+        Tensor::from_parts_checked(
+            rhs.data.iter().map(|&v| self + v).collect(),
+            rhs.shape.clone(),
+        )
     }
 }
 
@@ -145,12 +135,10 @@ impl Sub<&Tensor> for f64 {
     fn sub(self, rhs: &Tensor) -> Tensor {
         #[cfg(feature = "dynamic")]
         require_numeric(rhs, "sub (scalar-left)");
-        Tensor {
-            data: rhs.data.iter().map(|&v| self - v).collect(),
-            shape: rhs.shape.clone(),
-            #[cfg(feature = "dynamic")]
-            dynamic: None,
-        }
+        Tensor::from_parts_checked(
+            rhs.data.iter().map(|&v| self - v).collect(),
+            rhs.shape.clone(),
+        )
     }
 }
 
@@ -167,12 +155,10 @@ impl Mul<&Tensor> for f64 {
     fn mul(self, rhs: &Tensor) -> Tensor {
         #[cfg(feature = "dynamic")]
         require_numeric(rhs, "mul (scalar-left)");
-        Tensor {
-            data: rhs.data.iter().map(|&v| self * v).collect(),
-            shape: rhs.shape.clone(),
-            #[cfg(feature = "dynamic")]
-            dynamic: None,
-        }
+        Tensor::from_parts_checked(
+            rhs.data.iter().map(|&v| self * v).collect(),
+            rhs.shape.clone(),
+        )
     }
 }
 
@@ -190,11 +176,9 @@ impl Div<&Tensor> for f64 {
     fn div(self, rhs: &Tensor) -> Tensor {
         #[cfg(feature = "dynamic")]
         require_numeric(rhs, "div (scalar-left)");
-        Tensor {
-            data: rhs.data.iter().map(|&v| self / v).collect(),
-            shape: rhs.shape.clone(),
-            #[cfg(feature = "dynamic")]
-            dynamic: None,
-        }
+        Tensor::from_parts_checked(
+            rhs.data.iter().map(|&v| self / v).collect(),
+            rhs.shape.clone(),
+        )
     }
 }

@@ -11,7 +11,7 @@ use crate::error::MattenError;
 /// This is a DX / parser-abuse guard, not a mathematical limit: shapes are
 /// stored as `Vec<usize>`, so the cap can be relaxed by a later RFC.
 // MAX_NDIM is defined in crate::limits and re-exported from there.
-use crate::limits::MAX_NDIM;
+use crate::limits::{MAX_ELEMENTS, MAX_NDIM, MAX_REPRESENTABLE_DIMENSION};
 
 /// Validates a shape and returns its logical element count.
 ///
@@ -32,7 +32,7 @@ pub(crate) fn validate_shape(
             ),
         });
     }
-    checked_shape_len(shape, operation)
+    checked_shape_len(shape, operation, MAX_ELEMENTS)
 }
 
 /// Computes the logical element count of a shape with checked arithmetic.
@@ -41,10 +41,43 @@ pub(crate) fn validate_shape(
 /// Zero-sized dimensions are accepted (RFC-111): a shape containing a `0`
 /// yields a length of `0`, arithmetically what it means. The empty product
 /// (rank 0, a scalar) is `1`, not `0` — a scalar is never empty.
+///
+/// `max_dimension` bounds each **individual** dimension, not the product
+/// (RFC-127). A zero dimension makes the product `0`, so the `checked_mul`
+/// loop below can never overflow once one is present — before RFC-111, a
+/// zero dimension was rejected outright, which incidentally bounded every
+/// dimension; RFC-111 removed that rejection deliberately, and nothing
+/// downstream re-bounded the surviving dimensions. Without this loop, a
+/// shape like `[400_000_000_000, 0]` validates here (product `0`) and later
+/// aborts the process when some other operation allocates based on the
+/// surviving `400_000_000_000`-sized axis.
+///
+/// The effective bound is always `min(max_dimension, MAX_REPRESENTABLE_DIMENSION)`
+/// (RFC-127 §5 review): a caller-supplied [`MattenLimits`](crate::MattenLimits)
+/// can set `max_elements` arbitrarily high, including above `isize::MAX`, and
+/// nothing else enforced that it stayed representable. Clamping here — not
+/// merely documenting the assumption elsewhere — is what makes
+/// `slice.rs`'s `usize_to_isize_saturating` unconditionally correct, rather
+/// than correct only as long as every caller happens to respect a limit
+/// nothing checked.
 pub(crate) fn checked_shape_len(
     shape: &[usize],
     operation: &'static str,
+    max_dimension: usize,
 ) -> Result<usize, MattenError> {
+    let max_dimension = max_dimension.min(MAX_REPRESENTABLE_DIMENSION);
+    for &dim in shape {
+        if dim > max_dimension {
+            return Err(MattenError::Allocation {
+                requested_elements: dim,
+                message: format!(
+                    "dimension {dim} in shape {shape:?} exceeds the maximum \
+                     supported single-dimension size of {max_dimension} in {operation}"
+                ),
+            });
+        }
+    }
+
     let mut len: usize = 1;
     for &dim in shape {
         len = len.checked_mul(dim).ok_or_else(|| MattenError::Allocation {

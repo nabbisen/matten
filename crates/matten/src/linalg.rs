@@ -186,12 +186,7 @@ impl Tensor {
                 data.push(a * b);
             }
         }
-        Ok(Tensor {
-            data,
-            shape: out_shape,
-            #[cfg(feature = "dynamic")]
-            dynamic: None,
-        })
+        Ok(Tensor::from_parts_checked(data, out_shape))
     }
 }
 

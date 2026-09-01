@@ -135,11 +135,7 @@ impl Tensor {
                 }
             }
         }
-        Ok(Tensor {
-            data: floats,
-            shape: dyn_t.shape.clone(),
-            dynamic: None,
-        })
+        Ok(Tensor::from_parts_checked(floats, dyn_t.shape.clone()))
     }
 
     /// Parses a JSON string into a dynamic `Tensor`, mapping JSON values to
@@ -397,11 +393,7 @@ impl Tensor {
                 }
             })
             .collect();
-        Tensor {
-            data,
-            shape: dyn_t.shape.clone(),
-            dynamic: None,
-        }
+        Tensor::from_parts_checked(data, dyn_t.shape.clone())
     }
 
     /// Returns `true` if every element in this dynamic tensor can be coerced

@@ -14,12 +14,10 @@ impl Tensor {
     ///
     /// Caller must ensure `self` is non-dynamic (the public methods guard first).
     fn map_unchecked(&self, f: impl Fn(f64) -> f64) -> Tensor {
-        Tensor {
-            data: self.data.iter().map(|&v| f(v)).collect(),
-            shape: self.shape.clone(),
-            #[cfg(feature = "dynamic")]
-            dynamic: None,
-        }
+        Tensor::from_parts_checked(
+            self.data.iter().map(|&v| f(v)).collect(),
+            self.shape.clone(),
+        )
     }
 
     /// Elementwise absolute value. Shape is preserved.

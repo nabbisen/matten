@@ -56,12 +56,7 @@ impl Tensor {
             v[len - 1] = end;
             v
         };
-        Ok(Tensor {
-            data,
-            shape: vec![len],
-            #[cfg(feature = "dynamic")]
-            dynamic: None,
-        })
+        Ok(Tensor::from_parts_checked(data, vec![len]))
     }
 
     /// Creates an `n × n` identity matrix (1.0 on the diagonal, 0.0 elsewhere).
@@ -100,12 +95,7 @@ impl Tensor {
         for i in 0..n {
             data[i * n + i] = 1.0;
         }
-        Ok(Tensor {
-            data,
-            shape: vec![n, n],
-            #[cfg(feature = "dynamic")]
-            dynamic: None,
-        })
+        Ok(Tensor::from_parts_checked(data, vec![n, n]))
     }
 }
 

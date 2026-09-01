@@ -20,11 +20,6 @@ impl Neg for &Tensor {
                 "matten unsupported error in neg: unary negation is not supported on dynamic tensors; call try_numeric() first"
             );
         }
-        Tensor {
-            data: self.data.iter().map(|&v| -v).collect(),
-            shape: self.shape.clone(),
-            #[cfg(feature = "dynamic")]
-            dynamic: None,
-        }
+        Tensor::from_parts_checked(self.data.iter().map(|&v| -v).collect(), self.shape.clone())
     }
 }

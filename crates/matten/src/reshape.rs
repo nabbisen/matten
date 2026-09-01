@@ -42,12 +42,10 @@ pub(crate) fn try_reshape_impl(t: &Tensor, new_shape: &[usize]) -> Result<Tensor
         });
     }
     validate_reshape(t.len(), new_shape, "reshape")?;
-    Ok(Tensor {
-        data: t.data.clone(),
-        shape: new_shape.to_vec(),
-        #[cfg(feature = "dynamic")]
-        dynamic: None,
-    })
+    Ok(Tensor::from_parts_checked(
+        t.data.clone(),
+        new_shape.to_vec(),
+    ))
 }
 
 // ---- axis permutation ---------------------------------------------------
@@ -79,12 +77,7 @@ pub(crate) fn permute_axes(t: &Tensor, permutation: &[usize]) -> Tensor {
             .expect("permuted coordinate is always valid by construction");
         result_data[dst_flat] = t.data[src_flat];
     }
-    Tensor {
-        data: result_data,
-        shape: result_shape,
-        #[cfg(feature = "dynamic")]
-        dynamic: None,
-    }
+    Tensor::from_parts_checked(result_data, result_shape)
 }
 
 /// Validates that `axis1` and `axis2` are both in-bounds for `ndim`, returning

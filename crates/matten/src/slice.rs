@@ -246,12 +246,7 @@ pub(crate) fn execute_slice(
         });
     }
 
-    Ok(Tensor {
-        data: out_data,
-        shape: out_shape,
-        #[cfg(feature = "dynamic")]
-        dynamic: None,
-    })
+    Ok(Tensor::from_parts_checked(out_data, out_shape))
 }
 
 // ---- IntoSliceRange sealed trait ----------------------------------------
@@ -295,11 +290,29 @@ impl IntoSliceRange for std::ops::RangeTo<usize> {}
 impl IntoSliceRange for std::ops::RangeFull {}
 impl IntoSliceRange for std::ops::RangeInclusive<usize> {}
 
+// A usize at or above 2^63 does not fit in isize; casting with `as` wraps it
+// negative, and a negative Index/Range bound means "from the end" (RFC-088).
+// That silently turns an absurdly large, out-of-range value into a plausible
+// small one instead of an error (RFC-127 Change C). `isize::MAX` can never be
+// a real, in-bounds resolved index: `checked_shape_len` clamps every
+// dimension it accepts to at most `MAX_REPRESENTABLE_DIMENSION`
+// (`isize::MAX / 8`) UNCONDITIONALLY, regardless of what a caller sets
+// `MattenLimits::max_elements` to (RFC-127 §5 review — a caller-set budget
+// above `isize::MAX` previously made this saturating cast wrong, since
+// nothing enforced that the budget stayed representable). So saturating to
+// `isize::MAX` here is equivalent to erroring immediately: it is guaranteed
+// to fail the existing `resolved as usize >= dim` bounds check in
+// `resolve_spec` below, for every dimension a shape check could ever have
+// accepted.
+fn usize_to_isize_saturating(value: usize) -> isize {
+    isize::try_from(value).unwrap_or(isize::MAX)
+}
+
 impl SliceConvert for std::ops::Range<usize> {
     fn into_repr(self) -> SliceSpecRepr {
         SliceSpecRepr(SliceSpec::Range {
-            start: Some(self.start as isize),
-            end: Some(self.end as isize),
+            start: Some(usize_to_isize_saturating(self.start)),
+            end: Some(usize_to_isize_saturating(self.end)),
             step: 1,
         })
     }
@@ -307,7 +320,7 @@ impl SliceConvert for std::ops::Range<usize> {
 impl SliceConvert for std::ops::RangeFrom<usize> {
     fn into_repr(self) -> SliceSpecRepr {
         SliceSpecRepr(SliceSpec::Range {
-            start: Some(self.start as isize),
+            start: Some(usize_to_isize_saturating(self.start)),
             end: None,
             step: 1,
         })
@@ -317,7 +330,7 @@ impl SliceConvert for std::ops::RangeTo<usize> {
     fn into_repr(self) -> SliceSpecRepr {
         SliceSpecRepr(SliceSpec::Range {
             start: None,
-            end: Some(self.end as isize),
+            end: Some(usize_to_isize_saturating(self.end)),
             step: 1,
         })
     }
@@ -329,11 +342,11 @@ impl SliceConvert for std::ops::RangeFull {
 }
 impl SliceConvert for std::ops::RangeInclusive<usize> {
     fn into_repr(self) -> SliceSpecRepr {
-        // Use saturating_add to avoid overflow on usize::MAX..=usize::MAX;
-        // the resulting spec will fail bounds-checking at build() time.
+        // saturating_add avoids overflow on usize::MAX..=usize::MAX before the
+        // isize conversion below, which is itself saturating for the same reason.
         SliceSpecRepr(SliceSpec::Range {
-            start: Some(*self.start() as isize),
-            end: Some(self.end().saturating_add(1) as isize),
+            start: Some(usize_to_isize_saturating(*self.start())),
+            end: Some(usize_to_isize_saturating(self.end().saturating_add(1))),
             step: 1,
         })
     }
@@ -386,7 +399,8 @@ impl<'a> SliceBuilder<'a> {
     /// The builder takes `usize` only — negative indices are a `slice_str`-only
     /// convenience (RFC-088 §4); a caller with `len` in hand writes `len - 1`.
     pub fn index(mut self, index: usize) -> Self {
-        self.specs.push(SliceSpec::Index(index as isize));
+        self.specs
+            .push(SliceSpec::Index(usize_to_isize_saturating(index)));
         self
     }
 

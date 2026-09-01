@@ -15,6 +15,19 @@ pub(crate) const MAX_NDIM: usize = 8;
 /// Maximum number of elements allowed by `arange` and by construction helpers.
 pub(crate) const MAX_ELEMENTS: usize = 1 << 20; // ~1 M elements / ~8 MiB f64
 
+/// The largest single-dimension size any shape check may ever enforce,
+/// regardless of a caller-supplied [`MattenLimits::max_elements`] (RFC-127
+/// §5 review). Every `Tensor` element is `f64` (8 bytes), and Rust's largest
+/// single allocation is `isize::MAX` bytes — no larger element count is ever
+/// satisfiable by any allocation, so this is a hard ceiling, not a policy
+/// choice. It is also what makes `slice.rs`'s `usize_to_isize_saturating`
+/// correct: saturating an out-of-range `usize` to `isize::MAX` is guaranteed
+/// to exceed this ceiling, and therefore any dimension a shape check has
+/// actually accepted, unconditionally — not merely "as long as
+/// `max_elements` stays below `isize::MAX`", which nothing previously
+/// enforced.
+pub(crate) const MAX_REPRESENTABLE_DIMENSION: usize = isize::MAX as usize / 8;
+
 /// Maximum number of elements the JSON parser will accept per array dimension.
 #[cfg(feature = "json")]
 pub(crate) const MAX_JSON_ELEMENTS: usize = 1 << 24; // 16 M — generous PoC bound
@@ -129,7 +142,7 @@ impl MattenLimits {
                 ),
             });
         }
-        let len = crate::shape::checked_shape_len(shape, operation)?;
+        let len = crate::shape::checked_shape_len(shape, operation, self.max_elements)?;
         self.check_elements(len, operation)?;
         Ok(len)
     }
@@ -167,12 +180,10 @@ impl Tensor {
         limits: &MattenLimits,
     ) -> Result<Tensor, MattenError> {
         let len = limits.check_shape(shape, "try_zeros")?;
-        Ok(Tensor {
-            data: vec![0.0f64; len],
-            shape: shape.to_vec(),
-            #[cfg(feature = "dynamic")]
-            dynamic: None,
-        })
+        Ok(Tensor::from_parts_checked(
+            vec![0.0f64; len],
+            shape.to_vec(),
+        ))
     }
 
     /// Creates a ones tensor, returning an error instead of panicking.
@@ -197,12 +208,10 @@ impl Tensor {
         limits: &MattenLimits,
     ) -> Result<Tensor, MattenError> {
         let len = limits.check_shape(shape, "try_ones")?;
-        Ok(Tensor {
-            data: vec![1.0f64; len],
-            shape: shape.to_vec(),
-            #[cfg(feature = "dynamic")]
-            dynamic: None,
-        })
+        Ok(Tensor::from_parts_checked(
+            vec![1.0f64; len],
+            shape.to_vec(),
+        ))
     }
 
     /// Creates a tensor filled with `value`, returning an error instead of panicking.
@@ -228,11 +237,6 @@ impl Tensor {
         limits: &MattenLimits,
     ) -> Result<Tensor, MattenError> {
         let len = limits.check_shape(shape, "try_full")?;
-        Ok(Tensor {
-            data: vec![value; len],
-            shape: shape.to_vec(),
-            #[cfg(feature = "dynamic")]
-            dynamic: None,
-        })
+        Ok(Tensor::from_parts_checked(vec![value; len], shape.to_vec()))
     }
 }

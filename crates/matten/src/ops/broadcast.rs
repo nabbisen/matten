@@ -161,13 +161,7 @@ where
     for i in 0..ctx.result_len() {
         data.push(f(ldata[ctx.left_flat(i)], rdata[ctx.right_flat(i)]));
     }
-    // SAFETY: result_shape was computed from validated shapes; product == data.len().
-    crate::Tensor {
-        data,
-        shape: result_shape,
-        #[cfg(feature = "dynamic")]
-        dynamic: None,
-    }
+    crate::Tensor::from_parts_checked(data, result_shape)
 }
 
 #[cfg(test)]
