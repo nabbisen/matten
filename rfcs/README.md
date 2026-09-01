@@ -153,6 +153,7 @@ sign-off and implementation — not that the state is unused.
 
 | ID | Title | Handoff |
 |---:|---|---|
+| 134 | [`0.46.2` — The Unbounded-Dimension Patch](./accepted/134-0462-the-unbounded-dimension-patch.md) | [`134-…-handoff.md`](./handoffs/134-0462-the-unbounded-dimension-patch-handoff.md) — **urgent**: ships the Critical |
 | 123 | [Move the Per-Crate Badges into the Crate Table](./accepted/123-crate-table-badges.md) | [`123-…-handoff.md`](./handoffs/123-crate-table-badges-handoff.md) — **blocked until `0.46.1` ships** — **reduced to Change D**: A/B/C performed by the owner 2026-09-01 |
 | 129 | [Result-Zone Arithmetic](./accepted/129-result-zone-arithmetic.md) | [`129-…-handoff.md`](./handoffs/129-result-zone-arithmetic-handoff.md) — **prioritized**, rides `0.47.0` |
 | 128 | [Property Testing](./accepted/128-property-testing.md) | [`128-…-handoff.md`](./handoffs/128-property-testing-handoff.md) — after RFC-127 |

@@ -1,6 +1,8 @@
 # RFC-134: `0.46.2` — The Unbounded-Dimension Patch
 
-**Status:** Proposed
+**Status:** **Accepted** 2026-09-01 by the owner. Not yet implemented. Handoff:
+`rfcs/handoffs/134-0462-the-unbounded-dimension-patch-handoff.md`. **The tag and the publish are NOT
+authorized by this acceptance** — each is a separate owner authorization at the time (RFC-094 §5).
 **Target:** `Cargo.toml`, live version pins, `CHANGELOG.md`
 **Theme:** Ship the Critical. It is fixed in git and still live on crates.io.
 **Related:** RFC-127 (what ships), RFC-094 §4.1 (patch contents), RFC-118 (the CI gate), RFC-121 (the
