@@ -28,6 +28,22 @@ under Option A          that pair returns Ok
 Both RFCs ship in `0.47.0`. **RFC-129's handoff has been amended.** If you are implementing them
 separately, coordinate — landing RFC-129 alone ships a test asserting behaviour this task removes.
 
+## 2.1 CORRECTED 2026-09-01 — read RFC-132 §12.0 before anything else
+
+Your escalation was right and the RFC has been amended. **Three guards stay put:**
+
+```text
+math.rs:739        mm_mul       KEEP
+linalg.rs:181      outer        KEEP
+ops/broadcast.rs   BroadcastCtx KEEP
+```
+
+The corrected rule: **limits bound any allocation that can exceed the combined size of the inputs
+determining it.** One question — *can the output be bigger than its inputs put together?* A subset
+or a sum, no. A product, yes.
+
+`matmul` splits: `vv_dot`/`mv_mul`/`vm_mul` need no guard; only `mm_mul` does.
+
 ## 3. The rule you are implementing
 
 > **Limits bound allocations sized by a value the CALLER SUPPLIED as data — a shape, a count, a
@@ -49,9 +65,9 @@ LIMITS APPLY
   repeat / repeat_axis / tile / meshgrid                        caller-supplied COUNT
 
 LIMITS DO NOT APPLY
-  arithmetic and its try_ twins
+  arithmetic and its try_ twins   -- EXCEPT BroadcastCtx's guard, see §2.1
   reductions, axis reductions, statistics
-  matmul / dot / outer / trace / norm
+  dot's vv/mv/vm branches, trace, norm  -- NOT mm_mul, NOT outer (§2.1)
   slicing an existing tensor
   concatenate / stack
 ```

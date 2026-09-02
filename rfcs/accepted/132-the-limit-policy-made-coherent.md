@@ -1,6 +1,8 @@
 # RFC-132: The Limit Policy, Made Coherent
 
-**Status:** **Stage 1 DECIDED 2026-09-01 — Option A, boundary-only**, authorized by the owner:
+**Status:** **Stage 1 DECIDED 2026-09-01 — Option A, boundary-only.** **§12.1's rule and site list
+were CORRECTED 2026-09-01 before implementation (§12.0)** after the implementer escalated: applying
+them literally would have reintroduced an uncatchable process abort., authorized by the owner:
 *"Simple design and proactive protection are good."* Stage 2 (applying it) is **Accepted** and
 handed off: `rfcs/handoffs/132-the-limit-policy-made-coherent-handoff.md`. Rides `0.47.0` **with**
 RFC-129 — they interact (§12). No version bump, tag, or publish in this RFC.
@@ -302,6 +304,83 @@ value of this RFC is that afterwards there is an answer, and it is the same answ
 
 **Option A is chosen.** The owner's reason, recorded: *"Simple design and proactive protection are
 good."*
+
+### 12.0 CORRECTED 2026-09-01, before implementation — §12.1's rule and list were wrong
+
+**The implementer escalated before writing any code, and was right. Applying §12.1's list literally
+would have reintroduced an uncatchable process abort six days after `0.46.2` shipped to close one.**
+
+```text
+today   [1048576,1] + [1,1048576]   -> CATCHABLE PANIC, process survives
+                                       (ops/broadcast.rs:91-93 guards before allocating)
+under §12.1's list, that guard is REMOVED
+        -> Vec::with_capacity(1_099_511_627_776) -> uncatchable allocator abort
+        -> reachable from two ordinary ~1M vectors and a `+`. No hostile input.
+```
+
+Reproduced. The same applies to `mm_mul` — whose guard **RFC-127 added six days ago for this exact
+scenario** — and to `outer`, whose guard predates the audit entirely and which RFC-127 cited as the
+correct pattern to copy.
+
+**Why the rule failed.** *"Allocations sized by data already in memory"* describes
+`concatenate`/`stack` correctly — their output is the **sum** of existing allocations. It does not
+describe an output whose size is the **product** of two independent already-validated dimensions.
+That product is a new quantity **neither operand's own validation bounded**, and it grows
+multiplicatively rather than linearly.
+
+The implementer's articulation is better than mine and is adopted:
+
+> `repeat`/`tile` stay guarded because the *multiplier* is caller-supplied. For
+> `matmul`/`outer`/broadcast, **the other operand's shape plays the multiplier's role.** They are
+> the same kind of subtle case, for a parallel reason.
+
+### 12.0.1 The corrected rule
+
+> **Limits bound any allocation that can exceed the combined size of the already-validated inputs
+> determining it — and every boundary where a size arrives from untrusted input. A subset or a sum
+> needs no guard; a product does.**
+
+The test is one question: **can this output be bigger than its inputs put together?**
+
+```text
+reductions, statistics      smaller than the input          NO GUARD
+slicing                     a subset of the input           NO GUARD
+concatenate / stack         equal to the sum of inputs      NO GUARD
+vv_dot / mv_mul / vm_mul    bounded by ONE operand          NO GUARD
+trace / norm                return f64, no allocation       NO GUARD
+
+mm_mul  [m,n]x[n,p] -> [m,p]   m and p from DIFFERENT operands   GUARD
+outer   [m]x[n]     -> [m,n]   same product shape                GUARD
+broadcast + - * /              result shape is a product         GUARD
+repeat / tile / meshgrid       caller-supplied multiplier        GUARD
+every parse / caller-supplied shape                              GUARD
+```
+
+**Note `matmul` splits across the line**: three of its four branches need no guard; only `mm_mul`
+does. §12.1's list named "matmul" wholesale, which was wrong in both directions.
+
+### 12.0.2 What this changes for implementation
+
+```text
+KEEP, unchanged — do NOT remove these three guards
+    math.rs:739       mm_mul      (added by RFC-127 for precisely this case)
+    linalg.rs:181     outer       (predates the audit; RFC-127's cited pattern)
+    ops/broadcast.rs:91-93        (today a safe catchable panic; removing it
+                                   makes it an uncatchable abort)
+```
+
+Everything else in §12.1 stands. The `try_*` methods, `max_parse_bytes` enforcement, the two
+sentence rewrites, and guard removal at the sites where the reasoning genuinely holds all proceed
+unchanged.
+
+### 12.0.3 What this does not change
+
+Option A stands. §5's accepted cost — *"a caller can still OOM on their own data"* — was about
+genuinely large data exhausting memory. **It was not a decision to convert a catchable panic into an
+uncatchable abort on small, ordinary inputs**, and the RFC never argued for that because it never
+noticed the case. Rust's `Vec` has no stable fallible allocation API, so an oversized allocation
+aborts the process outright — which is why "NumPy lets you OOM too" does not transfer: Python raises
+a catchable `MemoryError`.
 
 ### 12.1 The rule, stated so a future operation can apply it unaided
 
