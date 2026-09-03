@@ -427,14 +427,34 @@ if grep -rIn --exclude-dir=benchmarks 'Phase[ -]1\|Phase[ -]2' "${USER_DOCS[@]}"
   FAIL=1
 fi
 
-echo "=== Checking root README crate table uses family wording, not bare patch versions ==="
-# Crate-table rows look like: | [`name`](path) | VERSION | STATUS | desc |
-# A bare patch version (0.20.0) in the version cell drifts every release; require
-# "N.M.x family" instead.
-if grep -nE '^\| \[.*\]\(.*\) \| [0-9]+\.[0-9]+\.[0-9]+ ' README.md; then
-  echo "ERROR: root README crate table has a bare patch version; use 'N.M.x family'"
-  FAIL=1
-fi
+echo "=== Checking every crates/ directory has a crate-table row with both badges ==="
+# RFC-123 Change D. The check this replaces (a bare patch version in the crate
+# table's version cell) can never match again: Change C removed the version
+# cells' hand-maintained strings entirely, replacing that column's content
+# with badges. A guard whose pattern matches zero rows and can never match
+# again passes vacuously forever -- RFC-117's ninth-guard instruction is to
+# error loudly rather than pass like that, so this checks the invariant that
+# actually failed for eight releases instead: matten-stats had a row in the
+# table but no crates.io badge and no docs.rs badge (§2 of the RFC). The crate
+# list is derived from crates/ on disk, not hand-written, so the next crate
+# added is covered the day it is.
+for crate_path in crates/*/; do
+  crate="$(basename "$crate_path")"
+  row_line="$(grep -nE "^\\| \\[\`${crate}\`\\]\\(" README.md || true)"
+  if [ -z "$row_line" ]; then
+    echo "ERROR: README.md's crate table has no row for '$crate'"
+    FAIL=1
+    continue
+  fi
+  if ! grep -qE "crates/v/${crate}\\.svg" <<<"$row_line"; then
+    echo "ERROR: README.md's crate table row for '$crate' is missing its crates.io badge"
+    FAIL=1
+  fi
+  if ! grep -qE "docsrs/${crate}\\?" <<<"$row_line"; then
+    echo "ERROR: README.md's crate table row for '$crate' is missing its docs.rs badge"
+    FAIL=1
+  fi
+done
 
 echo "=== Checking core matten example naming convention ==="
 # Examples reorganization ruling (architect, 2026-06-24): core matten examples must
