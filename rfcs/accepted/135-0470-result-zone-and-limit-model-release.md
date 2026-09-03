@@ -1,6 +1,8 @@
 # RFC-135: `0.47.0` — The Result-Zone and Limit-Model Release
 
-**Status:** Proposed
+**Status:** **Accepted** 2026-09-03 by the owner, who directed the corrections be applied directly
+rather than handed off. Implemented by the high-capability model. **The tag and the publish are NOT
+authorized by this acceptance** — each is a separate owner authorization at the time (RFC-094 §5).
 **Target:** `Cargo.toml`, live version pins, `CHANGELOG.md`, `introduction.md`,
 `public-api-snapshot.md`
 **Theme:** Release four closed RFCs, and invert almost every instruction the last two releases gave
@@ -111,6 +113,22 @@ LINES 19-20  "This documentation tracks the current 0.46 release family, carryin
 LINE 34      "see the `[0.46.0]` CHANGELOG entry"
              -> a pointer to a HEADING that keeps its name. DO NOT TOUCH.
 ```
+
+> **CORRECTED at implementation, 2026-09-03. The "DO NOT TOUCH" above is wrong.**
+>
+> That pointer is not a standalone reference — it is the **closing sentence of the very paragraph
+> being rewritten**, and what it points at is *"the complete list"* of the family's changes. Once the
+> paragraph describes `0.47`, pointing at `[0.46.0]`'s entry would send the reader to the wrong list.
+>
+> ```text
+> WAS  "...never a panic in any released version — see the [0.46.0] CHANGELOG entry
+>       for the complete list."     (the 0.46 narrative's own closing line)
+> NOW  "...are corrected — see the [0.47.0] CHANGELOG entry for the complete list."
+> ```
+>
+> The instruction came from RFC-121 and RFC-134, where it was **correct** — those were patches that
+> did not rewrite the paragraph, so the sentence and its pointer both stood. It does not survive a
+> minor. Carried forward without re-examining what the sentence actually says.
 
 **One file, two opposite instructions.** Getting this wrong in either direction is easy: a blanket
 retarget breaks line 34, and a blanket "don't touch introduction.md" (RFC-121's rule) leaves lines
