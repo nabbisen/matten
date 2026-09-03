@@ -1,9 +1,15 @@
 # RFC-133: Matmul Loop Order, and a Benchmark That Can See It
 
-**Status:** **Accepted** 2026-09-03 by the owner. Handoff:
-`rfcs/handoffs/133-matmul-loop-order-handoff.md`. RFC-127's collision is resolved — it shipped in
-`0.46.2` — so this is unblocked. **No version bump, tag, or publish is authorized by this
-acceptance**; each is a separate owner authorization at the time (RFC-094 §5).
+**Status:** **Implemented** 2026-09-03 in commit *"Interchange mm_mul's loops i-j-k -> i-k-j, and
+add a 512x512 benchmark case (RFC-133)"* (`0f42a8f`), reviewed and approved. **Unreleased** — the
+first theme of `0.48.0`. Measured **~10× on 512×512** (159.34 ms → 15.67 ms by the implementer;
+independently reproduced at review as 9.9× against a from-scratch `i-j-k` reference), closely
+matching the external audit's E2 on different hardware. **The RFC's own §5.1 was wrong and is
+amended in place**: the interchange is **bit-identical**, not merely close, so the changelog claims
+*no numeric change* rather than hedging — see §5.1. Only one correction was required and it was to
+this document, not the code; the implementation additionally records the bit-identity's
+preconditions in `mm_mul`'s comment, so a future tiling or parallel-reduction change is warned that
+it would break a published promise. Handoff: `rfcs/handoffs/133-matmul-loop-order-handoff.md`.
 **Target:** `crates/matten/src/math.rs`, `benchmarks/benches/core.rs`
 **Theme:** A 10× win from reordering two loops — and first, a measurement that can observe it
 **Related:** RFC-049 (benchmark scope, expanded here with owner authorization), RFC-127 (must ship
