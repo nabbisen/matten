@@ -1,4 +1,5 @@
 use crate::{MattenError, Tensor};
+use proptest::prelude::*;
 
 // ---- SliceBuilder -------------------------------------------------------
 
@@ -347,4 +348,77 @@ fn preexisting_specs_still_parse_to_identical_results() {
         t.slice_str("0:10:2").unwrap().as_slice(),
         &[0.0, 2.0, 4.0, 6.0, 8.0]
     );
+}
+
+// ---- P4: slice bounds (RFC-128) --------------------------------------------
+//
+// for any tensor and any index:
+//     the result is either Err, or a tensor whose every element appears in
+//     the source
+//
+// The literal RFC wording ("every element appears in the source") alone
+// would NOT have caught RFC-127's F-5 (`index(usize::MAX)` silently mapping
+// to a valid-looking LAST ROW, whose elements genuinely do appear in the
+// source — the defect was in which row got selected, not in the values
+// themselves). This implements the stronger property that actually
+// reproduces F-5: an index outside `0..shape[0]` must be `Err`; an index
+// inside that range must select EXACTLY that row, not merely "some row that
+// happens to share values." Flagged here rather than silently narrowed to
+// the weaker reading (RFC-128 R5: report a property gap, do not paper over
+// it).
+//
+// `any::<usize>()` did not reliably sample a value >= 2^63 in ordinary
+// (256-case) property runs during development (RFC-128 §5's fail-proof
+// review request has the full account), so RFC-127's own F-5 reproduction is
+// ALSO pinned here directly, not left to the property's luck.
+
+#[test]
+fn p4_index_usize_max_out_of_range_regression() {
+    let t = Tensor::new(vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0], &[2, 3]);
+    let err = t.slice().index(usize::MAX).all().build().unwrap_err();
+    assert!(matches!(err, MattenError::Slice { .. }));
+}
+
+proptest! {
+    #[test]
+    fn p4_index_axis0_matches_or_errs(
+        shp in crate::proptest_support::small_shape(),
+        raw_index in any::<usize>(),
+    ) {
+        if shp.is_empty() {
+            return Ok(()); // a scalar has no axis to index
+        }
+        let len: usize = shp.iter().product();
+        let data: Vec<f64> = (0..len).map(|i| i as f64).collect();
+        let t = Tensor::new(data.clone(), &shp);
+
+        let mut builder = t.slice().index(raw_index);
+        for _ in 1..shp.len() {
+            builder = builder.all();
+        }
+
+        match builder.build() {
+            Ok(r) => {
+                // Only a genuinely in-range index may succeed.
+                prop_assert!(
+                    raw_index < shp[0],
+                    "index {} outside [0,{}) unexpectedly succeeded (shape {:?})",
+                    raw_index, shp[0], shp
+                );
+                // And it must select EXACTLY that row, not merely some row
+                // whose values happen to appear elsewhere in the source.
+                let row_len: usize = shp[1..].iter().product();
+                let expected = &data[raw_index * row_len..(raw_index + 1) * row_len];
+                prop_assert_eq!(r.as_slice(), expected);
+            }
+            Err(_) => {
+                // An in-range index must never fail.
+                prop_assert!(
+                    raw_index >= shp[0],
+                    "in-range index {} unexpectedly errored (shape {:?})",
+                    raw_index, shp
+                );
+            }
+        }
+    }
 }

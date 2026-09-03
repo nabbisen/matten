@@ -95,6 +95,8 @@ mod linalg;
 mod math;
 mod ops;
 mod parse;
+#[cfg(test)]
+mod proptest_support;
 mod reshape;
 mod selection;
 mod ser;

@@ -1,4 +1,5 @@
 use crate::{MattenError, Tensor};
+use proptest::prelude::*;
 
 // ---- construction & inspection (M1) -------------------------------------
 
@@ -452,4 +453,54 @@ fn ones_panics_when_default_limit_exceeded() {
 fn full_panics_when_default_limit_exceeded() {
     use crate::limits::MAX_ELEMENTS;
     let _ = Tensor::full(&[MAX_ELEMENTS + 1], 1.0);
+}
+
+// ---- P1: shape/data invariant (RFC-128) ------------------------------------
+//
+// for any tensor produced by ANY public constructor or operation:
+//     shape.iter().product() == data.len()
+//
+// This is the property whose absence produced RFC-127's Critical: a shape
+// like [400_000_000_000, 0] validated and a huge surviving axis later aborted
+// the process. `try_zeros` validates the shape (rejecting anything the
+// default MattenLimits budget disallows) before allocating, so generating
+// shapes FREELY here and asserting only "if Ok, the invariant holds" is
+// exactly RFC-128 §4.1's instruction: bound the DATA, not the shape — the
+// Err branch below is itself the property's coverage of the rejected cases,
+// not a skip (RFC-128 R1/R5).
+
+proptest! {
+    #[test]
+    fn p1_try_zeros_invariant(shp in crate::proptest_support::shape()) {
+        use crate::limits::{MAX_ELEMENTS, MAX_NDIM};
+
+        match Tensor::try_zeros(&shp) {
+            Ok(t) => {
+                let expected = crate::proptest_support::checked_product(&shp);
+                prop_assert_eq!(Some(t.as_slice().len()), expected, "shape {:?}", shp);
+                prop_assert_eq!(t.shape(), shp.as_slice());
+            }
+            Err(_) => {
+                // A rejection must have a real cause: too many axes, a
+                // single dimension past `MAX_ELEMENTS` (the effective
+                // per-dimension bound `try_zeros`'s DEFAULT limits enforce —
+                // checked_shape_len bounds each dimension against
+                // `min(self.max_elements, MAX_REPRESENTABLE_DIMENSION)`,
+                // and MAX_ELEMENTS is far smaller than
+                // MAX_REPRESENTABLE_DIMENSION here, so it is the binding
+                // one), or the overall product exceeding that same budget
+                // (or overflowing usize entirely). Anything else would mean
+                // try_zeros spuriously rejected a reasonable shape.
+                let rank_too_big = shp.len() > MAX_NDIM;
+                let dim_too_big = shp.iter().any(|&d| d > MAX_ELEMENTS);
+                let too_big_or_overflow = crate::proptest_support::checked_product(&shp)
+                    .is_none_or(|p| p > MAX_ELEMENTS);
+                prop_assert!(
+                    rank_too_big || dim_too_big || too_big_or_overflow,
+                    "try_zeros rejected a shape that should have been representable: {:?}",
+                    shp
+                );
+            }
+        }
+    }
 }

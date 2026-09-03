@@ -37,3 +37,6 @@ required-features = ["csv"]
 [[example]]
 name = "12_boundary_error_handling"
 required-features = ["json", "csv"]
+
+[dev-dependencies]
+proptest = "1.11.0"

@@ -1,4 +1,5 @@
-use crate::Tensor;
+use crate::{MattenLimits, Tensor};
+use proptest::prelude::*;
 
 // ── dot (vector) ──────────────────────────────────────────────────────────
 
@@ -193,4 +194,62 @@ fn matmul_both_dims_zero() {
     assert_eq!(r.shape(), &[0, 0]);
     assert!(r.as_slice().is_empty());
     assert_eq!(a.dot(&b), r);
+}
+
+// ── P1: shape/data invariant for matmul (RFC-128) ──────────────────────────
+//
+// for any tensor produced by ANY public constructor or operation:
+//     shape.iter().product() == data.len()
+//
+// `mm_mul` (math.rs) is one of the two sites RFC-127 actually fixed: two
+// individually-cheap-to-construct operands ([m, n] and [n, p] with n kept
+// small) can still combine to an m*p output too large for the default
+// budget. This reproduces that shape directly rather than trusting the
+// fixed guard stays in place.
+
+fn matmul_extreme_dim() -> impl Strategy<Value = usize> {
+    prop_oneof![
+        6 => 0usize..6,
+        1 => Just(2000usize),
+        1 => Just(crate::limits::MAX_ELEMENTS + 1),
+    ]
+}
+
+proptest! {
+    #[test]
+    fn p1_try_matmul_invariant(
+        m in matmul_extreme_dim(),
+        n in 0usize..4,
+        p in matmul_extreme_dim(),
+    ) {
+        // A generous per-operand budget: only mm_mul's own hardcoded DEFAULT
+        // budget check (not this one) should be able to reject the m*p output.
+        let generous = MattenLimits {
+            max_elements: usize::MAX / 8,
+            ..MattenLimits::default()
+        };
+        let a = match Tensor::try_zeros_with_limits(&[m, n], &generous) {
+            Ok(t) => t,
+            Err(_) => return Ok(()), // operand itself unconstructible; nothing to test here
+        };
+        let b = match Tensor::try_zeros_with_limits(&[n, p], &generous) {
+            Ok(t) => t,
+            Err(_) => return Ok(()),
+        };
+
+        match a.try_matmul(&b) {
+            Ok(r) => {
+                let expected: usize = r.shape().iter().product();
+                prop_assert_eq!(r.as_slice().len(), expected);
+                prop_assert_eq!(r.shape(), &[m, p][..]);
+            }
+            Err(e) => {
+                prop_assert!(
+                    matches!(e, crate::MattenError::Allocation { .. }),
+                    "unexpected error variant: {:?}",
+                    e
+                );
+            }
+        }
+    }
 }

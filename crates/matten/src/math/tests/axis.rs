@@ -1,4 +1,5 @@
 use crate::{MattenError, Tensor};
+use proptest::prelude::*;
 
 // ── axis reductions ───────────────────────────────────────────────────────
 
@@ -366,5 +367,83 @@ fn try_axis_reductions_on_vector_give_scalar() {
         assert!(got.is_scalar());
         assert_eq!(got.shape(), want.shape());
         assert_eq!(got.as_slice(), want.as_slice());
+    }
+}
+
+// ── P1: shape/data invariant for axis reduction (RFC-128) ──────────────────
+//
+// for any tensor produced by ANY public constructor or operation:
+//     shape.iter().product() == data.len()
+//
+// Generalizes t3_sum_axis_on_zero_reduced_axis_does_not_abort
+// (tests/rfc127_unbounded_dimension.rs): sum_axis uniquely permits a
+// zero-length REDUCED axis (RFC-110), so the surviving axes' product is not
+// otherwise bounded by the input's own size (a zero anywhere makes the whole
+// shape's product 0, so construction always succeeds regardless of how huge
+// the other axes are) -- reducing over that zero axis is where the risk
+// lives, and this is one of the two sites RFC-127 actually fixed (math.rs's
+// axis_reduce).
+
+fn surviving_axis_dim() -> impl Strategy<Value = usize> {
+    prop_oneof![
+        3 => 0usize..4,
+        1 => Just(crate::limits::MAX_REPRESENTABLE_DIMENSION),
+        1 => Just(2_000_000usize),
+    ]
+}
+
+proptest! {
+    #[test]
+    fn p1_sum_axis_zero_reduced_axis_invariant(
+        rank in 1usize..=crate::limits::MAX_NDIM,
+        zero_axis_raw in 0usize..crate::limits::MAX_NDIM,
+        dims in prop::collection::vec(surviving_axis_dim(), crate::limits::MAX_NDIM),
+    ) {
+        let zero_axis = zero_axis_raw % rank;
+        let mut shape: Vec<usize> = dims.into_iter().take(rank).collect();
+        shape[zero_axis] = 0;
+
+        // A generous per-operand budget, matching RFC-127's own
+        // t3_sum_axis_on_zero_reduced_axis_does_not_abort: try_zeros's
+        // DEFAULT limits bound each dimension individually to MAX_ELEMENTS
+        // (not just the product), so a huge surviving axis needs a raised
+        // max_elements to construct at all -- the product being 0 does not
+        // exempt it from the per-dimension check. Only sum_axis's own
+        // hardcoded DEFAULT budget (not this raised one) should be able to
+        // reject the surviving-axes' product below.
+        let generous = crate::MattenLimits {
+            max_elements: usize::MAX / 16,
+            ..crate::MattenLimits::default()
+        };
+        let t = match Tensor::try_zeros_with_limits(&shape, &generous) {
+            Ok(t) => t,
+            Err(_) => {
+                // A genuinely-zero-product shape can still overflow the
+                // CHECKED (left-to-right) product computation if a huge
+                // dimension is encountered before the zero -- e.g.
+                // [huge, 1, huge, 0]: checked_mul overflows multiplying the
+                // two huge values together, before ever reaching the
+                // trailing zero that would mathematically bring the product
+                // back to 0. This is order-dependent, safe (an Err, never a
+                // corrupt Tensor or an abort), and orthogonal to what this
+                // property targets (sum_axis's own guard, not construction)
+                // -- nothing to test for this generated shape.
+                return Ok(());
+            }
+        };
+
+        match t.try_sum_axis(zero_axis) {
+            Ok(r) => {
+                let expected: usize = r.shape().iter().product();
+                prop_assert_eq!(r.as_slice().len(), expected);
+            }
+            Err(e) => {
+                prop_assert!(
+                    matches!(e, MattenError::Allocation { .. }),
+                    "unexpected error variant: {:?}",
+                    e
+                );
+            }
+        }
     }
 }

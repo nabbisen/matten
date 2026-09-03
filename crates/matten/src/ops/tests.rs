@@ -1,4 +1,5 @@
 use crate::{MattenLimits, Tensor};
+use proptest::prelude::*;
 
 // ---- broadcasting (M3) -------------------------------------------------
 
@@ -220,4 +221,42 @@ fn add_panics_with_byte_identical_dynamic_message() {
         "matten unsupported error in add: element-wise arithmetic is not supported on dynamic \
          tensors; call try_numeric() on each operand first"
     );
+}
+
+// ---- P1: shape/data invariant for arithmetic (RFC-128) ---------------------
+//
+// for any tensor produced by ANY public constructor or operation:
+//     shape.iter().product() == data.len()
+//
+// Extends tensor::tests's construction-only P1 to an actual operation:
+// broadcasting arithmetic. Both operands are bounded (small_shape) so the
+// property can materialize real data; genuine broadcast expansion within
+// that bound never approaches the default element budget, so an Err here
+// must be Broadcast (incompatible shapes), never Allocation.
+
+proptest! {
+    #[test]
+    fn p1_try_add_invariant(
+        left_shape in crate::proptest_support::small_shape(),
+        right_shape in crate::proptest_support::small_shape(),
+    ) {
+        let left_len: usize = left_shape.iter().product();
+        let right_len: usize = right_shape.iter().product();
+        let a = Tensor::new(vec![1.0; left_len], &left_shape);
+        let b = Tensor::new(vec![2.0; right_len], &right_shape);
+
+        match a.try_add(&b) {
+            Ok(r) => {
+                let expected: usize = r.shape().iter().product();
+                prop_assert_eq!(r.as_slice().len(), expected);
+            }
+            Err(e) => {
+                prop_assert!(
+                    matches!(e, crate::MattenError::Broadcast { .. }),
+                    "small, bounded operands should only fail with Broadcast, got {:?}",
+                    e
+                );
+            }
+        }
+    }
 }

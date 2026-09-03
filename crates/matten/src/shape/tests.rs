@@ -1,4 +1,5 @@
 use crate::shape::{coord_to_flat, flat_to_coord, strides_for_shape};
+use proptest::prelude::*;
 
 #[test]
 fn strides_are_row_major() {
@@ -27,5 +28,35 @@ fn index_round_trip() {
                 "shape {shp:?} flat {flat}"
             );
         }
+    }
+}
+
+// ---- P2: index round-trip (RFC-128) ----------------------------------------
+//
+// for any valid shape and any flat index in range:
+//     coord_to_flat(flat_to_coord(i)) == i
+//
+// `index_round_trip` above already covers this for six hand-picked shapes;
+// this property generalizes it to the shapes RFC-127's edge cases live in —
+// rank 0, zero dimensions, and everything `proptest_support::small_shape`
+// generates — while staying bounded so the test itself cannot allocate more
+// than a few thousand elements.
+
+proptest! {
+    #[test]
+    fn p2_index_round_trip_property(
+        shp in crate::proptest_support::small_shape(),
+        raw_flat in any::<usize>(),
+    ) {
+        let len: usize = shp.iter().product();
+        if len == 0 {
+            // No valid flat index exists for a zero-element shape; nothing to
+            // round-trip. (A rank-0 scalar has len == 1, not 0 — see shape.rs.)
+            return Ok(());
+        }
+        let flat = raw_flat % len;
+        let coord = flat_to_coord(flat, &shp);
+        prop_assert_eq!(coord.len(), shp.len());
+        prop_assert_eq!(coord_to_flat(&coord, &shp), Some(flat));
     }
 }

@@ -1,6 +1,7 @@
 //! Unit tests for the broadcast module.
 
 use super::{BroadcastCtx, broadcast_shape};
+use proptest::prelude::*;
 
 #[test]
 fn broadcast_shape_same_rank_equal_dims() {
@@ -72,4 +73,53 @@ fn broadcast_ctx_column_broadcast() {
     // Row 1 of result: left maps to flat 1, right maps to 0-3
     assert_eq!(ctx.left_flat(4), 1);
     assert_eq!(ctx.right_flat(4), 0);
+}
+
+// ---- P3: broadcasting algebra (RFC-128) -------------------------------------
+//
+// for any two broadcast-compatible shapes:
+//     the result shape is the pairwise max, right-aligned
+// and for any INcompatible pair, the operation errors rather than panicking
+// or producing a wrong shape
+//
+// `reference_broadcast` restates the documented spec (module doc above:
+// "equal dimensions are compatible; one dimension equal to 1 broadcasts to
+// the other; a missing leading dimension is treated as 1") independently of
+// `broadcast_shape`'s own control flow, so this checks the function against
+// its specification rather than against itself.
+
+/// Right-aligned NumPy-style broadcast, computed directly from the spec
+/// rather than by calling `broadcast_shape`.
+fn reference_broadcast(left: &[usize], right: &[usize]) -> Option<Vec<usize>> {
+    let rank = left.len().max(right.len());
+    let mut result = Vec::with_capacity(rank);
+    for i in 0..rank {
+        let l = left.len().checked_sub(rank - i).map_or(1, |idx| left[idx]);
+        let r = right
+            .len()
+            .checked_sub(rank - i)
+            .map_or(1, |idx| right[idx]);
+        if l == r {
+            result.push(l);
+        } else if l == 1 {
+            result.push(r);
+        } else if r == 1 {
+            result.push(l);
+        } else {
+            return None;
+        }
+    }
+    Some(result)
+}
+
+proptest! {
+    #[test]
+    fn p3_broadcast_shape_matches_reference_spec(
+        left in crate::proptest_support::shape(),
+        right in crate::proptest_support::shape(),
+    ) {
+        let actual = broadcast_shape(&left, &right).ok();
+        let expected = reference_broadcast(&left, &right);
+        prop_assert_eq!(actual, expected, "left {:?} right {:?}", left, right);
+    }
 }
