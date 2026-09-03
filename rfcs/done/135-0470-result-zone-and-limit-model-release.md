@@ -1,8 +1,12 @@
 # RFC-135: `0.47.0` — The Result-Zone and Limit-Model Release
 
-**Status:** **Accepted** 2026-09-03 by the owner, who directed the corrections be applied directly
-rather than handed off. Implemented by the high-capability model. **The tag and the publish are NOT
-authorized by this acceptance** — each is a separate owner authorization at the time (RFC-094 §5).
+**Status:** **Released** 2026-09-03. Prepared in commit *"Prepare 0.47.0: 24 pins, 8 family
+references, two page rewrites, the changelog entry (RFC-135)"* (`d1f02eb`); the owner authorized
+push, tag and publish as one instruction after CI was confirmed green. All five crates are live at
+`0.47.0` on crates.io, verified against the **sparse index** (`index.crates.io`), none yanked. The
+signed tag `0.47.0` sits on the *Prepare* commit per the `0.37.0`-`0.46.2` convention, though three
+commits touching **zero** `crates/` paths (RFC-123, RFC-130 A/B, a handoff correction) had landed on
+top of it by then -- verified before tagging, so the tag still marks exactly the released content.
 **Target:** `Cargo.toml`, live version pins, `CHANGELOG.md`, `introduction.md`,
 `public-api-snapshot.md`
 **Theme:** Release four closed RFCs, and invert almost every instruction the last two releases gave

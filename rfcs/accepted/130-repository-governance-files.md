@@ -1,11 +1,15 @@
 # RFC-130: Repository Governance Files
 
-**Status:** **Accepted** 2026-09-01 by the owner. **UNBLOCKED 2026-09-03** — private vulnerability
-reporting is now **enabled** on the repository, confirmed via
-`gh api repos/nabbisen/matten/private-vulnerability-reporting` → `{"enabled": true}`, so the owner's
-disclosure URL now accepts reports. RFC-127 has also shipped (`0.46.2`), satisfying the sequencing
-condition. **Implementation may start.** Handoff:
-`rfcs/handoffs/130-repository-governance-files-handoff.md`. No version, no tag, no publish.
+**Status:** **Partially implemented — deliberately still open.** Changes A and B landed
+2026-09-03 in commit *"Add SECURITY.md and CONTRIBUTING.md (RFC-130)"* (`c13e304`), reviewed and
+approved with **no corrections**; the implementer re-derived the reporting toggle themselves rather
+than trusting this RFC's banner, on the reasoning that a setting can be switched off after the
+document depending on it is written. **Change C (the manifest keys) is NOT implemented.** §6 directs
+it to be *"folded into [`0.47.0`'s] release slice"*; `0.47.0` was tagged and published on 2026-09-03
+without it, so that window has closed and Change C now waits for the next minor. This RFC therefore
+**stays in `accepted/`**: moving it to `done/` with a third of its content unbuilt is precisely the
+"status that lies" RFC-000 names as the anti-pattern, and the folder is the only status this project
+keeps. Handoff (Changes A/B only): `rfcs/handoffs/130-repository-governance-files-handoff.md`.
 **Target:** `SECURITY.md`, `CONTRIBUTING.md`, `crates/*/Cargo.toml` (manifest metadata)
 **Theme:** Give a vulnerability somewhere to go, and make the contributor and project links findable
 **Related:** RFC-001 (the threat model this serves), RFC-094 §4.1 (why the manifest keys are a patch),

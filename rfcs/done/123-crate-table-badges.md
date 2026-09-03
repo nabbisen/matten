@@ -1,9 +1,12 @@
 # RFC-123: Move the Per-Crate Badges into the Crate Table
 
-**Status:** **Accepted** 2026-08-28 by the owner. **BLOCKED — do not start.** Implementation waits
-until `0.46.1` is tagged and published: RFC-121 asserts the five `0.46.x` references in `README.md`
-are unchanged, and those five are exactly the Version cells Change C deletes (§7). Handoff:
-`rfcs/handoffs/123-crate-table-badges-handoff.md`. No version, no tag, no publish.
+**Status:** **Implemented** 2026-09-03 in commit *"Replace the vacuous crate-table guard with a
+badge-coverage check (RFC-123)"* (`5499094`), reviewed and approved with **no corrections**. The
+block was lifted once `0.46.1` shipped. Changes A/B/C were made by the owner directly; **Change D**
+-- the guard replacement -- was the implementer's, and is the substance: the old check watched
+version strings Change C had already deleted, so it matched zero rows and could never fail again.
+The replacement derives the crate list from `crates/` on disk and asserts both badges per row. Proven
+able to fail by deleting `matten-stats`' docs.rs badge, independently reproduced at review.
 **Target:** `README.md`, `scripts/check-release-docs.sh`
 **Theme:** Make an incomplete crate list structurally visible instead of merely unlikely
 **Related:** RFC-030 (lock-step versioning), RFC-117 (guards that cannot pass vacuously), RFC-121
