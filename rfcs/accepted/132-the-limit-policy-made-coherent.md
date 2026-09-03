@@ -362,12 +362,43 @@ does. §12.1's list named "matmul" wholesale, which was wrong in both directions
 ### 12.0.2 What this changes for implementation
 
 ```text
-KEEP, unchanged — do NOT remove these three guards
+KEEP — do NOT remove these three guards
     math.rs:739       mm_mul      (added by RFC-127 for precisely this case)
     linalg.rs:181     outer       (predates the audit; RFC-127's cited pattern)
-    ops/broadcast.rs:91-93        (today a safe catchable panic; removing it
+    ops/broadcast.rs              (today a safe catchable panic; removing it
                                    makes it an uncatchable abort)
 ```
+
+> **FURTHER CORRECTED 2026-09-03, at implementation review. "KEEP, unchanged" was under-specified
+> for `BroadcastCtx`, and taken literally it contradicts this RFC's own worked example.**
+>
+> ```text
+> §12.2 promises   "&big + &big  panics today -> works"
+> §13 requires     a [2000,1000] pair returns Ok
+> the guard, applied UNCONDITIONALLY, rejects that pair: 2_000_000 > 1_048_576
+> ```
+>
+> The guard **stays**, but must fire **only on genuine multiplicative expansion** — which is what
+> §12.0.1's rule actually says. The site-level instruction ("keep the guard") never settled the
+> guard's internal condition, and the two readings diverge.
+>
+> ```text
+> guard when   result_len > combined_input_len   (left_len + right_len)
+>
+> same-shape [2000,1000]+[2000,1000]     4M combined, 2M result   -> no guard, Ok
+> row broadcast [2000,1000]+[1,1000]    ~2M combined, 2M result   -> no guard, Ok
+> moderate expansion [2000,1]x[1,1000] 3000 combined, 2M result   -> GUARD, Err
+> the escalation [1048576,1]x[1,1048576] 2M combined, 1.1T result -> GUARD, Err
+> ```
+>
+> **A fourth guard is kept, decided by the rule rather than by this list**: `axis_reduce`
+> (`math.rs:547`). `sum_axis` uniquely permits a zero-length *reduced* axis (RFC-110), so the
+> surviving-axes product is not bounded by the input's own size. The list did not name it; the rule
+> does.
+>
+> **The lesson, stated because it recurred within one task:** this RFC's *list* has now been wrong
+> twice and its *rule* right both times. Implementers should apply §12.0.1 and treat §12.0.2 as a
+> worked example of it, not as the authority.
 
 Everything else in §12.1 stands. The `try_*` methods, `max_parse_bytes` enforcement, the two
 sentence rewrites, and guard removal at the sites where the reasoning genuinely holds all proceed
