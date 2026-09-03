@@ -26,6 +26,48 @@ crates are expressed by per-crate status labels, not by separate version numbers
 > trigger — unfired across eight consecutive releases before RFC-074 found
 > it — a mandatory per-entry check rather than a rule that only an RFC states.
 
+## [0.47.0] - 2026-09-03
+
+The Result-zone and limit-model release: the four arithmetic operators gain recoverable twins, and
+the element budget now applies where an allocation can outgrow its inputs rather than everywhere.
+
+### Added
+
+- **`try_add` / `try_sub` / `try_mul` / `try_div` on `Tensor`.** Recoverable twins for the four
+  operators, returning `Result<Tensor, MattenError>` where `+`/`-`/`*`/`/` panic. The operators are
+  unchanged — same behaviour, byte-identical panic messages — and now delegate to these. Closes the
+  one gap in the two-zone error model: every other convenience API already had a `try_` form.
+  (RFC-129)
+
+### Changed
+
+- **The element budget no longer applies to operations on data already in memory.** Arithmetic,
+  reductions, slicing and concatenation are no longer checked against `MattenLimits::max_elements`,
+  so `&big + &big` on two ordinary in-memory tensors now succeeds where it previously panicked. The
+  budget still applies at every boundary where a size arrives from outside — parsers, caller-supplied
+  shapes, the slice mini-language — and to any operation whose output can exceed its inputs combined:
+  `matmul`, `outer`, broadcast expansion, and `repeat`/`tile`. (RFC-132)
+- **`max_parse_bytes` is enforced.** Every file and string parser now bounds its input before
+  reading, including `matten-data`'s `Table::from_csv_path`. The field had been public and documented
+  since RFC-018 while no parser read it. (RFC-132)
+
+### Fixed
+
+- Five documentation statements that had become false as the code moved: a `From<Vec<f64>>` impl
+  documenting a panic that cannot happen, a slicing guarantee that does not hold for dynamic tensors,
+  two contradictory comments on one constant, a shape validator describing the opposite of its own
+  behaviour, and undocumented non-reflexive `PartialEq` for `NaN`. (RFC-131)
+
+### Notes
+
+- Property-based tests were added for the shape/data invariant, the index round-trip, broadcasting,
+  and slice bounds, using `proptest` as a **dev-dependency only** — no change to the dependency graph
+  of anything that depends on `matten`. No runtime behaviour changes. (RFC-128)
+
+### Version
+
+- Release bump `0.46.2` -> `0.47.0`, lock-step.
+
 ## [0.46.2] - 2026-09-01
 
 RFC-127 release: an uncatchable process abort reachable from untrusted input, fixed. Three

@@ -85,7 +85,7 @@ the trailer hitch.
 
 ```toml
 [dependencies]
-matten = "0.46.2"
+matten = "0.47.0"
 ```
 
 ```rust
@@ -109,7 +109,7 @@ guide](docs/src/reference/dynamic.md)):
 
 ```toml
 [dependencies]
-matten = { version = "0.46.2", features = ["dynamic"] }
+matten = { version = "0.47.0", features = ["dynamic"] }
 ```
 
 ```rust
@@ -130,8 +130,8 @@ assert_eq!(numeric.as_slice(), &[1.0, 2.5, 0.0, 4.0]);
 
 ```toml
 [dependencies]
-matten = "0.46.2"
-matten-ndarray = "0.46.2"
+matten = "0.47.0"
+matten-ndarray = "0.47.0"
 ```
 
 ```rust
@@ -151,8 +151,8 @@ More examples are [here](crates/matten-ndarray/examples/).
 
 ```toml
 [dependencies]
-matten = "0.46.2"
-matten-mlprep = "0.46.2"
+matten = "0.47.0"
+matten-mlprep = "0.47.0"
 ```
 
 ```rust

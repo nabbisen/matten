@@ -1,6 +1,6 @@
 # Public API snapshot
 
-This page lists every public item in `matten` at the current v0.46 release
+This page lists every public item in `matten` at the current v0.47 release
 family. It serves as the baseline for tracking breaking changes toward v1.0.0
 and as the review gate required by RFC-015. Core `matten`'s public API most
 recently changed in RFC-104, which added `get_mut`/`get_flat_mut` (numeric) and

@@ -131,7 +131,7 @@ dependencies = [
 
 [[package]]
 name = "matten"
-version = "0.46.2"
+version = "0.47.0"
 dependencies = [
  "csv",
  "proptest",
@@ -141,7 +141,7 @@ dependencies = [
 
 [[package]]
 name = "matten-data"
-version = "0.46.2"
+version = "0.47.0"
 dependencies = [
  "csv",
  "matten",
@@ -149,14 +149,14 @@ dependencies = [
 
 [[package]]
 name = "matten-mlprep"
-version = "0.46.2"
+version = "0.47.0"
 dependencies = [
  "matten",
 ]
 
 [[package]]
 name = "matten-ndarray"
-version = "0.46.2"
+version = "0.47.0"
 dependencies = [
  "matten",
  "ndarray",
@@ -164,7 +164,7 @@ dependencies = [
 
 [[package]]
 name = "matten-stats"
-version = "0.46.2"
+version = "0.47.0"
 dependencies = [
  "matten",
 ]

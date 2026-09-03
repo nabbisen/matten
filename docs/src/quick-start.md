@@ -3,7 +3,7 @@
 Add `matten` to your `Cargo.toml`:
 
 ```toml
-matten = "0.46.2"
+matten = "0.47.0"
 ```
 
 Then:
@@ -27,7 +27,7 @@ see [Boundary integration](./reference/boundary.md) for those.
 If you don't need JSON/CSV/serde, opt into the smaller dependency footprint:
 
 ```toml
-matten = { version = "0.46.2", default-features = false }
+matten = { version = "0.47.0", default-features = false }
 ```
 
 On this profile, `Tensor::from_json` / `Tensor::from_csv` are not available. See

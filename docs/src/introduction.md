@@ -16,20 +16,15 @@ This book is organized by reader:
 - **Reference** — the rules that shape the public API.
 - **Contributors** — project layout, milestones, and process.
 
-> This documentation tracks the current 0.46 release family, carrying RFC-110, RFC-111,
-> and RFC-112 — no new API, only behaviour changes and a restriction removed. Zero-sized
-> dimensions are now **constructible directly** (`Tensor::try_new(vec![], &[0, 3])`
-> succeeds), not merely reachable by slicing as before: every constructor, `reshape`,
-> the shape-composition family, `linspace`/`eye`, serde, and the `matten-ndarray` bridge
-> accept them. `Display` on an empty tensor now shows its **shape** instead of an empty
-> string; `Debug` is unchanged. `mean_axis`/`min_axis`/`max_axis`/`var_axis`/`std_axis`
-> now **error** when the **reduced** axis has length 0, instead of leaking `NaN`/`inf`/
-> `-inf` — a zero-length *surviving* axis is a different case and was and remains `Ok`
-> with an empty result; `sum`/`sum_axis` are unchanged, their additive identity was
-> already correct. `matten-ndarray`'s `ZeroSizedAxis` error variant is deprecated and
-> never constructed, kept only so existing code matching on it still compiles.
-> `matten-mlprep`'s `standardize_columns`/`minmax_scale_columns` return a different
-> error — not a different outcome — for a zero-row input: previously a shape-rejection
-> error from tensor construction, now an axis-reduction error, both `Err`, never a
-> panic in any released version — see the `[0.46.0]` CHANGELOG entry for the complete
+> This documentation tracks the current 0.47 release family, carrying RFC-128 through
+> RFC-132. The four arithmetic operators gain recoverable twins — `try_add`, `try_sub`,
+> `try_mul`, `try_div` — returning `Result` where `+`/`-`/`*`/`/` panic; the operators
+> themselves are unchanged and now delegate to them. The element budget **no longer applies**
+> to arithmetic, reductions, slicing, or concatenation on data already in memory, so
+> `&big + &big` succeeds where it previously panicked. It still applies at every boundary
+> where a size arrives from outside, and to any operation whose output can exceed its inputs
+> combined — `matmul`, `outer`, broadcast expansion, and `repeat`/`tile`. `max_parse_bytes`
+> is now enforced at every file and string parser, including `matten-data`'s
+> `Table::from_csv_path`, where it had been documented but inert. Five rustdoc statements
+> that had gone false are corrected — see the `[0.47.0]` CHANGELOG entry for the complete
 > list.

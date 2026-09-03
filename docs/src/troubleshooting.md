@@ -13,14 +13,14 @@ error[E0599]: no associated function or constant named `from_csv` found for stru
 The `csv` (or `json`, for `from_json`) feature is off. This happens on the lean profile:
 
 ```toml
-matten = { version = "0.46.2", default-features = false }
+matten = { version = "0.47.0", default-features = false }
 ```
 
 Either drop `default-features = false` to get the default profile (`serde` + `json` + `csv`), or
 opt back in explicitly:
 
 ```toml
-matten = { version = "0.46.2", features = ["csv"] }
+matten = { version = "0.47.0", features = ["csv"] }
 ```
 
 See [Quick start](./quick-start.md) and [Cargo features](./reference/boundary.md#cargo-features).
