@@ -24,7 +24,7 @@
 >
 > **The blocker below is also lifted** — `0.46.1` shipped on 2026-08-31.
 
-## 1. DO NOT START THIS YET
+## 1. ~~DO NOT START THIS YET~~ — unblocked; the reasoning is kept as record
 
 ~~**This task is blocked, and starting it early breaks work already in flight.**~~ **LIFTED — `0.46.1` shipped 2026-08-31.** The original reasoning is kept below as the record of why it was held.
 

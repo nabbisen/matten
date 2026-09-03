@@ -23,8 +23,12 @@ NOT yours** — see §6.
 
 ## 2. Sequence with RFC-127, and why
 
-**Publishing a disclosure channel is an invitation to look.** RFC-127 closes a live, uncatchable
-process abort reachable from untrusted JSON, currently on crates.io.
+**SATISFIED 2026-09-03 — `0.46.2` shipped, and with it RFC-127's fix.** This section is kept as the
+record of why the sequencing mattered; the condition it imposes is met and does not block you.
+
+**Publishing a disclosure channel is an invitation to look.** RFC-127 closed a live, uncatchable
+process abort reachable from untrusted JSON, which **was** on crates.io in every version from
+`0.17.0` until `0.46.2` fixed it.
 
 ```text
 RFC-127 ships as 0.46.2  ->  THEN this
