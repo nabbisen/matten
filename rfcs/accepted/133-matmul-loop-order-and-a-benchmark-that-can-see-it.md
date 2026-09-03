@@ -1,6 +1,9 @@
 # RFC-133: Matmul Loop Order, and a Benchmark That Can See It
 
-**Status:** Proposed
+**Status:** **Accepted** 2026-09-03 by the owner. Handoff:
+`rfcs/handoffs/133-matmul-loop-order-handoff.md`. RFC-127's collision is resolved — it shipped in
+`0.46.2` — so this is unblocked. **No version bump, tag, or publish is authorized by this
+acceptance**; each is a separate owner authorization at the time (RFC-094 §5).
 **Target:** `crates/matten/src/math.rs`, `benchmarks/benches/core.rs`
 **Theme:** A 10× win from reordering two loops — and first, a measurement that can observe it
 **Related:** RFC-049 (benchmark scope, expanded here with owner authorization), RFC-127 (must ship
@@ -131,9 +134,20 @@ the version bump                              the 0.47.0 release RFC owns it
 function.
 
 ```text
-RFC-127 -> 0.46.2   (math.rs: allocation guards)
-then this           -> rides 0.47.0 with RFC-129 and RFC-132
+RFC-127 -> 0.46.2   (math.rs: allocation guards)          SHIPPED 2026-09-03
+then this           -> rides 0.47.0 with RFC-129/RFC-132  SUPERSEDED, see below
 ```
+
+> **Amended 2026-09-03 on acceptance.** Both halves of the sequencing above are now history:
+> RFC-127 shipped in `0.46.2` and `0.47.0` was tagged and published the same day, carrying RFC-128,
+> RFC-129, RFC-131 and RFC-132. **The collision this section existed to prevent is therefore gone,
+> and `math.rs` is at its post-RFC-127 shape** — which is what §5's "keep RFC-127's guard
+> byte-identical" now refers to concretely, rather than to an unlanded change.
+>
+> **This RFC now rides `0.48.0`, and is the first theme in it.** Under RFC-094 §4.2 that has a
+> consequence worth recording: a minor needs two themes, 28 days, or the owner asking, so this RFC
+> is one of the two triggers for the release that will also carry **RFC-130's Change C** (the
+> manifest `homepage` key), which missed `0.47.0`'s window.
 
 ## 9. Risks
 

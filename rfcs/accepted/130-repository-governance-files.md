@@ -121,6 +121,24 @@ belongs in a minor.
 **Therefore:** A and B land immediately with no release. **C waits for `0.47.0`** and should be folded
 into that release's slice rather than triggering anything of its own.
 
+> **Amended 2026-09-03, after `0.47.0` shipped without Change C.** The sentence above is kept
+> verbatim because it was the right instruction when written; it is simply no longer executable.
+> `0.47.0` was tagged and published on 2026-09-03. The implementer raised the ambiguity at exactly
+> the right moment — prep landed, tag not yet cut — and review ruled the window genuinely open but
+> the call the owner's, since folding Change C in would have expanded a prepared release past
+> RFC-135's declared contents. The owner authorized the release as prepared, so the window closed.
+>
+> **Change C now rides `0.48.0`**, whose first theme is RFC-133 (matmul loop order), accepted the
+> same day. Nothing further is required of the owner: Change C is already accepted, and RFC-094
+> §4.2's triggers carry it. The reasoning of §6 is untouched by any of this — manifest metadata is
+> still not patch content, so it still needs a minor; only *which* minor has changed.
+>
+> **The narrower lesson is about the wording, not the decision.** "C waits for `0.47.0`" named a
+> specific release, which made it a statement that could go stale — and did, within three days.
+> "C waits for the next minor" would have stayed true through any number of releases. This project
+> has now corrected four statements of this shape (two handoff banners, RFC-133 §8, and this one);
+> the common cause is naming a moving target by its current value.
+
 If the owner would rather have the crates.io links sooner, the lever is authorizing `0.47.0` — the
 same lever RFC-129 needs.
 
