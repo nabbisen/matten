@@ -1,11 +1,11 @@
 # RFC-130: Repository Governance Files
 
-**Status:** **Accepted** 2026-09-01 by the owner, who supplied the disclosure URL
-`https://github.com/nabbisen/matten/security/advisories/new`. **BLOCKED on one owner action:**
-private vulnerability reporting is currently **disabled** on the repository — measured 2026-09-01 via
-`gh api repos/nabbisen/matten/private-vulnerability-reporting` → `{"enabled": false}` — so that URL
-does not accept reports yet. Handoff: `rfcs/handoffs/130-repository-governance-files-handoff.md`.
-Starts after RFC-127 **ships**. No version bump, tag, or publish.
+**Status:** **Accepted** 2026-09-01 by the owner. **UNBLOCKED 2026-09-03** — private vulnerability
+reporting is now **enabled** on the repository, confirmed via
+`gh api repos/nabbisen/matten/private-vulnerability-reporting` → `{"enabled": true}`, so the owner's
+disclosure URL now accepts reports. RFC-127 has also shipped (`0.46.2`), satisfying the sequencing
+condition. **Implementation may start.** Handoff:
+`rfcs/handoffs/130-repository-governance-files-handoff.md`. No version, no tag, no publish.
 **Target:** `SECURITY.md`, `CONTRIBUTING.md`, `crates/*/Cargo.toml` (manifest metadata)
 **Theme:** Give a vulnerability somewhere to go, and make the contributor and project links findable
 **Related:** RFC-001 (the threat model this serves), RFC-094 §4.1 (why the manifest keys are a patch),

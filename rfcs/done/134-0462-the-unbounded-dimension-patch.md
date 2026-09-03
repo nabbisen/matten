@@ -149,6 +149,40 @@ NOTE  private vulnerability reporting is currently DISABLED on the repository,
 **This is the owner's decision and it does not block the release.** Ship `0.46.2` either way; an
 advisory can follow.
 
+### 7.1 DECIDED 2026-09-03 — no advisory, with a stated trigger
+
+The owner raised the right objection: *"matten has never been in production use. Therefore, I did not
+know if it was worth doing."* Measured rather than assumed:
+
+```text
+reverse dependencies on matten   4  -> matten-data, matten-mlprep, matten-ndarray, matten-stats
+EXTERNAL consumers               0  -> all four are its own companions
+age / versions                   74 days, 108 published versions
+downloads                        2,983 total  =  ~27 per version
+```
+
+**~27 downloads per version is the signature of docs.rs builds, CI and mirrors, not people.** And an
+advisory's entire mechanism is `cargo audit` warning a *downstream consumer*. There are none. Filing
+would consume RustSec reviewer attention and add a line to every downstream audit report, to reach
+nobody.
+
+**Decision: no advisory.** The `### Security` CHANGELOG entry already does everything an advisory
+would, for the population that exists.
+
+**The trigger for revisiting**, so this is not a permanent "no" reached once and forgotten:
+
+```text
+curl .../crates/matten/reverse_dependencies
+   -> if any dependent name does NOT start with "matten", re-ask.
+```
+
+An external dependent cannot be reached any other way, and at that point the calculus inverts.
+
+**Separately decided and unrelated:** private vulnerability reporting was **enabled** on 2026-09-03.
+That question is about how the *next* report arrives, not about this defect's exposure, and it does
+not depend on adoption at all — this project attracts external audits, which is how this Critical was
+found, by someone who had nowhere private to report it. RFC-130 is unblocked.
+
 ## 8. Out of scope — a diff touching these is a defect
 
 ```text

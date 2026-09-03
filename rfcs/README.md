@@ -158,7 +158,7 @@ sign-off and implementation — not that the state is unused.
 |---:|---|---|
 | 123 | [Move the Per-Crate Badges into the Crate Table](./accepted/123-crate-table-badges.md) | [`123-…-handoff.md`](./handoffs/123-crate-table-badges-handoff.md) — **blocked until `0.46.1` ships** — **reduced to Change D**: A/B/C performed by the owner 2026-09-01 |
 | 128 | [Property Testing](./accepted/128-property-testing.md) | [`128-…-handoff.md`](./handoffs/128-property-testing-handoff.md) — after RFC-127 |
-| 130 | [Repository Governance Files](./accepted/130-repository-governance-files.md) | [`130-…-handoff.md`](./handoffs/130-repository-governance-files-handoff.md) — **blocked**: private reporting is off |
+| 130 | [Repository Governance Files](./accepted/130-repository-governance-files.md) | [`130-…-handoff.md`](./handoffs/130-repository-governance-files-handoff.md) — unblocked 2026-09-03 |
 | 131 | [Documentation Corrections, Batched](./accepted/131-documentation-corrections-batch.md) | [`131-…-handoff.md`](./handoffs/131-documentation-corrections-batch-handoff.md) — after RFC-127 |
 
 ## Archive

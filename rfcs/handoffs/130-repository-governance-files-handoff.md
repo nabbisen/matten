@@ -4,21 +4,17 @@
 **Design authority:** `rfcs/proposed/130-repository-governance-files.md`
 **Base:** **after RFC-127 ships.** See §2 — the sequencing is not incidental.
 
-> **ACCEPTED 2026-09-01 — but BLOCKED.** Private vulnerability reporting is **disabled** on the
-> repository, measured 2026-09-01:
+> **UNBLOCKED 2026-09-03. You may start.**
 >
 > ```text
-> gh api repos/nabbisen/matten/private-vulnerability-reporting  ->  {"enabled": false}
+> gh api repos/nabbisen/matten/private-vulnerability-reporting  ->  {"enabled": true}
 > ```
 >
-> **The owner's URL does not accept reports until that is switched on.** Do not write `SECURITY.md`
-> until it is. Change B (`CONTRIBUTING.md`) is unaffected and may proceed.
-
-> **Priority rule.** The RFC is the design authority; this handoff never overrides it. Where the two
-> disagree, **raise it before proceeding**. A pure addition in the handoff you can simply omit may be
-> omitted and reported prominently; anything else, ask first.
-
----
+> The owner enabled private vulnerability reporting, so `https://github.com/nabbisen/matten/security/advisories/new`
+> now accepts reports. **§3's precondition is satisfied** — re-derive it yourself before writing the
+> file rather than trusting this banner, since a setting can be turned off again.
+>
+> RFC-127 has also shipped as `0.46.2`, satisfying §2's sequencing condition.
 
 ## 1. Task title
 
