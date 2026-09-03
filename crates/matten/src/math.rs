@@ -743,13 +743,31 @@ fn mm_mul(a: &Tensor, b: &Tensor, op: &'static str) -> Result<Tensor, MattenErro
     if p == 0 {
         return Ok(Tensor::from_parts_checked(out, vec![m, p]));
     }
+    // RFC-133: i-k-j loop order (interchanged from i-j-k). For any fixed
+    // (i, j), both orders add the same n terms in the same k = 0..n sequence
+    // into that one accumulator — the interchange only changes which memory
+    // location holds it while summing (a register vs. `out[i*p+j]` read back
+    // each step), not the order of the additions themselves. IEEE 754 `+` is
+    // deterministic given its two operands, so this is bit-identical to the
+    // previous implementation, not merely close (verified: a random and an
+    // adversarial-magnitude 512x512 case both matched to the bit, see the
+    // RFC-133 review request). The win is purely from memory access order:
+    // `out` is already zero-initialised, so each `k` accumulates one row of
+    // `b` into the corresponding stretch of `out` in place, instead of
+    // striding through `b` by `p` per multiply. Measured ~10x on 512x512.
+    //
+    // This bit-identity is a property of THIS interchange, which keeps k as
+    // the per-cell reduction sequence. Tiling, blocking, a parallel reduction
+    // over k, or mul_add would each break it and would change published
+    // numeric output. Any such change is a behaviour change, not a pure
+    // optimisation.
     for (i, row) in out.chunks_mut(p).enumerate() {
-        for (j, slot) in row.iter_mut().enumerate() {
-            let mut acc = 0.0f64;
-            for k in 0..n {
-                acc += a.data[i * n + k] * b.data[k * p + j];
+        for k in 0..n {
+            let aik = a.data[i * n + k];
+            let b_row = &b.data[k * p..k * p + p];
+            for (slot, &bkj) in row.iter_mut().zip(b_row) {
+                *slot += aik * bkj;
             }
-            *slot = acc;
         }
     }
     Ok(Tensor::from_parts_checked(out, vec![m, p]))

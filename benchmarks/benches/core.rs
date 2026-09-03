@@ -19,6 +19,15 @@ fn bench_core(c: &mut Criterion) {
     let lhs = common::matrix(side, side);
     let rhs = common::matrix(side, side);
 
+    // RFC-133: side = 64 (4096 elements) is cache-resident and cannot see the
+    // mm_mul loop-interchange improvement this case exists to measure. Kept
+    // alongside the 64 case, not replacing it -- it measures a different
+    // (cache-resident) regime, and removing it would discard comparability
+    // with every past run.
+    let side_512 = 512;
+    let lhs_512 = common::matrix(side_512, side_512);
+    let rhs_512 = common::matrix(side_512, side_512);
+
     c.bench_function("core/construction", |b| {
         b.iter(|| black_box(core::construction(black_box(n))))
     });
@@ -42,6 +51,9 @@ fn bench_core(c: &mut Criterion) {
     });
     c.bench_function("core/matmul", |b| {
         b.iter(|| black_box(core::matmul(black_box(&lhs), black_box(&rhs))))
+    });
+    c.bench_function("core/matmul_512", |b| {
+        b.iter(|| black_box(core::matmul(black_box(&lhs_512), black_box(&rhs_512))))
     });
     c.bench_function("core/slice_rows", |b| {
         b.iter(|| black_box(core::slice_rows(black_box(&mat), 8)))
