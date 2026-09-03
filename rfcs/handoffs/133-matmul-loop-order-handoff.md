@@ -107,6 +107,13 @@ this RFC's scope besides.
 
 ### 5.2 The float consequence, which you must not bury
 
+> **SUPERSEDED 2026-09-03 — this section's premise is false; kept as record.** The interchange is
+> **bit-identical**, verified independently at review in both profiles across six adversarial cases.
+> There is no float consequence, the changelog should claim *no numeric change* rather than hedge,
+> and the instruction below to list every exact-equality test is void — **zero needed changing.**
+> See RFC-133 §5.1's amendment. The reason it is still a **minor** is RFC-094 §4.1: a performance
+> improvement is not a correctness fix, so it cannot be patch content.
+
 Summation order changes, so results change in the last bits. This is **a `Changed` entry and a
 minor** — not a bug fix, not a silent improvement. Word the changelog so a reader understands their
 numbers may differ in the final digits.

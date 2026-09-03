@@ -83,6 +83,32 @@ in behaviour.
 
 ### 5.1 The float consequence, stated plainly
 
+> **AMENDED 2026-09-03 at implementation review — the claim below is WRONG, and is kept verbatim
+> because the error is instructive.** The interchange is **bit-identical**, not merely close.
+> Verified empirically (independent `i-j-k` reference, `to_bits()` comparison, matching on 512×512
+> random, catastrophic cancellation at `1e16`, a 1024-term mixed-magnitude accumulation, a
+> vector-remainder width, denormals/infinities, and `0.0 * inf`, in **both** debug and release) and
+> provably: for a fixed `(i, j)` both orders add the same `n` terms **in the same `k` sequence**, and
+> IEEE 754 `+` does not depend on whether its accumulator lives in a register or in `out[i*p+j]`.
+>
+> **The reasoning error was applying a general rule without checking this instance.** "Loop
+> interchange changes summation order" is true of tiling, blocking, and parallel reduction — any
+> transform that *splits* a reduction. It is false for an interchange that keeps the reduction index
+> as the per-cell accumulation sequence, which is exactly what `i-j-k → i-k-j` does.
+>
+> **Consequences:** the changelog should make the *stronger* claim — *no numeric change; ~10× faster
+> on matmul shapes that exceed cache*. It is **still a minor**, but on the surviving reason rather
+> than this dead one: RFC-094 §4.1 as amended by RFC-120 confines patches to *correctness fixes*, and
+> a performance improvement is not one — nothing was wrong, it was slow. The §5.2 instruction below
+> to list every exact-equality test is therefore void; **zero tests needed changing**, and none were.
+>
+> **What survives, and matters more:** the bit-identity is **conditional**. It rests on this
+> interchange preserving the per-cell `k` order *and* on Rust never enabling FP reassociation or
+> contraction. Tiling, blocking, a parallel reduction over `k`, or `mul_add` would each break it —
+> and each is a plausible next step for a function just singled out as slow. Any of them is a
+> **behaviour change, not a pure optimisation**, and this is recorded in `mm_mul`'s own comment so
+> the person most likely to break the promise reads it there.
+
 Summation order changes, so results change in the last bits. That is:
 
 ```text
