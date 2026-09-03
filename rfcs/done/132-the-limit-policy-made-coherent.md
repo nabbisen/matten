@@ -1,11 +1,11 @@
 # RFC-132: The Limit Policy, Made Coherent
 
-**Status:** **Stage 1 DECIDED 2026-09-01 — Option A, boundary-only.** **§12.1's rule and site list
-were CORRECTED 2026-09-01 before implementation (§12.0)** after the implementer escalated: applying
-them literally would have reintroduced an uncatchable process abort., authorized by the owner:
-*"Simple design and proactive protection are good."* Stage 2 (applying it) is **Accepted** and
-handed off: `rfcs/handoffs/132-the-limit-policy-made-coherent-handoff.md`. Rides `0.47.0` **with**
-RFC-129 — they interact (§12). No version bump, tag, or publish in this RFC.
+**Status:** **Stage 1 DECIDED** 2026-09-01 (Option A, boundary-only). **Stage 2 Implemented**
+2026-09-03 in `46fb4b6`, landed with RFC-129, reviewed and approved after one required correction
+(`matten-data`'s `from_csv_path`, applied). **§12.1's rule and list were corrected TWICE before and
+during implementation** — see §12.0 and §12.0.2's second note; the list was wrong both times and the
+rule right both times. **Unreleased** — rides `0.47.0`. Handoff:
+`rfcs/handoffs/132-the-limit-policy-made-coherent-handoff.md`.
 **Target:** `crates/matten/src/limits.rs` and every allocating operation; `RFC-018`'s policy
 **Theme:** Decide once what `MattenLimits` *is*, so no future operation has to re-derive it
 **Related:** RFC-018 (the policy this reopens), RFC-001 (the threat model that motivates it),

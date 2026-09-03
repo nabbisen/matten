@@ -1,9 +1,9 @@
 # RFC-129: Result-Zone Arithmetic
 
-**Status:** **Accepted** 2026-09-01 by the owner, and **prioritized** — the owner exercised RFC-094
-§4.2(c) to authorize `0.47.0` sooner, which is the only lever that moves this ahead of a patch.
-Handoff: `rfcs/handoffs/129-result-zone-arithmetic-handoff.md`. Runs in parallel with RFC-127; the
-two touch disjoint files (§7.1). No version bump, tag, or publish in this RFC.
+**Status:** **Implemented** 2026-09-03 in commit *"Add try_add/sub/mul/div (RFC-129) and apply the
+boundary-only limit model (RFC-132)"* (`46fb4b6`), landed together with RFC-132 Stage 2 as §13
+required, reviewed and approved after one required correction (in RFC-132's half). **Unreleased** —
+rides `0.47.0`. Handoff: `rfcs/handoffs/129-result-zone-arithmetic-handoff.md`.
 **Target:** `crates/matten/src/ops/`, `docs/src/reference/`, `docs/src/reference/compatibility.md`
 **Theme:** Give the four operators most likely to exceed the budget a recoverable twin
 **Related:** RFC-094 §4.1 (why this cannot ride a patch), RFC-127, RFC-018, RFC-001 §10
