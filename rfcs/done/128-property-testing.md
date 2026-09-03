@@ -1,8 +1,10 @@
 # RFC-128: Property Testing
 
-**Status:** **Accepted** 2026-09-01 by the owner. Not yet implemented. Handoff:
-`rfcs/handoffs/128-property-testing-handoff.md`. Starts after RFC-127 lands (both touch test modules).
-No version bump, tag, or publish.
+**Status:** **Implemented** 2026-09-03 in commit *"Add property tests for the shape/data invariant,
+index round-trip, broadcasting, and slice bounds (RFC-128)"* (`56bef1d`), reviewed and approved with
+**no corrections**. **Unreleased** — §7's packaging question was answered (test files DO ship), but
+adding tests is not patch content under RFC-094 §4.1, so it rides `0.47.0` with RFC-129 and RFC-132
+rather than needing a release of its own. Handoff: `rfcs/handoffs/128-property-testing-handoff.md`.
 **Target:** `crates/matten/Cargo.toml` (`[dev-dependencies]`), `crates/matten/src/**/tests.rs`,
 `.github/workflows/test.yaml`
 **Theme:** Write the invariants down as properties, so the next RFC-111 cannot remove one silently
