@@ -177,6 +177,7 @@ Withdrawn or superseded. Numbers are never reused. See
 | ID | Title | Scope |
 |---:|---|---|
 | 076 | [v1.0 Release Preparation](./proposed/076-v1-release-preparation.md) | Reviewed and accepted (GO, no conditions); its inventory refreshed by RFC-081 (five-crate family, matten-mlprep production-ready, matten-stats row added, RFC-081 §3 precondition added). RFC-081's precondition is now **discharged** — `matten-stats` took **Exit A (promotion)** via RFC-084 — but this RFC remains deferred and no implementation is authorized: v1.0 is not currently wanted, a separate and unrelated reason |
+| 136 | [The Axis-Reduction Hoist](./proposed/136-axis-reduction-hoist.md) | **Awaiting acceptance.** Hoists the per-element coordinate arithmetic out of `axis_reduce` and `nan_axis_reduce`. The cost is not "recomputed strides" as the audit framed it but **four heap allocations per input element** — over four million to perform one million additions. Measured **81× / 111× / 14×** by axis on a 1 048 576-element tensor, **bit-identical** on all three. Unlike RFC-133 the bit-identity is derivable *before* implementation: the transform reorders nothing, so any `f` sees the same operands in the same sequence. **The harness already saw this one** — both baseline reports named `sum_mean_axis` the clearest signal in the suite and classified it *not a defect*, and nothing converted that into a decision for ~20 releases. Second theme of `0.48.0` |
 
 ## Remaining Themes And Issues
 
