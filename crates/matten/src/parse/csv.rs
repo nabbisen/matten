@@ -7,6 +7,7 @@
 
 use crate::Tensor;
 use crate::error::{DataFormat, MattenError};
+use crate::limits::MAX_PARSE_BYTES;
 
 fn parse_err(msg: impl Into<String>) -> MattenError {
     MattenError::Parse {
@@ -18,8 +19,22 @@ fn parse_err(msg: impl Into<String>) -> MattenError {
 /// Parses a CSV string into a [`Tensor`] with shape `[rows, cols]`.
 ///
 /// All fields must be valid `f64` values. Rows must have equal column counts.
-/// Returns [`MattenError::Parse`] for any structural or type error.
+///
+/// # Errors
+///
+/// Returns [`MattenError::Parse`] for any structural or type error, or if
+/// `input` exceeds
+/// [`MattenLimits::max_parse_bytes`](crate::MattenLimits::max_parse_bytes)
+/// (RFC-132 §12.3) — the boundary control for untrusted CSV, checked before
+/// parsing begins.
 pub(crate) fn from_csv_str(input: &str) -> Result<Tensor, MattenError> {
+    if input.len() > MAX_PARSE_BYTES {
+        return Err(parse_err(format!(
+            "input is {} bytes, exceeding the maximum parse size of {MAX_PARSE_BYTES} bytes \
+             (MattenLimits::max_parse_bytes)",
+            input.len()
+        )));
+    }
     let mut reader = csv::ReaderBuilder::new()
         .has_headers(false)
         .flexible(false)

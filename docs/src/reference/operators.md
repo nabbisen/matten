@@ -102,6 +102,36 @@ Incompatible shapes panic in operator code with an actionable message:
 matten broadcast error in add: shapes [2, 3] and [2] are not compatible
 ```
 
+## Non-panicking form (`try_add` / `try_sub` / `try_mul` / `try_div`, RFC-129)
+
+`Add`/`Sub`/`Mul`/`Div` are `std::ops` traits and cannot return `Result`, so they
+panic on incompatible shapes and on dynamic tensors. Each has a `try_` twin that
+returns `Result<Tensor, MattenError>` instead:
+
+```rust
+use matten::Tensor;
+
+let a = Tensor::new(vec![1.0, 2.0, 3.0, 4.0], &[2, 2]);
+let b = Tensor::new(vec![1.0, 2.0, 3.0], &[3]);
+
+match a.try_add(&b) {
+    Ok(sum) => println!("{sum}"),
+    Err(e) => println!("could not add: {e}"), // Broadcast: incompatible shapes
+}
+```
+
+`try_add`/`try_sub`/`try_mul`/`try_div` return `MattenError::Broadcast` on
+incompatible shapes and `MattenError::Unsupported` on a dynamic tensor
+(matching `try_dot`/`try_matmul`) — the same two conditions the operators
+panic on, with the same messages. Neither the operators nor the `try_` twins
+bound an ordinary result by `MattenLimits::max_elements`: arithmetic on
+already-in-memory, already-validated tensors is not a boundary the limit
+model bounds (RFC-132), so `&big + &big` succeeds regardless of size. A
+genuine multiplicative broadcast expansion — the result exceeding the
+combined size of its two operands, such as a `[1048576, 1]` column against a
+`[1, 1048576]` row — still checks against the default budget, so that one
+case stays a catchable error rather than an uncatchable allocator abort.
+
 ## IEEE 754 semantics
 
 `matten` does not intercept `NaN` or `inf`:

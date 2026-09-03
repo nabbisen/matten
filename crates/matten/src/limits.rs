@@ -1,9 +1,23 @@
-//! Resource safety limits (RFC-018).
+//! Resource safety limits (RFC-018, revised RFC-132).
 //!
-//! [`MattenLimits`] is the single source of truth for all allocation and shape
-//! bounds in `matten`. The former scattered constants (`MAX_NDIM`,
-//! `ARANGE_MAX_ELEMENTS`, etc.) now live here as the default values and are
-//! re-exported for internal use.
+//! [`MattenLimits`] bounds allocations sized by a value the **caller supplied
+//! as data** — a shape passed to a constructor, a count passed to
+//! `repeat`/`tile`, a document handed to a parser (RFC-132 §12.1). It does
+//! **not** bound ordinary operations on already-validated, already-in-memory
+//! data (arithmetic, reductions, matmul, slicing, concatenation) — that data
+//! is the caller's own, and `matten` does not second-guess it.
+//!
+//! **Three exceptions keep a fixed, non-configurable ceiling regardless of
+//! this rule**: `matmul`, `outer`, and elementwise-arithmetic broadcasting.
+//! Their output size is the *product* of two independent already-validated
+//! dimensions, not their sum or a subset of them, so neither operand's own
+//! validation bounds it (RFC-132 §12.0 — an implementer-caught correction to
+//! this RFC's original, broader "do not apply" list). These three always
+//! check against the *default* budget; there is no way for a caller to raise
+//! it for them.
+//!
+//! The former scattered constants (`MAX_NDIM`, `ARANGE_MAX_ELEMENTS`, etc.)
+//! live here as the default values and are re-exported for internal use.
 
 use crate::{MattenError, Tensor};
 
@@ -44,12 +58,16 @@ pub(crate) const MAX_PARSE_BYTES: usize = 128 * 1024 * 1024; // 128 MiB
 
 // ── Public struct ──────────────────────────────────────────────────────────
 
-/// Resource safety limits for shape calculations and allocations (RFC-018).
+/// Resource safety limits for shape calculations and allocations (RFC-018,
+/// revised RFC-132).
 ///
-/// `MattenLimits` is the single source of truth for all allocation budgets in
-/// `matten`. The default values are generous for typical PoC workloads but
-/// prevent pathological resource exhaustion from malformed or adversarial
-/// inputs.
+/// `MattenLimits` bounds allocations sized by a caller-supplied value — a
+/// shape, a count, a parsed document. It does not bound ordinary operations
+/// on data already in memory and already validated: that data is the
+/// caller's own. See the module docs for the model and its one deliberate
+/// exception (`matmul`/`outer`/broadcast). The default values are generous
+/// for typical PoC workloads but prevent pathological resource exhaustion
+/// from malformed or adversarial inputs at the points where limits apply.
 ///
 /// # Examples
 ///
@@ -67,20 +85,39 @@ pub(crate) const MAX_PARSE_BYTES: usize = 128 * 1024 * 1024; // 128 MiB
 pub struct MattenLimits {
     /// Maximum number of axes (rank). Default: 8.
     pub max_dimensions: usize,
-    /// Maximum number of elements any fill constructor or broadcast output may allocate.
+    /// Maximum number of elements a caller-supplied shape may produce.
     /// Default: 1 048 576 (~1 M, ~8 MiB for f64).
+    ///
+    /// Read by the three `_with_limits` constructors (`try_zeros_with_limits`
+    /// etc.) — the caller-supplied value here governs those. `matmul`,
+    /// `outer`, and arithmetic broadcasting also check against a value of
+    /// this same *kind*, but always the **default**, never this instance's
+    /// value: their output size is a product of two independent operands
+    /// (RFC-132 §12.0), not a caller-supplied shape, so there is no way to
+    /// raise their ceiling.
     ///
     /// Note: a 2048×2048 matrix has ~4 M elements and exceeds this default.
     /// This is an intentionally conservative safety-first default for PoC use.
     /// Use `try_zeros_with_limits` with a custom `MattenLimits` for larger tensors,
     /// or use the panicking `zeros`/`ones`/`full` only when you know the shape is safe.
     pub max_elements: usize,
-    /// Maximum number of bytes a JSON or CSV parser may accept.
+    /// Maximum number of bytes `load_json`/`load_csv` and the string parsers
+    /// (`from_json`, `from_csv`, `from_json_dynamic`, `from_csv_dynamic`)
+    /// accept — the boundary control for untrusted JSON/CSV (RFC-132 §12.3).
     /// Default: 128 MiB.
     ///
-    /// **Note:** this field is a future extension point. The current
-    /// parsers (`from_json`, `from_csv`, etc.) do not yet enforce this
-    /// limit at runtime. See RFC-018 implementation notes.
+    /// **Not read by any parser in this crate.** Core `matten`'s own parsers
+    /// enforce the same budget via the internal `MAX_PARSE_BYTES` constant
+    /// directly, not this field — there is no `_with_limits` form for
+    /// parsers, so setting this on a `MattenLimits` instance has no effect
+    /// on `load_json`/`load_csv`/etc. It exists as a documented budget and a
+    /// future extension point, should a caller-configurable parser variant
+    /// be added later.
+    ///
+    /// The field itself **is** read from outside this crate: `matten-data`'s
+    /// `Table::from_csv_path` uses `MattenLimits::default().max_parse_bytes`
+    /// directly (RFC-132 §12.1), since `MAX_PARSE_BYTES` is `pub(crate)` and
+    /// not reachable from a companion crate.
     pub max_parse_bytes: usize,
 }
 
@@ -106,6 +143,14 @@ impl MattenLimits {
 
     /// Checks that `requested` does not exceed `max_elements`, returning a
     /// clear `MattenError::Allocation` on failure.
+    ///
+    /// The message says only "use smaller shapes", not "or increase the
+    /// limit" (RFC-132 §12.5 review correction): most callers of this check
+    /// have no way to raise `max_elements` at all — only the three
+    /// `_with_limits` constructors do, and their own doc comments already
+    /// name that path. A remedy the caller cannot act on is worse than no
+    /// remedy, especially in an error message read exactly when someone is
+    /// already stuck.
     pub(crate) fn check_elements(
         &self,
         requested: usize,
@@ -116,8 +161,7 @@ impl MattenLimits {
                 requested_elements: requested,
                 message: format!(
                     "{operation} requested {requested} elements, exceeding the \
-                     limit of {} (MattenLimits::max_elements); use smaller shapes \
-                     or increase the limit",
+                     limit of {} (MattenLimits::max_elements); use smaller shapes",
                     self.max_elements
                 ),
             })

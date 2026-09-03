@@ -194,7 +194,21 @@ Operator traits implemented for `&Tensor`:
 Scalar operators: `&Tensor + f64`, `&Tensor - f64`, `&Tensor * f64`, `&Tensor / f64`
 (and reverse: `f64 + &Tensor`, `f64 - &Tensor`, `f64 * &Tensor`, `f64 / &Tensor`).
 
-All panic on dynamic tensors.
+All panic on dynamic tensors, and on incompatible broadcast shapes. Each has a
+non-panicking twin (RFC-129):
+
+| Method | Returns | Notes |
+|---|---|---|
+| `try_add(other)` | `Result<Tensor, MattenError>` | `Broadcast` on incompatible shapes; `Unsupported` on dynamic |
+| `try_sub(other)` | `Result<Tensor, MattenError>` | `Broadcast` on incompatible shapes; `Unsupported` on dynamic |
+| `try_mul(other)` | `Result<Tensor, MattenError>` | `Broadcast` on incompatible shapes; `Unsupported` on dynamic |
+| `try_div(other)` | `Result<Tensor, MattenError>` | `Broadcast` on incompatible shapes; `Unsupported` on dynamic |
+
+None of the four bound the result by `MattenLimits::max_elements` — arithmetic on
+already-in-memory, already-validated tensors is not a boundary the limit model
+bounds (RFC-132). A genuine multiplicative broadcast expansion (the result
+exceeding the combined size of its two operands) still checks against the
+default budget, to avoid an uncatchable allocator abort.
 
 ## `Tensor` — elementwise comfort math (numeric Tensor, RFC-038)
 

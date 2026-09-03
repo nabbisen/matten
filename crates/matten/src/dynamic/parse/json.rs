@@ -7,6 +7,7 @@
 use crate::Tensor;
 use crate::dynamic::element::Element;
 use crate::error::{DataFormat, MattenError};
+use crate::limits::MAX_PARSE_BYTES;
 use crate::shape::validate_shape;
 use serde_json::Value;
 
@@ -23,7 +24,20 @@ fn parse_err(msg: impl Into<String>) -> MattenError {
 /// - canonical object form `{"shape":[…],"data":[…]}` where data elements
 ///   may be numbers, strings, booleans, or nulls;
 /// - nested array form (rank 1 and 2) with mixed value types.
+///
+/// # Errors
+///
+/// Returns [`MattenError::Parse`] if `input` exceeds
+/// [`MattenLimits::max_parse_bytes`](crate::MattenLimits::max_parse_bytes)
+/// (RFC-132 §12.3), checked before parsing begins.
 pub(crate) fn from_json_dynamic(input: &str) -> Result<Tensor, MattenError> {
+    if input.len() > MAX_PARSE_BYTES {
+        return Err(parse_err(format!(
+            "input is {} bytes, exceeding the maximum parse size of {MAX_PARSE_BYTES} bytes \
+             (MattenLimits::max_parse_bytes)",
+            input.len()
+        )));
+    }
     let value: Value =
         serde_json::from_str(input).map_err(|e| parse_err(format!("invalid JSON: {e}")))?;
     match &value {

@@ -3,6 +3,58 @@
 
 use crate::{MattenError, Tensor};
 
+/// Reads `path` into a `String`, refusing to read more than
+/// [`MattenLimits::max_parse_bytes`](crate::MattenLimits::max_parse_bytes)
+/// bytes (RFC-132 §12.3). A metadata check rejects an obviously oversized
+/// file before opening it; `Read::take` bounds the actual read too, since a
+/// size check alone is a TOCTOU race — the file can grow between the check
+/// and the read.
+#[cfg(any(feature = "json", feature = "csv"))]
+fn read_bounded_file(
+    path: &std::path::Path,
+    data_format: crate::error::DataFormat,
+) -> Result<String, MattenError> {
+    use std::io::Read;
+
+    let max_bytes = crate::limits::MAX_PARSE_BYTES;
+    let metadata = std::fs::metadata(path).map_err(|e| MattenError::Io {
+        path: path.to_path_buf(),
+        source: e,
+    })?;
+    if metadata.len() > max_bytes as u64 {
+        return Err(MattenError::Parse {
+            format: data_format,
+            message: format!(
+                "file is {} bytes, exceeding the maximum parse size of {max_bytes} bytes \
+                 (MattenLimits::max_parse_bytes)",
+                metadata.len()
+            ),
+        });
+    }
+
+    let file = std::fs::File::open(path).map_err(|e| MattenError::Io {
+        path: path.to_path_buf(),
+        source: e,
+    })?;
+    let mut content = String::new();
+    file.take(max_bytes as u64 + 1)
+        .read_to_string(&mut content)
+        .map_err(|e| MattenError::Io {
+            path: path.to_path_buf(),
+            source: e,
+        })?;
+    if content.len() > max_bytes {
+        return Err(MattenError::Parse {
+            format: data_format,
+            message: format!(
+                "file exceeds the maximum parse size of {max_bytes} bytes \
+                 (MattenLimits::max_parse_bytes)"
+            ),
+        });
+    }
+    Ok(content)
+}
+
 impl Tensor {
     // ---- Shape operations (M4 / RFC-007) ------------------------------------
 
@@ -377,14 +429,15 @@ impl Tensor {
     ///
     /// # Errors
     ///
-    /// Returns an error if the file cannot be read or the content is invalid.
+    /// Returns an error if the file cannot be read or the content is invalid,
+    /// or if the file exceeds
+    /// [`MattenLimits::max_parse_bytes`](crate::MattenLimits::max_parse_bytes)
+    /// (RFC-132 §12.3) — checked via file metadata before the file is opened,
+    /// and enforced again during the read itself.
     #[cfg(feature = "json")]
     pub fn load_json(path: impl AsRef<std::path::Path>) -> Result<Tensor, MattenError> {
         let path = path.as_ref();
-        let content = std::fs::read_to_string(path).map_err(|e| MattenError::Io {
-            path: path.to_path_buf(),
-            source: e,
-        })?;
+        let content = read_bounded_file(path, crate::error::DataFormat::Json)?;
         crate::parse::json::from_json_str(&content)
     }
 
@@ -395,14 +448,15 @@ impl Tensor {
     ///
     /// # Errors
     ///
-    /// Returns an error if the file cannot be read or the content is invalid.
+    /// Returns an error if the file cannot be read or the content is invalid,
+    /// or if the file exceeds
+    /// [`MattenLimits::max_parse_bytes`](crate::MattenLimits::max_parse_bytes)
+    /// (RFC-132 §12.3) — checked via file metadata before the file is opened,
+    /// and enforced again during the read itself.
     #[cfg(feature = "csv")]
     pub fn load_csv(path: impl AsRef<std::path::Path>) -> Result<Tensor, MattenError> {
         let path = path.as_ref();
-        let content = std::fs::read_to_string(path).map_err(|e| MattenError::Io {
-            path: path.to_path_buf(),
-            source: e,
-        })?;
+        let content = read_bounded_file(path, crate::error::DataFormat::Csv)?;
         crate::parse::csv::from_csv_str(&content)
     }
 }

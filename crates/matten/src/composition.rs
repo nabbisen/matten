@@ -10,12 +10,17 @@
 //! most confused pair in this area. [`Tensor::meshgrid`] builds the two coordinate
 //! grids for evaluating a function of two variables over a rank-1 `x`/`y` pair.
 //!
-//! All of these enforce [`MattenLimits`] on the output allocation and reject dynamic
-//! tensors — convert with [`Tensor::try_numeric`](crate::Tensor::try_numeric) first.
-//! The `try_*` forms return [`MattenError`]; the convenience forms panic with the
-//! same message.
+//! All of these reject dynamic tensors — convert with
+//! [`Tensor::try_numeric`](crate::Tensor::try_numeric) first. The `try_*` forms
+//! return [`MattenError`]; the convenience forms panic with the same message.
+//!
+//! [`MattenLimits`] bounds [`Tensor::repeat`]/[`Tensor::repeat_axis`]/[`Tensor::tile`]/
+//! [`Tensor::meshgrid`]'s output, since each takes a caller-supplied count that
+//! determines the allocation (RFC-132 §12.1). [`Tensor::concatenate`]/[`Tensor::stack`]
+//! are not budget-checked — their output size is bounded by the already-validated
+//! inputs' own sizes, not a caller-supplied value.
 
-use crate::limits::MattenLimits;
+use crate::limits::{MAX_NDIM, MattenLimits};
 use crate::shape::{coord_to_flat, flat_to_coord};
 use crate::{MattenError, Tensor};
 
@@ -62,7 +67,9 @@ impl Tensor {
     /// # Panics
     /// Panics if the input list is empty, the ranks or non-axis dimensions
     /// disagree, `axis` is out of range (`0..rank`), any input is a dynamic tensor,
-    /// or the result exceeds the allocation limit. Use [`Tensor::try_concatenate`]
+    /// or computing the result size overflows (RFC-132: the output is not
+    /// budget-checked — its size is bounded by the already-validated inputs'
+    /// own sizes, not a caller-supplied value). Use [`Tensor::try_concatenate`]
     /// for the non-panicking form.
     ///
     /// ```
@@ -85,7 +92,8 @@ impl Tensor {
     /// - [`MattenError::Shape`] on rank mismatch, a non-axis dimension mismatch, or
     ///   `axis >= rank`.
     /// - [`MattenError::Unsupported`] if any input is a dynamic tensor.
-    /// - [`MattenError::Allocation`] if the result exceeds the allocation limit.
+    /// - [`MattenError::Allocation`] if computing the result size overflows
+    ///   (RFC-132: not budget-checked — see [`Tensor::concatenate`]'s docs).
     ///
     /// ```
     /// use matten::Tensor;
@@ -147,7 +155,12 @@ impl Tensor {
         }
         let mut out_shape = first.shape.clone();
         out_shape[axis] = axis_total;
-        let total = MattenLimits::default().check_shape(&out_shape, "concatenate")?;
+        // RFC-132 §12.1: concatenate's output is the SUM of already-validated
+        // inputs' own sizes, not a product — the boundary-only model does not
+        // budget-check it. `checked_shape_len` with an unbounded per-dimension
+        // ceiling keeps the overflow-safe product computation (a real, if
+        // remote, correctness concern) without an artificial element cap.
+        let total = crate::shape::checked_shape_len(&out_shape, "concatenate", usize::MAX)?;
 
         // Row-major copy: for each outer slab, append each input's contiguous block.
         let inner: usize = first.shape[axis + 1..].iter().product();
@@ -173,9 +186,11 @@ impl Tensor {
     ///
     /// # Panics
     /// Panics if the input list is empty, the input shapes are not all identical,
-    /// `axis` is out of range (`0..=rank`), any input is a dynamic tensor, or the
-    /// result exceeds the allocation limit. Use [`Tensor::try_stack`] for the
-    /// non-panicking form.
+    /// `axis` is out of range (`0..=rank`), any input is a dynamic tensor, the
+    /// output rank would exceed the maximum supported rank, or computing the
+    /// result size overflows (RFC-132: the element count is not
+    /// budget-checked — only rank is, since stack is the one operation here
+    /// that can grow it). Use [`Tensor::try_stack`] for the non-panicking form.
     ///
     /// ```
     /// use matten::Tensor;
@@ -195,9 +210,11 @@ impl Tensor {
     ///
     /// # Errors
     /// - [`MattenError::InvalidArgument`] if `tensors` is empty.
-    /// - [`MattenError::Shape`] if the input shapes differ or `axis > rank`.
+    /// - [`MattenError::Shape`] if the input shapes differ, `axis > rank`, or
+    ///   the output rank would exceed the maximum supported rank.
     /// - [`MattenError::Unsupported`] if any input is a dynamic tensor.
-    /// - [`MattenError::Allocation`] if the result exceeds the allocation limit.
+    /// - [`MattenError::Allocation`] if computing the result size overflows
+    ///   (RFC-132: not budget-checked — see [`Tensor::stack`]'s docs).
     ///
     /// ```
     /// use matten::Tensor;
@@ -239,7 +256,22 @@ impl Tensor {
         out_shape.extend_from_slice(&first.shape[..axis]);
         out_shape.push(n);
         out_shape.extend_from_slice(&first.shape[axis..]);
-        let total = MattenLimits::default().check_shape(&out_shape, "stack")?;
+        // RFC-132 §12.1: stack's element count is not budget-checked — its
+        // output is bounded by the already-validated inputs' own total sizes,
+        // not a product of independent operands. Rank is a different, model
+        // constraint (MAX_NDIM), not an allocation budget, and stack is the
+        // one operation here that can grow it, so it stays checked.
+        if out_shape.len() > MAX_NDIM {
+            return Err(MattenError::Shape {
+                operation: "stack",
+                message: format!(
+                    "stacking would produce rank {}, exceeding the maximum supported rank of \
+                     {MAX_NDIM} (shape {out_shape:?})",
+                    out_shape.len()
+                ),
+            });
+        }
+        let total = crate::shape::checked_shape_len(&out_shape, "stack", usize::MAX)?;
 
         // Row-major copy: for each outer slab, append each input's inner block in
         // turn, placing the new axis (size n) at position `axis`.

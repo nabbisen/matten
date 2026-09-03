@@ -356,6 +356,23 @@ fn from_csv_path_missing_file_is_io_error() {
     }
 }
 
+#[test]
+fn from_csv_path_refuses_file_exceeding_max_parse_bytes() {
+    // A file whose LENGTH (via set_len, no actual bytes written) exceeds
+    // matten::MattenLimits::default().max_parse_bytes exercises the metadata
+    // pre-check path without writing 128MiB+ to disk (RFC-132 §12.1 — the
+    // same boundary control core matten's load_csv enforces).
+    let path =
+        std::env::temp_dir().join(format!("matten_data_oversized_{}.csv", std::process::id()));
+    let max_bytes = matten::MattenLimits::default().max_parse_bytes;
+    let file = std::fs::File::create(&path).unwrap();
+    file.set_len(max_bytes as u64 + 1).unwrap();
+    let err = Table::from_csv_path(&path).unwrap_err();
+    assert!(matches!(err, MattenDataError::Matten(_)));
+    assert!(err.to_string().contains("max_parse_bytes"));
+    let _ = std::fs::remove_file(&path);
+}
+
 // --- Error quality (RFC-035 §9) ---
 
 #[test]

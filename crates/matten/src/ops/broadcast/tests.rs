@@ -35,7 +35,7 @@ fn broadcast_shape_incompatible_returns_err() {
 fn broadcast_ctx_same_shape_identity() {
     // For same-shape tensors the context should map each flat index to itself.
     let shape = &[2usize, 3];
-    let ctx = BroadcastCtx::new(shape, shape, shape);
+    let ctx = BroadcastCtx::new(shape, shape, shape).unwrap();
     assert_eq!(ctx.result_len(), 6);
     for i in 0..6 {
         assert_eq!(ctx.left_flat(i), i);
@@ -49,7 +49,7 @@ fn broadcast_ctx_scalar_repeats_for_all() {
     let left = &[][..];
     let right = &[3usize][..];
     let result = &[3usize][..];
-    let ctx = BroadcastCtx::new(left, right, result);
+    let ctx = BroadcastCtx::new(left, right, result).unwrap();
     for i in 0..3 {
         assert_eq!(ctx.left_flat(i), 0, "scalar should always map to index 0");
         assert_eq!(ctx.right_flat(i), i);
@@ -62,7 +62,7 @@ fn broadcast_ctx_column_broadcast() {
     let left = &[3usize, 1];
     let right = &[1usize, 4];
     let result = &[3usize, 4];
-    let ctx = BroadcastCtx::new(left, right, result);
+    let ctx = BroadcastCtx::new(left, right, result).unwrap();
     assert_eq!(ctx.result_len(), 12);
     // Row 0 of result: left maps to row 0 col 0 (flat 0), right maps to row 0 cols 0-3 (0-3)
     assert_eq!(ctx.left_flat(0), 0);

@@ -12,6 +12,53 @@ use std::path::Path;
 use crate::error::MattenDataError;
 use crate::table::{CellValue, Table};
 
+/// Reads `path` into a `String`, refusing to read more than
+/// `matten::MattenLimits::default().max_parse_bytes` bytes (RFC-132 §12.1) —
+/// mirrors core `matten`'s `read_bounded_file` (`tensor/ops.rs`). A metadata
+/// check rejects an obviously oversized file before opening it; `Read::take`
+/// bounds the actual read too, since a size check alone is a TOCTOU race.
+fn read_bounded_file(path: &Path) -> Result<String, MattenDataError> {
+    use std::io::Read;
+
+    let max_bytes = matten::MattenLimits::default().max_parse_bytes;
+    let metadata = std::fs::metadata(path).map_err(|source| MattenDataError::Io {
+        path: path.to_path_buf(),
+        source,
+    })?;
+    if metadata.len() > max_bytes as u64 {
+        return Err(MattenDataError::Matten(matten::MattenError::Parse {
+            format: matten::DataFormat::Csv,
+            message: format!(
+                "file is {} bytes, exceeding the maximum parse size of {max_bytes} bytes \
+                 (MattenLimits::max_parse_bytes)",
+                metadata.len()
+            ),
+        }));
+    }
+
+    let file = std::fs::File::open(path).map_err(|source| MattenDataError::Io {
+        path: path.to_path_buf(),
+        source,
+    })?;
+    let mut content = String::new();
+    file.take(max_bytes as u64 + 1)
+        .read_to_string(&mut content)
+        .map_err(|source| MattenDataError::Io {
+            path: path.to_path_buf(),
+            source,
+        })?;
+    if content.len() > max_bytes {
+        return Err(MattenDataError::Matten(matten::MattenError::Parse {
+            format: matten::DataFormat::Csv,
+            message: format!(
+                "file exceeds the maximum parse size of {max_bytes} bytes \
+                 (MattenLimits::max_parse_bytes)"
+            ),
+        }));
+    }
+    Ok(content)
+}
+
 impl Table {
     /// Parse a `Table` from a CSV string.
     ///
@@ -100,12 +147,18 @@ impl Table {
     ///
     /// I/O failures (for example a missing file) are reported as
     /// [`MattenDataError::Io`] with the path and underlying error preserved.
+    ///
+    /// # Errors
+    ///
+    /// Also returns [`MattenDataError::Matten`] if the file exceeds
+    /// `matten::MattenLimits::default().max_parse_bytes` (RFC-132 §12.1) — the
+    /// same boundary control core `matten`'s `load_csv` enforces, applied here
+    /// too since this is the same kind of untrusted-file entry point. Checked
+    /// via file metadata before the file is opened, and enforced again during
+    /// the read itself (a size check alone is a TOCTOU race).
     pub fn from_csv_path<P: AsRef<Path>>(path: P) -> Result<Table, MattenDataError> {
         let path = path.as_ref();
-        let content = std::fs::read_to_string(path).map_err(|source| MattenDataError::Io {
-            path: path.to_path_buf(),
-            source,
-        })?;
+        let content = read_bounded_file(path)?;
         Table::from_csv_str(&content)
     }
 }

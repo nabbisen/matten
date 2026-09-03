@@ -230,6 +230,58 @@ fn load_csv_fixture() {
     assert_eq!(t.as_slice(), &[1.0, 2.0, 3.0, 4.0, 5.0, 6.0]);
 }
 
+// ---- load_json / load_csv refuse an oversized file (RFC-132 §12.3) ------
+
+/// A file path under the system temp dir, removed on drop. Its *length* is
+/// set via `set_len` to just past `max_parse_bytes` without writing that
+/// many actual bytes — this exercises the `read_bounded_file` metadata
+/// pre-check path, not the (also-guarded, but expensive to construct) actual
+/// over-length-content path.
+#[cfg(any(feature = "json", feature = "csv"))]
+struct SparseOversizedFile {
+    path: std::path::PathBuf,
+}
+
+#[cfg(any(feature = "json", feature = "csv"))]
+impl SparseOversizedFile {
+    fn new(name: &str) -> Self {
+        let path = std::env::temp_dir().join(format!(
+            "matten-rfc132-{name}-{}-{}.tmp",
+            std::process::id(),
+            name.len() // trivial extra uniqueness without a dep
+        ));
+        let file = std::fs::File::create(&path).unwrap();
+        let max_bytes = crate::limits::MAX_PARSE_BYTES as u64;
+        file.set_len(max_bytes + 1).unwrap();
+        Self { path }
+    }
+}
+
+#[cfg(any(feature = "json", feature = "csv"))]
+impl Drop for SparseOversizedFile {
+    fn drop(&mut self) {
+        let _ = std::fs::remove_file(&self.path);
+    }
+}
+
+#[cfg(feature = "json")]
+#[test]
+fn load_json_refuses_file_exceeding_max_parse_bytes() {
+    let f = SparseOversizedFile::new("json");
+    let err = Tensor::load_json(&f.path).unwrap_err();
+    assert!(matches!(err, MattenError::Parse { .. }));
+    assert!(err.to_string().contains("max_parse_bytes"));
+}
+
+#[cfg(feature = "csv")]
+#[test]
+fn load_csv_refuses_file_exceeding_max_parse_bytes() {
+    let f = SparseOversizedFile::new("csv");
+    let err = Tensor::load_csv(&f.path).unwrap_err();
+    assert!(matches!(err, MattenError::Parse { .. }));
+    assert!(err.to_string().contains("max_parse_bytes"));
+}
+
 // ---- allocation / size limit tests (RFC-009 §13) -------------------------
 
 #[cfg(feature = "json")]

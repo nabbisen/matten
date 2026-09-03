@@ -10,6 +10,7 @@
 use crate::Tensor;
 use crate::dynamic::element::Element;
 use crate::error::{DataFormat, MattenError};
+use crate::limits::MAX_PARSE_BYTES;
 
 fn parse_err(msg: impl Into<String>) -> MattenError {
     MattenError::Parse {
@@ -22,7 +23,20 @@ fn parse_err(msg: impl Into<String>) -> MattenError {
 ///
 /// Each field is independently inferred to the most specific `Element` type.
 /// Ragged rows are rejected.
+///
+/// # Errors
+///
+/// Returns [`MattenError::Parse`] if `input` exceeds
+/// [`MattenLimits::max_parse_bytes`](crate::MattenLimits::max_parse_bytes)
+/// (RFC-132 §12.3), checked before parsing begins.
 pub(crate) fn from_csv_dynamic(input: &str) -> Result<Tensor, MattenError> {
+    if input.len() > MAX_PARSE_BYTES {
+        return Err(parse_err(format!(
+            "input is {} bytes, exceeding the maximum parse size of {MAX_PARSE_BYTES} bytes \
+             (MattenLimits::max_parse_bytes)",
+            input.len()
+        )));
+    }
     let mut reader = csv::ReaderBuilder::new()
         .has_headers(false)
         .flexible(false)

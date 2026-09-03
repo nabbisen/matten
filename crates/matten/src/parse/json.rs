@@ -24,6 +24,10 @@ const MAX_NESTING: usize = 8; // matches MAX_NDIM
 
 /// Maximum total element count accepted from a JSON payload.
 use crate::limits::MAX_JSON_ELEMENTS;
+// max_parse_bytes is the boundary control for the whole document, checked
+// before parsing (RFC-132 §12.3) — MAX_JSON_ELEMENTS above is a separate,
+// pre-existing check on the parsed element count.
+use crate::limits::MAX_PARSE_BYTES;
 
 fn parse_err(msg: impl Into<String>) -> MattenError {
     MattenError::Parse {
@@ -37,7 +41,21 @@ fn parse_err(msg: impl Into<String>) -> MattenError {
 /// Accepts the canonical `{"shape":[…],"data":[…]}` object form and the
 /// convenience nested-array form (`[[1,2],[3,4]]`). Returns
 /// [`MattenError::Parse`] for any structural or type error; never panics.
+///
+/// # Errors
+///
+/// Returns [`MattenError::Parse`] if `input` exceeds
+/// [`MattenLimits::max_parse_bytes`](crate::MattenLimits::max_parse_bytes)
+/// (RFC-132 §12.3) — this is the boundary control for untrusted JSON,
+/// checked before parsing begins.
 pub(crate) fn from_json_str(input: &str) -> Result<Tensor, MattenError> {
+    if input.len() > MAX_PARSE_BYTES {
+        return Err(parse_err(format!(
+            "input is {} bytes, exceeding the maximum parse size of {MAX_PARSE_BYTES} bytes \
+             (MattenLimits::max_parse_bytes)",
+            input.len()
+        )));
+    }
     let value: Value =
         serde_json::from_str(input).map_err(|e| parse_err(format!("invalid JSON: {e}")))?;
 
