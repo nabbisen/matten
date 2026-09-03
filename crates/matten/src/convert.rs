@@ -18,11 +18,8 @@ use crate::{MattenError, Tensor};
 impl From<Vec<f64>> for Tensor {
     /// Creates a 1-D tensor from a flat vector; shape is `[len]`.
     ///
-    /// # Panics
-    ///
-    /// Panics only if the resulting `[len]` shape is somehow invalid (not
-    /// possible for non-empty `Vec<f64>` unless `len` is 0, which triggers the
-    /// zero-sized-dimension policy). An empty vector will panic.
+    /// Never panics: `[len]` is always a valid shape for a `Vec<f64>` of that
+    /// length, including an empty vector (`shape = [0]`, RFC-111).
     fn from(data: Vec<f64>) -> Self {
         let len = data.len();
         Tensor::new(data, &[len])

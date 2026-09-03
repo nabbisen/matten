@@ -22,7 +22,9 @@ use serde_json::Value;
 /// Maximum nesting depth accepted in nested-array form.
 const MAX_NESTING: usize = 8; // matches MAX_NDIM
 
-/// Maximum total element count accepted from a JSON payload.
+// MAX_JSON_ELEMENTS bounds each array's own length, checked at every nesting
+// level (see extract_nested below) — not a running total across the whole
+// payload; the doc comment on its definition (limits.rs) is the accurate one.
 use crate::limits::MAX_JSON_ELEMENTS;
 // max_parse_bytes is the boundary control for the whole document, checked
 // before parsing (RFC-132 §12.3) — MAX_JSON_ELEMENTS above is a separate,

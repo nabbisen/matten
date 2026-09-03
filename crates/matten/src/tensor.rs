@@ -44,6 +44,15 @@ pub struct Tensor {
     pub(crate) dynamic: Option<Box<crate::dynamic::storage::DynamicTensor>>,
 }
 
+/// Shape and, for numeric tensors, element-wise `f64` equality (dynamic
+/// tensors compare their logical element sequence instead).
+///
+/// **Non-reflexive when either tensor contains `NaN`**: per IEEE 754,
+/// `f64::NAN != f64::NAN`, so a tensor containing `NaN` is not equal to
+/// itself (`t != t`). This matches `f64`, `Vec<f64>`, `ndarray`, and NumPy —
+/// it is not a defect to "fix"; `matten` deliberately does not intercept or
+/// sanitize `NaN` (see the arithmetic reference's IEEE 754 semantics
+/// section).
 impl PartialEq for Tensor {
     fn eq(&self, other: &Self) -> bool {
         // Compare Phase 1 fields. Dynamic tensors with same shape and logical

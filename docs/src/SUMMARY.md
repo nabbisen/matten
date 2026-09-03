@@ -8,6 +8,7 @@
 - [Quick start](./quick-start.md)
 - [Playground](./playground.md)
 - [Architecture](./architecture.md)
+- [Troubleshooting](./troubleshooting.md)
 
 # Tutorial
 

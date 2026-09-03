@@ -4,7 +4,11 @@
 //! NumPy-like convenience that always returns `Result` and never panics on
 //! malformed input.
 //!
-//! Phase 1 rule: every slice result is an independent owned [`Tensor`].
+//! Phase 1 rule: every NUMERIC slice result is an independent owned [`Tensor`].
+//! A DYNAMIC tensor's slice result (RFC-102) instead shares storage with its
+//! source via `Arc::clone` — a retention cost, not a copy — until the first
+//! mutation materializes it (RFC-104). See the book's Slicing reference page
+//! for the full contract.
 
 use crate::shape::coord_to_flat;
 use crate::{MattenError, Tensor};

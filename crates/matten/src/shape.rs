@@ -15,10 +15,12 @@ use crate::limits::{MAX_ELEMENTS, MAX_NDIM, MAX_REPRESENTABLE_DIMENSION};
 
 /// Validates a shape and returns its logical element count.
 ///
-/// Enforces, in order: the rank limit ([`MAX_NDIM`]), rejection of zero-sized
-/// dimensions, and checked multiplication of the dimension lengths. Returns
-/// [`MattenError::Shape`] for rank/zero-dimension problems and
-/// [`MattenError::Allocation`] for product overflow.
+/// Enforces, in order: the rank limit ([`MAX_NDIM`]), then checked
+/// multiplication of the dimension lengths via [`checked_shape_len`] — which
+/// **accepts** zero-sized dimensions (RFC-111) rather than rejecting them.
+/// Returns [`MattenError::Shape`] for a rank problem and
+/// [`MattenError::Allocation`] for a dimension or product that is too large,
+/// or overflows.
 pub(crate) fn validate_shape(
     shape: &[usize],
     operation: &'static str,
