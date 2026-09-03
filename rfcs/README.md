@@ -162,6 +162,7 @@ sign-off and implementation — not that the state is unused.
 | ID | Title | Handoff |
 |---:|---|---|
 | 130 | [Repository Governance Files](./accepted/130-repository-governance-files.md) | [`130-…-handoff.md`](./handoffs/130-repository-governance-files-handoff.md) — **Changes A/B implemented 2026-09-03; Change C is not, so this stays open.** §6 directed the manifest keys to be folded into `0.47.0`'s slice; that release shipped without them, so Change C rides `0.48.0`. Moving this to `done/` with a third of its content unbuilt is the *status that lies* RFC-000 names as the anti-pattern |
+| 136 | [The Axis-Reduction Hoist](./accepted/136-axis-reduction-hoist.md) | [`136-…-handoff.md`](./handoffs/136-axis-reduction-hoist-handoff.md) — accepted 2026-09-03. Hoists the per-element coordinate arithmetic out of `axis_reduce` and `nan_axis_reduce`. The cost is not "recomputed strides" as the audit framed it but **four heap allocations per input element**. Measured **81× / 111× / 14×** by axis, **bit-identical** on all three — and unlike RFC-133 that is derivable *before* implementation, since the transform reorders nothing and the guarantee therefore holds for any `f`, including non-associative `min`/`max`. **The harness already saw this**: both baseline reports named `sum_mean_axis` the clearest signal and filed it *not a defect*, and nothing converted that into a decision for ~20 releases. Second theme of `0.48.0`, satisfying RFC-094 §4.2 alongside RFC-133 |
 
 ## Archive
 
@@ -177,7 +178,6 @@ Withdrawn or superseded. Numbers are never reused. See
 | ID | Title | Scope |
 |---:|---|---|
 | 076 | [v1.0 Release Preparation](./proposed/076-v1-release-preparation.md) | Reviewed and accepted (GO, no conditions); its inventory refreshed by RFC-081 (five-crate family, matten-mlprep production-ready, matten-stats row added, RFC-081 §3 precondition added). RFC-081's precondition is now **discharged** — `matten-stats` took **Exit A (promotion)** via RFC-084 — but this RFC remains deferred and no implementation is authorized: v1.0 is not currently wanted, a separate and unrelated reason |
-| 136 | [The Axis-Reduction Hoist](./proposed/136-axis-reduction-hoist.md) | **Awaiting acceptance.** Hoists the per-element coordinate arithmetic out of `axis_reduce` and `nan_axis_reduce`. The cost is not "recomputed strides" as the audit framed it but **four heap allocations per input element** — over four million to perform one million additions. Measured **81× / 111× / 14×** by axis on a 1 048 576-element tensor, **bit-identical** on all three. Unlike RFC-133 the bit-identity is derivable *before* implementation: the transform reorders nothing, so any `f` sees the same operands in the same sequence. **The harness already saw this one** — both baseline reports named `sum_mean_axis` the clearest signal in the suite and classified it *not a defect*, and nothing converted that into a decision for ~20 releases. Second theme of `0.48.0` |
 
 ## Remaining Themes And Issues
 

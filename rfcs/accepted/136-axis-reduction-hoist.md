@@ -1,6 +1,9 @@
 # RFC-136: The Axis-Reduction Hoist
 
-**Status:** Proposed
+**Status:** **Accepted** 2026-09-03 by the owner. Handoff: `rfcs/handoffs/136-axis-reduction-hoist-handoff.md`.
+**Second theme of `0.48.0`**, satisfying RFC-094 §4.2's two-theme trigger alongside RFC-133 — the
+release that also carries RFC-130's Change C. **No version bump, tag, or publish is authorized by
+this acceptance**; each is a separate owner authorization at the time (RFC-094 §5).
 **Target:** `crates/matten/src/math.rs` (`axis_reduce`, `nan_axis_reduce`)
 **Theme:** A 14–111× win with no numeric change at all — and the harness saw this one two years ago
 **Related:** RFC-133 (the sibling optimisation, and the contrast), RFC-049 (the harness that already
