@@ -10,6 +10,7 @@ rust-version.workspace  = true
 authors.workspace       = true
 license.workspace       = true
 repository.workspace    = true
+homepage.workspace      = true
 
 # Companion crate: depends on core `matten` only (no default features), one
 # direction (matten-data -> matten). CSV ingestion (RFC-035) is behind the

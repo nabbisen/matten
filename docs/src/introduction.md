@@ -16,15 +16,9 @@ This book is organized by reader:
 - **Reference** — the rules that shape the public API.
 - **Contributors** — project layout, milestones, and process.
 
-> This documentation tracks the current 0.47 release family, carrying RFC-128 through
-> RFC-132. The four arithmetic operators gain recoverable twins — `try_add`, `try_sub`,
-> `try_mul`, `try_div` — returning `Result` where `+`/`-`/`*`/`/` panic; the operators
-> themselves are unchanged and now delegate to them. The element budget **no longer applies**
-> to arithmetic, reductions, slicing, or concatenation on data already in memory, so
-> `&big + &big` succeeds where it previously panicked. It still applies at every boundary
-> where a size arrives from outside, and to any operation whose output can exceed its inputs
-> combined — `matmul`, `outer`, broadcast expansion, and `repeat`/`tile`. `max_parse_bytes`
-> is now enforced at every file and string parser, including `matten-data`'s
-> `Table::from_csv_path`, where it had been documented but inert. Five rustdoc statements
-> that had gone false are corrected — see the `[0.47.0]` CHANGELOG entry for the complete
-> list.
+> This documentation tracks the current 0.48 release family. `matmul` and the axis
+> reductions (`sum_axis`, `mean_axis`, `min_axis`, `max_axis`) are substantially faster on
+> larger tensors. **No numeric output changes** — both are exact restructurings, verified
+> bit-identical to the previous implementations rather than merely close. The published
+> crates now carry a `homepage` link to the project book. See the `[0.48.0]` CHANGELOG
+> entry for the complete list.

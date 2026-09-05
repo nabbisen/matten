@@ -39,12 +39,13 @@ exclude = [
 # this version. Per-crate `keywords`/`categories`/`description` are NOT shared —
 # they differ per crate and aid crates.io discoverability.
 [workspace.package]
-version = "0.47.0"
+version = "0.48.0"
 edition         = "2024"
 rust-version    = "1.85"
 license         = "Apache-2.0"
 authors         = ["nabbisen"]
 repository      = "https://github.com/nabbisen/matten"
+homepage        = "https://nabbisen.github.io/matten"
 
 # Core `matten` is path-published; companions inherit this path + version
 # requirement. The broad pre-1.0 requirement (`version = "0"`) is intentional:

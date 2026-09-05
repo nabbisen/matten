@@ -10,6 +10,7 @@ rust-version.workspace  = true
 authors.workspace       = true
 license.workspace       = true
 repository.workspace    = true
+homepage.workspace      = true
 # Shared docs, RFCs, ROADMAP, and CI live at the workspace root, outside this
 # package directory, so they are not part of the published crate by construction.
 

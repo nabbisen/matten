@@ -26,6 +26,18 @@ crates are expressed by per-crate status labels, not by separate version numbers
 > trigger — unfired across eight consecutive releases before RFC-074 found
 > it — a mandatory per-entry check rather than a rule that only an RFC states.
 
+## [0.48.0] - 2026-09-06
+
+The performance and metadata release: two operations get substantially faster with no numeric
+change at all, and the published crates finally link to the project book.
+
+### Changed
+
+- `matmul` is substantially faster on matrices that exceed cache, and axis reductions (`sum_axis`,
+  `mean_axis`, `min_axis`, `max_axis`) are faster by an order of magnitude or more. **No numeric
+  output changes**: both are exact restructurings, verified bit-identical rather than merely close.
+- The published crates now carry a `homepage` link to the project book.
+
 ## [0.47.0] - 2026-09-03
 
 The Result-zone and limit-model release: the four arithmetic operators gain recoverable twins, and
