@@ -14,7 +14,6 @@
 use crate::MattenError;
 use crate::Tensor;
 use crate::limits::MattenLimits;
-use crate::shape::{coord_to_flat, flat_to_coord};
 
 // ── Whole-tensor reductions ───────────────────────────────────────────────
 
@@ -391,13 +390,7 @@ impl Tensor {
                 ),
             });
         }
-        Ok(nan_axis_reduce(
-            self,
-            axis,
-            "min_axis",
-            f64::INFINITY,
-            |a, b| a.min(b),
-        ))
+        nan_axis_reduce(self, axis, "min_axis", f64::INFINITY, |a, b| a.min(b))
     }
 
     /// Reduces along `axis` by taking the maximum, removing that axis from the
@@ -449,24 +442,27 @@ impl Tensor {
                 ),
             });
         }
-        Ok(nan_axis_reduce(
-            self,
-            axis,
-            "max_axis",
-            f64::NEG_INFINITY,
-            |a, b| a.max(b),
-        ))
+        nan_axis_reduce(self, axis, "max_axis", f64::NEG_INFINITY, |a, b| a.max(b))
     }
 }
 
 /// Axis reduction with explicit NaN propagation (for min/max).
+///
+/// # Errors
+///
+/// Returns [`MattenError::Allocation`] if the output shape's element count
+/// exceeds the default budget. Not reachable today — `min_axis`/`max_axis`
+/// reject a zero-length *reduced* axis upstream (RFC-110), so the surviving
+/// axes' product is already bounded by the input's own size — but the bound
+/// is kept local to the site that allocates rather than resting on a policy
+/// enforced elsewhere (RFC-136 §6/§7).
 fn nan_axis_reduce(
     t: &Tensor,
     axis: usize,
     operation: &'static str,
     identity: f64,
     f: impl Fn(f64, f64) -> f64,
-) -> Tensor {
+) -> Result<Tensor, MattenError> {
     if axis >= t.ndim() {
         panic!(
             "matten shape error in {operation}: axis {axis} is out of range for rank-{} tensor",
@@ -480,31 +476,29 @@ fn nan_axis_reduce(
         .filter(|&(i, _)| i != axis)
         .map(|(_, &d)| d)
         .collect();
-    let out_len: usize = if out_shape.is_empty() {
-        1
-    } else {
-        out_shape.iter().product()
-    };
+    let out_len = MattenLimits::default().check_shape(&out_shape, operation)?;
     let mut out_data = vec![identity; out_len];
     let mut has_nan = vec![false; out_len];
 
-    for (src_flat, &val) in t.data.iter().enumerate() {
-        let src_coord = flat_to_coord(src_flat, src_shape);
-        let out_coord: Vec<usize> = src_coord
-            .iter()
-            .enumerate()
-            .filter(|&(i, _)| i != axis)
-            .map(|(_, &c)| c)
-            .collect();
-        let dst_flat = if out_shape.is_empty() {
-            0
-        } else {
-            coord_to_flat(&out_coord, &out_shape).expect("valid by construction")
-        };
-        if val.is_nan() {
-            has_nan[dst_flat] = true;
-        } else {
-            out_data[dst_flat] = f(out_data[dst_flat], val);
+    // RFC-136: same hoist as axis_reduce (see its comment for the
+    // bit-identity argument) — no allocation inside either loop.
+    let axis_len = src_shape[axis];
+    let outer: usize = src_shape[..axis].iter().product();
+    let inner: usize = src_shape[axis + 1..].iter().product();
+
+    for o in 0..outer {
+        let base = o * axis_len * inner;
+        let dst = o * inner;
+        for a in 0..axis_len {
+            let row = base + a * inner;
+            for i in 0..inner {
+                let val = t.data[row + i];
+                if val.is_nan() {
+                    has_nan[dst + i] = true;
+                } else {
+                    out_data[dst + i] = f(out_data[dst + i], val);
+                }
+            }
         }
     }
     // Propagate NaN
@@ -513,7 +507,7 @@ fn nan_axis_reduce(
             out_data[i] = f64::NAN;
         }
     }
-    Tensor::from_parts_checked(out_data, out_shape)
+    Ok(Tensor::from_parts_checked(out_data, out_shape))
 }
 
 /// Generic axis reduction.
@@ -547,21 +541,27 @@ fn axis_reduce(
     let out_len = MattenLimits::default().check_shape(&out_shape, operation)?;
     let mut out_data = vec![identity; out_len];
 
-    for (src_flat, &val) in t.data.iter().enumerate() {
-        let src_coord = flat_to_coord(src_flat, src_shape);
-        // Drop the reduced axis coordinate.
-        let out_coord: Vec<usize> = src_coord
-            .iter()
-            .enumerate()
-            .filter(|&(i, _)| i != axis)
-            .map(|(_, &c)| c)
-            .collect();
-        let dst_flat = if out_shape.is_empty() {
-            0
-        } else {
-            coord_to_flat(&out_coord, &out_shape).expect("valid by construction")
-        };
-        out_data[dst_flat] = f(out_data[dst_flat], val);
+    // RFC-136: hoisted out of the per-element coordinate round-trip
+    // (flat_to_coord / coord_to_flat, four heap allocations per input
+    // element) into the decomposition stats.rs already uses. For a fixed
+    // output cell the contributing input elements are the `axis_len` values
+    // at `base + a*inner + i`, visited here in ascending `a` -- the same
+    // order the old per-element scan visited them in (`a*inner` was the only
+    // varying term), so the result is bit-identical for any `f`, not merely
+    // to within float associativity. No allocation inside either loop.
+    let axis_len = src_shape[axis];
+    let outer: usize = src_shape[..axis].iter().product();
+    let inner: usize = src_shape[axis + 1..].iter().product();
+
+    for o in 0..outer {
+        let base = o * axis_len * inner;
+        let dst = o * inner;
+        for a in 0..axis_len {
+            let row = base + a * inner;
+            for i in 0..inner {
+                out_data[dst + i] = f(out_data[dst + i], t.data[row + i]);
+            }
+        }
     }
 
     Ok(Tensor::from_parts_checked(out_data, out_shape))
