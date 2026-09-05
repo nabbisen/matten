@@ -163,6 +163,7 @@ sign-off and implementation — not that the state is unused.
 | ID | Title | Handoff |
 |---:|---|---|
 | 130 | [Repository Governance Files](./accepted/130-repository-governance-files.md) | [`130-…-handoff.md`](./handoffs/130-repository-governance-files-handoff.md) — **Changes A/B implemented 2026-09-03; Change C is not, so this stays open.** §6 directed the manifest keys to be folded into `0.47.0`'s slice; that release shipped without them, so Change C rides `0.48.0`. Moving this to `done/` with a third of its content unbuilt is the *status that lies* RFC-000 names as the anti-pattern |
+| 137 | [`0.48.0` — The Performance and Metadata Release](./accepted/137-0480-performance-and-metadata-release.md) | [`137-…-handoff.md`](./handoffs/137-0480-release-handoff.md) — accepted 2026-09-05. Ships RFC-133, RFC-136 and RFC-130's Change C. **The first release changing nothing a user's code can observe except speed** — no public API added or removed, every program bit-identical. RFC-094 §4.1 as amended by RFC-120 settles the version for the fourth time: neither a performance win nor a missing link is a *correctness fix*, so neither rides a patch. The changelog claims **floors, not multipliers**, after RFC-136's review found the baseline — not the change — is what swings. The retarget is **guard-driven**: bumping `Cargo.toml` makes `check-release-docs.sh` produce the worklist itself, which is why the handoff tells the implementer not to trust this RFC's own counts |
 
 ## Archive
 
@@ -178,7 +179,6 @@ Withdrawn or superseded. Numbers are never reused. See
 | ID | Title | Scope |
 |---:|---|---|
 | 076 | [v1.0 Release Preparation](./proposed/076-v1-release-preparation.md) | Reviewed and accepted (GO, no conditions); its inventory refreshed by RFC-081 (five-crate family, matten-mlprep production-ready, matten-stats row added, RFC-081 §3 precondition added). RFC-081's precondition is now **discharged** — `matten-stats` took **Exit A (promotion)** via RFC-084 — but this RFC remains deferred and no implementation is authorized: v1.0 is not currently wanted, a separate and unrelated reason |
-| 137 | [`0.48.0` — The Performance and Metadata Release](./proposed/137-0480-performance-and-metadata-release.md) | **Awaiting acceptance.** Ships RFC-133, RFC-136 and — at last — RFC-130's Change C. **The first release that changes nothing a user's code can observe except speed**: no public API added or removed (E3), no behaviour change, every program bit-identical. That makes the version look wrong at a glance, and RFC-094 §4.1 as amended by RFC-120 settles it cleanly for the fourth time: neither a performance win nor a missing manifest link is a *correctness fix*, so neither can ride a patch. **The changelog claims floors, not multipliers** — RFC-136's review showed the same change measures 81×/110×/199× on one machine because the old path's four million allocations make the baseline swing, not the change. 24 pins + 10 family refs retarget, and the guard derives the minor from `Cargo.toml` so it drives that list itself |
 
 ## Remaining Themes And Issues
 

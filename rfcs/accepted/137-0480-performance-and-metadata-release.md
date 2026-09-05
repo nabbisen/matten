@@ -1,6 +1,8 @@
 # RFC-137: `0.48.0` — The Performance and Metadata Release
 
-**Status:** Proposed
+**Status:** **Accepted** 2026-09-05 by the owner. Handoff:
+`rfcs/handoffs/137-0480-release-handoff.md`. **The tag and the publish are NOT authorized by this
+acceptance** — each is a separate owner authorization at the time (RFC-094 §5).
 **Target:** `Cargo.toml`, `crates/*/Cargo.toml`, live version pins, `CHANGELOG.md`,
 `introduction.md`, `public-api-snapshot.md`
 **Theme:** The first release that changes nothing a user's code can observe — except speed
