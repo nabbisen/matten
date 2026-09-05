@@ -1,9 +1,16 @@
 # RFC-136: The Axis-Reduction Hoist
 
-**Status:** **Accepted** 2026-09-03 by the owner. Handoff: `rfcs/handoffs/136-axis-reduction-hoist-handoff.md`.
-**Second theme of `0.48.0`**, satisfying RFC-094 §4.2's two-theme trigger alongside RFC-133 — the
-release that also carries RFC-130's Change C. **No version bump, tag, or publish is authorized by
-this acceptance**; each is a separate owner authorization at the time (RFC-094 §5).
+**Status:** **Implemented** 2026-09-05 in commit *"Hoist the per-element coordinate arithmetic out of
+both axis reductions (RFC-136)"* (`3db17b2`), reviewed and approved. **Unreleased** — the second
+theme of `0.48.0`, satisfying RFC-094 §4.2's two-theme trigger alongside RFC-133. **Bit-identical**
+across ranks 1-4, every axis, with NaN scattered and an all-NaN case, verified at review against an
+independent reconstruction of the pre-change algorithm.
+
+> **§2's measured figures are narrowed by the review — see §2.1.** The 81× / 111× / 14× reported
+> below are real, but so are the implementer's 199.6× / 109.8× / 16.6× on the *same machine*. The
+> ratio is not a stable number; **the floor is ~10×**, and that is what the changelog may claim.
+
+Handoff: `rfcs/handoffs/136-axis-reduction-hoist-handoff.md`.
 **Target:** `crates/matten/src/math.rs` (`axis_reduce`, `nan_axis_reduce`)
 **Theme:** A 14–111× win with no numeric change at all — and the harness saw this one two years ago
 **Related:** RFC-133 (the sibling optimisation, and the contrast), RFC-049 (the harness that already
@@ -44,6 +51,33 @@ below was produced on this project's own hardware against the current tree.
 **E5 independently reproduces the external audit's P-1** (~65× vs whole reductions) on different
 hardware, which is worth stating because RFC-133's E2 also reproduced. The auditor's performance
 numbers have now been checked twice and held twice.
+
+### 2.1 The ratio is unstable — amended 2026-09-05 at review
+
+The figures in §2 are honest measurements and do not reproduce. Neither do the implementer's. The
+cause was found at review and is specific to what this RFC removes:
+
+```text
+old algorithm, axis 0, same binary, same machine:
+    cold (first run ever)   75.39 ms
+    warm (best of 5)        38.35 ms     <- 1.97x from allocator warm-up alone
+and the WARM baseline itself moved 14.96 ms -> 38.64 ms between invocations
+```
+
+The old path's cost is dominated by **four million heap allocations**, making it unusually sensitive
+to allocator state and machine load. The hoisted path is not — every run agrees to within a few
+percent. So the *numerator* is stable and the *denominator* is not, which is why 81×, 110× and 199×
+are all true of the same change.
+
+**Consequence for §9's changelog wording:** claim the **floor**, never a headline multiplier. Axis 2
+measured 10.1× / 14.4× / 14.6× / 16.6× across four runs, so *"an order of magnitude or more, with no
+numeric change"* holds under every methodology tried. A floor is the right shape for a performance
+claim regardless: it is what a user is entitled to rely on.
+
+> The implementer attributed the gap to CPU generation and compiler version. Both runs were on the
+> same `AMD Ryzen 9 9950X`, one rustc patch release apart — so that explanation was wrong, and the
+> methodological one replaces it. **A ratio is a claim about two numbers, and the unstable one here
+> is a baseline nobody will ever run again.**
 
 ## 3. What the cost actually is
 
