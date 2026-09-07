@@ -1,8 +1,12 @@
 # RFC-137: `0.48.0` — The Performance and Metadata Release
 
-**Status:** **Accepted** 2026-09-05 by the owner. Handoff:
-`rfcs/handoffs/137-0480-release-handoff.md`. **The tag and the publish are NOT authorized by this
-acceptance** — each is a separate owner authorization at the time (RFC-094 §5).
+**Status:** **Released** 2026-09-07. Prepared in commit *"Prepare 0.48.0: 35 references retargeted, the
+manifest keys, the changelog entry (RFC-137)"* (`4a1694a`); the owner authorized push, then tag and
+publish. All five crates live at `0.48.0`, verified against the **sparse index**, none yanked. The
+signed tag sits on the Prepare commit, which was `HEAD` this time — `git diff --name-only
+4a1694a..HEAD -- crates/` returned empty, checked rather than assumed. CI was confirmed green on
+`4a1694a` by reading each workflow's `head_sha` from the API. **Change C is live**: crates.io now
+reports `homepage`, with `documentation` correctly absent.
 **Target:** `Cargo.toml`, `crates/*/Cargo.toml`, live version pins, `CHANGELOG.md`,
 `introduction.md`, `public-api-snapshot.md`
 **Theme:** The first release that changes nothing a user's code can observe — except speed

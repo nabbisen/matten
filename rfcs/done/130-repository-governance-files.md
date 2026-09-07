@@ -1,15 +1,15 @@
 # RFC-130: Repository Governance Files
 
-**Status:** **Partially implemented — deliberately still open.** Changes A and B landed
-2026-09-03 in commit *"Add SECURITY.md and CONTRIBUTING.md (RFC-130)"* (`c13e304`), reviewed and
-approved with **no corrections**; the implementer re-derived the reporting toggle themselves rather
-than trusting this RFC's banner, on the reasoning that a setting can be switched off after the
-document depending on it is written. **Change C (the manifest keys) is NOT implemented.** §6 directs
-it to be *"folded into [`0.47.0`'s] release slice"*; `0.47.0` was tagged and published on 2026-09-03
-without it, so that window has closed and Change C now waits for the next minor. This RFC therefore
-**stays in `accepted/`**: moving it to `done/` with a third of its content unbuilt is precisely the
-"status that lies" RFC-000 names as the anti-pattern, and the folder is the only status this project
-keeps. Handoff (Changes A/B only): `rfcs/handoffs/130-repository-governance-files-handoff.md`.
+**Status:** **Implemented and closed** 2026-09-07. Changes A and B landed 2026-09-03 (`c13e304`);
+**Change C shipped in `0.48.0`** (RFC-137), three releases after §6 directed it into `0.47.0`'s
+slice. `homepage` is live on crates.io for all five crates; `documentation` was deliberately
+omitted, cargo defaulting it to docs.rs. This RFC stayed in `accepted/` for four days with two
+thirds of its content built, rather than moving to `done/` with Change C outstanding — the folder is
+the only status this project keeps, and a `done/` RFC with unbuilt content is the *status that lies*
+RFC-000 names as the anti-pattern. **§6's wording is the lasting lesson** (see its amendment):
+*"C waits for `0.47.0`"* named a specific release and went stale in three days, where *"C waits for
+the next minor"* would have survived. Handoff:
+`rfcs/handoffs/130-repository-governance-files-handoff.md`.
 **Target:** `SECURITY.md`, `CONTRIBUTING.md`, `crates/*/Cargo.toml` (manifest metadata)
 **Theme:** Give a vulnerability somewhere to go, and make the contributor and project links findable
 **Related:** RFC-001 (the threat model this serves), RFC-094 §4.1 (why the manifest keys are a patch),
