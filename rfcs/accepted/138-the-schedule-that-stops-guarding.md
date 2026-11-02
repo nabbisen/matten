@@ -1,6 +1,8 @@
 # RFC-138: The Schedule That Stops Guarding
 
-**Status:** Proposed
+**Status:** **Accepted** 2026-11-03 by the owner. Handoff:
+`rfcs/handoffs/138-benchmarks-peers-trigger-handoff.md`. Touches zero published packages; no version
+bump, tag, or publish.
 **Target:** `.github/workflows/benchmarks-peers.yml`, the release sequence
 **Theme:** A weekly guard GitHub will switch off silently, protecting something cheaper than it looks
 **Related:** RFC-049 Phase 2 (the architect ruling that created this workflow), RFC-117 (guards that
@@ -120,11 +122,19 @@ on:
 
 Both steps stay exactly as they are.
 
-**And the release sequence gains one step**, before the tag:
+**And the release sequence gains one step.** The operational file is
+`docs/src/contributing/release-checklist.md` — not RFC-118, which is the *design record* for
+confirming CI before tagging and needs no amendment for a different check.
 
-```text
-dispatch benchmarks-peers and confirm it is green
-```
+> **Corrected on acceptance.** §8 R5 originally said the step must land "in RFC-118's sequence".
+> RFC-118 is a `done/` design RFC; releases are actually run from the book's release checklist. The
+> risk R5 names is real — a guarantee that lives only in an RFC does not exist — but it named the
+> wrong file, which would have produced exactly the outcome it warns about.
+
+It belongs in `### Push, confirm CI green, then tag` (`:257`), **after the push and before the
+tag** — not in "Before every release" — for RFC-118's own reason: a dispatch runs against a ref, so
+dispatching after the push tests *the commit that is about to be tagged* rather than whatever the
+working tree happened to hold.
 
 A release is the moment the question is actually live — the project is about to publish, and wants
 to know the peer harness still builds and isolation still holds. It is an event that cannot be
@@ -174,8 +184,9 @@ R2  Dropping the workflow entirely. workflow_dispatch MUST stay; it is the
 R3  Touching either step. Both are correct, including the redundant one (§4).
 R4  Adding a push or pull_request trigger (§7 B).
 R5  Letting the release-sequence step live only in this RFC. It must land in
-    RFC-118's sequence where releases are actually run from, or the guarantee
-    this RFC claims does not exist.
+    `docs/src/contributing/release-checklist.md`, which is where releases are
+    actually run from, or the guarantee this RFC claims does not exist.
+    (This risk originally named RFC-118 -- see §6's correction.)
 ```
 
 ## 9. Acceptance criteria
@@ -186,7 +197,8 @@ R5  Letting the release-sequence step live only in this RFC. It must land in
 [ ] both run steps unchanged
 [ ] `gh workflow run benchmarks-peers.yml` dispatches and passes, proving the
     manual path works before the automatic one is removed
-[ ] the release sequence records the dispatch step, before the tag
+[ ] `docs/src/contributing/release-checklist.md` records the dispatch step, in
+    `### Push, confirm CI green, then tag`, after the push and before the tag
 [ ] nine guards; no crates/ path touched; zero published packages affected
 [ ] no version bump, tag, or publish
 ```

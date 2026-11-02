@@ -1,6 +1,8 @@
 # RFC-139: The Guard That Cannot See a Wrapped Sentence
 
-**Status:** Proposed
+**Status:** **Accepted** 2026-11-03 by the owner. Handoff:
+`rfcs/handoffs/139-wrapped-sentence-guard-handoff.md`. Touches zero published packages; no version
+bump, tag, or publish.
 **Target:** `scripts/check-release-docs.sh` (the stale-prior-family checks, `:370-404`)
 **Theme:** A guard whose comment names a file it is structurally unable to read
 **Related:** RFC-117 (guards that cannot pass vacuously), RFC-123 (the vacuous crate-table guard),
