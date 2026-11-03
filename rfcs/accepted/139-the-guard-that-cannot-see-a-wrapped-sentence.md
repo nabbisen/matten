@@ -87,6 +87,54 @@ at all, and the RFC does not pretend otherwise.
 
 ## 5. The fix, prototyped and proven
 
+> **AMENDED 2026-11-03 — this section was incomplete, and the gap was found in implementation
+> review, not here. The original text below is kept verbatim.**
+>
+> "Run the existing patterns against that stream" is true of the **match** stage and false of the
+> **exclusion** stage. Each check is a pair: match the pattern, then drop occurrences of the
+> *current* family. Widening the unit of text from a line to a paragraph widens the exclusion
+> exactly as much as the match, so **a paragraph that mentions the current family anywhere
+> immunizes every stale reference inside it** — including the public-API snapshot's own 2,406-character
+> header paragraph, the one file this RFC exists to protect. Two cases that the old line-based guard
+> caught and the first implementation did not were reproduced end-to-end.
+>
+> The fix is to exclude by **occurrence**: strip every current-family match out of the text first,
+> then apply the (byte-identical) stale pattern to what remains. §5.1's first requirement stands as
+> written for the three match patterns; it does **not** license leaving the exclusion stage
+> unchanged.
+>
+> Two consequences followed, both now required:
+>
+> - Matching moved into `awk`'s dynamic-regex engine, so the script must **assert that the installed
+>   awk honours interval expressions** (`.{0,2}` in pattern (b)) before relying on them. An awk that
+>   does not compiles the pattern and then matches nothing, for every input — a silently vacuous
+>   guard, which is the RFC-117 class arriving through this RFC's own fix. Checked up front with
+>   `exit 1`, on the model of the `CURRENT_MINOR` precondition at `:424`.
+> - Printing a whole joined paragraph is not an error message. The failure output must name the file,
+>   the line, and the offending phrase.
+>
+> §5.1's last requirement is also wrong as written: the file list does **not** cover "the same
+> extensions `grep -r` reached". `grep -rI` reads every text file under `docs/src`; `.md` and `.rs`
+> is deliberately **narrower**, excluding the playground's generated wasm-bindgen output. The
+> narrowing is correct — awk cannot usefully read a `.wasm` — but it must be stated as a narrowing,
+> not as an equivalence. A comment claiming coverage its code does not provide is the defect this
+> RFC was written to close.
+>
+> §5.2's CI requirement is sound but under-specified: **a proof covers a pattern, not a check.**
+> Pattern (c) has no interval expression and pattern (b) does, so a CI proof using (c) establishes
+> nothing about (b).
+>
+> Verification note: a before/after match-**set** comparison on a clean tree cannot detect any of the
+> above, because neither side holds a stale reference. Mutation testing is required — one case per
+> shape, including a stale reference sharing a paragraph with a current one.
+>
+> **Closed.** All of the above landed in *Exclude stale version references per occurrence, not per
+> paragraph, so a paragraph cannot immunize itself (RFC-139)*. The interval question was settled by
+> evidence rather than inference: a masked-(b) mutation pushed to a throwaway branch went red in CI
+> with `crates/matten-ndarray/README.md:102: 0.47.x\` family`, and the assertion did **not** fire —
+> so CI's awk does honour intervals, and the guard says so on every run from now on.
+
+
 Join each Markdown paragraph into one logical line, tagged with the paragraph's true start line, and
 run the existing patterns against that stream.
 

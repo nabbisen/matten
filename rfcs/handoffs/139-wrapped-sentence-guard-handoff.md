@@ -32,6 +32,49 @@ API, and the guard was green the whole time.
 
 ## 3. The fix
 
+> **AMENDED 2026-11-03 — three requirements were missing from this document and one was wrong.
+> Everything below is kept verbatim; read this block first.**
+>
+> **1. Exclude by occurrence, not by paragraph.** §4's "KEEP the three regexes byte-identical. This
+> is a change of INPUT" is correct about the three **match** patterns and silent about the
+> **exclusion** stage, which also reads the widened text. A paragraph mentioning the current family
+> anywhere therefore immunized every stale reference inside it — proven on the public-API snapshot's
+> own 2,406-character header paragraph and on the ndarray README's Compatibility list, both of which
+> the old line-based guard caught. Strip current-family occurrences out of the text first, then apply
+> the stale pattern to what remains.
+>
+> **2. Assert the awk honours interval expressions.** Matching now runs through awk's dynamic-regex
+> engine. Pattern (b) contains `.{0,2}`; an awk that does not honour intervals compiles it and then
+> matches nothing, forever — a silently vacuous guard. Assert it up front with `exit 1`, on the model
+> of the `CURRENT_MINOR` precondition at `:424`, and prove the assertion can fail before trusting it.
+>
+> **3. Make the failure output readable.** Printing a matched paragraph prints up to thousands of
+> characters. Report `file:line: <offending phrase>`.
+>
+> **Wrong as written:** §4's "must reach the same files `grep -r` reached -- that means .md AND .rs".
+> `grep -rI` reads every text file under `docs/src`; `.md` and `.rs` is deliberately **narrower**,
+> excluding the playground's generated wasm-bindgen output. The narrowing is right; stating it as an
+> equivalence is not, and a comment claiming coverage its code lacks is this RFC's own defect class.
+>
+> **§5's set comparison is necessary but not sufficient.** It compares two implementations on a tree
+> with no stale reference, so it cannot see a lost detection. Add mutation testing: plain, wrapped,
+> **masked** (stale sharing a paragraph with current), last-paragraph-no-trailing-newline, and clean.
+>
+> **§6's CI proof covers a pattern, not a check.** (c) has no interval expression; (b) does. Prove
+> (b) in CI separately.
+>
+> **Ruled 2026-11-03, after review:** `report_stale` reporting only the first offender per paragraph
+> stays as-is. All ten current subjects sit in ten distinct paragraphs, so even at a bump — when every
+> one goes stale at once — it costs zero extra passes, and a `while`/`match` loop would risk a hang in
+> a release gate. Record the cost in a comment. If revisited, use `gsub`, which cannot spin.
+>
+> **All of the above is done**, in *Exclude stale version references per occurrence, not per
+> paragraph, so a paragraph cannot immunize itself (RFC-139)*. Three throwaway-branch CI proofs back
+> it: the wrapped shape, the masked-(c) shape, and the masked-(b) shape — the last of which also
+> proved CI's awk honours intervals, since the assertion did not fire. This document is now a record,
+> not a task.
+
+
 Build a stream of paragraph-joined logical lines, each tagged with the paragraph's true starting line
 number, and run the **existing patterns, unchanged** against it.
 
