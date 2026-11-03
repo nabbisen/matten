@@ -273,3 +273,31 @@ R6  Retargeting any 0.4x string while testing. CHANGELOG, ROADMAP and rfcs/
   statements of a different kind -- some genuinely stale, some permanently
   true -- and need per-row judgement rather than a pattern.
 ```
+
+> **Both resolved 2026-11-03, after RFC-139 closed. Kept above as written.**
+>
+> **The other-guards audit was run, and found nothing hidden.** All 13 multi-word prose patterns in
+> `check-release-docs.sh` were compared line-based against paragraph-joined over the real tree; not one
+> gains a match, so the wrapped snapshot header this RFC fixed was the only **live** instance. The
+> exposure that remains is latent, and it is asymmetric in a way worth recording: the guard holds 9
+> must-contain assertions (`! grep -q`) and 32 must-not-contain ones. **A wrap makes a must-contain
+> assertion fail loudly and a must-not-contain assertion pass silently** — only the second is
+> dangerous, and every one of those currently matches nothing, in any form. One irony is worth
+> keeping: the architect ruling behind the overclaim checks requires *"phrase-anchored (multi-word)
+> only, no bare-word bans"*, and multi-word is exactly what makes a pattern wrap-vulnerable. The
+> precision requirement and the line-based implementation are in tension; nothing has fallen through
+> it yet. **No RFC proposed** — converting 13 patterns across 9 file sets and two polarities to fix a
+> latent risk is a large blast radius, and this RFC just demonstrated that converting two introduced
+> two regressions.
+>
+> **The Done-table rows were resolved per row.** 15 stale claims corrected against the version each
+> RFC actually shipped in, derived two independent ways that agreed exactly — the earliest tag
+> containing each RFC's `crates/`-touching commit, and the earliest tag containing the introduction of
+> its public symbol. 4 rows were left untouched because *"unreleased and unversioned"* is permanently
+> accurate for them (RFC-092, RFC-094 process policy; RFC-093, RFC-095 book-only), and RFC-097 was
+> reworded from **Unreleased** to **Unversioned**, which is what it always meant.
+>
+> **And the text above says "the eleven", in an RFC whose own handoff forbids verifying anything
+> against a count.** There were 19 rows mentioning the word. The count was never checked; it was
+> carried between documents, which is the third count this series has got wrong after RFC-127 §8's
+> "~31" against 47 and this RFC's own "25 install pins" against 23.
