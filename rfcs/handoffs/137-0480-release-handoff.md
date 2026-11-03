@@ -1,6 +1,6 @@
 # RFC-137 Developer Handoff — Preparing `0.48.0`
 
-**RFC:** `rfcs/accepted/137-0480-performance-and-metadata-release.md`
+**RFC:** `rfcs/done/137-0480-performance-and-metadata-release.md`
 **Status:** Accepted 2026-09-05 by the owner.
 **Target:** `Cargo.toml`, `crates/*/Cargo.toml`, live version pins, `CHANGELOG.md`,
 `introduction.md`, `public-api-snapshot.md`

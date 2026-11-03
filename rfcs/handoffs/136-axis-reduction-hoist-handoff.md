@@ -1,6 +1,6 @@
 # RFC-136 Developer Handoff — The Axis-Reduction Hoist
 
-**RFC:** `rfcs/accepted/136-axis-reduction-hoist.md`
+**RFC:** `rfcs/done/136-axis-reduction-hoist.md`
 **Status:** Accepted 2026-09-03 by the owner. Unblocked — RFC-133 has landed (`0f42a8f`).
 **Target:** `crates/matten/src/math.rs` — `axis_reduce` (:520) and `nan_axis_reduce` (:463)
 **Authority:** where this document and the RFC disagree, **the RFC wins.**

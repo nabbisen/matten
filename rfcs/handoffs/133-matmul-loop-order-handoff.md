@@ -1,6 +1,6 @@
 # RFC-133 Developer Handoff — Matmul Loop Order, and a Benchmark That Can See It
 
-**RFC:** `rfcs/accepted/133-matmul-loop-order-and-a-benchmark-that-can-see-it.md`
+**RFC:** `rfcs/done/133-matmul-loop-order-and-a-benchmark-that-can-see-it.md`
 **Status:** Accepted 2026-09-03 by the owner. **Unblocked** — RFC-127 shipped in `0.46.2`.
 **Target:** `crates/matten/src/math.rs`, `benchmarks/benches/core.rs`
 **Authority:** where this document and the RFC disagree, **the RFC wins.**
