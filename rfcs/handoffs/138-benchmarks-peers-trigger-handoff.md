@@ -1,6 +1,6 @@
 # RFC-138 Developer Handoff — Drop the Weekly Schedule, Keep the Check
 
-**RFC:** `rfcs/accepted/138-the-schedule-that-stops-guarding.md`
+**RFC:** `rfcs/done/138-the-schedule-that-stops-guarding.md`
 **Status:** Accepted 2026-11-03 by the owner.
 **Target:** `.github/workflows/benchmarks-peers.yml`, `docs/src/contributing/release-checklist.md`
 **Authority:** where this document and the RFC disagree, **the RFC wins.**

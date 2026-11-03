@@ -1,6 +1,6 @@
 # RFC-139 Developer Handoff — Make the Stale-Version Checks See Wrapped Sentences
 
-**RFC:** `rfcs/accepted/139-the-guard-that-cannot-see-a-wrapped-sentence.md`
+**RFC:** `rfcs/done/139-the-guard-that-cannot-see-a-wrapped-sentence.md`
 **Status:** Accepted 2026-11-03 by the owner.
 **Target:** `scripts/check-release-docs.sh`, the stale-prior-family checks at `:370-404`
 **Authority:** where this document and the RFC disagree, **the RFC wins.**

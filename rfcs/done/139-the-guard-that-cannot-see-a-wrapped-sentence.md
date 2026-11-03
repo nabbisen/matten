@@ -1,8 +1,22 @@
 # RFC-139: The Guard That Cannot See a Wrapped Sentence
 
-**Status:** **Accepted** 2026-11-03 by the owner. Handoff:
-`rfcs/handoffs/139-wrapped-sentence-guard-handoff.md`. Touches zero published packages; no version
-bump, tag, or publish.
+**Status:** **Implemented** 2026-11-03 in commit *"Exclude stale version references per
+occurrence, not per paragraph, so a paragraph cannot immunize itself (RFC-139)"* (`1973500`),
+reviewed and approved over three rounds. Checks (b)/(c) now read paragraph-joined logical lines with
+the three match patterns byte-identical, so the wrapped `public-api-snapshot.md` header its own
+comment names is finally visible — the blindness that let `0.39.0` ship claiming to document the
+`v0.38` API with this check green. **This RFC's §5 was incomplete and is amended in place**: widening
+the unit of text widened the *exclusion* stage too, so a paragraph mentioning the current family
+immunized every stale reference inside it, including the snapshot's own 2,406-character header
+paragraph. The exclusion is now per **occurrence**. Two further requirements came out of the same
+review: the script asserts that the installed `awk` honours interval expressions before relying on
+`.{0,2}`, because an awk that does not would compile the pattern and match nothing forever; and
+failure output names the file, line and offending phrase instead of printing the paragraph. The
+implementer independently found and fixed a real `awk -v` escape-stripping bug along the way (`\.`
+reduced to `.`, so an exclusion pattern for `0.48.x` matched `0X48Xx`), reading it out of a warning
+rather than dismissing it. Proven RED in CI on three throwaway branches — wrapped, masked-(c), and
+masked-(b); the last also settled the interval question, since the assertion did not fire. Touches
+zero published packages; no version bump, tag, or publish.
 **Target:** `scripts/check-release-docs.sh` (the stale-prior-family checks, `:370-404`)
 **Theme:** A guard whose comment names a file it is structurally unable to read
 **Related:** RFC-117 (guards that cannot pass vacuously), RFC-123 (the vacuous crate-table guard),

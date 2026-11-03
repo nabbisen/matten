@@ -1,8 +1,18 @@
 # RFC-138: The Schedule That Stops Guarding
 
-**Status:** **Accepted** 2026-11-03 by the owner. Handoff:
-`rfcs/handoffs/138-benchmarks-peers-trigger-handoff.md`. Touches zero published packages; no version
-bump, tag, or publish.
+**Status:** **Implemented** 2026-11-03 in commit *"Dispatch the peers compile-check from the
+release sequence instead of a weekly schedule (RFC-138)"* (`f5e155c`), reviewed and approved. The
+weekly `schedule:` is gone and `workflow_dispatch:` is the only trigger; the check now runs as step 3
+of `docs/src/contributing/release-checklist.md`'s push/CI/tag sequence. **The manual path was proved
+green before the automatic one was removed** — run `41543222187`, `event: workflow_dispatch`,
+`headSha` the commit about to be edited, dispatched 65 seconds before the file was first written.
+In 19 prior runs over 18 weeks, every trigger had been `schedule` and `workflow_dispatch` had never
+been used. **Review found one defect in the checklist step and it was fixed before the commit**: it
+read the dispatched run with `gh run list --limit 1`, which returns before the new run exists and
+shows neither SHA nor event, so it could be satisfied by the previous green scheduled run — the same
+shape as the defect that put step 2 in that document. It now asks for
+`--json headSha,event,conclusion,url` and says what to compare. Touches zero published packages; no
+version bump, tag, or publish.
 **Target:** `.github/workflows/benchmarks-peers.yml`, the release sequence
 **Theme:** A weekly guard GitHub will switch off silently, protecting something cheaper than it looks
 **Related:** RFC-049 Phase 2 (the architect ruling that created this workflow), RFC-117 (guards that
