@@ -367,6 +367,52 @@ USER_DOCS=(
   docs/src
 )
 
+# RFC-139. USER_DOCS mixes individual files with docs/src, a directory the
+# checks below used to walk via grep -r's own recursion (which, via -I, reads
+# every TEXT file under it, not only .md/.rs). Converting checks (b)/(c) to
+# read paragraph-joined logical lines instead of raw ones (next) needs an
+# explicit file list instead, expanded here to .md and .rs ONLY -- narrower
+# than grep -r's own reach, deliberately: docs/src also holds the shape
+# playground's generated wasm-bindgen output (a .wasm binary, a .js glue
+# file, two .d.ts files), which contains no version string today and would
+# not parse sensibly as awk input even if it did. Pattern (a) is unchanged
+# and still walks all of USER_DOCS via grep -r, so it alone still reaches
+# those four files; if one of them ever needs checking too, widen this list
+# and say so, rather than letting the comment and the code drift apart again.
+expand_user_docs() {
+  local path
+  for path in "${USER_DOCS[@]}"; do
+    if [ -d "$path" ]; then
+      find "$path" -type f \( -name '*.md' -o -name '*.rs' \)
+    else
+      printf '%s\n' "$path"
+    fi
+  done
+}
+
+# Joins each file's blank-line-delimited paragraphs into one logical line,
+# tagged with the paragraph's own starting line number, in the same
+# "file:line:text" shape grep -rIn emits -- so checks (b)/(c) below run
+# UNCHANGED patterns against paragraphs rather than raw lines (RFC-139). A
+# sentence that wraps across a line break is invisible to a line-based grep,
+# which is exactly how the public-API snapshot's header ("...at the current
+# v0.NN release / family. ...", split across two lines) shipped stale for a
+# full release cycle: 0.39.0 went to crates.io still claiming to document the
+# v0.38 API, and this check was green throughout. FNR==1 flushes the
+# PREVIOUS file's pending buffer before fname is reassigned -- END fires once
+# for the whole run, not once per file, so without that flush the final
+# paragraph of every file but the last would be silently dropped, which would
+# be a new blind spot of exactly the kind this fix exists to close.
+join_paragraphs() {
+  awk '
+    function flush() { if (buf != "") { print fname ":" start ":" buf; buf="" } }
+    FNR==1           { flush(); fname=FILENAME }
+    /^[[:space:]]*$/ { flush(); next }
+                     { if (buf=="") start=FNR; buf = (buf=="" ? $0 : buf " " $0) }
+    END              { flush() }
+  ' "$@"
+}
+
 echo "=== Checking for stale prior-family version references in user-facing docs ==="
 # Current family minor, derived dynamically from the workspace version so it can
 # never go stale on a bump (the previous hardcoded value was missed at the 0.23.0
@@ -380,16 +426,89 @@ if [ -z "$CURRENT_MINOR" ] || ! echo "$CURRENT_MINOR" | grep -Eq '^[0-9]+$'; the
   exit 1
 fi
 # (a) install-snippet version pins: `<crate> = "0.NN"` / `version = "0.NN"`
-#     / exact prerelease pins such as `0.NN.0-pre.1`.
+#     / exact prerelease pins such as `0.NN.0-pre.1`. Left LINE-based (RFC-139):
+#     a TOML pin is one line by construction and cannot wrap, and running it
+#     against paragraph-joined text risks merging a code fence into
+#     surrounding prose, which would report the wrong line even where
+#     detection still worked.
 if grep -rInE '(version|matten[a-z-]*) = "0\.[0-9]+([^"]*)?"' "${USER_DOCS[@]}" 2>/dev/null \
    | grep -vE "= \"0\.${CURRENT_MINOR}([.\"-]|$)"; then
   echo "ERROR: stale install-snippet version pin in user-facing docs (pin the current minor 0.${CURRENT_MINOR})"
   FAIL=1
 fi
+# RFC-139: (b) and (c) below read paragraph-joined logical lines instead of
+# raw ones -- a change of INPUT only; both patterns are byte-identical to
+# before. Computed once and reused so every file is read a single time.
+# mapfile into an array first, rather than an unquoted command substitution,
+# so a path is never subject to word splitting.
+mapfile -t USER_DOC_FILES < <(expand_user_docs)
+PARAGRAPH_LINES="$(join_paragraphs "${USER_DOC_FILES[@]}")"
+
+# RFC-139 review correction. Excluding by WHOLE LINE (the original `grep -v`
+# behaviour, kept unchanged when the unit of text was one raw line) stops
+# working the moment the unit of text widens to a paragraph: a paragraph that
+# mentions the CURRENT family anywhere immunizes every stale reference
+# elsewhere in that same paragraph, including the public-API snapshot's own
+# 2000+ character header paragraph -- the exact file this RFC exists to
+# protect. The fix excludes by OCCURRENCE instead: strip every current-family
+# match out of the text FIRST (sed), then apply the (byte-identical) stale
+# pattern to what remains. A stale reference sharing a paragraph with a
+# current one is no longer able to hide behind it.
+#
+# Printing a full match would print the whole joined paragraph, which can run
+# to thousands of characters -- useless as an error message. report_stale
+# re-extracts just the file:line prefix and the single matched phrase via
+# awk's match()/RSTART/RLENGTH, so the output stays one short line per
+# offender regardless of how long the source paragraph is.
+#
+# match() returns only the first occurrence, so a paragraph holding more than
+# one offender for the same pattern reports just the earliest. Every subject
+# in this tree sits in its own paragraph today, so this costs nothing; a
+# re-run after each fix still converges. If that ever changes, prefer
+# counting occurrences (e.g. gsub(ENVIRON["PAT"], "&", text)) over a
+# match()-in-a-loop, which can spin forever on a zero-length match.
+report_stale() {
+  # The pattern is passed via the environment, not `-v`: gawk's `-v var=value`
+  # assignment re-runs the SAME backslash-escape processing a string literal
+  # in source would get, so `\.` (not a recognised escape) is silently
+  # stripped to a bare `.` with a warning -- which then means "any character"
+  # to the regex engine instead of "literal dot". Caught empirically: a
+  # pattern meant to match only `0.48.x` matched `0X48Xx` once passed through
+  # -v. ENVIRON reads the raw value with no such reinterpretation.
+  PAT="$1" awk '
+    {
+      n = index($0, ":"); rest = substr($0, n + 1)
+      m = index(rest, ":"); file = substr($0, 1, n - 1); line = substr(rest, 1, m - 1)
+      text = substr(rest, m + 1)
+      if (match(text, ENVIRON["PAT"])) {
+        print file ":" line ": " substr(text, RSTART, RLENGTH)
+      }
+    }
+  '
+}
+
+# A precondition checks (b)/(c) cannot do their job without, checked up front
+# and exiting hard -- the same shape as the CURRENT_MINOR derivation check
+# above (:424), not a FAIL=1. Pattern (b) uses an interval expression
+# (`.{0,2}`), and matching now goes through awk's dynamic-regex engine rather
+# than grep -E's. Not every awk honours interval expressions; one that
+# doesn't compiles the pattern fine and then matches nothing, for every
+# input -- a silently vacuous guard, undetectable from a green run (the same
+# RFC-117 class this RFC exists to close, arriving through the fix for it).
+if ! PAT='x.{0,2}y' awk 'BEGIN { exit !match("xy", ENVIRON["PAT"]) }'; then
+  echo "ERROR: this awk does not honour interval expressions; checks (b)/(c) would be vacuous"
+  exit 1
+fi
+
 # (b) `X.Y.x family` labels (with or without surrounding backticks). Requires the
 #     word "family" so generic patch-notation examples like "(0.13.x)" don't match.
-if grep -rInE '0\.[0-9]+\.x.{0,2}family' "${USER_DOCS[@]}" 2>/dev/null \
-   | grep -vE "0\.${CURRENT_MINOR}\.x"; then
+#     Paragraph-joined prophylactically: nothing wraps here today, but a label
+#     split across a line wrap would otherwise be as invisible as (c) was.
+B_STALE="$(printf '%s\n' "$PARAGRAPH_LINES" \
+  | sed -E "s/0\\.${CURRENT_MINOR}\\.x//g" \
+  | report_stale '0\.[0-9]+\.x.{0,2}family')"
+if [ -n "$B_STALE" ]; then
+  echo "$B_STALE"
   echo "ERROR: stale 'X.Y.x family' label in user-facing docs (current family is 0.${CURRENT_MINOR}.x)"
   FAIL=1
 fi
@@ -397,8 +516,16 @@ fi
 #     introduction page). The `v` prefix is optional: both "current v0.24 family"
 #     and "current 0.24 release family" are matched, so a stale ref cannot hide
 #     behind a spelling difference (v0.24.1 deep-review P2; v0.37.0 release-review B1).
-if grep -rInE 'current v?0\.[0-9]+( release)? family' "${USER_DOCS[@]}" 2>/dev/null \
-   | grep -vE "current v?0\.${CURRENT_MINOR}( release)? family"; then
+#     Paragraph-joined (RFC-139): this sentence legitimately wraps across two
+#     source lines in the public-API snapshot's own header, which a line-based
+#     grep cannot see -- proven by the 0.39.0 release, which shipped to
+#     crates.io still claiming to document the v0.38 API while this exact
+#     check stayed green throughout.
+C_STALE="$(printf '%s\n' "$PARAGRAPH_LINES" \
+  | sed -E "s/current v?0\\.${CURRENT_MINOR}( release)? family//g" \
+  | report_stale 'current v?0\.[0-9]+( release)? family')"
+if [ -n "$C_STALE" ]; then
+  echo "$C_STALE"
   echo "ERROR: stale 'current [v]X.Y [release] family' reference in user-facing docs"
   FAIL=1
 fi
