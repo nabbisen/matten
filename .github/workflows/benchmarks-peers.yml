@@ -3,13 +3,17 @@
 # Kept OUT of ordinary CI (architect ruling §B3 / §5): peer dependencies
 # (ndarray, nalgebra) are heavy and must not slow the normal test flow, and peer
 # benchmarks never run with pass/fail speed semantics. This workflow only
-# compile-checks the opt-in `peers` bench, on manual dispatch and a weekly schedule.
+# compile-checks the opt-in `peers` bench, on manual dispatch only (RFC-138).
 name: benchmarks-peers
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "0 6 * * 1" # Mondays 06:00 UTC
+  # schedule: removed -- see RFC-138. GitHub disables a scheduled workflow after
+  # 60 days of repository inactivity, and a disabled workflow does not fail, it
+  # stops: no red X, and it stays stopped once activity resumes. This check is
+  # therefore dispatched from the release sequence (docs/src/contributing/
+  # release-checklist.md), where a human reads the result, instead of relying
+  # on a trigger that can lapse unobserved.
 
 jobs:
   peers-compile-check:

@@ -269,9 +269,33 @@ each step:
    ```
 
    or the repository's Actions tab, and match the run against the commit SHA just pushed.
-3. **Tag**, only after step 1 has already landed on the remote. A tag pointing at a commit absent
+3. **Dispatch the peers compile-check** against the commit just pushed (RFC-138):
+
+   ```bash
+   gh workflow run benchmarks-peers.yml --ref main
+   # wait for the run to register, then confirm it is YOUR run against YOUR commit:
+   gh run list --workflow benchmarks-peers.yml --limit 1 --json headSha,event,conclusion,url
+   ```
+
+   `gh workflow run` returns as soon as the dispatch is accepted, before the run exists — an
+   immediate `gh run list --limit 1` can still show the *previous* run. Confirm `event` is
+   `workflow_dispatch` and `headSha` matches the commit just pushed; a green run alone does not prove
+   this one checked anything. `workflow_dispatch` takes a branch or tag ref, never a SHA, so
+   `--ref main` resolves to the branch tip — the commit just pushed only if nothing landed in between,
+   which steps 1–2 already assume.
+
+   This compile-checks the opt-in `peers` benchmark harness (workspace-excluded, `publish = false`,
+   behind `--features peers`) against freshly-resolved peer dependencies (`ndarray`, `nalgebra`) and
+   the current stable toolchain — the one check this project does **not** run on every push, because
+   the architect ruling (RFC-049 §B3/§5) keeps those heavy peer deps out of the normal flow. It is
+   **not** a speed gate, and it does **not** guard dependency isolation — that is
+   `scripts/check-published-dependency-isolation.sh`, which already runs on every push
+   (`test.yaml:28`) and is unaffected by this step's result either way. A red run here means the
+   developer-only `peers` harness no longer builds — investigate and decide; it is a judgement call
+   about a tool, not a gate that by itself blocks the release the way step 2's red CI does.
+4. **Tag**, only after step 1 has already landed on the remote. A tag pointing at a commit absent
    from the remote is the orphaned-tag defect this project repaired once, for `0.38.0`/`0.39.0`.
-4. **Publish** — see below.
+5. **Publish** — see below.
 
 `0.46.0` was tagged and published across four consecutive red CI runs because this step did not
 exist: every local gate passed, and the workflow result on the commit just pushed was never checked
